@@ -34,10 +34,19 @@ public class WKTTokenizer {
     private final WKTWordMatcher wordMatcher;
     private int currentPos = 0;
     private boolean isMeasured = false;
+    private char openListChar = '(';
+    private char closeListChar = ')';
+
 
     WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher) {
         this.wkt = wkt;
         this.wordMatcher = wordMatcher;
+    }
+
+    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher, char openListChar, char closeListChar) {
+        this(wkt, wordMatcher);
+        this.openListChar = openListChar;
+        this.closeListChar = closeListChar;
     }
 
     public boolean moreTokens() {
@@ -49,10 +58,10 @@ public class WKTTokenizer {
         if (!moreTokens()) {
             return WKTToken.end();
         }
-        if (wkt.charAt(currentPos) == '(') {
+        if (wkt.charAt(currentPos) == openListChar) {
             currentPos++;
             return WKTToken.startList();
-        } else if (wkt.charAt(currentPos) == ')') {
+        } else if (wkt.charAt(currentPos) == closeListChar) {
             currentPos++;
             return WKTToken.endList();
         } else if (Character.isLetter(wkt.charAt(currentPos))) {
@@ -148,7 +157,7 @@ public class WKTTokenizer {
         boolean inNumber = true;
         //move to the end of this point (ends with a ',' or a ')'
         char c = wkt.charAt(pos);
-        while (!(c == ',' || c == ')')) {
+        while (!(c == ',' || c == closeListChar)) {
             if (!(Character.isDigit(c) || c == '.' || c == '-')) {
                 inNumber = false;
             } else if (!inNumber) {
