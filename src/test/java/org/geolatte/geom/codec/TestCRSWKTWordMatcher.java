@@ -39,7 +39,7 @@ public class TestCRSWKTWordMatcher {
         WKTToken token = matcher.match(test, 0, test.length());
         assertNotNull(token);
         assertTrue(token instanceof CRSWKTToken);
-        assertEquals(CRSWKTToken.CRSWords.PROJCS, ((CRSWKTToken)token).getWord());
+        assertEquals(CRSWKTToken.PROJCS, token);
     }
 
     @Test
@@ -48,7 +48,16 @@ public class TestCRSWKTWordMatcher {
         WKTToken token = matcher.match(test, 1, 7);
         assertNotNull(token);
         assertTrue(token instanceof CRSWKTToken);
-        assertEquals(CRSWKTToken.CRSWords.GEOGCS, ((CRSWKTToken)token).getWord());
+        assertEquals(CRSWKTToken.GEOGCS, token);
+    }
+
+        @Test
+    public void testMatchingGeoAXIS(){
+        String test = " AXIS  ";
+        WKTToken token = matcher.match(test, 1, 5);
+        assertNotNull(token);
+        assertTrue(token instanceof CRSWKTToken);
+        assertEquals(CRSWKTToken.AXIS, token);
     }
 
     @Test

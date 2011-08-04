@@ -21,41 +21,46 @@
 
 package org.geolatte.geom.codec;
 
+import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+
 /**
+ * Models the tokens in CRS WKT strings.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CRSWKTToken extends WKTToken {
+class CRSWKTToken extends WKTToken {
 
-    static  enum CRSWords {
-        PROJCS,
-        PROJECTION,
-        GEOGCS,
-        DATUM,
-        SPHEROID,
-        PRIMEM,
-        AUTHORITY,
-        AXIS,
-        NORTH,
-        SOUTH,
-        EAST,
-        WEST,
-        UP,
-        DOWN,
-        OTHER,
-        PARAMETER
+
+    static final CRSWKTToken PROJCS = new CRSWKTToken("PROJCS");
+    static final CRSWKTToken PROJECTION = new CRSWKTToken("PROJECTION");
+    static final CRSWKTToken GEOGCS = new CRSWKTToken("GEOGCS");
+    static final CRSWKTToken GEOCCS = new CRSWKTToken("GEOCCS");
+    static final CRSWKTToken DATUM = new CRSWKTToken("DATUM");
+    static final CRSWKTToken SPHEROID = new CRSWKTToken("SPHEROID");
+    static final CRSWKTToken PRIMEM = new CRSWKTToken("PRIMEM");
+    static final CRSWKTToken AUTHORITY = new CRSWKTToken("AUTHORITY");
+    static final CRSWKTToken AXIS = new CRSWKTToken("AXIS");
+    static final CRSWKTToken NORTH = new CRSWKTToken("NORTH");
+    static final CRSWKTToken SOUTH = new CRSWKTToken("SOUTH");
+    static final CRSWKTToken EAST = new CRSWKTToken("EAST");
+    static final CRSWKTToken WEST = new CRSWKTToken("WEST");
+    static final CRSWKTToken UP = new CRSWKTToken("UP");
+    static final CRSWKTToken DOWN = new CRSWKTToken("DOWN");
+    static final CRSWKTToken OTHER = new CRSWKTToken("OTHER");
+    static final CRSWKTToken PARAMETER = new CRSWKTToken("PARAMETER");
+    static final CRSWKTToken UNIT = new CRSWKTToken("UNIT");
+    static final CRSWKTToken TOWGS84 = new CRSWKTToken("TOWGS84");
+
+    private final Pattern pattern;
+
+    private CRSWKTToken(String word) {
+        this.pattern =  Pattern.compile(word, CASE_INSENSITIVE);
     }
 
-    private final CRSWords word;
-
-
-    CRSWKTToken(CRSWords word){
-        this.word = word;
+    public Pattern getPattern() {
+        return pattern;
     }
-
-    public CRSWords getWord() {
-        return this.word;
-    }
-
-
 }

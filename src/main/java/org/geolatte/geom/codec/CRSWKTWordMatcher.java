@@ -24,12 +24,10 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -37,25 +35,37 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  */
 public class CRSWKTWordMatcher extends WKTWordMatcher{
 
-    private static final Map<CRSWKTToken.CRSWords, Pattern> patterns = new HashMap<CRSWKTToken.CRSWords, Pattern>();
+    private final static Set<CRSWKTToken> tokens;
 
     static {
-        for(CRSWKTToken.CRSWords word : CRSWKTToken.CRSWords.values()) {
-            patterns.put(word, Pattern.compile(word.toString(), CASE_INSENSITIVE));
+        tokens = new HashSet<CRSWKTToken>();
+        for (Field field : CRSWKTToken.class.getDeclaredFields()) {
+            if ( isCRSWKTTokenField(field) ){
+                try {
+                    Object o = field.get(null);
+                    tokens.add((CRSWKTToken)o);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Programming error.", e);
+                }
+            }
         }
+    }
+
+    private static boolean isCRSWKTTokenField(Field field){
+        return CRSWKTToken.class.isAssignableFrom(field.getType());
     }
 
     @Override
     public WKTToken match(CharSequence wkt, int currentPos, int endPos) {
 
-        for (CRSWKTToken.CRSWords word : patterns.keySet()){
-             Matcher m = patterns.get(word).matcher(wkt);
+        for (CRSWKTToken token : tokens){
+             Matcher m = token.getPattern().matcher(wkt);
              m.region(currentPos, endPos);
              if (m.matches()) {
-                 return new CRSWKTToken(word);
+                 return token;
              }
         }
-        throw new WKTParseException(String.format("Can't interpret wordt %s in WKT.", wkt.subSequence(currentPos, endPos)));
+        throw new WKTParseException(String.format("Can't interpret word %s in WKT.", wkt.subSequence(currentPos, endPos)));
     }
 
     @Override

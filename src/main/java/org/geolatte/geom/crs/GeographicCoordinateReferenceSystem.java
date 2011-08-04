@@ -27,7 +27,55 @@ package org.geolatte.geom.crs;
  */
 public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    GeographicCoordinateReferenceSystem(int SRID, String name) {
+    private final Unit unit;
+    private GeodeticDatum datum;
+    private PrimeMeridian primem;
+
+    public GeographicCoordinateReferenceSystem(int SRID, String name, Unit unit) {
         super(SRID, name);
+        this.unit = unit;
+    }
+
+    public void setDatum(GeodeticDatum datum) {
+        this.datum = datum;
+    }
+
+    public GeodeticDatum getDatum() {
+        return datum;
+    }
+
+    public void setPrimeMeridian(PrimeMeridian primeMeridian) {
+        this.primem  = primeMeridian;
+    }
+
+    public PrimeMeridian getPrimeMeridian(){
+        return primem;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GeographicCoordinateReferenceSystem)) return false;
+
+        GeographicCoordinateReferenceSystem that = (GeographicCoordinateReferenceSystem) o;
+
+        if (datum != null ? !datum.equals(that.datum) : that.datum != null) return false;
+        if (primem != null ? !primem.equals(that.primem) : that.primem != null) return false;
+        if (unit != null ? !unit.equals(that.unit) : that.unit != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = unit != null ? unit.hashCode() : 0;
+        result = 31 * result + (datum != null ? datum.hashCode() : 0);
+        result = 31 * result + (primem != null ? primem.hashCode() : 0);
+        return result;
+    }
+
+    public Unit getUnit() {
+        return unit;
     }
 }

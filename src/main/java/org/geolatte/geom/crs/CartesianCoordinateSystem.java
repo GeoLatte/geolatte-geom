@@ -32,7 +32,6 @@ public class CartesianCoordinateSystem extends CoordinateSystem {
     public final static CartesianCoordinateSystem XYM = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y, CoordinateSystemAxis.M);
     public final static CartesianCoordinateSystem XYZM = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y, CoordinateSystemAxis.Z, CoordinateSystemAxis.M);
 
-
     public CartesianCoordinateSystem(AccessorToAxisMap accessorToAxisMap, CoordinateSystemAxis... axes) {
         super(accessorToAxisMap, axes);
     }

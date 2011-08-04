@@ -21,42 +21,52 @@
 
 package org.geolatte.geom.crs;
 
-import java.util.List;
-
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ *         creation-date: 8/4/11
  */
-public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem {
+public class PrimeMeridian {
 
-    private Projection projection;
-    private GeographicCoordinateReferenceSystem geoCRS;
-    private List<CRSParameter> parameters;
+    private final int srid;
+    private final String name;
+    private final double longitude;
 
+    public PrimeMeridian(int srid, String name, double longitude) {
+        this.srid = srid;
+        this.name = name;
+        this.longitude = longitude;
+    }
 
-    public ProjectedCoordinateReferenceSystem(int SRID, String name) {
-        super(SRID, name);
+    public int getSrid() {
+        return srid;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProjectedCoordinateReferenceSystem)) return false;
+        if (!(o instanceof PrimeMeridian)) return false;
 
-        ProjectedCoordinateReferenceSystem that = (ProjectedCoordinateReferenceSystem) o;
+        PrimeMeridian that = (PrimeMeridian) o;
 
-        if (geoCRS != null ? !geoCRS.equals(that.geoCRS) : that.geoCRS != null) return false;
-        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
-        if (projection != null ? !projection.equals(that.projection) : that.projection != null) return false;
+        if (Double.compare(that.longitude, longitude) != 0) return false;
+        if (srid != that.srid) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = projection != null ? projection.hashCode() : 0;
-        result = 31 * result + (geoCRS != null ? geoCRS.hashCode() : 0);
-        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        int result;
+        long temp;
+        result = srid;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        temp = longitude != +0.0d ? Double.doubleToLongBits(longitude) : 0L;
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 }

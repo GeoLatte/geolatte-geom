@@ -21,9 +21,9 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.PointSequenceBuilder;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
+import org.geolatte.geom.PointSequenceBuilder;
+import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -36,6 +36,7 @@ public class WKTTokenizer {
     private boolean isMeasured = false;
     private char openListChar = '(';
     private char closeListChar = ')';
+    private boolean pointListAsSingleToken = true;
 
 
     WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher) {
@@ -43,10 +44,19 @@ public class WKTTokenizer {
         this.wordMatcher = wordMatcher;
     }
 
-    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher, char openListChar, char closeListChar) {
+    /**
+     * A Tokenizer for WKT strings
+     * @param wkt the string to tokenize
+     * @param wordMatcher the list of words to recognize as separate tokens
+     * @param openListChar the "open list" character
+     * @param closeListChar the "close list" character
+     * @param pointListAsSingelNumber this treats any substring consisting of list delimiters and numeric characters as a single pointlist
+     */
+    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher, char openListChar, char closeListChar, boolean pointListAsSingelNumber) {
         this(wkt, wordMatcher);
         this.openListChar = openListChar;
         this.closeListChar = closeListChar;
+        this.pointListAsSingleToken = pointListAsSingelNumber;
     }
 
     public boolean moreTokens() {
@@ -64,10 +74,16 @@ public class WKTTokenizer {
         } else if (wkt.charAt(currentPos) == closeListChar) {
             currentPos++;
             return WKTToken.endList();
+        } else if (wkt.charAt(currentPos) == '"') {
+            return readText();
         } else if (Character.isLetter(wkt.charAt(currentPos))) {
             return readWord();
         } else if (Character.isDigit(wkt.charAt(currentPos)) || wkt.charAt(currentPos) == '.' || wkt.charAt(currentPos) == '-') {
-            return readPointList();
+            if (pointListAsSingleToken){
+                return readPointList();
+            } else {
+                return readNumberToken();
+            }
         } else if (wkt.charAt(currentPos) == ',') {
             currentPos++;
             return WKTToken.elementSeparator();
@@ -131,6 +147,22 @@ public class WKTTokenizer {
         } else {
             return sign*d;
         }
+    }
+
+    protected WKTToken readNumberToken(){
+        double d = readNumber();
+        return new WKTToken.NumberToken(d);
+    }
+
+    protected WKTToken readText(){
+        StringBuilder builder = new StringBuilder();
+        char c = wkt.charAt(++currentPos);
+        while ( c != '"') {
+            builder.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        currentPos++;
+        return new WKTToken.TextToken(builder.toString());
     }
 
     private int countPoints() {

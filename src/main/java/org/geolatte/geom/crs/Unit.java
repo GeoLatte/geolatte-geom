@@ -21,51 +21,71 @@
 
 package org.geolatte.geom.crs;
 
-/**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
- */
-public class Ellipsoid {
+public class Unit {
 
-    private final int SRID;
-    private final String name;
-    private final double semiMajorAxis;
-    private final double inverseFlattening;
+    /**
+     * @author Karel Maesen, Geovise BVBA
+     *         creation-date: 8/4/11
+     */
+    public enum Type {
 
-    public Ellipsoid(int SRID, String name, double semiMajorAxis, double inverseFlattening) {
-        this.SRID = SRID;
-        this.name = name;
-        this.semiMajorAxis = semiMajorAxis;
-        this.inverseFlattening = inverseFlattening;
+        LINEAR(false),
+        ANGULAR(true);
+
+        private final boolean isAngular;
+
+        private Type(boolean isAngular) {
+            this.isAngular = isAngular;
+        }
+
+        boolean isAngular() {
+            return this.isAngular;
+        }
+
     }
 
-    public int getSRID() {
-        return SRID;
+    private final int srid;
+
+    private final String name;
+
+    private final Type type;
+
+    private final double conversionFactor;
+
+    public Unit(int srid, String name, Type type, double conversionFactor) {
+        this.srid = srid;
+        this.name = name;
+        this.type = type;
+        this.conversionFactor = conversionFactor;
+    }
+
+    public double getConversionFactor() {
+        return conversionFactor;
     }
 
     public String getName() {
         return name;
     }
 
-    public double getSemiMajorAxis() {
-        return semiMajorAxis;
+    public int getSrid() {
+        return srid;
     }
 
-    public double getInverseFlattening() {
-        return inverseFlattening;
+    public boolean isAngular(){
+        return this.type.isAngular();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Unit)) return false;
 
-        Ellipsoid ellipsoid = (Ellipsoid) o;
+        Unit unit = (Unit) o;
 
-        if (SRID != ellipsoid.SRID) return false;
-        if (Double.compare(ellipsoid.inverseFlattening, inverseFlattening) != 0) return false;
-        if (Double.compare(ellipsoid.semiMajorAxis, semiMajorAxis) != 0) return false;
-        if (name != null ? !name.equals(ellipsoid.name) : ellipsoid.name != null) return false;
+        if (Double.compare(unit.conversionFactor, conversionFactor) != 0) return false;
+        if (srid != unit.srid) return false;
+        if (name != null ? !name.equals(unit.name) : unit.name != null) return false;
+        if (type != unit.type) return false;
 
         return true;
     }
@@ -74,11 +94,10 @@ public class Ellipsoid {
     public int hashCode() {
         int result;
         long temp;
-        result = SRID;
+        result = srid;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        temp = semiMajorAxis != +0.0d ? Double.doubleToLongBits(semiMajorAxis) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = inverseFlattening != +0.0d ? Double.doubleToLongBits(inverseFlattening) : 0L;
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        temp = conversionFactor != +0.0d ? Double.doubleToLongBits(conversionFactor) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
