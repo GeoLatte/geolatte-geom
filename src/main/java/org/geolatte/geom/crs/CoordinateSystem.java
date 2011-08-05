@@ -22,7 +22,6 @@
 package org.geolatte.geom.crs;
 
 import org.geolatte.geom.CoordinateAccessor;
-import org.geolatte.geom.Units;
 
 import java.util.Arrays;
 
@@ -92,8 +91,8 @@ public abstract class CoordinateSystem {
         return this.axes[index];
     }
 
-    public Units getAxisUnits(int index){
-        return this.axes[index].getUnits();
+    public Unit getAxisUnits(int index){
+        return this.axes[index].getUnit();
     }
 
 }

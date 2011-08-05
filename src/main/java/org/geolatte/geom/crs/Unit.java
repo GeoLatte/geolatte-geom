@@ -44,6 +44,10 @@ public class Unit {
 
     }
 
+    public final static Unit DEGREE = new Unit(9122, "degree", Type.ANGULAR, 0.01745329251994328);
+    public final static Unit METER = new Unit(9001, "metre", Type.LINEAR, 1);
+
+
     private final int srid;
 
     private final String name;
