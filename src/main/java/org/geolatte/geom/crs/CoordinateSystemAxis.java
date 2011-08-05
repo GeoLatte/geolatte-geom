@@ -29,8 +29,8 @@ public class CoordinateSystemAxis {
 
 
     //Common axes for ellipsoidal and spherical Coordinate Systems
-    public static final CoordinateSystemAxis LONGITUDE = new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
-    public static final CoordinateSystemAxis LATITUDE = new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
+    public static final CoordinateSystemAxis LONG = new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
+    public static final CoordinateSystemAxis LAT = new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
     public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGTH = new CoordinateSystemAxis("ellipsoidal height", CoordinateSystemAxisDirection.UP, Unit.METER);
     //TODO -- check the axis direction for radius.
     public static final CoordinateSystemAxis GEOCENTRIC_RADIUS = new CoordinateSystemAxis("geocentric radius", CoordinateSystemAxisDirection.GeocentricZ, Unit.METER);
@@ -75,5 +75,27 @@ public class CoordinateSystemAxis {
 
     public Unit getUnit() {
         return unit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CoordinateSystemAxis)) return false;
+
+        CoordinateSystemAxis that = (CoordinateSystemAxis) o;
+
+        if (axisName != null ? !axisName.equals(that.axisName) : that.axisName != null) return false;
+        if (coordinateSystemAxisDirection != that.coordinateSystemAxisDirection) return false;
+        if (unit != null ? !unit.equals(that.unit) : that.unit != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = axisName != null ? axisName.hashCode() : 0;
+        result = 31 * result + (coordinateSystemAxisDirection != null ? coordinateSystemAxisDirection.hashCode() : 0);
+        result = 31 * result + (unit != null ? unit.hashCode() : 0);
+        return result;
     }
 }

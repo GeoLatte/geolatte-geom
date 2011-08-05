@@ -24,6 +24,8 @@ package org.geolatte.geom.crs;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/6/11
+ *
+ * TODO -- remove this class. Base class should now be sufficient....
  */
 public class CartesianCoordinateSystem extends CoordinateSystem {
 

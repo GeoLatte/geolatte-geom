@@ -29,7 +29,7 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
-public abstract class CoordinateSystem {
+public class CoordinateSystem {
 
 
     protected final AccessorToAxisMap accessorToAxisMap;
@@ -43,6 +43,10 @@ public abstract class CoordinateSystem {
         this.accessorToAxisMap.initialize(axes);
         this.axes = axes;
         checkCompatibility();
+    }
+
+    public CoordinateSystem(CoordinateSystemAxis... axes) {
+        this(AccessorToAxisMap.createDefault(), axes);
     }
 
 

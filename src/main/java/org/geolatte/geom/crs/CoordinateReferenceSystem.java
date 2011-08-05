@@ -29,11 +29,12 @@ public abstract class CoordinateReferenceSystem {
 
     private final int SRID;
     private final String name;
-    private CoordinateSystem coordinateSystem;
+    private final CoordinateSystem coordinateSystem;
 
-    CoordinateReferenceSystem(int SRID, String name){
+    CoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes){
         this.SRID = SRID;
         this.name = name;
+        this.coordinateSystem = new CoordinateSystem(axes);
     }
 
     public int getSRID() {
@@ -48,7 +49,7 @@ public abstract class CoordinateReferenceSystem {
         return coordinateSystem;
     }
 
-    void setCoordinateSystem(CoordinateSystem coordinateSystem) {
-        this.coordinateSystem = coordinateSystem;
+    public CoordinateSystemAxis[] getAxes(){
+        return coordinateSystem.getAxes();
     }
 }

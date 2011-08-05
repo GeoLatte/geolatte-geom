@@ -23,17 +23,12 @@ package org.geolatte.geom.crs;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/29/11
+ *         creation-date: 8/5/11
  */
-public class SphericalCoordinateSystem extends CoordinateSystem{
+public class GeocentricCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    public SphericalCoordinateSystem(AccessorToAxisMap map, CoordinateSystemAxis... axes) {
-        super(map, axes);
+    GeocentricCoordinateReferenceSystem(int SRID, String name) {
+        super(SRID, name);
     }
-
-    public SphericalCoordinateSystem(CoordinateSystemAxis... axes) {
-        super(AccessorToAxisMap.createDefault(), axes);
-    }
-
 
 }
