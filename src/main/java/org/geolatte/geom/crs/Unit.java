@@ -29,22 +29,29 @@ public class Unit {
      */
     public enum Type {
 
-        LINEAR(false),
-        ANGULAR(true);
+        LINEAR(false, RADIAN),
+        ANGULAR(true, METER);
 
         private final boolean isAngular;
+        private Unit fundamentalUnit;
 
-        private Type(boolean isAngular) {
+        private Type(boolean isAngular, Unit fundamentalUnit) {
             this.isAngular = isAngular;
+            this.fundamentalUnit = fundamentalUnit;
         }
 
         boolean isAngular() {
             return this.isAngular;
         }
 
+        Unit getFundamentalUnit(){
+            return this.fundamentalUnit;
+        }
+
     }
 
     public final static Unit DEGREE = new Unit(9122, "degree", Type.ANGULAR, 0.01745329251994328);
+    public final static Unit RADIAN = new Unit(9101, "radian", Type.ANGULAR, 1);
     public final static Unit METER = new Unit(9001, "metre", Type.LINEAR, 1);
 
 
@@ -63,6 +70,21 @@ public class Unit {
         this.conversionFactor = conversionFactor;
     }
 
+    /**
+     * Returns the fundamental unit for this type of <code>Unit</code>.
+     *
+     * @param type the type of <code>Unit</code>
+     * @return Meter for linear, Radian for angular units.
+     */
+    public static Unit getFundamentalUnit(Type type){
+        return type.getFundamentalUnit();
+    }
+
+    /**
+     * Returns the conversion factor: the scalar value that converts a value of this <code>Unit</code> to the fundamental unit
+     * for this type of unit.
+     * @return
+     */
     public double getConversionFactor() {
         return conversionFactor;
     }
