@@ -62,11 +62,64 @@ public class CRSWKTDecoder {
         PrimeMeridian primem = matchesPrimem();
         matchesListDelimiter();
         Unit unit = matchesUnit(Unit.Type.ANGULAR);
-        int srid = 4326;
-        GeographicCoordinateReferenceSystem system = new GeographicCoordinateReferenceSystem(srid, crsName, unit);
+        CoordinateSystemAxis[] twinAxes = matchesTwinAxis(unit, GeographicCoordinateReferenceSystem.class);
+        int srid = optionalMatchesAuthority();
+        GeographicCoordinateReferenceSystem system = new GeographicCoordinateReferenceSystem(srid, crsName, twinAxes);
         system.setDatum(datum);
         system.setPrimeMeridian(primem);
         return system;
+    }
+
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[]  matchesTwinAxis(Unit unit, Class<T> crsClass) {
+        matchesListDelimiter();
+        if (currentToken != CRSWKTToken.AXIS) {
+            return defaultCRS(unit, crsClass);
+        }
+        CoordinateSystemAxis[] twinAxes = new CoordinateSystemAxis[2];
+        twinAxes[0] = matchesAxis(unit);
+        matchesListDelimiter();
+        twinAxes[1] = matchesAxis(unit);
+        return twinAxes;
+    }
+
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] defaultCRS(Unit unit, Class<T> crsClass) {
+
+        if (GeographicCoordinateReferenceSystem.class.isAssignableFrom(crsClass)){
+            return new CoordinateSystemAxis[]{
+                    new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST,unit),
+                    new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, unit)
+            };
+        }
+
+        if (ProjectedCoordinateReferenceSystem.class.isAssignableFrom(crsClass)){
+            return new CoordinateSystemAxis[]{
+                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, unit),
+                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)
+            };
+        }
+
+        if (GeocentricCoordinateReferenceSystem.class.isAssignableFrom(crsClass)){
+            return new CoordinateSystemAxis[]{
+                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.GeocentricX,unit),
+                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.GeocentricY, unit),
+                    new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, unit)
+            };
+        }
+
+        throw new IllegalStateException("Can't create default for CRS of type " + crsClass.getCanonicalName());
+
+    }
+
+    private CoordinateSystemAxis matchesAxis(Unit unit) {
+        if (currentToken != CRSWKTToken.AXIS) {
+            throw new WKTParseException("Expected AXIS keyword, found " + toString(currentToken));
+        }
+        String name = matchesName();
+        matchesListDelimiter();
+        CoordinateSystemAxisDirection direction = CoordinateSystemAxisDirection.valueOf(currentToken.toString());
+        nextToken();
+        matchesEndList();
+        return new CoordinateSystemAxis(name, direction, unit);
     }
 
     private Unit matchesUnit(Unit.Type type) {
@@ -78,6 +131,7 @@ public class CRSWKTDecoder {
         double cf = matchesNumber();
         matchesListDelimiter();
         int srid = optionalMatchesAuthority();
+        matchesEndList();
         return new Unit(srid, name, type, cf);
     }
 
@@ -108,13 +162,13 @@ public class CRSWKTDecoder {
         String datumName = matchesName();
         matchesListDelimiter();
         Ellipsoid ellipsoid = matchesSpheroid();
-        double[] toWGS84 = matchesToWGS84();
+        double[] toWGS84 = optionalMatchesToWGS84();
         int srid = optionalMatchesAuthority();
         matchesEndList();
         return new GeodeticDatum(srid, ellipsoid, datumName, toWGS84);
     }
 
-    private double[] matchesToWGS84() {
+    private double[] optionalMatchesToWGS84() {
         matchesListDelimiter();
         if (currentToken != CRSWKTToken.TOWGS84)
             return new double[0];
@@ -220,7 +274,7 @@ public class CRSWKTDecoder {
 
     private String toString(WKTToken token){
         if (token instanceof CRSWKTToken) {
-            return ((CRSWKTToken)token).getPattern().toString();
+            return token.toString();
         }
         return token.getClass().getSimpleName();
     }

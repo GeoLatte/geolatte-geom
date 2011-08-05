@@ -98,4 +98,13 @@ public class CoordinateSystemAxis {
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "CoordinateSystemAxis{" +
+                "axisName='" + axisName + '\'' +
+                ", coordinateSystemAxisDirection=" + coordinateSystemAxisDirection +
+                ", unit=" + unit +
+                '}';
+    }
 }

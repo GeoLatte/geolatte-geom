@@ -34,10 +34,9 @@ public enum CoordinateSystemAxisDirection {
     WEST,
     UP,
     DOWN,
+    OTHER,
     GeocentricX,
     GeocentricY,
-    GeocentricZ,
-    NOT_APPLICABLE //used for CS axes that have no relation to the earth's surface (e.g. measures)
-
+    GeocentricZ
 
 }

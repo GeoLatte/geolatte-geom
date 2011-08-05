@@ -63,4 +63,9 @@ class CRSWKTToken extends WKTToken {
     public Pattern getPattern() {
         return pattern;
     }
+
+    @Override
+    public String toString() {
+        return pattern.toString();
+    }
 }
