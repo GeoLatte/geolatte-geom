@@ -23,36 +23,18 @@ package org.geolatte.geom.crs;
 
 public class Unit {
 
-    /**
-     * @author Karel Maesen, Geovise BVBA
-     *         creation-date: 8/4/11
-     */
-    public enum Type {
-
-        LINEAR(false, RADIAN),
-        ANGULAR(true, METER);
-
-        private final boolean isAngular;
-        private Unit fundamentalUnit;
-
-        private Type(boolean isAngular, Unit fundamentalUnit) {
-            this.isAngular = isAngular;
-            this.fundamentalUnit = fundamentalUnit;
-        }
-
-        boolean isAngular() {
-            return this.isAngular;
-        }
-
-        Unit getFundamentalUnit(){
-            return this.fundamentalUnit;
-        }
-
+    public static enum Type {
+        LINEAR,
+        ANGULAR;
     }
 
+    //common units
     public final static Unit DEGREE = new Unit(9122, "degree", Type.ANGULAR, 0.01745329251994328);
     public final static Unit RADIAN = new Unit(9101, "radian", Type.ANGULAR, 1);
     public final static Unit METER = new Unit(9001, "metre", Type.LINEAR, 1);
+
+    //this is used when the units can't be determined.
+    public final static Unit UNKNOWN = new Unit(-1, "unknown", Type.LINEAR, 1);
 
 
     private final int srid;
@@ -76,13 +58,15 @@ public class Unit {
      * @param type the type of <code>Unit</code>
      * @return Meter for linear, Radian for angular units.
      */
-    public static Unit getFundamentalUnit(Type type){
-        return type.getFundamentalUnit();
+    public static Unit getFundamentalUnit(Type type) {
+        if (type == Type.ANGULAR) return RADIAN;
+        return METER;
     }
 
     /**
      * Returns the conversion factor: the scalar value that converts a value of this <code>Unit</code> to the fundamental unit
      * for this type of unit.
+     *
      * @return
      */
     public double getConversionFactor() {
@@ -97,8 +81,8 @@ public class Unit {
         return srid;
     }
 
-    public boolean isAngular(){
-        return this.type.isAngular();
+    public boolean isAngular() {
+        return this.type == Type.ANGULAR;
     }
 
     @Override
@@ -126,5 +110,14 @@ public class Unit {
         temp = conversionFactor != +0.0d ? Double.doubleToLongBits(conversionFactor) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Unit{" +
+                "srid=" + srid +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                '}';
     }
 }
