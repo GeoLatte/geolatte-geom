@@ -109,7 +109,7 @@ public class WKTTokenizer {
 
     private void readPoint(double[] coords) {
         for (int i = 0; i < coords.length; i++) {
-            coords[i] = readNumber();
+            coords[i] = fastReadNumber();
         }
     }
 
@@ -117,11 +117,12 @@ public class WKTTokenizer {
      * Reads a number at the current position.
      *
      * TODO -- this does not handle approximate numbers (see the WKT spec). Approximate numbers have format: \d+E\d)
+     * TODO -- this has also problems in that it loses precision (cfr. 51.16666723333333 becomes 51.16666723333332)
      *
      *
      * @return
      */
-    protected double readNumber() {
+    protected double fastReadNumber() {
         skipWhitespace();
         double d = 0.0d;
         char c = wkt.charAt(currentPos);
@@ -148,6 +149,30 @@ public class WKTTokenizer {
             return sign*d;
         }
     }
+
+    protected double readNumber() {
+        skipWhitespace();
+        StringBuilder stb = new StringBuilder();
+        char c = wkt.charAt(currentPos);
+        if (c == '-') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        while (Character.isDigit(c)) {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        if (c == '.') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+            while (Character.isDigit(c)) {
+                stb.append(c);
+                c = wkt.charAt(++currentPos);
+            }
+        }
+        return Double.parseDouble(stb.toString());
+    }
+
 
     protected WKTToken readNumberToken(){
         double d = readNumber();
@@ -219,12 +244,16 @@ public class WKTTokenizer {
 
     private WKTToken readWord() {
         int endPos = this.currentPos;
-        while (endPos < wkt.length() && Character.isLetter(wkt.charAt(endPos))) {
+        while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
             endPos++;
         }
         WKTToken nextToken = matchWord(currentPos, endPos);
         currentPos = endPos;
         return nextToken;
+    }
+
+    private boolean isWordChar(char c) {
+        return (Character.isLetter(c) || Character.isDigit(c) || c == '_');
     }
 
     /**
