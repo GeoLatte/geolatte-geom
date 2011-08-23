@@ -22,7 +22,6 @@
 package org.geolatte.geom.crs;
 
 import org.geolatte.geom.CoordinateAccessor;
-import org.geolatte.geom.Units;
 
 import java.util.Arrays;
 
@@ -30,7 +29,7 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
-public abstract class CoordinateSystem {
+public class CoordinateSystem {
 
 
     protected final AccessorToAxisMap accessorToAxisMap;
@@ -43,13 +42,10 @@ public abstract class CoordinateSystem {
         this.accessorToAxisMap = accessorToAxisMap;
         this.accessorToAxisMap.initialize(axes);
         this.axes = axes;
-        checkCompatibility();
     }
 
-
-    //TODO -- implement this method
-    protected void checkCompatibility() {
-
+    public CoordinateSystem(CoordinateSystemAxis... axes) {
+        this(AccessorToAxisMap.createDefault(), axes);
     }
 
     public CoordinateSystemAxis[] getAxes() {
@@ -92,8 +88,8 @@ public abstract class CoordinateSystem {
         return this.axes[index];
     }
 
-    public Units getAxisUnits(int index){
-        return this.axes[index].getUnits();
+    public Unit getAxisUnits(int index){
+        return this.axes[index].getUnit();
     }
 
 }

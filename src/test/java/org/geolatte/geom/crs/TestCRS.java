@@ -21,19 +21,26 @@
 
 package org.geolatte.geom.crs;
 
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/29/11
+ *         creation-date: 8/2/11
  */
-public class SphericalCoordinateSystem extends CoordinateSystem{
+public class TestCRS {
 
-    public SphericalCoordinateSystem(AccessorToAxisMap map, CoordinateSystemAxis... axes) {
-        super(map, axes);
+    @Test
+    public void testCreateCRSFromEPSGCode(){
+        CoordinateReferenceSystem crs = CRS.create(4326);
+        assertNotNull(crs);
+        assertEquals(4326,crs.getSRID());
+        assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
+        assertEquals("WGS 84", crs.getName());
+        crs.getCoordinateSystem();
     }
-
-    public SphericalCoordinateSystem(CoordinateSystemAxis... axes) {
-        super(AccessorToAxisMap.createDefault(), axes);
-    }
-
 
 }

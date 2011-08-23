@@ -22,22 +22,34 @@
 package org.geolatte.geom.crs;
 
 /**
- * The
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/29/11
+ *         creation-date: 8/2/11
  */
-public enum CoordinateSystemAxisDirection {
+public abstract class CoordinateReferenceSystem {
 
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
-    UP,
-    DOWN,
-    OTHER,
-    UNKNOWN,
-    GeocentricX,
-    GeocentricY,
-    GeocentricZ
+    private final int SRID;
+    private final String name;
+    private final CoordinateSystem coordinateSystem;
 
+    CoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes){
+        this.SRID = SRID;
+        this.name = name;
+        this.coordinateSystem = new CoordinateSystem(axes);
+    }
+
+    public int getSRID() {
+        return SRID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public CoordinateSystem getCoordinateSystem() {
+        return coordinateSystem;
+    }
+
+    public CoordinateSystemAxis[] getAxes(){
+        return coordinateSystem.getAxes();
+    }
 }

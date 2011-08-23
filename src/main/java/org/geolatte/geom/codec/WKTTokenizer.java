@@ -21,9 +21,9 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.PointSequenceBuilder;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
+import org.geolatte.geom.PointSequenceBuilder;
+import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -34,10 +34,29 @@ public class WKTTokenizer {
     private final WKTWordMatcher wordMatcher;
     private int currentPos = 0;
     private boolean isMeasured = false;
+    private char openListChar = '(';
+    private char closeListChar = ')';
+    private boolean pointListAsSingleToken = true;
+
 
     WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher) {
         this.wkt = wkt;
         this.wordMatcher = wordMatcher;
+    }
+
+    /**
+     * A Tokenizer for WKT strings
+     * @param wkt the string to tokenize
+     * @param wordMatcher the list of words to recognize as separate tokens
+     * @param openListChar the "open list" character
+     * @param closeListChar the "close list" character
+     * @param pointListAsSingelNumber this treats any substring consisting of list delimiters and numeric characters as a single pointlist
+     */
+    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher, char openListChar, char closeListChar, boolean pointListAsSingelNumber) {
+        this(wkt, wordMatcher);
+        this.openListChar = openListChar;
+        this.closeListChar = closeListChar;
+        this.pointListAsSingleToken = pointListAsSingelNumber;
     }
 
     public boolean moreTokens() {
@@ -49,16 +68,22 @@ public class WKTTokenizer {
         if (!moreTokens()) {
             return WKTToken.end();
         }
-        if (wkt.charAt(currentPos) == '(') {
+        if (wkt.charAt(currentPos) == openListChar) {
             currentPos++;
             return WKTToken.startList();
-        } else if (wkt.charAt(currentPos) == ')') {
+        } else if (wkt.charAt(currentPos) == closeListChar) {
             currentPos++;
             return WKTToken.endList();
+        } else if (wkt.charAt(currentPos) == '"') {
+            return readText();
         } else if (Character.isLetter(wkt.charAt(currentPos))) {
             return readWord();
         } else if (Character.isDigit(wkt.charAt(currentPos)) || wkt.charAt(currentPos) == '.' || wkt.charAt(currentPos) == '-') {
-            return readPointList();
+            if (pointListAsSingleToken){
+                return readPointList();
+            } else {
+                return readNumberToken();
+            }
         } else if (wkt.charAt(currentPos) == ',') {
             currentPos++;
             return WKTToken.elementSeparator();
@@ -84,7 +109,7 @@ public class WKTTokenizer {
 
     private void readPoint(double[] coords) {
         for (int i = 0; i < coords.length; i++) {
-            coords[i] = readNumber();
+            coords[i] = fastReadNumber();
         }
     }
 
@@ -92,11 +117,12 @@ public class WKTTokenizer {
      * Reads a number at the current position.
      *
      * TODO -- this does not handle approximate numbers (see the WKT spec). Approximate numbers have format: \d+E\d)
+     * TODO -- this has also problems in that it loses precision (cfr. 51.16666723333333 becomes 51.16666723333332)
      *
      *
      * @return
      */
-    protected double readNumber() {
+    protected double fastReadNumber() {
         skipWhitespace();
         double d = 0.0d;
         char c = wkt.charAt(currentPos);
@@ -124,6 +150,46 @@ public class WKTTokenizer {
         }
     }
 
+    protected double readNumber() {
+        skipWhitespace();
+        StringBuilder stb = new StringBuilder();
+        char c = wkt.charAt(currentPos);
+        if (c == '-') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        while (Character.isDigit(c)) {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        if (c == '.') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+            while (Character.isDigit(c)) {
+                stb.append(c);
+                c = wkt.charAt(++currentPos);
+            }
+        }
+        return Double.parseDouble(stb.toString());
+    }
+
+
+    protected WKTToken readNumberToken(){
+        double d = readNumber();
+        return new WKTToken.NumberToken(d);
+    }
+
+    protected WKTToken readText(){
+        StringBuilder builder = new StringBuilder();
+        char c = wkt.charAt(++currentPos);
+        while ( c != '"') {
+            builder.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        currentPos++;
+        return new WKTToken.TextToken(builder.toString());
+    }
+
     private int countPoints() {
         int pos = currentPos + 1;
         char c = wkt.charAt(pos);
@@ -148,7 +214,7 @@ public class WKTTokenizer {
         boolean inNumber = true;
         //move to the end of this point (ends with a ',' or a ')'
         char c = wkt.charAt(pos);
-        while (!(c == ',' || c == ')')) {
+        while (!(c == ',' || c == closeListChar)) {
             if (!(Character.isDigit(c) || c == '.' || c == '-')) {
                 inNumber = false;
             } else if (!inNumber) {
@@ -178,12 +244,16 @@ public class WKTTokenizer {
 
     private WKTToken readWord() {
         int endPos = this.currentPos;
-        while (endPos < wkt.length() && Character.isLetter(wkt.charAt(endPos))) {
+        while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
             endPos++;
         }
         WKTToken nextToken = matchWord(currentPos, endPos);
         currentPos = endPos;
         return nextToken;
+    }
+
+    private boolean isWordChar(char c) {
+        return (Character.isLetter(c) || Character.isDigit(c) || c == '_');
     }
 
     /**
