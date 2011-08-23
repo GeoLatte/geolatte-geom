@@ -42,17 +42,10 @@ public class CoordinateSystem {
         this.accessorToAxisMap = accessorToAxisMap;
         this.accessorToAxisMap.initialize(axes);
         this.axes = axes;
-        checkCompatibility();
     }
 
     public CoordinateSystem(CoordinateSystemAxis... axes) {
         this(AccessorToAxisMap.createDefault(), axes);
-    }
-
-
-    //TODO -- implement this method
-    protected void checkCompatibility() {
-
     }
 
     public CoordinateSystemAxis[] getAxes() {

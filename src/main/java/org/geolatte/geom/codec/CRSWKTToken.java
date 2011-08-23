@@ -50,6 +50,7 @@ class CRSWKTToken extends WKTToken {
     static final CRSWKTToken UP = new CRSWKTToken("UP");
     static final CRSWKTToken DOWN = new CRSWKTToken("DOWN");
     static final CRSWKTToken OTHER = new CRSWKTToken("OTHER");
+    static final CRSWKTToken UNKNOWN = new CRSWKTToken("UNKNOWN");
     static final CRSWKTToken PARAMETER = new CRSWKTToken("PARAMETER");
     static final CRSWKTToken UNIT = new CRSWKTToken("UNIT");
     static final CRSWKTToken TOWGS84 = new CRSWKTToken("TOWGS84");

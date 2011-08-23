@@ -24,6 +24,9 @@ package org.geolatte.geom.crs;
 import org.geolatte.geom.codec.CRSWKTDecoder;
 import org.geolatte.geom.codec.WKTParseException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,8 +40,9 @@ import java.util.Map;
  */
 public class CRS {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(CRS.class);
     private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
-    private static final String DELIM = "|";
+    private static final String DELIM = "\\|";
 
     static {
         try {
@@ -78,13 +82,12 @@ public class CRS {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
             crsMap.put(srid, crs);
         } catch (WKTParseException e) {
-            //skip this line on parse error.
-            //TODO -- log error
+            LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid,tokens[2], e.getMessage()));
         }
 
     }
 
     public static CoordinateReferenceSystem create(int SRID) {
-        return null;
+        return crsMap.get(SRID);
     }
 }

@@ -23,6 +23,10 @@ package org.geolatte.geom.crs;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
@@ -32,7 +36,11 @@ public class TestCRS {
     @Test
     public void testCreateCRSFromEPSGCode(){
         CoordinateReferenceSystem crs = CRS.create(4326);
-//        assertNotNull(crs);
+        assertNotNull(crs);
+        assertEquals(4326,crs.getSRID());
+        assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
+        assertEquals("WGS 84", crs.getName());
+        crs.getCoordinateSystem();
     }
 
 }

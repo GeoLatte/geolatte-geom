@@ -35,6 +35,7 @@ public enum CoordinateSystemAxisDirection {
     UP,
     DOWN,
     OTHER,
+    UNKNOWN,
     GeocentricX,
     GeocentricY,
     GeocentricZ

@@ -81,9 +81,19 @@ public class CRSWKTDecoder {
         matchesListDelimiter();
         GeographicCoordinateReferenceSystem geogcs = matchesGeographicCRS();
         matchesListDelimiter();
-        Unit unit = matchesUnit(Unit.Type.LINEAR);
-        Projection projection = matchesProjection();
-        List<CRSParameter> parameters = optionalMatchesParameters();
+        Unit unit;
+        Projection projection;
+        List<CRSParameter> parameters;
+        // spatial_reference.sql contains both variants of ProjCRS WKT
+        if (currentToken == CRSWKTToken.UNIT) {
+            unit = matchesUnit(Unit.Type.LINEAR);
+            projection = matchesProjection();
+            parameters = optionalMatchesParameters();
+        }  else {
+            projection = matchesProjection();
+            parameters = optionalMatchesParameters();
+            unit = matchesUnit(Unit.Type.LINEAR);
+        }
         int srid = optionalMatchesAuthority();
         CoordinateSystemAxis[] twinAxes = optionalMatchesTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
         ProjectedCoordinateReferenceSystem result = new ProjectedCoordinateReferenceSystem(srid, crsName, geogcs, projection, parameters, twinAxes);
