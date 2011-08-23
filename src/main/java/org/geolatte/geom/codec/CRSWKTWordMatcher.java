@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -74,7 +74,7 @@ public class CRSWKTWordMatcher extends WKTWordMatcher{
     }
 
     @Override
-    public String wordFor(CartesianCoordinateSystem flag) {
+    public String wordFor(DimensionalFlag flag) {
         throw new UnsupportedOperationException();
     }
 }

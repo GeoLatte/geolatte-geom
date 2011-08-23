@@ -21,10 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.PointSequence;
-import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.VariableSizePointSequenceBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +34,7 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void test() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(CartesianCoordinateSystem.XY);
+        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.XY);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
@@ -51,7 +47,7 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(CartesianCoordinateSystem.XY);
+        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.XY);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());

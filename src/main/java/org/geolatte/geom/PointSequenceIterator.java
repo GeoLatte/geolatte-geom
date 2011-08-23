@@ -56,7 +56,7 @@ public class PointSequenceIterator implements Iterator<Point> {
     private PointSequence createSingleElementPointSequenceFrom(PointSequence sequence, int i) {
         double[] coords = new double[sequence.getCoordinateDimension()];
         sequence.getCoordinates(coords, i);
-        return new PackedPointSequence(coords, sequence.getCoordinateSystem());
+        return new PackedPointSequence(coords, sequence.getDimensionalFlag());
     }
 
     @Override

@@ -22,7 +22,7 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
 
@@ -48,7 +48,7 @@ public class PGWKBDecoder15 {
         int typeCode = readTypeCode(bytes);
         WKBGeometryType wkbType = WKBGeometryType.parse((byte) typeCode);
         readSRID(bytes, typeCode);
-        CartesianCoordinateSystem flag = getCoordinateDimension(typeCode);
+        DimensionalFlag flag = getCoordinateDimension(typeCode);
         switch (wkbType) {
             case POINT:
                 return decodePoint(bytes, flag);
@@ -106,63 +106,63 @@ public class PGWKBDecoder15 {
         return GeometryCollection.create(geometries,SRID);
     }
 
-    private Polygon decodePolygon(Bytes bytes, CartesianCoordinateSystem flag) {
+    private Polygon decodePolygon(Bytes bytes, DimensionalFlag flag) {
         int numRings = bytes.getInt();
         LinearRing[] rings = readPolygonRings(numRings, bytes, flag, SRID);
         return Polygon.create(rings, SRID);
     }
 
-    private LineString decodeLineString(Bytes bytes, CartesianCoordinateSystem flag) {
+    private LineString decodeLineString(Bytes bytes, DimensionalFlag flag) {
         int numPoints = bytes.getInt();
         PointSequence points = readPoints(numPoints, bytes, flag);
         return LineString.create(points, SRID);
     }
 
-    private Point decodePoint(Bytes bytes, CartesianCoordinateSystem flag) {
+    private Point decodePoint(Bytes bytes, DimensionalFlag flag) {
         PointSequence points = readPoints(1, bytes, flag);
         return Point.create(points, SRID);
     }
 
-    protected PointSequence readPoints(int numPoints, Bytes bytes, CartesianCoordinateSystem coordinateSystem) {
-        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, coordinateSystem);
-        double[] coordinates = new double[coordinateSystem.getCoordinateDimension()];
+    protected PointSequence readPoints(int numPoints, Bytes bytes, DimensionalFlag dimensionalFlag) {
+        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
-            readPoint(bytes, coordinateSystem, coordinates);
+            readPoint(bytes, dimensionalFlag, coordinates);
             psBuilder.add(coordinates);
         }
         return psBuilder.toPointSequence();
     }
 
-    private void readPoint(Bytes bytes, CartesianCoordinateSystem coordinateSystem, double[] coordinates) {
-        for (int ci = 0; ci < coordinateSystem.getCoordinateDimension(); ci++) {
+    private void readPoint(Bytes bytes, DimensionalFlag dimensionalFlag, double[] coordinates) {
+        for (int ci = 0; ci < dimensionalFlag.getCoordinateDimension(); ci++) {
             coordinates[ci] = bytes.getDouble();
         }
     }
 
-    protected LinearRing[] readPolygonRings(int numRings, Bytes bytes, CartesianCoordinateSystem coordinateSystem, int SRID) {
+    protected LinearRing[] readPolygonRings(int numRings, Bytes bytes, DimensionalFlag dimensionalFlag, int SRID) {
         LinearRing[] rings = new LinearRing[numRings];
         for (int i = 0; i < numRings; i++) {
-            rings[i] = readRing(bytes, coordinateSystem, SRID);
+            rings[i] = readRing(bytes, dimensionalFlag, SRID);
         }
         return rings;
     }
 
-    private LinearRing readRing(Bytes bytes, CartesianCoordinateSystem coordinateSystem, int SRID) {
+    private LinearRing readRing(Bytes bytes, DimensionalFlag dimensionalFlag, int SRID) {
         int numPoints = bytes.getInt();
-        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, coordinateSystem);
-        double[] coordinates = new double[coordinateSystem.getCoordinateDimension()];
+        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
-            readPoint(bytes, coordinateSystem, coordinates);
+            readPoint(bytes, dimensionalFlag, coordinates);
             psBuilder.add(coordinates);
         }
         return LinearRing.create(psBuilder.toPointSequence(), SRID);
     }
 
 
-    private CartesianCoordinateSystem getCoordinateDimension(int typeCode) {
+    private DimensionalFlag getCoordinateDimension(int typeCode) {
         boolean hasM = (typeCode & PGWKBTypeMasks.M_FLAG) == PGWKBTypeMasks.M_FLAG;
         boolean hasZ = (typeCode & PGWKBTypeMasks.Z_FLAG) == PGWKBTypeMasks.Z_FLAG;
-        return CartesianCoordinateSystem.parse(hasZ, hasM);
+        return DimensionalFlag.parse(hasZ, hasM);
     }
 
     private void readSRID(Bytes bytes, int typeCode) {

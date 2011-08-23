@@ -19,36 +19,63 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.crs;
+package org.geolatte.geom;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/6/11
  *
- * TODO -- remove this class. Base class should now be sufficient....
  */
-public class CartesianCoordinateSystem extends CoordinateSystem {
+public enum DimensionalFlag {
 
-    public final static CartesianCoordinateSystem XY = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y);
-    public final static CartesianCoordinateSystem XYZ = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y, CoordinateSystemAxis.Z);
-    public final static CartesianCoordinateSystem XYM = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y, CoordinateSystemAxis.M);
-    public final static CartesianCoordinateSystem XYZM = new CartesianCoordinateSystem(CoordinateSystemAxis.X, CoordinateSystemAxis.Y, CoordinateSystemAxis.Z, CoordinateSystemAxis.M);
+    XY(2),
+    XYZ(3),
+    XYM(3),
+    XYZM(4);
 
-    public CartesianCoordinateSystem(AccessorToAxisMap accessorToAxisMap, CoordinateSystemAxis... axes) {
-        super(accessorToAxisMap, axes);
+    private final int dimension;
+
+    private DimensionalFlag(int dimension) {
+        this.dimension = dimension;
     }
 
-    public CartesianCoordinateSystem(CoordinateSystemAxis... axes) {
-        this(AccessorToAxisMap.createDefault(), axes);
-    }
 
-    //TODO -- remove use of this function
-    public static CartesianCoordinateSystem parse(boolean is3D, boolean isMeasured) {
+    public static DimensionalFlag parse(boolean is3D, boolean isMeasured) {
         if (!isMeasured && !is3D) return XY;
         if (!isMeasured && is3D) return XYZ;
         if (isMeasured && !is3D) return XYM;
         return XYZM;
     }
 
+    public int getCoordinateDimension() {
+        return this.dimension;
+    }
 
+    public boolean is3D() {
+        return (this == XYZ ||this == XYZM);
+    }
+
+    public boolean isMeasured() {
+        return (this == XYM ||this == XYZM);
+    }
+
+
+    public int getIndex(CoordinateAccessor accessor) {
+        switch (accessor) {
+            case X:
+                return 0;
+            case Y:
+                return 1;
+            case Z:
+                return ( this == XYZ || this == XYZM) ? 2 : -1;
+            case M:
+                if (this == XYM)
+                    return 2;
+                else if (this == XYZM)
+                    return 3;
+                else
+                    return -1;
+        }
+        return -1;
+    }
 }

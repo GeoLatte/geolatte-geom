@@ -21,9 +21,9 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
 import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -95,10 +95,10 @@ public class WKTTokenizer {
 
     //TODO -- handle irregular whitespace in reading the points.
     private WKTToken readPointList() {
-        CartesianCoordinateSystem coordinateSystem = countDimension();
+        DimensionalFlag dimensionalFlag = countDimension();
         int numPoints = countPoints();
-        double[] coords = new double[coordinateSystem.getCoordinateDimension()];
-        PointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, coordinateSystem);
+        double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
+        PointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);
@@ -208,7 +208,7 @@ public class WKTTokenizer {
      *
      * @return
      */
-    private CartesianCoordinateSystem countDimension() {
+    private DimensionalFlag countDimension() {
         int pos = currentPos;
         int num = 1;
         boolean inNumber = true;
@@ -224,10 +224,10 @@ public class WKTTokenizer {
             if (pos == wkt.length() - 1) throw new WKTParseException("");
             c = wkt.charAt(++pos);
         }
-        if (num == 4) return CartesianCoordinateSystem.XYZM;
-        if (num == 3 && isMeasured) return CartesianCoordinateSystem.XYM;
-        if (num == 3 && !isMeasured) return CartesianCoordinateSystem.XYZ;
-        if (num == 2) return CartesianCoordinateSystem.XY;
+        if (num == 4) return DimensionalFlag.XYZM;
+        if (num == 3 && isMeasured) return DimensionalFlag.XYM;
+        if (num == 3 && !isMeasured) return DimensionalFlag.XYZ;
+        if (num == 2) return DimensionalFlag.XY;
         throw new WKTParseException("Point with less than 2 coordinates at position " + currentPos);
     }
 

@@ -22,7 +22,7 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
 
 /**
@@ -108,7 +108,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(Point geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
     }
@@ -116,7 +116,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(LineString geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumPoints());
         writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
@@ -125,7 +125,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(Polygon geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writeNumRings(geom, output);
         for (LinearRing ring : geom) {
@@ -136,7 +136,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(PolyHedralSurface geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumPatches());
         for (Polygon pg : geom) {
@@ -147,7 +147,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(GeometryCollection geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumGeometries());
         for (Geometry part : geom) {
@@ -173,7 +173,7 @@ class WKBVisitor implements GeometryVisitor {
     @Override
     public void visit(LinearRing geom) {
         writeByteOrder(output);
-        CartesianCoordinateSystem dimension = CartesianCoordinateSystem.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writeRing(geom);
     }
@@ -205,7 +205,7 @@ class WKBVisitor implements GeometryVisitor {
         output.put(output.getWKBByteOrder().byteValue());
     }
 
-    protected void writeTypeCodeAndSRID(Geometry geometry, CartesianCoordinateSystem dimension, Bytes output) {
+    protected void writeTypeCodeAndSRID(Geometry geometry, DimensionalFlag dimension, Bytes output) {
         int typeCode = getGeometryType(geometry);
         boolean hasSRID = (geometry.getSRID() > 0);
         if (hasSRID && !hasWrittenSRID)

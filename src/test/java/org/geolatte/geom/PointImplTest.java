@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,10 +33,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class PointImplTest {
 
-    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , CartesianCoordinateSystem.XY);
-    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , CartesianCoordinateSystem.XYZ);
-    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , CartesianCoordinateSystem.XYM);
-    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , CartesianCoordinateSystem.XYZM);
+    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.XY);
+    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.XYZ);
+    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.XYM);
+    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.XYZM);
 
     Point point2D =  Point.create(seq2D, 4326);
     Point point3D =  Point.create(seq3D, 4326);
@@ -157,21 +155,21 @@ public class PointImplTest {
 
     @Test
     public void testEqualsAndHashCode(){
-        Point test2D = Point.create(new double[]{1, 2}, CartesianCoordinateSystem.XY, 4326);
+        Point test2D = Point.create(new double[]{1, 2}, DimensionalFlag.XY, 4326);
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point test3D = Point.create(new double[]{1, 2, -3}, CartesianCoordinateSystem.XYZ, 4326);
+        Point test3D = Point.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, 4326);
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point test2DM = Point.create(new double[]{1, 2, 3}, CartesianCoordinateSystem.XYM, 4326);
+        Point test2DM = Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, 4326);
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point test3DM = Point.create(new double[]{1, 2, 3, 4}, CartesianCoordinateSystem.XYZM, 4326);
+        Point test3DM = Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, 4326);
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2}, CartesianCoordinateSystem.XY, 0)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, CartesianCoordinateSystem.XYZ, 4326)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, CartesianCoordinateSystem.XYM, 4326)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2}, DimensionalFlag.XY, 0)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, 4326)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, 4326)));
     }
 
     @Test

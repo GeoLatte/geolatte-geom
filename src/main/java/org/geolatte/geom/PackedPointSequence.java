@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateSystem;
-
 import java.util.Arrays;
 
 /**
@@ -32,8 +30,8 @@ class PackedPointSequence extends AbstractPointSequence {
 
     private final double[] coordinates;
 
-    PackedPointSequence(double[] coordinates, CoordinateSystem coordinateSystem){
-        super(coordinateSystem);
+    PackedPointSequence(double[] coordinates, DimensionalFlag dimensionalFlag){
+        super(dimensionalFlag);
         if (coordinates == null) {
             this.coordinates = new double[0];
         } else {
@@ -52,7 +50,7 @@ class PackedPointSequence extends AbstractPointSequence {
     @Override
     public double getCoordinate(int i, CoordinateAccessor accessor) {
         try {
-            int index = getCoordinateSystem().getIndex(accessor);
+            int index = getDimensionalFlag().getIndex(accessor);
             return index > -1 ? this.coordinates[i * getCoordinateDimension() + index] : Double.NaN;
         }catch(IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException(String.format("Index %d out of getPointSequenceElementAt 0..%d", i, size()-1));

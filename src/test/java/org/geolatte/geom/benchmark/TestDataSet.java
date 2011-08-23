@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.benchmark;
 
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.codec.PGWKTEncoder15;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.jts.JTS;
@@ -34,7 +34,7 @@ import org.geolatte.geom.jts.JTS;
 public class TestDataSet {
 
     public static final int SIZE = 100;
-    public static Geometry[] geometries = RandomGeometryGenerator.createRandomGeometries(GeometryType.LINE_STRING, SIZE, CartesianCoordinateSystem.XY);
+    public static Geometry[] geometries = RandomGeometryGenerator.createRandomGeometries(GeometryType.LINE_STRING, SIZE, DimensionalFlag.XY);
     public static  com.vividsolutions.jts.geom.Geometry[] jtsGeoms = new com.vividsolutions.jts.geom.Geometry[SIZE];
     public static String[] wktStrings = new String[SIZE];
 

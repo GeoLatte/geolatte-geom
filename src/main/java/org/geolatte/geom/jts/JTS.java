@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
 
 /**
@@ -107,7 +107,7 @@ public class JTS {
 
     private static PointSequence toPointSequence(CoordinateSequence cs) {
         if (cs instanceof PointSequence) return (PointSequence) cs;
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(cs.size(), CartesianCoordinateSystem.XYZ);
+        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(cs.size(), DimensionalFlag.XYZ);
         double[] coord = new double[3];
         for (int i = 0; i < cs.size(); i++) {
             for (int ci = 0; ci < coord.length; ci++) {

@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateSystem;
-
 import java.io.Serializable;
 
 /**
@@ -36,7 +34,7 @@ public interface PointSequence extends Iterable<Point>, Cloneable, Serializable 
 
     boolean isMeasured();
 
-    CoordinateSystem getCoordinateSystem();
+    DimensionalFlag getDimensionalFlag();
 
     boolean isEmpty();
 

@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 
@@ -95,7 +95,7 @@ public class PGWKTWordMatcher15 extends WKTWordMatcher {
     }
 
     @Override
-    public String wordFor(CartesianCoordinateSystem flag) {
+    public String wordFor(DimensionalFlag flag) {
         throw new UnsupportedOperationException("Postgis EWKT has no symbol corresponding to a dimensional flag.");
     }
 
