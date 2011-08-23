@@ -34,6 +34,4 @@ public class CRSWKT {
         return decoder.decode(wkt);
     }
 
-
-
 }

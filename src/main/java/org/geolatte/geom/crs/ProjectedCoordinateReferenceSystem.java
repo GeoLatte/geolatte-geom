@@ -21,6 +21,7 @@
 
 package org.geolatte.geom.crs;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,13 +30,28 @@ import java.util.List;
  */
 public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    private Projection projection;
-    private GeographicCoordinateReferenceSystem geoCRS;
-    private List<CRSParameter> parameters;
+    private final Projection projection;
+    private final GeographicCoordinateReferenceSystem geoCRS;
+    private final List<CRSParameter> parameters;
 
 
-    public ProjectedCoordinateReferenceSystem(int SRID, String name) {
-        super(SRID, name);
+    public ProjectedCoordinateReferenceSystem(int SRID, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CRSParameter> parameters, CoordinateSystemAxis... axes) {
+        super(SRID, name, axes);
+        this.geoCRS = geoCRS;
+        this.projection = projection;
+        this.parameters = parameters;
+    }
+
+    public List<CRSParameter> getParameters() {
+        return Collections.unmodifiableList(parameters);
+    }
+
+    public GeographicCoordinateReferenceSystem getGeographicCoordinateSystem() {
+        return geoCRS;
+    }
+
+    public Projection getProjection() {
+        return projection;
     }
 
     @Override

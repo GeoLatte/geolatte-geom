@@ -23,7 +23,12 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.crs.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
+ * Decodes the WKT CRS definitions according to the Postgis
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -54,7 +59,7 @@ public class CRSWKTDecoder {
         return null;  //To change body of created methods use File | Settings | File Templates.
     }
 
-    private CoordinateReferenceSystem matchesGeographicCRS() {
+    private GeographicCoordinateReferenceSystem matchesGeographicCRS() {
         String crsName = matchesName();
         matchesListDelimiter();
         GeodeticDatum datum = matchesDatum();
@@ -62,15 +67,64 @@ public class CRSWKTDecoder {
         PrimeMeridian primem = matchesPrimem();
         matchesListDelimiter();
         Unit unit = matchesUnit(Unit.Type.ANGULAR);
-        CoordinateSystemAxis[] twinAxes = matchesTwinAxis(unit, GeographicCoordinateReferenceSystem.class);
+        CoordinateSystemAxis[] twinAxes = optionalMatchesTwinAxis(unit, GeographicCoordinateReferenceSystem.class);
         int srid = optionalMatchesAuthority();
+        matchesEndList();
         GeographicCoordinateReferenceSystem system = new GeographicCoordinateReferenceSystem(srid, crsName, twinAxes);
         system.setDatum(datum);
         system.setPrimeMeridian(primem);
         return system;
     }
 
-    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[]  matchesTwinAxis(Unit unit, Class<T> crsClass) {
+     private CoordinateReferenceSystem matchesProjectedCRS() {
+        String crsName = matchesName();
+        matchesListDelimiter();
+        GeographicCoordinateReferenceSystem geogcs = matchesGeographicCRS();
+        matchesListDelimiter();
+        Unit unit = matchesUnit(Unit.Type.LINEAR);
+        Projection projection = matchesProjection();
+        List<CRSParameter> parameters = optionalMatchesParameters();
+        int srid = optionalMatchesAuthority();
+        CoordinateSystemAxis[] twinAxes = optionalMatchesTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
+        ProjectedCoordinateReferenceSystem result = new ProjectedCoordinateReferenceSystem(srid, crsName, geogcs, projection, parameters, twinAxes);
+        return result;
+    }
+
+    private List<CRSParameter> optionalMatchesParameters() {
+        List<CRSParameter> parameters = new ArrayList<CRSParameter>();
+        CRSParameter parameter = optionalMatchParameter();
+        while (parameter != null) {
+            parameters.add( parameter );
+            parameter = optionalMatchParameter();
+        }
+        return parameters;
+    }
+
+    private CRSParameter optionalMatchParameter(){
+        matchesListDelimiter();
+        if (currentToken != CRSWKTToken.PARAMETER) {
+            return null;
+        }
+        nextToken();
+        String name = matchesName();
+        matchesListDelimiter();
+        double value = matchesNumber();
+        matchesEndList();
+        return new CRSParameter(name, value);
+    }
+
+    private Projection matchesProjection(){
+        matchesListDelimiter();
+        if (currentToken != CRSWKTToken.PROJECTION) {
+            throw new WKTParseException("Expected PROJECTION keyword, found " + toString(currentToken));
+        }
+        String name = matchesName();
+        int srid = optionalMatchesAuthority();
+        matchesEndList();
+        return new Projection(srid, name);
+    }
+
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] optionalMatchesTwinAxis(Unit unit, Class<T> crsClass) {
         matchesListDelimiter();
         if (currentToken != CRSWKTToken.AXIS) {
             return defaultCRS(unit, crsClass);
@@ -147,14 +201,6 @@ public class CRSWKTDecoder {
         return new PrimeMeridian(srid, name, longitude);
     }
 
-    private CoordinateReferenceSystem matchesProjectedCRS() {
-        String crsName = matchesName();
-        CoordinateReferenceSystem geogcs = matchesGeographicCRS();
-        int srid = 0;
-        ProjectedCoordinateReferenceSystem result = new ProjectedCoordinateReferenceSystem(srid, crsName);
-        return result;
-    }
-
     private GeodeticDatum matchesDatum() {
         if (currentToken != CRSWKTToken.DATUM) {
             throw new WKTParseException("Expected DATUM token.");
@@ -172,6 +218,7 @@ public class CRSWKTDecoder {
         matchesListDelimiter();
         if (currentToken != CRSWKTToken.TOWGS84)
             return new double[0];
+        nextToken();
         double[] toWGS = new double[7];
         matchesStartList();
         for (int i = 0; i < 7; i++) {

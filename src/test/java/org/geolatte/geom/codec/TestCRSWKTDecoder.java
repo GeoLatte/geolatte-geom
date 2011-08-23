@@ -24,6 +24,9 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.crs.*;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -98,6 +101,45 @@ public class TestCRSWKTDecoder {
         assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.DEGREE), geoCRS.getAxes()[0]);
         assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE), geoCRS.getAxes()[1]);
 
+        assertEquals(4326, geoCRS.getSRID());
+
+
+    }
+
+    @Test
+    public void testDecodeLambert72(){
+        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CoordinateReferenceSystem system = decoder.decode(WKT_31370);
+        assertNotNull(system);
+        assertTrue (system instanceof ProjectedCoordinateReferenceSystem);
+        ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem)system;
+
+        //check the geo-CRS
+        assertEquals(4313, projCRS.getGeographicCoordinateSystem().getSRID());
+        GeographicCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
+        double[] expected = new double[]{106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1};
+        for (int i = 0 ; i < expected.length; i++ ){
+            assertEquals(expected[i], geoCRS.getDatum().getToWGS84()[i], Math.ulp(100d));
+        }
+
+        //check the projection
+        assertEquals(new Projection(-1, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
+        List<CRSParameter> parameters = projCRS.getParameters();
+        List<CRSParameter> expectedParameters = new ArrayList<CRSParameter>();
+        expectedParameters.add ( new CRSParameter("standard_parallel_1",51.16666723333333));
+        expectedParameters.add ( new CRSParameter("standard_parallel_2",49.8333339));
+        expectedParameters.add ( new CRSParameter("latitude_of_origin",90));
+        expectedParameters.add ( new CRSParameter("central_meridian",4.367486666666666));
+        expectedParameters.add ( new CRSParameter("false_easting",150000.013));
+        expectedParameters.add ( new CRSParameter("false_northing",5400088.438));
+        assertArrayEquals(expectedParameters.toArray(new CRSParameter[]{}), parameters.toArray(new CRSParameter[]{}));
+
+        //check the authority
+        assertEquals(31370, projCRS.getSRID());
+
+        //check the axes
+        assertEquals(new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER) , projCRS.getCoordinateSystem().getAxis(0));
+        assertEquals(new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER) , projCRS.getCoordinateSystem().getAxis(1));
 
     }
 

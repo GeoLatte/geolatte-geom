@@ -30,7 +30,7 @@ public class CRSParameter {
     private final String name;
     private final double value;
 
-    CRSParameter(String name, double value) {
+    public CRSParameter(String name, double value) {
         this.name = name;
         this.value = value;
     }
@@ -41,5 +41,36 @@ public class CRSParameter {
 
     public double getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CRSParameter that = (CRSParameter) o;
+
+        if (Double.compare(that.value, value) != 0) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = name != null ? name.hashCode() : 0;
+        temp = value != +0.0d ? Double.doubleToLongBits(value) : 0L;
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CRSParameter{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                '}';
     }
 }

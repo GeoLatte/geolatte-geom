@@ -72,19 +72,19 @@ public class CRS {
 
     private static void addDefinition(String line, CRSWKTDecoder decoder) {
         String[] tokens = line.split(DELIM);
-        if (! "EPSG".equals(tokens[0])) return;
+        if (!"EPSG".equals(tokens[0])) return;
         Integer srid = Integer.valueOf(tokens[1]);
         try {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
             crsMap.put(srid, crs);
-        }catch (WKTParseException e){
+        } catch (WKTParseException e) {
             //skip this line on parse error.
             //TODO -- log error
         }
 
     }
 
-    public static CoordinateReferenceSystem create(int SRID){
+    public static CoordinateReferenceSystem create(int SRID) {
         return null;
     }
 }
