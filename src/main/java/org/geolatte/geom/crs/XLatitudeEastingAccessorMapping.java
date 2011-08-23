@@ -39,13 +39,13 @@ class XLatitudeEastingAccessorMapping extends AccessorToAxisMap {
         X_LAT_E.put(CoordinateAccessor.X, new CoordinateSystemAxis[]{
                 CoordinateSystemAxis.X,
                 CoordinateSystemAxis.GEOCENTRIC_X,
-                CoordinateSystemAxis.LATITUDE,
+                CoordinateSystemAxis.LAT,
                 CoordinateSystemAxis.E});
 
         X_LAT_E.put(CoordinateAccessor.Y, new CoordinateSystemAxis[]{
                 CoordinateSystemAxis.Y,
                 CoordinateSystemAxis.GEOCENTRIC_Y,
-                CoordinateSystemAxis.LONGITUDE,
+                CoordinateSystemAxis.LONG,
                 CoordinateSystemAxis.N});
 
         X_LAT_E.put(CoordinateAccessor.Z, new CoordinateSystemAxis[]{
@@ -60,19 +60,19 @@ class XLatitudeEastingAccessorMapping extends AccessorToAxisMap {
         X_LAT_E.put(CoordinateAccessor.Lat, new CoordinateSystemAxis[]{
                 CoordinateSystemAxis.X,
                 CoordinateSystemAxis.GEOCENTRIC_X,
-                CoordinateSystemAxis.LATITUDE,
+                CoordinateSystemAxis.LAT,
                 CoordinateSystemAxis.E});
 
         X_LAT_E.put(CoordinateAccessor.Lat, new CoordinateSystemAxis[]{
                 CoordinateSystemAxis.X,
                 CoordinateSystemAxis.GEOCENTRIC_X,
-                CoordinateSystemAxis.LATITUDE,
+                CoordinateSystemAxis.LAT,
                 CoordinateSystemAxis.E});
 
         X_LAT_E.put(CoordinateAccessor.Lon, new CoordinateSystemAxis[]{
                 CoordinateSystemAxis.Y,
                 CoordinateSystemAxis.GEOCENTRIC_Y,
-                CoordinateSystemAxis.LONGITUDE,
+                CoordinateSystemAxis.LONG,
                 CoordinateSystemAxis.N});
 
         X_LAT_E.put(CoordinateAccessor.M, new CoordinateSystemAxis[]{CoordinateSystemAxis.M});

@@ -21,8 +21,6 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.Units;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
@@ -31,57 +29,82 @@ public class CoordinateSystemAxis {
 
 
     //Common axes for ellipsoidal and spherical Coordinate Systems
-    public static final CoordinateSystemAxis LONGITUDE = new CoordinateSystemAxis("longitude", "lon", CoordinateSystemAxisDirection.EAST, Units.DECIMAL_DEGREE);
-    public static final CoordinateSystemAxis LATITUDE = new CoordinateSystemAxis("latitude", "lat", CoordinateSystemAxisDirection.NORTH, Units.DECIMAL_DEGREE);
-    public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGTH = new CoordinateSystemAxis("ellipsoidal height", "height", CoordinateSystemAxisDirection.UP, Units.METER);
+    public static final CoordinateSystemAxis LONG = new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
+    public static final CoordinateSystemAxis LAT = new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
+    public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGTH = new CoordinateSystemAxis("ellipsoidal height", CoordinateSystemAxisDirection.UP, Unit.METER);
     //TODO -- check the axis direction for radius.
-    public static final CoordinateSystemAxis GEOCENTRIC_RADIUS = new CoordinateSystemAxis("geocentric radius", "radius", CoordinateSystemAxisDirection.GeocentricZ, Units.METER);
+    public static final CoordinateSystemAxis GEOCENTRIC_RADIUS = new CoordinateSystemAxis("geocentric radius", CoordinateSystemAxisDirection.GeocentricZ, Unit.METER);
 
-    public static final CoordinateSystemAxis GEOCENTRIC_X = new CoordinateSystemAxis("geocentric X", "X", CoordinateSystemAxisDirection.GeocentricX, Units.METER);
-    public static final CoordinateSystemAxis GEOCENTRIC_Y = new CoordinateSystemAxis("geocentric Y", "Y", CoordinateSystemAxisDirection.GeocentricY, Units.METER);
-    public static final CoordinateSystemAxis GEOCENTRIC_Z = new CoordinateSystemAxis("geocentric Z", "Z", CoordinateSystemAxisDirection.GeocentricZ, Units.METER);
+    public static final CoordinateSystemAxis GEOCENTRIC_X = new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.GeocentricX, Unit.METER);
+    public static final CoordinateSystemAxis GEOCENTRIC_Y = new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.GeocentricY, Unit.METER);
+    public static final CoordinateSystemAxis GEOCENTRIC_Z = new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, Unit.METER);
 
     //Common axes for cartesian projected coordinate systems
-    public static final CoordinateSystemAxis X = new CoordinateSystemAxis("X", "X", CoordinateSystemAxisDirection.EAST, Units.METER);
-    public static final CoordinateSystemAxis Y = new CoordinateSystemAxis("Y", "Y", CoordinateSystemAxisDirection.NORTH, Units.METER);
-    public static final CoordinateSystemAxis Z = new CoordinateSystemAxis("Z", "Z", CoordinateSystemAxisDirection.UP, Units.METER);
-    public static final CoordinateSystemAxis M = new CoordinateSystemAxis("M", "M", CoordinateSystemAxisDirection.NOT_APPLICABLE, Units.INDETERMINATE);
+    public static final CoordinateSystemAxis X = new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER);
+    public static final CoordinateSystemAxis Y = new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER);
+    public static final CoordinateSystemAxis Z = new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.UP, Unit.METER);
+    public static final CoordinateSystemAxis M = new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.UP, Unit.METER);
 
 
     //Common axes for map projection Coordinate Systems
-    public static final CoordinateSystemAxis N = new CoordinateSystemAxis("northing", "N", CoordinateSystemAxisDirection.NORTH, Units.METER);
-    public static final CoordinateSystemAxis S = new CoordinateSystemAxis("southing", "S", CoordinateSystemAxisDirection.SOUTH, Units.METER);
-    public static final CoordinateSystemAxis E = new CoordinateSystemAxis("easting", "E", CoordinateSystemAxisDirection.EAST, Units.METER);
-    public static final CoordinateSystemAxis W = new CoordinateSystemAxis("westing", "W", CoordinateSystemAxisDirection.WEST, Units.METER);
+    public static final CoordinateSystemAxis N = new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.METER);
+    public static final CoordinateSystemAxis S = new CoordinateSystemAxis("Southing", CoordinateSystemAxisDirection.SOUTH, Unit.METER);
+    public static final CoordinateSystemAxis E = new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.METER);
+    public static final CoordinateSystemAxis W = new CoordinateSystemAxis("Westing", CoordinateSystemAxisDirection.WEST, Unit.METER);
 
 
 
 
     private final String axisName;
-    private final String axisAbbreviation;
     private final CoordinateSystemAxisDirection coordinateSystemAxisDirection;
-    private final Units units;
+    private final Unit unit;
 
-    public CoordinateSystemAxis(String axisName, String axisAbbreviation, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Units units) {
+    public CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Unit unit) {
         this.axisName = axisName;
-        this.axisAbbreviation = axisAbbreviation;
         this.coordinateSystemAxisDirection = coordinateSystemAxisDirection;
-        this.units = units;
+        this.unit = unit;
     }
 
     public String getAxisName() {
         return axisName;
     }
 
-    public String getAxisAbbreviation() {
-        return axisAbbreviation;
-    }
-
     public CoordinateSystemAxisDirection getAxisDirection() {
         return coordinateSystemAxisDirection;
     }
 
-    public Units getUnits() {
-        return units;
+    public Unit getUnit() {
+        return unit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CoordinateSystemAxis)) return false;
+
+        CoordinateSystemAxis that = (CoordinateSystemAxis) o;
+
+        if (axisName != null ? !axisName.equals(that.axisName) : that.axisName != null) return false;
+        if (coordinateSystemAxisDirection != that.coordinateSystemAxisDirection) return false;
+        if (unit != null ? !unit.equals(that.unit) : that.unit != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = axisName != null ? axisName.hashCode() : 0;
+        result = 31 * result + (coordinateSystemAxisDirection != null ? coordinateSystemAxisDirection.hashCode() : 0);
+        result = 31 * result + (unit != null ? unit.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CoordinateSystemAxis{" +
+                "axisName='" + axisName + '\'' +
+                ", coordinateSystemAxisDirection=" + coordinateSystemAxisDirection +
+                ", unit=" + unit +
+                '}';
     }
 }

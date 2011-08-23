@@ -128,5 +128,31 @@ abstract class WKTToken {
 
     static class ElementSeparator extends WKTToken {
     }
+
+    static class TextToken extends WKTToken {
+        private String text;
+
+        TextToken(String text){
+            super();
+            this.text = text;
+        }
+
+        public String getText(){
+            return this.text;
+        }
+    }
+
+    static class NumberToken extends WKTToken {
+        private double number;
+
+        public NumberToken(double number) {
+            super();
+            this.number = number;
+        }
+
+        public double getNumber(){
+            return this.number;
+        }
+    }
 }
 

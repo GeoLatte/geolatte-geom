@@ -22,22 +22,42 @@
 package org.geolatte.geom.crs;
 
 /**
- * The
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/29/11
+ *         creation-date: 8/2/11
  */
-public enum CoordinateSystemAxisDirection {
+public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
-    UP,
-    DOWN,
-    OTHER,
-    UNKNOWN,
-    GeocentricX,
-    GeocentricY,
-    GeocentricZ
+    private GeodeticDatum datum;
+    private PrimeMeridian primem;
 
+    public GeographicCoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes) {
+        super(SRID, name, axes);
+    }
+
+    public void setDatum(GeodeticDatum datum) {
+        this.datum = datum;
+    }
+
+    public GeodeticDatum getDatum() {
+        return datum;
+    }
+
+    public void setPrimeMeridian(PrimeMeridian primeMeridian) {
+        this.primem  = primeMeridian;
+    }
+
+    public PrimeMeridian getPrimeMeridian(){
+        return primem;
+    }
+
+
+    public Unit getUnit() {
+
+        //TODO -- this should no longer be necessary. CRS always has at least two coordinate axes
+        if (getAxes() == null || getAxes().length == 0) {
+            return Unit.UNKNOWN;
+        }
+        return getAxes()[0].getUnit();
+
+    }
 }
