@@ -30,5 +30,18 @@ package org.geolatte.geom;
  *         creation-date: 4/30/11
  */
 public enum CoordinateAccessor {
-        X, Y, Z, Lat, Lon, M
+        X, Y, Z, M;
+
+    //TODO -- clean out redundant code (see DimensionalFlag)
+//    public int getIndex(DimensionalFlag flag) {
+//        if (this == X) return 0;
+//        if (this == Y) return 1;
+//        if (this == Z)
+//            return (flag.is3D() ? -1: 2);
+//        if (this == M)
+//            return flag.isMeasured() ?
+//                     (flag.is3D() ? 3 : 2 ):
+//                      -1;
+//        return -1;
+//        }
 }
