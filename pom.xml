@@ -19,36 +19,98 @@
   ~ Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.geolatte</groupId>
+    <artifactId>geolatte-geom</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <description>
+        This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL specification.
+    </description>
+    <url>http://www.geolatte.org/confluence/display/geom</url>
 
-  <groupId>org.hibernate.spatial</groupId>
-  <artifactId>geom</artifactId>
-  <version>2.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <organization>
+        <name>geolatte.org</name>
+        <url>http://www.geolatte.org/</url>
+    </organization>
 
-  <name>geom</name>
-  <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
-<repositories>
-        <repository>
-            <id>OSGEO</id>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-    </repositories>
+    <licenses>
+        <license>
+            <name>LGPL 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:GeoLatte/geolatte-common.git</connection>
+        <url>scm:git:git@github.com:GeoLatte/geolatte-common.git</url>
+        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-common.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>maesenka</id>
+            <name>Karel Maesen</name>
+            <email>karel@geovise.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>bertvh</id>
+            <name>Bert Vanhooff</name>
+            <email>bert.vanhooff@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>yvesv</id>
+            <name>Yves Vandewoude</name>
+            <email>yves.vandewoude@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>rigolepe</id>
+            <name>Peter Rigole</name>
+            <email>peter.rigole@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+    </developers>
+
     <build>
         <plugins>
+            <!-- generate compiled (binary) artefacts -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
@@ -68,6 +130,17 @@
                 </executions>
             </plugin>
 
+            <!-- generate javadoc artefacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
+
             <!-- exclude the Caliper Microbenchmarkts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -79,17 +152,25 @@
                 </configuration>
             </plugin>
 
+            <!-- sign files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+		<version>1.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
-
-    <licenses>
-        <license>
-            <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1</name>
-            <url>http://www.gnu.org/licenses/lgpl.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
     <dependencies>
         <dependency>
             <groupId>com.vividsolutions</groupId>
@@ -126,4 +207,18 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>OSGEO</id>
+            <url>http://download.osgeo.org/webdav/geotools</url>
+        </repository>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>
