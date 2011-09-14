@@ -81,17 +81,17 @@ public abstract class GeoJsonTo {
      *         in the input, with the lowest values for all axes followed by the highest values.
      */
     public static double[] createBoundingBox(double[][] input) {
-        double[] result = new double[input[0].length];
-        for (int i = 0; i < result.length / 2; i++) {
+        double[] result = new double[input[0].length*2];
+        for (int i = 0; i < input[0].length; i++) {
             result[i] = Double.MAX_VALUE;
         }
-        for (int i = result.length / 2; i < result.length; i++) {
+        for (int i = input[0].length; i < result.length; i++) {
             result[i] = Double.MIN_VALUE;
         }
         for (double[] coord : input) {
             for (int i = 0; i < coord.length; i++) {
                 result[i] = Math.min(coord[i], result[i]);
-                result[i + result.length] = Math.max(coord[i + result.length], result[i + result.length]);
+                result[i + coord.length] = Math.max(coord[i], result[i + coord.length]);
             }
         }
         return result;
