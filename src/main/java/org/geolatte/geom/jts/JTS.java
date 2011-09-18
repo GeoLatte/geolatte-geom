@@ -22,10 +22,16 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.FixedSizePointSequenceBuilder;
-import org.geolatte.geom.PointSequence;
-import org.geolatte.geom.PointSequenceFactory;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.geolatte.geom.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011 (original code)
@@ -74,7 +80,7 @@ public class JTS {
         } else if (jtsGeometry instanceof MultiPolygon) {
             return from((MultiPolygon) jtsGeometry, SRID);
         } else if (jtsGeometry instanceof GeometryCollection) {
-            return from((GeometryCollection) jtsGeometry);
+            return from((GeometryCollection) jtsGeometry, SRID);
         } else {
             throw new JTSConversionException();
         }
@@ -98,6 +104,8 @@ public class JTS {
             return to((org.geolatte.geom.MultiLineString) geometry);
         } else if (geometry instanceof org.geolatte.geom.MultiPolygon) {
             return to((org.geolatte.geom.MultiPolygon) geometry);
+        } else if (geometry instanceof org.geolatte.geom.GeometryCollection) {
+            return to((org.geolatte.geom.GeometryCollection) geometry);
         } else {
             throw new JTSConversionException();
         }
@@ -147,8 +155,12 @@ public class JTS {
     /*
      * Converts a jts geometrycollection into a geolatte geometrycollection
      */
-    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry) {
-        throw new UnsupportedOperationException();
+    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, int SRID) {
+        org.geolatte.geom.Geometry[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
+        for (int i=0; i < jtsGeometry.getNumGeometries(); i++) {
+            geoms[i] = from(jtsGeometry.getGeometryN(i), SRID);
+        }
+        return org.geolatte.geom.GeometryCollection.create(geoms, SRID);
     }
 
     /*
@@ -243,6 +255,15 @@ public class JTS {
         return mp;
     }
 
+    private static GeometryCollection to(org.geolatte.geom.GeometryCollection collection) {
+        Geometry[] geoms = new Geometry[collection.getNumGeometries()];
+        for (int i=0; i < collection.getNumGeometries(); i++) {
+            geoms[i] = to(collection.getGeometryN(i));
+        }
+        GeometryCollection gc = geometryFactory().createGeometryCollection(geoms);
+        gc.setSRID(collection.getSRID());
+        return gc;
+    }
 
     /*
      * Helpermethod that transforms a coordinatesequence into a pointsequence.
