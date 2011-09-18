@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,11 +44,11 @@ public class MultiLineStringImplTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = LineString.create(new PackedPointSequence(c1, CartesianCoordinateSystem.XYM), 0);
-    LineString ls2 = LineString.create(new PackedPointSequence(c2, CartesianCoordinateSystem.XYM), 0);
-    LineString ls3 = LineString.create(new PackedPointSequence(c3, CartesianCoordinateSystem.XYM), 0);
-    LineString lcs = LineString.create(new PackedPointSequence(cClosedSimple, CartesianCoordinateSystem.XYM), 0);
-    LineString lcns = LineString.create(new PackedPointSequence(cClosedNonSimple, CartesianCoordinateSystem.XYM), 0);
+    LineString ls1 = LineString.create(new PackedPointSequence(c1, DimensionalFlag.XYM), 0);
+    LineString ls2 = LineString.create(new PackedPointSequence(c2, DimensionalFlag.XYM), 0);
+    LineString ls3 = LineString.create(new PackedPointSequence(c3, DimensionalFlag.XYM), 0);
+    LineString lcs = LineString.create(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), 0);
+    LineString lcns = LineString.create(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), 0);
 
 
     @Before
@@ -65,7 +63,7 @@ public class MultiLineStringImplTest {
     @Test
     public void testConstituentsHaveSameDimension(){
         for (int i = 0; i < ml1.getNumGeometries(); i++) {
-            assertEquals(((LineString) ml1.getGeometryN(i)).getPoints().getCoordinateSystem(), ml1.getPoints().getCoordinateSystem());
+            assertEquals(((LineString) ml1.getGeometryN(i)).getPoints().getDimensionalFlag(), ml1.getPoints().getDimensionalFlag());
         }
     }
 

@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
 
@@ -59,25 +59,25 @@ public class CodecTestCases {
     public CodecTestCases() {
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
-                Point.create(new double[]{1, 1}, CartesianCoordinateSystem.XY, -1));
+                Point.create(new double[]{1, 1}, DimensionalFlag.XY, -1));
         addCase(POINT_3D,
                 "POINT(1 2 3)",
                 "0101000080000000000000F03F00000000000000400000000000000840",
-                Point.create(new double[]{1, 2, 3}, CartesianCoordinateSystem.XYZ, -1));
+                Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, -1));
         addCase(POINT_3DM,
                 "POINT(1 2 3 4)",
                 "01010000C0000000000000F03F000000000000004000000000000008400000000000001040",
-                Point.create(new double[]{1, 2, 3, 4}, CartesianCoordinateSystem.XYZM, -1));
+                Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, -1));
         addCase(POINT_2DM,
                 "POINTM(1 2 4)",
                 "0101000040000000000000F03F00000000000000400000000000001040",
-                Point.create(new double[]{1, 2, 4}, CartesianCoordinateSystem.XYM, -1));
+                Point.create(new double[]{1, 2, 4}, DimensionalFlag.XYM, -1));
         addCase(POINT_WITH_SRID,
                 "SRID=4326;POINT(1 2 3 4)",
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
-                Point.create(new double[]{1, 2, 3, 4}, CartesianCoordinateSystem.XYZM, 4326));
+                Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, 4326));
 
-        FixedSizePointSequenceBuilder psb = new FixedSizePointSequenceBuilder(2, CartesianCoordinateSystem.XY);
+        FixedSizePointSequenceBuilder psb = new FixedSizePointSequenceBuilder(2, DimensionalFlag.XY);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
         Geometry expected = LineString.create(psb.toPointSequence(), -1);
         addCase(LINESTRING_2D,
@@ -85,7 +85,7 @@ public class CodecTestCases {
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
                 expected);
 
-        psb = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        psb = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         expected = Polygon.create(psb.toPointSequence(), -1);
         addCase(POLYGON_2D_NO_INNER_RINGS,
@@ -93,9 +93,9 @@ public class CodecTestCases {
                 "0103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F00000000000000000000000000000000",
                 expected);
 
-        FixedSizePointSequenceBuilder psb1 = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        FixedSizePointSequenceBuilder psb1 = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        FixedSizePointSequenceBuilder psb2 = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        FixedSizePointSequenceBuilder psb2 = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
         LinearRing[] rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), -1), LinearRing.create(psb2.toPointSequence(), -1)};
         expected = Polygon.create(rings, -1);
@@ -105,8 +105,8 @@ public class CodecTestCases {
                 expected);
 
 
-        Point pnt1 = Point.create(new double[]{1, 1}, CartesianCoordinateSystem.XY, -1);
-        Point pnt2 = Point.create(new double[]{2, 2}, CartesianCoordinateSystem.XY, -1);
+        Point pnt1 = Point.create(new double[]{1, 1}, DimensionalFlag.XY, -1);
+        Point pnt2 = Point.create(new double[]{2, 2}, DimensionalFlag.XY, -1);
         expected = GeometryCollection.create(new Geometry[]{pnt1, pnt2}, -1);
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
@@ -123,16 +123,16 @@ public class CodecTestCases {
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
                 MultiPoint.create(new Point[]{pnt1, pnt2}, -1));
 
-        pnt1 = Point.create(new double[]{1, 2}, CartesianCoordinateSystem.XY, 4326);
-        pnt2 = Point.create(new double[]{3, 4}, CartesianCoordinateSystem.XY, 4326);
+        pnt1 = Point.create(new double[]{1, 2}, DimensionalFlag.XY, 4326);
+        pnt2 = Point.create(new double[]{3, 4}, DimensionalFlag.XY, 4326);
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
                 MultiPoint.create(new Point[]{pnt1, pnt2}, -1));
 
-        FixedSizePointSequenceBuilder psl1 = new FixedSizePointSequenceBuilder(3, CartesianCoordinateSystem.XY);
+        FixedSizePointSequenceBuilder psl1 = new FixedSizePointSequenceBuilder(3, DimensionalFlag.XY);
         psl1.add(1, 2).add(2, 3).add(4, 5);
-        FixedSizePointSequenceBuilder psl2 = new FixedSizePointSequenceBuilder(2, CartesianCoordinateSystem.XY);
+        FixedSizePointSequenceBuilder psl2 = new FixedSizePointSequenceBuilder(2, DimensionalFlag.XY);
         psl2.add(6, 7).add(8, 9);
         LineString[] linestrings = new LineString[2];
         linestrings[0] = LineString.create(psl1.toPointSequence(), -1);
@@ -151,13 +151,13 @@ public class CodecTestCases {
                 , MultiLineString.create(linestrings, 4326));
 
 
-        psb = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        psb = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         Polygon[] polygons = new Polygon[2];
         polygons[0] = Polygon.create(psb.toPointSequence(), -1);
-        psb1 = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        psb1 = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        psb2 = new FixedSizePointSequenceBuilder(5, CartesianCoordinateSystem.XY);
+        psb2 = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
         rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), -1), LinearRing.create(psb2.toPointSequence(), -1)};
         polygons[1] = Polygon.create(rings, -1);

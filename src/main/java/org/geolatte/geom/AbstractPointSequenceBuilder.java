@@ -21,26 +21,23 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.crs.CoordinateSystem;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
 public abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
-    protected final CoordinateSystem coordinateSystem;
+    protected final DimensionalFlag dimensionalFlag;
 
-    public AbstractPointSequenceBuilder(CoordinateSystem coordinateSystem) {
-        this.coordinateSystem = coordinateSystem;
+    public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag) {
+        this.dimensionalFlag = dimensionalFlag;
     }
 
     @Override
     public PointSequenceBuilder add(double[] coordinates) {
-        if (coordinates.length < coordinateSystem.getCoordinateDimension())
-            throw new IllegalArgumentException(String.format("Parameter must be array of getLength %d", coordinateSystem.getCoordinateDimension()));
-        for (int i = 0; i < coordinateSystem.getCoordinateDimension(); i++) {
+        if (coordinates.length < dimensionalFlag.getCoordinateDimension())
+            throw new IllegalArgumentException(String.format("Parameter must be array of getLength %d", dimensionalFlag.getCoordinateDimension()));
+        for (int i = 0; i < dimensionalFlag.getCoordinateDimension(); i++) {
             add(coordinates[i]);
         }
         return this;
@@ -48,8 +45,8 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
 
     @Override
     public PointSequenceBuilder add(double x, double y) {
-        if (coordinateSystem != CartesianCoordinateSystem.XY)
-            throw new IllegalStateException("Attempting to add 2D point to pointsequence of dimension " + coordinateSystem);
+        if (dimensionalFlag != DimensionalFlag.XY)
+            throw new IllegalStateException("Attempting to add 2D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
         return this;
@@ -57,8 +54,8 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
 
     @Override
     public PointSequenceBuilder addZ(double x, double y, double z) {
-        if (coordinateSystem != CartesianCoordinateSystem.XYZ)
-            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + coordinateSystem);
+        if (dimensionalFlag != DimensionalFlag.XYZ)
+            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
         add(z);
@@ -67,8 +64,8 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
 
     @Override
     public PointSequenceBuilder addM(double x, double y, double m) {
-        if (coordinateSystem != CartesianCoordinateSystem.XYM)
-            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + coordinateSystem);
+        if (dimensionalFlag != DimensionalFlag.XYM)
+            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
         add(m);
@@ -77,8 +74,8 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
 
     @Override
     public PointSequenceBuilder add(double x, double y, double z, double m) {
-        if (coordinateSystem != CartesianCoordinateSystem.XYZM)
-            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + coordinateSystem);
+        if (dimensionalFlag != DimensionalFlag.XYZM)
+            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
         add(z);

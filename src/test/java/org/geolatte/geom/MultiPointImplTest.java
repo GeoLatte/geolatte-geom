@@ -21,10 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.MultiPoint;
-import org.geolatte.geom.Point;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,7 +74,7 @@ public class MultiPointImplTest {
     @Test
     public void testGetGeometryN() throws Exception {
         for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(Point.create(new double[]{i, i}, CartesianCoordinateSystem.XY, 4326), pnt1.getGeometryN(i));
+            Assert.assertEquals(Point.create(new double[]{i, i}, DimensionalFlag.XY, 4326), pnt1.getGeometryN(i));
         }
     }
 
@@ -92,7 +88,7 @@ public class MultiPointImplTest {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(new double[]{i, i}, CartesianCoordinateSystem.XY, srid);
+            points[i] = Point.create(new double[]{i, i}, DimensionalFlag.XY, srid);
         }
         points[0] = points[size -1];
         return points;
@@ -101,7 +97,7 @@ public class MultiPointImplTest {
     private Point[] createPointsAllDifferent(int size, int srid) {
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(new double[]{i, i}, CartesianCoordinateSystem.XY, srid);
+            points[i] = Point.create(new double[]{i, i}, DimensionalFlag.XY, srid);
         }
         return points;
     }

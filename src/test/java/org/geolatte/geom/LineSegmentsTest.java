@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.*;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -36,7 +34,7 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegments() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(3, CartesianCoordinateSystem.XYZM);
+        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.XYZM);
         builder.add(new double[]{1, 1, 1, 1});
         builder.add(new double[]{2, 2, 2, 2});
         builder.add(new double[]{3, 3, 3, 3});
@@ -53,7 +51,7 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(0, CartesianCoordinateSystem.XYZM);
+        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(0, DimensionalFlag.XYZM);
         PointSequence sequence = builder.toPointSequence();
         for (LineSegment ls : new LineSegments(sequence)) {
             fail();

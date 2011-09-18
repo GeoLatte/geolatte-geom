@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.benchmark;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
 
 import java.util.Random;
@@ -37,7 +37,7 @@ public class RandomGeometryGenerator {
     private static final int MAX_LINESTRING_LENGTH = 100;
     private static final Random random = new Random();
 
-    public static double[] randomCoordinate(CartesianCoordinateSystem dim) {
+    public static double[] randomCoordinate(DimensionalFlag dim) {
         double[] co = new double[dim.getCoordinateDimension()];
         for (int i = 0; i < dim.getCoordinateDimension(); i++) {
             co[i] = MIN_COORDINATE_VALUE + random.nextDouble() *(MAX_COORDINATE_VALUE - MIN_COORDINATE_VALUE);
@@ -45,7 +45,7 @@ public class RandomGeometryGenerator {
         return co;
     }
 
-    public static Geometry[] createRandomGeometries(GeometryType type, int num, CartesianCoordinateSystem dim) {
+    public static Geometry[] createRandomGeometries(GeometryType type, int num, DimensionalFlag dim) {
         Geometry[] result = new Geometry[num];
         for (int i = 0; i < num; i++) {
             result[i] = createRandomGeometry(type, dim);
@@ -53,7 +53,7 @@ public class RandomGeometryGenerator {
         return result;
     }
 
-    private static Geometry createRandomGeometry(GeometryType type, CartesianCoordinateSystem dim) {
+    private static Geometry createRandomGeometry(GeometryType type, DimensionalFlag dim) {
         switch (type) {
             case POINT:
                 return createRandomPoint(dim);
@@ -65,11 +65,11 @@ public class RandomGeometryGenerator {
 
 
 
-    public static Point createRandomPoint(CartesianCoordinateSystem dim){
+    public static Point createRandomPoint(DimensionalFlag dim){
         return Point.create(randomCoordinate(dim), dim, -1);
     }
 
-    public static LineString createRandomLengthLineString(CartesianCoordinateSystem dim){
+    public static LineString createRandomLengthLineString(DimensionalFlag dim){
         int length = randomLineStringLength();
         PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(length, dim);
         for (int i = 0; i < length; i++) {

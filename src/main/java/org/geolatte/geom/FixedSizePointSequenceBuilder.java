@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateSystem;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
@@ -31,9 +29,9 @@ public class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder 
     private int index = 0;
     private final double[] coordinates;
 
-    public FixedSizePointSequenceBuilder(int capacity, CoordinateSystem coordinateSystem) {
-        super(coordinateSystem);
-        this.coordinates = new double[capacity * coordinateSystem.getCoordinateDimension()];
+    public FixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag) {
+        super(flag);
+        this.coordinates = new double[capacity * flag.getCoordinateDimension()];
     }
 
     protected void add(double x) {
@@ -42,7 +40,7 @@ public class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder 
 
     @Override
     public PointSequence toPointSequence() {
-        return new PackedPointSequence(this.coordinates, this.coordinateSystem);
+        return new PackedPointSequence(this.coordinates, this.dimensionalFlag);
     }
 
 }

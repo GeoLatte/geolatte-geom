@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +33,7 @@ import static org.junit.Assert.*;
  */
 public class PointSequenceIteratorTest {
 
-    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, CartesianCoordinateSystem.XY);
+    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, DimensionalFlag.XY);
     PointSequence emptySequence = EmptyPointSequence.INSTANCE;
 
     PointSequenceIterator itSeq;
