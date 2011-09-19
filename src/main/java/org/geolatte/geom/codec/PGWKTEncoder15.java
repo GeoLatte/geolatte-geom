@@ -24,8 +24,10 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.*;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -40,9 +42,10 @@ public class PGWKTEncoder15 {
     NumberFormat formatter;
 
     private static final int MAX_FRACTIONAL_DIGITS = 24;
+    private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
     public PGWKTEncoder15() {
-        formatter = new DecimalFormat("0.#");
+        formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
         formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
     }
 
