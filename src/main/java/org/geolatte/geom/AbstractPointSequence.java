@@ -24,7 +24,6 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geolatte.geom.crs.CoordinateSystem;
 
 import java.util.Iterator;
 
@@ -33,22 +32,22 @@ import java.util.Iterator;
  */
 abstract class AbstractPointSequence implements PointSequence, CoordinateSequence {
 
-    private final CoordinateSystem coordinateSystem;
+    private final DimensionalFlag dimensionalFlag;
 
-    AbstractPointSequence(CoordinateSystem coordinateSystem) {
-        this.coordinateSystem = coordinateSystem;
+    AbstractPointSequence(DimensionalFlag dimensionalFlag) {
+        this.dimensionalFlag = dimensionalFlag;
     }
 
     public static DimensionalCoordinate[] toCoordinateArray(AbstractPointSequence sequence) {
         DimensionalCoordinate[] coordinates = new DimensionalCoordinate[sequence.size()];
         for (int i = 0; i < sequence.size(); i++){
-            coordinates[i] = new DimensionalCoordinate(sequence.getCoordinateSystem());
+            coordinates[i] = new DimensionalCoordinate(sequence.getDimensionalFlag());
             sequence.getCoordinate(i, coordinates[i]);
         }
         return coordinates;
     }
 
-    public static CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateSystem dim) {
+    public static CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim) {
         FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(coordinates.length, dim);
         double[] ordinates = new double[dim.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
@@ -58,30 +57,30 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
         return (CoordinateSequence)builder.toPointSequence();
     }
 
-    private static void copy(Coordinate co, double[] ordinates, CoordinateSystem coordinateSystem) {
-        ordinates[coordinateSystem.getIndex(CoordinateAccessor.X)] = co.x;
-        ordinates[coordinateSystem.getIndex(CoordinateAccessor.Y)] = co.y;
-        if (coordinateSystem.is3D()) ordinates[coordinateSystem.getIndex(CoordinateAccessor.Z)] = co.z;
-        if (coordinateSystem.isMeasured()) {
-            ordinates[coordinateSystem.getIndex(CoordinateAccessor.M)] = (co instanceof DimensionalCoordinate) ?
+    private static void copy(Coordinate co, double[] ordinates, DimensionalFlag flag) {
+        ordinates[flag.getIndex(CoordinateAccessor.X)] = co.x;
+        ordinates[flag.getIndex(CoordinateAccessor.Y)] = co.y;
+        if (flag.is3D()) ordinates[flag.getIndex(CoordinateAccessor.Z)] = co.z;
+        if (flag.isMeasured()) {
+            ordinates[flag.getIndex(CoordinateAccessor.M)] = (co instanceof DimensionalCoordinate) ?
                    ((DimensionalCoordinate)co).m :
                     Double.NaN;
         }
     }
 
     @Override
-    public CoordinateSystem getCoordinateSystem() {
-        return this.coordinateSystem;
+    public DimensionalFlag getDimensionalFlag() {
+        return this.dimensionalFlag;
     }
 
     @Override
     public boolean is3D(){
-        return this.coordinateSystem.is3D();
+        return this.dimensionalFlag.is3D();
     }
 
     @Override
     public boolean isMeasured(){
-        return this.coordinateSystem.isMeasured();
+        return this.dimensionalFlag.isMeasured();
     }
 
     /*
@@ -93,7 +92,7 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     }
 
     public int getCoordinateDimension() {
-        return this.coordinateSystem.getCoordinateDimension();
+        return this.dimensionalFlag.getCoordinateDimension();
     }
 
     /**
@@ -108,16 +107,16 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     //TODO -- this can now be implemented much simpler now by a simple array copy
     @Override
     public void getCoordinates(double[] coordinates, int i) {
-        if (coordinates.length < this.coordinateSystem.getCoordinateDimension())
-            throw new IllegalArgumentException(String.format("Coordinate array must be at least of getLength %d", this.coordinateSystem.getCoordinateDimension()));
-        coordinates[coordinateSystem.getIndex(CoordinateAccessor.X)] = getX(i);
-        coordinates[coordinateSystem.getIndex(CoordinateAccessor.Y)] = getY(i);
+        if (coordinates.length < this.dimensionalFlag.getCoordinateDimension())
+            throw new IllegalArgumentException(String.format("Coordinate array must be at least of getLength %d", this.dimensionalFlag.getCoordinateDimension()));
+        coordinates[dimensionalFlag.getIndex(CoordinateAccessor.X)] = getX(i);
+        coordinates[dimensionalFlag.getIndex(CoordinateAccessor.Y)] = getY(i);
         int ci = 2;
         if (is3D() ) {
-            coordinates[coordinateSystem.getIndex(CoordinateAccessor.Z)]  = getZ(i);
+            coordinates[dimensionalFlag.getIndex(CoordinateAccessor.Z)]  = getZ(i);
         }
         if (isMeasured()){
-            coordinates[coordinateSystem.getIndex(CoordinateAccessor.M)] = getM(i);
+            coordinates[dimensionalFlag.getIndex(CoordinateAccessor.M)] = getM(i);
         }
     }
 
@@ -143,7 +142,7 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
 
     @Override
     public Coordinate getCoordinate(int i) {
-        DimensionalCoordinate co = new DimensionalCoordinate(getCoordinateSystem());
+        DimensionalCoordinate co = new DimensionalCoordinate(getDimensionalFlag());
         co.x = getX(i);
         co.y = getY(i);
         if (is3D())
@@ -209,7 +208,7 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
 
     @Override
     public void accept(PointVisitor visitor) {
-        visitor.setCoordinateSystem(getCoordinateSystem());
+        visitor.setCoordinateSystem(getDimensionalFlag());
         double[] coordinates = new double[getCoordinateDimension()];
         for (int i = 0; i < size(); i++) {
             getCoordinates(coordinates,i);

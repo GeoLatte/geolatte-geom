@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateSystem;
-
 import java.util.Arrays;
 
 /**
@@ -33,8 +31,8 @@ class NestedPointSequence extends AbstractPointSequence {
     private final PointSequence[] children;
     private final int size;
 
-    NestedPointSequence(PointSequence[] children, CoordinateSystem coordinateSystem) {
-        super(coordinateSystem);
+    NestedPointSequence(PointSequence[] children, DimensionalFlag dimensionalFlag) {
+        super(dimensionalFlag);
         if (children == null) throw new IllegalArgumentException("Require non-null argumnet");
         this.children = children;
         this.size = calculateSize();
@@ -85,7 +83,7 @@ class NestedPointSequence extends AbstractPointSequence {
         for (int i = 0; i < clonedChildren.length; i++) {
             clonedChildren[i] = children[i].clone();
         }
-        return new NestedPointSequence(clonedChildren, getCoordinateSystem());
+        return new NestedPointSequence(clonedChildren, getDimensionalFlag());
     }
 
     @Override

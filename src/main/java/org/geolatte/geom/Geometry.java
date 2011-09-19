@@ -22,7 +22,6 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.codec.Bytes;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 import java.io.Serializable;
 
@@ -54,7 +53,7 @@ public abstract class Geometry implements Serializable{
             }
             sequences[i] = (geometries[i]).getPoints();
         }
-        return new NestedPointSequence(sequences, CartesianCoordinateSystem.parse(is3D, isMeasured));
+        return new NestedPointSequence(sequences, DimensionalFlag.parse(is3D, isMeasured));
     }
 
     Geometry(GeometryOperations geometryOperations, int SRID){
@@ -97,7 +96,7 @@ public abstract class Geometry implements Serializable{
         }
         double[] coords = new double[getCoordinateDimension()];
         getPoints().getCoordinates(coords, index);
-        return Point.create(coords, CartesianCoordinateSystem.parse(is3D(), isMeasured()), getSRID());
+        return Point.create(coords, DimensionalFlag.parse(is3D(), isMeasured()), getSRID());
     }
 
     public abstract PointSequence getPoints();

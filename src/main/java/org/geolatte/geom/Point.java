@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-
 import java.util.Arrays;
 
 /**
@@ -38,11 +36,11 @@ public class Point extends Geometry {
         return new Point(sequence, SRID);
     }
 
-    public static Point create(double[] coordinates, CartesianCoordinateSystem coordinateSystem, int SRID) {
+    public static Point create(double[] coordinates, DimensionalFlag dimensionalFlag, int SRID) {
         if (coordinates == null || coordinates.length == 0) {
             return EMPTY;
         }
-        return new Point(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), coordinateSystem), SRID);
+        return new Point(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag), SRID);
     }
 
     Point(PointSequence sequence,int SRID){

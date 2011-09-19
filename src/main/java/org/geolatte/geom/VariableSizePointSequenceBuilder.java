@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-
 import java.util.Arrays;
 
 /**
@@ -34,9 +32,9 @@ public class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuild
     private double[] coordinates;
     private int index = 0;
 
-    public VariableSizePointSequenceBuilder(CartesianCoordinateSystem coordinateSystem) {
-        super(coordinateSystem);
-        this.coordinates = new double[coordinateSystem.getCoordinateDimension() * 10];
+    public VariableSizePointSequenceBuilder(DimensionalFlag flag) {
+        super(flag);
+        this.coordinates = new double[flag.getCoordinateDimension() * 10];
     }
 
     @Override
@@ -53,6 +51,6 @@ public class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuild
 
     @Override
     public PointSequence toPointSequence() {
-        return new PackedPointSequence(Arrays.copyOf(coordinates, index), coordinateSystem);
+        return new PackedPointSequence(Arrays.copyOf(coordinates, index), dimensionalFlag);
     }
 }

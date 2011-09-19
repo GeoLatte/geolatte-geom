@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateSystem;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
@@ -31,5 +29,5 @@ public interface PointVisitor {
 
     public void visit(double[] coordinates);
 
-    void setCoordinateSystem(CoordinateSystem coordinateSystem);
+    void setCoordinateSystem(DimensionalFlag dimensionalFlag);
 }

@@ -163,8 +163,8 @@ public class TestCRSWKTDecoder {
         CRSWKTDecoder decoder = new CRSWKTDecoder();
         ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3409);
         assertNotNull(system);
-//        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getCoordinateSystem().getAxis(0));
-//        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getCoordinateSystem().getAxis(1));
+//        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getDimensionalFlag().getAxis(0));
+//        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getDimensionalFlag().getAxis(1));
     }
 
 

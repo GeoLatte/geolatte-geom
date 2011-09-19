@@ -24,8 +24,6 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
-import org.geolatte.geom.crs.CoordinateSystem;
 
 import java.util.Arrays;
 
@@ -41,13 +39,13 @@ public class PointSequenceFactory implements CoordinateSequenceFactory {
         return EmptyPointSequence.INSTANCE;
     }
 
-    public PointSequence create(double[] coordinates, CoordinateSystem coordinateSystem){
-        return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), coordinateSystem);
+    public PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
+        return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
     }
 
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
-        CoordinateSystem flag = determineDimensionFlag(coordinates);
+        DimensionalFlag flag = determineDimensionFlag(coordinates);
         return AbstractPointSequence.fromCoordinateArray(coordinates, flag);
     }
 
@@ -61,10 +59,10 @@ public class PointSequenceFactory implements CoordinateSequenceFactory {
         throw new UnsupportedOperationException();
     }
 
-    private CoordinateSystem determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return CartesianCoordinateSystem.XY;
-        if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getCoordinateSystem();
-        return CartesianCoordinateSystem.XYZ;
+    private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
+        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
+        if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
+        return DimensionalFlag.XYZ;
     }
 }
 

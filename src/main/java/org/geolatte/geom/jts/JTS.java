@@ -22,18 +22,20 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 import org.geolatte.geom.*;
 
 /**
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA, 2011 (original code)
+ * @author Yves Vandewoude, Qmino bvba, 2011 (bugfixes)
  */
 public class JTS {
 
@@ -47,46 +49,101 @@ public class JTS {
         return jtsGeometryFactory;
     }
 
+    /**
+     * Primary Factory method that converts a JTS geometry into an equivalent geolatte geometry
+     * @param jtsGeometry the jts geometry to convert
+     * @return an equivalent geolatte geometry
+     */
     public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
         return from(jtsGeometry, jtsGeometry.getSRID());
     }
 
+    /**
+     * Factory method that converts a JTS geometry into an equivalent geolatte geometry and allows the caller to
+     * specify the srid value of the resulting geolatte geometry.
+     * @param jtsGeometry the jtsGeometry
+     * @param SRID the SRID to use in the geolatte geometry. Note that if the SRID specified differs from the SRID
+     * in the given JTS geometry, the coordinates will *not* be converted automatically.
+     * @return A geolatte geometry that corresponds with the given JTS geometry
+     */
     public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry, int SRID) {
         if (jtsGeometry instanceof Point) {
             return from((Point) jtsGeometry, SRID);
-        }
-
-        if (jtsGeometry instanceof LineString) {
+        } else if (jtsGeometry instanceof LineString) {
             return from((LineString) jtsGeometry, SRID);
-        }
-
-        if (jtsGeometry instanceof Polygon) {
+        } else if (jtsGeometry instanceof Polygon) {
             return from((Polygon) jtsGeometry, SRID);
-        }
-        if (jtsGeometry instanceof MultiPoint) {
+        } else if (jtsGeometry instanceof MultiPoint) {
             return from((MultiPoint) jtsGeometry, SRID);
-        }
-
-        if (jtsGeometry instanceof MultiLineString) {
+        } else if (jtsGeometry instanceof MultiLineString) {
             return from((MultiLineString) jtsGeometry, SRID);
+        } else if (jtsGeometry instanceof MultiPolygon) {
+            return from((MultiPolygon) jtsGeometry, SRID);
+        } else if (jtsGeometry instanceof GeometryCollection) {
+            return from((GeometryCollection) jtsGeometry, SRID);
+        } else {
+            throw new JTSConversionException();
         }
-
-        if (jtsGeometry instanceof GeometryCollection) {
-            return from((GeometryCollection) jtsGeometry);
-        }
-
-        throw new JTSConversionException();
     }
 
+    /**
+     * Primary facotry method that converts a geolatte geometry into an equivalent jts geometry
+     * @param geometry the geolatte geometry to start from
+     * @return the equivalent JTS geometry
+     */
+    public static com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry geometry) {
+        if (geometry instanceof org.geolatte.geom.Point) {
+            return to((org.geolatte.geom.Point) geometry);
+        } else if (geometry instanceof org.geolatte.geom.LineString) {
+            return to((org.geolatte.geom.LineString) geometry);
+        } else if (geometry instanceof org.geolatte.geom.MultiPoint) {
+            return to((org.geolatte.geom.MultiPoint) geometry);
+        } else if (geometry instanceof org.geolatte.geom.Polygon) {
+            return to((org.geolatte.geom.Polygon) geometry);
+        } else if (geometry instanceof org.geolatte.geom.MultiLineString) {
+            return to((org.geolatte.geom.MultiLineString) geometry);
+        } else if (geometry instanceof org.geolatte.geom.MultiPolygon) {
+            return to((org.geolatte.geom.MultiPolygon) geometry);
+        } else if (geometry instanceof org.geolatte.geom.GeometryCollection) {
+            return to((org.geolatte.geom.GeometryCollection) geometry);
+        } else {
+            throw new JTSConversionException();
+        }
+    }
+
+
+    ///
+    ///  Helpermethods: jts --> geolatte
+    ///
+
+    /*
+     * Converts a jts multipolygon into a geolatte multipolygon
+     */
+    private static org.geolatte.geom.MultiPolygon from(MultiPolygon jtsGeometry, int SRID) {
+        org.geolatte.geom.Polygon[] polygons = new org.geolatte.geom.Polygon[jtsGeometry.getNumGeometries()];
+        for (int i =0; i< jtsGeometry.getNumGeometries(); i++) {
+            polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), SRID);
+        }
+        return org.geolatte.geom.MultiPolygon.create(polygons, SRID);
+    }
+
+    /*
+     * Converts a jts polygon into a geolatte polygon
+     */
     private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, int SRID) {
-        org.geolatte.geom.LinearRing[] linestrings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
-        linestrings[0] = (org.geolatte.geom.LinearRing) from((LineString) jtsGeometry.getExteriorRing(), SRID);
-        for (int i = 1; i < linestrings.length; i++) {
-            linestrings[i] = (org.geolatte.geom.LinearRing) from((LineString) jtsGeometry.getInteriorRingN(i), SRID);
+        org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
+        org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), SRID);
+        rings[0] = org.geolatte.geom.LinearRing.create(extRing.getPoints(), extRing.getSRID());
+        for (int i = 1; i < rings.length; i++) {
+            org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), SRID);
+            rings[i] = org.geolatte.geom.LinearRing.create(intRing.getPoints(), extRing.getSRID());
         }
-        return org.geolatte.geom.Polygon.create(linestrings, jtsGeometry.getSRID());
+        return org.geolatte.geom.Polygon.create(rings, jtsGeometry.getSRID());
     }
 
+    /*
+     * Converts a jts multilinestring into a geolatte multilinestring
+     */
     private static org.geolatte.geom.MultiLineString from(MultiLineString jtsGeometry, int SRID) {
         org.geolatte.geom.LineString[] linestrings = new org.geolatte.geom.LineString[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < linestrings.length; i++) {
@@ -95,29 +152,29 @@ public class JTS {
         return org.geolatte.geom.MultiLineString.create(linestrings, jtsGeometry.getSRID());
     }
 
-    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry) {
-        throw new UnsupportedOperationException();
+    /*
+     * Converts a jts geometrycollection into a geolatte geometrycollection
+     */
+    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, int SRID) {
+        org.geolatte.geom.Geometry[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
+        for (int i=0; i < jtsGeometry.getNumGeometries(); i++) {
+            geoms[i] = from(jtsGeometry.getGeometryN(i), SRID);
+        }
+        return org.geolatte.geom.GeometryCollection.create(geoms, SRID);
     }
 
+    /*
+     * Converts a jts linestring into a geolatte linestring
+     */
     private static org.geolatte.geom.LineString from(LineString jtsLineString, int SRID) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
         return org.geolatte.geom.LineString.create(toPointSequence(cs), SRID);
 
     }
 
-    private static PointSequence toPointSequence(CoordinateSequence cs) {
-        if (cs instanceof PointSequence) return (PointSequence) cs;
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(cs.size(), CartesianCoordinateSystem.XYZ);
-        double[] coord = new double[3];
-        for (int i = 0; i < cs.size(); i++) {
-            for (int ci = 0; ci < coord.length; ci++) {
-                coord[ci] = cs.getOrdinate(i, ci);
-            }
-            builder.add(coord);
-        }
-        return builder.toPointSequence();
-    }
-
+    /*
+     * Converts a jts multipoint into a geolatte multipoint
+     */
     private static org.geolatte.geom.MultiPoint from(MultiPoint jtsMultiPoint, int SRID) {
         if (jtsMultiPoint == null || jtsMultiPoint.getNumGeometries() == 0)
             return org.geolatte.geom.MultiPoint.createEmpty();
@@ -128,37 +185,19 @@ public class JTS {
         return org.geolatte.geom.MultiPoint.create(points, SRID);
     }
 
+    /*
+     * Converts a jts point into a geolatte point
+     */
     private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, int SRID) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
         return org.geolatte.geom.Point.create(toPointSequence(cs), SRID);
     }
 
-    protected static CoordinateSequence sequenceOf(org.geolatte.geom.Geometry geometry) {
-        //TODO - when not Geometry instances, create a new PointSequence from the Geometry's Points.
-        if (!(geometry != null)) {
-            throw new JTSConversionException("Can't convert null geometries.");
-        }
-        return (CoordinateSequence) geometry.getPoints();
-    }
+    ///
+    ///  Helpermethods: geolatte --> jts
+    ///
 
-    public static com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry geometry) {
-        if (geometry instanceof org.geolatte.geom.Point)
-            return to((org.geolatte.geom.Point) geometry);
-
-        if (geometry instanceof org.geolatte.geom.LineString)
-            return to((org.geolatte.geom.LineString) geometry);
-
-        if (geometry instanceof org.geolatte.geom.MultiPoint)
-            return to((org.geolatte.geom.MultiPoint) geometry);
-
-        if (geometry instanceof org.geolatte.geom.Polygon)
-            return to((org.geolatte.geom.Polygon) geometry);
-
-        throw new JTSConversionException();
-
-    }
-
-    public static Polygon to(org.geolatte.geom.Polygon polygon) {
+    private static Polygon to(org.geolatte.geom.Polygon polygon) {
         LinearRing shell = to(polygon.getExteriorRing());
         LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
         for (int i = 0; i < holes.length; i++) {
@@ -169,32 +208,98 @@ public class JTS {
         return pg;
     }
 
-    public static Point to(org.geolatte.geom.Point point) {
+    private static Point to(org.geolatte.geom.Point point) {
         Point pnt = geometryFactory().createPoint(sequenceOf(point));
         pnt.setSRID(point.getSRID());
         return pnt;
     }
 
-    public static LineString to(org.geolatte.geom.LineString lineString) {
+    private static LineString to(org.geolatte.geom.LineString lineString) {
         LineString ls = geometryFactory().createLineString(sequenceOf(lineString));
         ls.setSRID(lineString.getSRID());
         return ls;
     }
 
-    public static LinearRing to(org.geolatte.geom.LinearRing linearRing) {
+    private static LinearRing to(org.geolatte.geom.LinearRing linearRing) {
         LinearRing lr = geometryFactory().createLinearRing(sequenceOf(linearRing));
         lr.setSRID(linearRing.getSRID());
         return lr;
     }
 
-
-    public static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
+    private static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
         MultiPoint mp = geometryFactory().createMultiPoint(sequenceOf(multiPoint));
         mp.setSRID(multiPoint.getSRID());
+        for (int i =0;i <mp.getNumGeometries(); i++) {
+            mp.getGeometryN(i).setSRID(multiPoint.getSRID());
+        }
         return mp;
     }
 
+    private static MultiLineString to(org.geolatte.geom.MultiLineString multiLineString) {
+        LineString[] lineStrings = new LineString[multiLineString.getNumGeometries()];
+        for (int i=0; i < multiLineString.getNumGeometries(); i++) {
+            lineStrings[i] = to(multiLineString.getGeometryN(i));
+        }
+        MultiLineString mls = geometryFactory().createMultiLineString(lineStrings);
+        mls.setSRID(multiLineString.getSRID());
+        return mls;
+    }
 
+    private static MultiPolygon to(org.geolatte.geom.MultiPolygon multiPolygon) {
+        Polygon[] polygons = new Polygon[multiPolygon.getNumGeometries()];
+        for (int i=0; i < multiPolygon.getNumGeometries(); i++) {
+            polygons[i] = to(multiPolygon.getGeometryN(i));
+        }
+        MultiPolygon mp = geometryFactory().createMultiPolygon(polygons);
+        mp.setSRID(multiPolygon.getSRID());
+        return mp;
+    }
+
+    private static GeometryCollection to(org.geolatte.geom.GeometryCollection collection) {
+        Geometry[] geoms = new Geometry[collection.getNumGeometries()];
+        for (int i=0; i < collection.getNumGeometries(); i++) {
+            geoms[i] = to(collection.getGeometryN(i));
+        }
+        GeometryCollection gc = geometryFactory().createGeometryCollection(geoms);
+        gc.setSRID(collection.getSRID());
+        return gc;
+    }
+
+    /*
+     * Helpermethod that transforms a coordinatesequence into a pointsequence.
+     */
+    private static PointSequence toPointSequence(CoordinateSequence cs) {
+        if (cs instanceof PointSequence) {
+            return (PointSequence) cs;
+        }
+        double[] coord;
+        DimensionalFlag df;
+        // TODO: A problem remains when the first point has a z value and the others don't
+        if (Double.isNaN(cs.getCoordinate(0).z)) {
+            df = DimensionalFlag.XY;
+            coord = new double[2];
+        } else {
+            df = DimensionalFlag.XYZ;
+            coord = new double[3];
+        }
+        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(cs.size(), df);
+        for (int i = 0; i < cs.size(); i++) {
+            for (int ci = 0; ci < coord.length; ci++) {
+                coord[ci] = cs.getOrdinate(i, ci);
+            }
+            builder.add(coord);
+        }
+        return builder.toPointSequence();
+    }
+
+    private static CoordinateSequence sequenceOf(org.geolatte.geom.Geometry geometry) {
+        //TODO - when not Geometry instances, create a new PointSequence from the Geometry's Points.
+        if (geometry == null) {
+            throw new JTSConversionException("Can't convert null geometries.");
+        } else {
+            return (CoordinateSequence) geometry.getPoints();
+        }
+    }
 }
 
 

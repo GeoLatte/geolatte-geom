@@ -24,7 +24,6 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
 
 import java.util.Iterator;
 
@@ -48,8 +47,8 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
     }
 
     @Override
-    public CartesianCoordinateSystem getCoordinateSystem() {
-        return CartesianCoordinateSystem.XY;
+    public DimensionalFlag getDimensionalFlag() {
+        return DimensionalFlag.XY;
     }
 
     @Override

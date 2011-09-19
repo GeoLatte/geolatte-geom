@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
 
 /**
@@ -34,5 +34,5 @@ public abstract class WKTWordMatcher {
 
     public abstract String wordFor(Geometry geometry);
 
-    public abstract String wordFor(CartesianCoordinateSystem flag);
+    public abstract String wordFor(DimensionalFlag flag);
 }

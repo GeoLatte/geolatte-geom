@@ -21,8 +21,6 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.CoordinateAccessor;
-
 import java.util.Arrays;
 
 /**
@@ -31,21 +29,13 @@ import java.util.Arrays;
  */
 public class CoordinateSystem {
 
-
-    protected final AccessorToAxisMap accessorToAxisMap;
     protected final CoordinateSystemAxis[] axes;
 
-    public CoordinateSystem(AccessorToAxisMap accessorToAxisMap, CoordinateSystemAxis... axes) {
+    public CoordinateSystem(CoordinateSystemAxis... axes) {
         if (axes == null || axes.length < 2) {
             throw new IllegalArgumentException("Require at least 2 axes");
         }
-        this.accessorToAxisMap = accessorToAxisMap;
-        this.accessorToAxisMap.initialize(axes);
         this.axes = axes;
-    }
-
-    public CoordinateSystem(CoordinateSystemAxis... axes) {
-        this(AccessorToAxisMap.createDefault(), axes);
     }
 
     public CoordinateSystemAxis[] getAxes() {
@@ -56,24 +46,8 @@ public class CoordinateSystem {
         return this.axes.length;
     }
 
-    public boolean is3D() {
-        return getIndex(CoordinateAccessor.Z) > -1;
-    }
 
-    public boolean isMeasured() {
-        return getIndex(CoordinateAccessor.M) > -1;
-    }
 
-    /**
-     * Returns the index in the coordinates of a position (an array) that is used
-     * by the specified <code>CoordinateAccessor</code>.
-     *
-     * @param accessor a enum value that represent a coordinate accessor method.
-     * @return the index in the coordinates to be used by the specified accessor.
-     */
-    public int getIndex(CoordinateAccessor accessor) {
-        return this.accessorToAxisMap.getIndex(accessor);
-    }
 
     public int getAxisIndex(CoordinateSystemAxis axis) {
         int i = 0;

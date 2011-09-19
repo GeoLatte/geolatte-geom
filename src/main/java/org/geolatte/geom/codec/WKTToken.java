@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.crs.CartesianCoordinateSystem;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.GeometryType;
 
 /**
@@ -51,7 +51,7 @@ abstract class WKTToken {
         return new PointSequence(sequence);
     }
 
-    static WKTToken dimensionMarker(CartesianCoordinateSystem flag) {
+    static WKTToken dimensionMarker(DimensionalFlag flag) {
         return new DimensionMarker(flag);
     }
 
@@ -111,18 +111,18 @@ abstract class WKTToken {
     }
 
     static class DimensionMarker extends WKTToken {
-        private CartesianCoordinateSystem coordinateSystem;
+        private DimensionalFlag dimensionalFlag;
 
-        DimensionMarker(CartesianCoordinateSystem flag) {
-            this.coordinateSystem = flag;
+        DimensionMarker(DimensionalFlag flag) {
+            this.dimensionalFlag = flag;
         }
 
         public boolean isMeasured() {
-            return this.coordinateSystem.isMeasured();
+            return this.dimensionalFlag.isMeasured();
         }
 
         public boolean is3D() {
-            return this.coordinateSystem.is3D();
+            return this.dimensionalFlag.is3D();
         }
     }
 

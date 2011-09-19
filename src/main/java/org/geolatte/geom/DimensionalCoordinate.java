@@ -22,7 +22,6 @@
 package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.geolatte.geom.crs.CoordinateSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -31,38 +30,38 @@ import org.geolatte.geom.crs.CoordinateSystem;
 public class DimensionalCoordinate extends Coordinate {
 
     public double m;
-    private final CoordinateSystem coordinateSystem;
+    private final DimensionalFlag dimensionalFlag;
 
-    DimensionalCoordinate(CoordinateSystem coordinateSystem){
+    DimensionalCoordinate(DimensionalFlag dimensionalFlag){
         super();
         this.m = Double.NaN;
-        this.coordinateSystem = coordinateSystem;
+        this.dimensionalFlag = dimensionalFlag;
     }
 
-    DimensionalCoordinate(Coordinate c, double m, CoordinateSystem coordinateSystem) {
+    DimensionalCoordinate(Coordinate c, double m, DimensionalFlag dimensionalFlag) {
         super(c);
         this.m = m;
-        this.coordinateSystem = coordinateSystem;
+        this.dimensionalFlag = dimensionalFlag;
     }
 
     public double getZ(){
-        return  (this.coordinateSystem.is3D()) ? this.z : Double.NaN;
+        return  (this.dimensionalFlag.is3D()) ? this.z : Double.NaN;
     }
 
     public double getM(){
-        return (this.coordinateSystem.isMeasured()) ? this.m : Double.NaN;
+        return (this.dimensionalFlag.isMeasured()) ? this.m : Double.NaN;
     }
 
     public boolean is3D(){
-        return this.coordinateSystem.is3D();
+        return this.dimensionalFlag.is3D();
     }
 
     public boolean isMeasured(){
-        return this.coordinateSystem.isMeasured();
+        return this.dimensionalFlag.isMeasured();
     }
 
-    public CoordinateSystem getCoordinateSystem(){
-        return this.coordinateSystem;
+    public DimensionalFlag getDimensionalFlag(){
+        return this.dimensionalFlag;
     }
 
 
