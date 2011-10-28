@@ -1,7 +1,5 @@
 package org.geolatte.geom.crs;
 
-import sun.org.mozilla.javascript.internal.Undefined;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
