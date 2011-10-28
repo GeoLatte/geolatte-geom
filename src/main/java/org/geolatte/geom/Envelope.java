@@ -17,6 +17,10 @@ public class Envelope {
         this(lowerLeft.getX(), lowerLeft.getY(), upperRight.getX(), upperRight.getY(), crsId);
     }
 
+    public Envelope(double minX, double minY, double maxX, double maxY) {
+        this(minX, minY, maxX, maxY, CrsId.UNDEFINED);
+    }
+
     public Envelope(double minX, double minY, double maxX, double maxY, CrsId crsId) {
         if (minX > maxX || minY > maxY)
             throw new IllegalArgumentException("Valid Bounding boxes require minX <= maxX and minY <= maxY");

@@ -12,6 +12,24 @@ public class CrsId {
     final String authority;
     final int code;
 
+    static public CrsId parse(String srsString) {
+          if (srsString == null || srsString.isEmpty())
+              throw new IllegalArgumentException("Require input of form '<authority>:<code>");
+          String[] tokens = srsString.split(":");
+          String authority;
+          String codeStr = tokens[tokens.length - 1];
+          codeStr = codeStr.trim();
+          int code = Integer.valueOf(codeStr);
+          authority = "EPSG";
+          if (tokens.length == 2) {
+              authority = tokens[0];
+          }
+          return new CrsId(authority, code);
+      }
+
+
+
+
     public CrsId(String authority, int code) {
         this.authority = authority;
         this.code = code;
@@ -24,6 +42,8 @@ public class CrsId {
     public int getCode() {
         return code;
     }
+
+
 
     @Override
     public String toString() {
