@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
- * Models the tokens in CRS WKT strings.
+ * Models the tokens in CrsRegistry WKT strings.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11

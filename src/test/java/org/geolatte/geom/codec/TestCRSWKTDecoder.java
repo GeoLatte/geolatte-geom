@@ -119,7 +119,7 @@ public class TestCRSWKTDecoder {
         assertTrue (system instanceof ProjectedCoordinateReferenceSystem);
         ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem)system;
 
-        //check the geo-CRS
+        //check the geo-CrsRegistry
         assertEquals(4313, projCRS.getGeographicCoordinateSystem().getSRID());
         GeographicCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
         double[] expected = new double[]{106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1};

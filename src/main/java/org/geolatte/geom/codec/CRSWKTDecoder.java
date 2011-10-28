@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Decodes the WKT CRS definitions according to the Postgis
+ * Decodes the WKT CrsRegistry definitions according to the Postgis
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
@@ -170,7 +170,7 @@ public class CRSWKTDecoder {
             };
         }
 
-        throw new IllegalStateException("Can't create default for CRS of type " + crsClass.getCanonicalName());
+        throw new IllegalStateException("Can't create default for CrsRegistry of type " + crsClass.getCanonicalName());
 
     }
 

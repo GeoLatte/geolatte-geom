@@ -38,9 +38,9 @@ import java.util.Map;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CRS {
+public class CrsRegistry {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CRS.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
     private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
     private static final String DELIM = "\\|";
 
@@ -67,7 +67,7 @@ public class CRS {
     }
 
     private static BufferedReader createReader() {
-        InputStream in = CRS.class.getClassLoader().getResourceAsStream("spatial_ref_sys.txt");
+        InputStream in = CrsRegistry.class.getClassLoader().getResourceAsStream("spatial_ref_sys.txt");
         if (in == null) {
             throw new IllegalStateException("Can't find spatial_ref_sys definitions.");
         }
