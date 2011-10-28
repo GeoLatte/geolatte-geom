@@ -90,7 +90,7 @@ public class Envelope {
     }
 
     public static Envelope union(Envelope b1, Envelope b2) {
-        if (b1.getCrsId() != b2.getCrsId()) throw new IllegalArgumentException("Envelopes have different CRS.");
+        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         if (b1 == null) return b2;
         if (b2 == null) return b1;
         double minX = Math.min(b1.getMinX(), b2.getMinX());
@@ -107,7 +107,7 @@ public class Envelope {
      * @return
      */
     public Envelope intersect(Envelope bbox) {
-        if (this.getCrsId() != bbox.getCrsId()) throw new IllegalArgumentException("Envelopes have different CRS.");
+        if (!this.getCrsId().equals(bbox.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         double minX = Math.max(bbox.getMinX(), getMinX());
         double minY = Math.max(bbox.getMinY(), getMinY());
         double maxX = Math.min(bbox.getMaxX(), getMaxX());
@@ -129,6 +129,7 @@ public class Envelope {
      * @param bbox
      */
     public boolean isWithin(Envelope bbox) {
+        if (!this.getCrsId().equals(bbox.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         return bbox.getMinX() <= this.getMinX() &&
                 bbox.getMaxX() >= this.getMaxX() &&
                 bbox.getMinY() <= this.getMinY() &&

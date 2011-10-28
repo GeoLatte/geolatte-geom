@@ -130,7 +130,6 @@ public class Point extends Geometry {
     }
 
     //TODO -- is this still necessary?? If Geometry's equals not enough?
-    @Override
     public boolean equals(Object o){
         if (this == o) return true;
         if (! (o instanceof Point)){
