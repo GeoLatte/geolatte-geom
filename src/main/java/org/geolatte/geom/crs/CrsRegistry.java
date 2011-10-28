@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Repository for <code>CoordinateReferenceSystem</code>s.
+
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
