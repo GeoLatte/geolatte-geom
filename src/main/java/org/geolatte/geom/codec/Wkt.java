@@ -21,11 +21,20 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
+
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class WKTParseException extends RuntimeException {
-    WKTParseException(String msg) {
-        super(msg);
+public class Wkt {
+
+    public static Geometry fromWkt(String wkt) {
+        Postgisv15WktDecoder decoder = new Postgisv15WktDecoder();
+        return decoder.decode(wkt);
+    }
+
+    public static String toWkt(Geometry geometry) {
+        Postgisv15WktEncoder encoder = new Postgisv15WktEncoder();
+        return encoder.encode(geometry);
     }
 }

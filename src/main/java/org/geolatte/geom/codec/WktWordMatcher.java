@@ -21,46 +21,19 @@
 
 package org.geolatte.geom.codec;
 
-import java.nio.ByteOrder;
+import org.geolatte.geom.DimensionalFlag;
+import org.geolatte.geom.Geometry;
 
 /**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: Oct 29, 2010
+ * A Word make
+ * @author Karel Maesen, Geovise BVBA, 2011
  */
-public enum WKBByteOrder {
-
-    XDR(ByteOrder.BIG_ENDIAN, (byte) 0),
-    NDR(ByteOrder.LITTLE_ENDIAN, (byte) 1);
-
-    private ByteOrder order;
-    private byte orderByte;
-
-    private WKBByteOrder(ByteOrder order, byte orderByte) {
-        this.order = order;
-        this.orderByte = orderByte;
-    }
+public abstract class WktWordMatcher {
 
 
-    public static WKBByteOrder valueOf(byte orderByte) {
-        for (WKBByteOrder wbo : values()) {
-            if (orderByte == wbo.byteValue()) return wbo;
-        }
-        throw new IllegalArgumentException("Order byte must be 0 or 1");
-    }
+    public abstract WktToken match(CharSequence wkt, int currentPos, int endPos);
 
-    ByteOrder getByteOrder() {
-        return this.order;
-    }
+    public abstract String wordFor(Geometry geometry);
 
-    byte byteValue() {
-        return orderByte;
-    }
-
-    static WKBByteOrder valueOf(ByteOrder byteOrder) {
-        for (WKBByteOrder wkbOrder : values()) {
-            if (wkbOrder.getByteOrder() == byteOrder) return wkbOrder;
-        }
-        throw new IllegalArgumentException();
-    }
-
+    public abstract String wordFor(DimensionalFlag flag);
 }

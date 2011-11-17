@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class TestPGWKBEncoderDecoder15 {
+public class TestPostgisv15WkbDecoder {
 
 
     CodecTestCases testcases = new CodecTestCases();
@@ -193,14 +193,14 @@ public class TestPGWKBEncoderDecoder15 {
 
 
     private void testEncoding(Bytes bytes, Geometry geom) {
-        Bytes out = WKB.toWKB(geom);
+        Bytes out = Wkb.toWkb(geom);
         assertTrue(String.format("Expected: %s, Received: %s", bytes.toString(), out.toString()),
                 bytes.hasSameContent(out));
     }
 
 
     private Geometry decode(Bytes bytes) {
-        return WKB.fromWKB(bytes);
+        return Wkb.fromWkb(bytes);
     }
 
 }

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class TestPGWKTEncoderDecoder15 {
+public class TestPostgisv15WktEncoderDecoder {
 
     CodecTestCases testcases = new CodecTestCases();
 
@@ -47,7 +47,7 @@ public class TestPGWKTEncoderDecoder15 {
     }
 
     private void testEncoding(String wkt, Geometry geom) {
-        Assert.assertEquals(wkt, WKT.toWKT(geom));
+        Assert.assertEquals(wkt, Wkt.toWkt(geom));
     }
 
     @Test
@@ -186,7 +186,7 @@ public class TestPGWKTEncoderDecoder15 {
 
 
     private Geometry decode(String wkt) {
-        return WKT.fromWKT(wkt);  //To change body of created methods use File | Settings | File Templates.
+        return Wkt.fromWkt(wkt);  //To change body of created methods use File | Settings | File Templates.
     }
 
 

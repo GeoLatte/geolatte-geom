@@ -21,20 +21,17 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
-
 /**
- * @author Karel Maesen, Geovise BVBA, 2011
+ * Bit masks for PostGIS Wkb Encoder/Decoder.
+ *
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 4/19/11
  */
-public class WKT {
+public class Postgisv15WkbTypeMasks {
 
-    public static Geometry fromWKT(String wkt) {
-        PGWKTDecoder15 decoder = new PGWKTDecoder15();
-        return decoder.decode(wkt);
-    }
+    public static final int Z_FLAG = 0x80000000;
+    public static final int M_FLAG = 0x40000000;
+    public static final int SRID_FLAG = 0x20000000;
 
-    public static String toWKT(Geometry geometry) {
-        PGWKTEncoder15 encoder = new PGWKTEncoder15();
-        return encoder.encode(geometry);
-    }
+
 }

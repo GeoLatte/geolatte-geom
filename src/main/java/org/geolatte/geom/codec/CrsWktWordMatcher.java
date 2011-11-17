@@ -33,17 +33,17 @@ import java.util.regex.Matcher;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CRSWKTWordMatcher extends WKTWordMatcher{
+public class CrsWktWordMatcher extends WktWordMatcher {
 
-    private final static Set<CRSWKTToken> tokens;
+    private final static Set<CrsWktToken> TOKENs;
 
     static {
-        tokens = new HashSet<CRSWKTToken>();
-        for (Field field : CRSWKTToken.class.getDeclaredFields()) {
+        TOKENs = new HashSet<CrsWktToken>();
+        for (Field field : CrsWktToken.class.getDeclaredFields()) {
             if ( isCRSWKTTokenField(field) ){
                 try {
                     Object o = field.get(null);
-                    tokens.add((CRSWKTToken)o);
+                    TOKENs.add((CrsWktToken)o);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException("Programming error.", e);
                 }
@@ -52,20 +52,20 @@ public class CRSWKTWordMatcher extends WKTWordMatcher{
     }
 
     private static boolean isCRSWKTTokenField(Field field){
-        return CRSWKTToken.class.isAssignableFrom(field.getType());
+        return CrsWktToken.class.isAssignableFrom(field.getType());
     }
 
     @Override
-    public WKTToken match(CharSequence wkt, int currentPos, int endPos) {
+    public WktToken match(CharSequence wkt, int currentPos, int endPos) {
 
-        for (CRSWKTToken token : tokens){
+        for (CrsWktToken token : TOKENs){
              Matcher m = token.getPattern().matcher(wkt);
              m.region(currentPos, endPos);
              if (m.matches()) {
                  return token;
              }
         }
-        throw new WKTParseException(String.format("Can't interpret word %s in WKT.", wkt.subSequence(currentPos, endPos)));
+        throw new WktParseException(String.format("Can't interpret word %s in Wkt.", wkt.subSequence(currentPos, endPos)));
     }
 
     @Override

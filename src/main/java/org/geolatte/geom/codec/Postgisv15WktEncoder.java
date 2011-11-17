@@ -32,9 +32,9 @@ import java.util.Locale;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PGWKTEncoder15 {
+public class Postgisv15WktEncoder {
 
-    private final static WKTWordMatcher wktWords = new PGWKTWordMatcher15();
+    private final static WktWordMatcher WKT_WORDS = new Postgisv15WktWordMatcher();
 
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
     private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
@@ -44,7 +44,7 @@ public class PGWKTEncoder15 {
     private static final int MAX_FRACTIONAL_DIGITS = 24;
     private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
-    public PGWKTEncoder15() {
+    public Postgisv15WktEncoder() {
         formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
         formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
     }
@@ -168,7 +168,7 @@ public class PGWKTEncoder15 {
     }
 
     private void addGeometryTag(Geometry geometry) {
-        this.builder.append(wktWords.wordFor(geometry));
+        this.builder.append(WKT_WORDS.wordFor(geometry));
     }
 
     private String result() {

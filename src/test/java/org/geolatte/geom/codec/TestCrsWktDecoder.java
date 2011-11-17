@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class TestCRSWKTDecoder {
+public class TestCrsWktDecoder {
 
     private static final String WKT_4326 = "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]";
 
@@ -51,7 +51,7 @@ public class TestCRSWKTDecoder {
 
     @Test
     public void testDecodeWGS84() {
-        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem system = decoder.decode(WKT_4326);
         assertNotNull(system);
         assertTrue (system instanceof GeographicCoordinateReferenceSystem);
@@ -89,7 +89,7 @@ public class TestCRSWKTDecoder {
 
     @Test
     public void testDecodeWGS84SpheroidNoAuthority() {
-        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem system = decoder.decode(WKT_4326_SPHEROID_NO_AUTHORITY);
         assertNotNull(system);
         assertTrue (system instanceof GeographicCoordinateReferenceSystem);
@@ -113,7 +113,7 @@ public class TestCRSWKTDecoder {
 
     @Test
     public void testDecodeLambert72(){
-        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem system = decoder.decode(WKT_31370);
         assertNotNull(system);
         assertTrue (system instanceof ProjectedCoordinateReferenceSystem);
@@ -150,7 +150,7 @@ public class TestCRSWKTDecoder {
 
     @Test
     public void testDecodeWKT3031() {
-        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CrsWktDecoder decoder = new CrsWktDecoder();
         ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3031);
         assertNotNull(system);
         assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getCoordinateSystem().getAxis(0));
@@ -160,7 +160,7 @@ public class TestCRSWKTDecoder {
 
     @Test
     public void testDecodeWKT3409() {
-        CRSWKTDecoder decoder = new CRSWKTDecoder();
+        CrsWktDecoder decoder = new CrsWktDecoder();
         ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3409);
         assertNotNull(system);
 //        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.UNKNOWN, Unit.METER) , system.getDimensionalFlag().getAxis(0));

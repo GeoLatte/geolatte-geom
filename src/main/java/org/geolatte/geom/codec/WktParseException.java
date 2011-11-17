@@ -21,18 +21,11 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.Geometry;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public abstract class WKTWordMatcher {
-
-
-    public abstract WKTToken match(CharSequence wkt, int currentPos, int endPos);
-
-    public abstract String wordFor(Geometry geometry);
-
-    public abstract String wordFor(DimensionalFlag flag);
+public class WktParseException extends RuntimeException {
+    WktParseException(String msg) {
+        super(msg);
+    }
 }

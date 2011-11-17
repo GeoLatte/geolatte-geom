@@ -27,34 +27,20 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/19/11
  */
-public enum WKBGeometryType {
+public enum WkbGeometryType {
 
 
     POINT(1, Point.class),
-
-//    CURVE(13, Curve.class),
-
-//    SURFACE(14, Surface.class),
 
     GEOMETRY_COLLECTION(7, GeometryCollection.class),
 
     LINE_STRING(2, LineString.class),
 
-    LINE(2, LineString.class),
-
-    LINEAR_RING(2, LinearRing.class),
-
     POLYGON(3, Polygon.class),
 
     POLYHEDRAL_SURFACE(15, PolyHedralSurface.class),
 
-//    MULTI_SURFACE(12, MultiSurface.class),
-//
-//    MULTI_CURVE(11, MultiCurve.class),
-
     MULTI_POINT(4, MultiPoint.class),
-
-//    TIN(16, TIN.class),
 
     MULTI_POLYGON(6, MultiPolygon.class),
 
@@ -63,7 +49,7 @@ public enum WKBGeometryType {
     private int wkbType;
     private Class<? extends Geometry> geometryClass;
 
-    private WKBGeometryType(int type, Class<? extends Geometry> geometryClass) {
+    private WkbGeometryType(int type, Class<? extends Geometry> geometryClass) {
         this.wkbType = type;
         this.geometryClass = geometryClass;
     }
@@ -72,16 +58,16 @@ public enum WKBGeometryType {
         return this.wkbType;
     }
 
-    public static WKBGeometryType parse(int typeCode) {
-        for (WKBGeometryType type : values()) {
+    public static WkbGeometryType parse(int typeCode) {
+        for (WkbGeometryType type : values()) {
             if (type.wkbType == typeCode) return type;
         }
         throw new IllegalArgumentException("Type code " + typeCode + " is not known.");
     }
 
-    public static WKBGeometryType forClass(Class<? extends Geometry> geomClass) {
-        WKBGeometryType candidate = null;
-        for (WKBGeometryType type : values()) {
+    public static WkbGeometryType forClass(Class<? extends Geometry> geomClass) {
+        WkbGeometryType candidate = null;
+        for (WkbGeometryType type : values()) {
             if (type.geometryClass.isAssignableFrom(geomClass) &&
                     isMoreSpecificClassMatch(candidate, type)) {
                 candidate = type;
@@ -90,7 +76,7 @@ public enum WKBGeometryType {
         return candidate;
     }
 
-    private static boolean isMoreSpecificClassMatch(WKBGeometryType candidate, WKBGeometryType type) {
+    private static boolean isMoreSpecificClassMatch(WkbGeometryType candidate, WkbGeometryType type) {
         return (candidate == null || candidate.geometryClass.isAssignableFrom(type.geometryClass));
     }
 }

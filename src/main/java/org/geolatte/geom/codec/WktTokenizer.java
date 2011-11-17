@@ -28,10 +28,10 @@ import org.geolatte.geom.PointSequenceBuilder;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class WKTTokenizer {
+public class WktTokenizer {
 
     private final CharSequence wkt;
-    private final WKTWordMatcher wordMatcher;
+    private final WktWordMatcher wordMatcher;
     private int currentPos = 0;
     private boolean isMeasured = false;
     private char openListChar = '(';
@@ -39,20 +39,20 @@ public class WKTTokenizer {
     private boolean pointListAsSingleToken = true;
 
 
-    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher) {
+    WktTokenizer(CharSequence wkt, WktWordMatcher wordMatcher) {
         this.wkt = wkt;
         this.wordMatcher = wordMatcher;
     }
 
     /**
-     * A Tokenizer for WKT strings
+     * A Tokenizer for Wkt strings
      * @param wkt the string to tokenize
      * @param wordMatcher the list of words to recognize as separate tokens
      * @param openListChar the "open list" character
      * @param closeListChar the "close list" character
      * @param pointListAsSingelNumber this treats any substring consisting of list delimiters and numeric characters as a single pointlist
      */
-    WKTTokenizer(CharSequence wkt, WKTWordMatcher wordMatcher, char openListChar, char closeListChar, boolean pointListAsSingelNumber) {
+    WktTokenizer(CharSequence wkt, WktWordMatcher wordMatcher, char openListChar, char closeListChar, boolean pointListAsSingelNumber) {
         this(wkt, wordMatcher);
         this.openListChar = openListChar;
         this.closeListChar = closeListChar;
@@ -64,16 +64,16 @@ public class WKTTokenizer {
         return this.currentPos < wkt.length();
     }
 
-    public WKTToken nextToken() {
+    public WktToken nextToken() {
         if (!moreTokens()) {
-            return WKTToken.end();
+            return WktToken.end();
         }
         if (wkt.charAt(currentPos) == openListChar) {
             currentPos++;
-            return WKTToken.startList();
+            return WktToken.startList();
         } else if (wkt.charAt(currentPos) == closeListChar) {
             currentPos++;
-            return WKTToken.endList();
+            return WktToken.endList();
         } else if (wkt.charAt(currentPos) == '"') {
             return readText();
         } else if (Character.isLetter(wkt.charAt(currentPos))) {
@@ -86,15 +86,15 @@ public class WKTTokenizer {
             }
         } else if (wkt.charAt(currentPos) == ',') {
             currentPos++;
-            return WKTToken.elementSeparator();
+            return WktToken.elementSeparator();
         } else {
-            throw new WKTParseException(String.format("Illegal Character at pos %d in WKT text: %s", currentPos, wkt));
+            throw new WktParseException(String.format("Illegal Character at pos %d in Wkt text: %s", currentPos, wkt));
         }
 
     }
 
     //TODO -- handle irregular whitespace in reading the points.
-    private WKTToken readPointList() {
+    private WktToken readPointList() {
         DimensionalFlag dimensionalFlag = countDimension();
         int numPoints = countPoints();
         double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
@@ -104,7 +104,7 @@ public class WKTTokenizer {
             psBuilder.add(coords);
             skipPointDelimiter();
         }
-        return WKTToken.pointSquence(psBuilder.toPointSequence());
+        return WktToken.pointSquence(psBuilder.toPointSequence());
     }
 
     private void readPoint(double[] coords) {
@@ -116,7 +116,7 @@ public class WKTTokenizer {
     /**
      * Reads a number at the current position.
      *
-     * TODO -- this does not handle approximate numbers (see the WKT spec). Approximate numbers have format: \d+E\d)
+     * TODO -- this does not handle approximate numbers (see the Wkt spec). Approximate numbers have format: \d+E\d)
      * TODO -- this has also problems in that it loses precision (cfr. 51.16666723333333 becomes 51.16666723333332)
      *
      *
@@ -174,12 +174,12 @@ public class WKTTokenizer {
     }
 
 
-    protected WKTToken readNumberToken(){
+    protected WktToken readNumberToken(){
         double d = readNumber();
-        return new WKTToken.NumberToken(d);
+        return new WktToken.NumberToken(d);
     }
 
-    protected WKTToken readText(){
+    protected WktToken readText(){
         StringBuilder builder = new StringBuilder();
         char c = wkt.charAt(++currentPos);
         while ( c != '"') {
@@ -187,7 +187,7 @@ public class WKTTokenizer {
             c = wkt.charAt(++currentPos);
         }
         currentPos++;
-        return new WKTToken.TextToken(builder.toString());
+        return new WktToken.TextToken(builder.toString());
     }
 
     private int countPoints() {
@@ -203,7 +203,7 @@ public class WKTTokenizer {
 
     /**
      * Determines the dimension by counting the number of coordinates in the current point,
-     * and taking into account if the tokenizer has already determined that the current WKT geometery
+     * and taking into account if the tokenizer has already determined that the current Wkt geometery
      * is measured or not.
      *
      * @return
@@ -221,14 +221,14 @@ public class WKTTokenizer {
                 num++;
                 inNumber = true;
             }
-            if (pos == wkt.length() - 1) throw new WKTParseException("");
+            if (pos == wkt.length() - 1) throw new WktParseException("");
             c = wkt.charAt(++pos);
         }
         if (num == 4) return DimensionalFlag.XYZM;
         if (num == 3 && isMeasured) return DimensionalFlag.XYM;
         if (num == 3 && !isMeasured) return DimensionalFlag.XYZ;
         if (num == 2) return DimensionalFlag.XY;
-        throw new WKTParseException("Point with less than 2 coordinates at position " + currentPos);
+        throw new WktParseException("Point with less than 2 coordinates at position " + currentPos);
     }
 
     private void skipWhitespace() {
@@ -242,12 +242,12 @@ public class WKTTokenizer {
         if (wkt.charAt(currentPos) == ',') currentPos++;
     }
 
-    private WKTToken readWord() {
+    private WktToken readWord() {
         int endPos = this.currentPos;
         while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
             endPos++;
         }
-        WKTToken nextToken = matchWord(currentPos, endPos);
+        WktToken nextToken = matchWord(currentPos, endPos);
         currentPos = endPos;
         return nextToken;
     }
@@ -257,21 +257,21 @@ public class WKTTokenizer {
     }
 
     /**
-     * Determines if the current word matches a WKT symbol.
+     * Determines if the current word matches a Wkt symbol.
      * <p/>
-     * <p>As a side-effect it informs this WKTTokenizer whether to expect coordinates with an M-coordinate.</p>
+     * <p>As a side-effect it informs this WktTokenizer whether to expect coordinates with an M-coordinate.</p>
      *
      * @param currentPos
      * @param endPos
      * @return
      */
-    private WKTToken matchWord(int currentPos, int endPos) {
-        WKTToken token = wordMatcher.match(wkt, currentPos, endPos);
-        if (token instanceof WKTToken.Geometry) {
-            this.isMeasured = ((WKTToken.Geometry) token).isMeasured();
+    private WktToken matchWord(int currentPos, int endPos) {
+        WktToken token = wordMatcher.match(wkt, currentPos, endPos);
+        if (token instanceof WktToken.Geometry) {
+            this.isMeasured = ((WktToken.Geometry) token).isMeasured();
         }
-        if (token instanceof WKTToken.DimensionMarker) {
-            this.isMeasured = ((WKTToken.DimensionMarker) token).isMeasured();
+        if (token instanceof WktToken.DimensionMarker) {
+            this.isMeasured = ((WktToken.DimensionMarker) token).isMeasured();
         }
         return token;
     }

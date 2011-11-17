@@ -29,35 +29,35 @@ import static org.junit.Assert.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class TestCRSWKTWordMatcher {
+public class TestCrsWktWordMatcher {
 
-    private CRSWKTWordMatcher matcher = new CRSWKTWordMatcher();
+    private CrsWktWordMatcher matcher = new CrsWktWordMatcher();
 
     @Test
     public void testMatchingProjectedCRS(){
         String test = "PROJCS";
-        WKTToken token = matcher.match(test, 0, test.length());
+        WktToken token = matcher.match(test, 0, test.length());
         assertNotNull(token);
-        assertTrue(token instanceof CRSWKTToken);
-        assertEquals(CRSWKTToken.PROJCS, token);
+        assertTrue(token instanceof CrsWktToken);
+        assertEquals(CrsWktToken.PROJCS, token);
     }
 
     @Test
     public void testMatchingGeoGCSCRS(){
         String test = " GEOGCS  ";
-        WKTToken token = matcher.match(test, 1, 7);
+        WktToken token = matcher.match(test, 1, 7);
         assertNotNull(token);
-        assertTrue(token instanceof CRSWKTToken);
-        assertEquals(CRSWKTToken.GEOGCS, token);
+        assertTrue(token instanceof CrsWktToken);
+        assertEquals(CrsWktToken.GEOGCS, token);
     }
 
         @Test
     public void testMatchingGeoAXIS(){
         String test = " AXIS  ";
-        WKTToken token = matcher.match(test, 1, 5);
+        WktToken token = matcher.match(test, 1, 5);
         assertNotNull(token);
-        assertTrue(token instanceof CRSWKTToken);
-        assertEquals(CRSWKTToken.AXIS, token);
+        assertTrue(token instanceof CrsWktToken);
+        assertEquals(CrsWktToken.AXIS, token);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TestCRSWKTWordMatcher {
         try {
             matcher.match(test, 0, test.length());
             fail();
-        }catch(WKTParseException e){
+        }catch(WktParseException e){
             //OK
         }
     }

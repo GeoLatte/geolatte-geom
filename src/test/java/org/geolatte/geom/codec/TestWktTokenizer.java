@@ -29,14 +29,14 @@ import static org.junit.Assert.*;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class TestWKTTokenizer {
-    private WKTWordMatcher words = new PGWKTWordMatcher15();
+public class TestWktTokenizer {
+    private WktWordMatcher words = new Postgisv15WktWordMatcher();
 
 
     @Test
     public void test_only_whitespace() {
         String wkt = "    ";
-        WKTTokenizer tokenizer = new WKTTokenizer(wkt, words);
+        WktTokenizer tokenizer = new WktTokenizer(wkt, words);
         assertFalse(tokenizer.moreTokens());
     }
 
@@ -44,90 +44,90 @@ public class TestWKTTokenizer {
     @Test
     public void test_tokenize_empty_point() {
         String wkt = "POINT EMPTY";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.Empty);
+        assertTrue(tokens.nextToken() instanceof WktToken.Empty);
     }
 
 
     @Test
     public void test_tokenize_point() {
         String wkt = "POINT (20 33.3)";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
         assertTrue(tokens.moreTokens());
-        WKTToken.PointSequence pstoken = (WKTToken.PointSequence) (tokens.nextToken());
+        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
         assertFalse(tokens.moreTokens());
     }
 
     @Test
     public void test_tokenize_point_3D() {
         String wkt = "POINT (20 33.3 .24)";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
         assertTrue(tokens.moreTokens());
-        WKTToken.PointSequence pstoken = (WKTToken.PointSequence) (tokens.nextToken());
+        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertEquals(0.24, pstoken.getPoints().getZ(0), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
         assertFalse(tokens.moreTokens());
     }
 
     @Test
     public void test_tokenize_point_M() {
         String wkt = "POINTM (20 33.3 .24)";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertTrue(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
         assertTrue(tokens.moreTokens());
-        WKTToken.PointSequence pstoken = (WKTToken.PointSequence) (tokens.nextToken());
+        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertEquals(0.24, pstoken.getPoints().getM(0), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
         assertFalse(tokens.moreTokens());
     }
 
     @Test
     public void test_tokenize_linestring() {
         String wkt = "LINESTRING(20 33.3 .24 , .1 2 3)";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.LINE_STRING, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
         assertTrue(tokens.moreTokens());
-        WKTToken.PointSequence pstoken = (WKTToken.PointSequence) (tokens.nextToken());
+        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
         assertEquals(2, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
@@ -136,27 +136,27 @@ public class TestWKTTokenizer {
         assertEquals(2d, pstoken.getPoints().getY(1), Math.ulp(20d));
         assertEquals(3d, pstoken.getPoints().getZ(1), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
         assertFalse(tokens.moreTokens());
     }
 
     @Test
     public void test_tokenize_polygon() {
         String wkt = "POLYGON((5 5, 1 0, 1 1 ,0 1, 3 3),(0.25 0.25, 0.25 0.5, 0.5 0.5, 0.5 0.25, 0.25 0.25))";
-        WKTTokenizer tokens = new WKTTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WKTToken.Geometry token = (WKTToken.Geometry) (tokens.nextToken());
+        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
         assertEquals(GeometryType.POLYGON, token.getType());
         assertFalse(token.isMeasured());
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WKTToken.PointSequence);
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
-        assertTrue(tokens.nextToken() instanceof WKTToken.ElementSeparator);
-        assertTrue(tokens.nextToken() instanceof WKTToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WKTToken.PointSequence);
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
-        assertTrue(tokens.nextToken() instanceof WKTToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.PointSequence);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.ElementSeparator);
+        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertTrue(tokens.nextToken() instanceof WktToken.PointSequence);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
         assertFalse(tokens.moreTokens());
     }
 

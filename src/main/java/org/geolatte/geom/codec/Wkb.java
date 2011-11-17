@@ -27,19 +27,19 @@ import org.geolatte.geom.Geometry;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
-public class WKB {
+public class Wkb {
 
-    public static Bytes toWKB(Geometry geometry) {
-        return toWKB(geometry, WKBByteOrder.NDR);
+    public static Bytes toWkb(Geometry geometry) {
+        return toWkb(geometry, WkbByteOrder.NDR);
     }
 
-    public static Bytes toWKB(Geometry geometry, WKBByteOrder byteOrder) {
-        PGWKBEncoder15 encoder = new PGWKBEncoder15();
+    public static Bytes toWkb(Geometry geometry, WkbByteOrder byteOrder) {
+        Postgisv15WkbEncoder encoder = new Postgisv15WkbEncoder();
         return encoder.encode(geometry, byteOrder);
     }
 
-    public static Geometry fromWKB(Bytes bytes) {
-        PGWKBDecoder15 decoder = new PGWKBDecoder15();
+    public static Geometry fromWkb(Bytes bytes) {
+        Postgisv15WkbDecoder decoder = new Postgisv15WkbDecoder();
         return decoder.decode(bytes);
     }
 

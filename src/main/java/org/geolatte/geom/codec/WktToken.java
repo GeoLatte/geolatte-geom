@@ -27,47 +27,47 @@ import org.geolatte.geom.GeometryType;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-abstract class WKTToken {
+abstract class WktToken {
 
-    private static final WKTToken END = new End();
-    private static final WKTToken START_LIST = new StartList();
-    private static final WKTToken END_LIST = new EndList();
-    private static final WKTToken EMPTY = new Empty();
-    private static final WKTToken ELEMENT_SEP = new ElementSeparator();
+    private static final WktToken END = new End();
+    private static final WktToken START_LIST = new StartList();
+    private static final WktToken END_LIST = new EndList();
+    private static final WktToken EMPTY = new Empty();
+    private static final WktToken ELEMENT_SEP = new ElementSeparator();
 
-    static WKTToken geometryTag(GeometryType type, boolean measured) {
+    static WktToken geometryTag(GeometryType type, boolean measured) {
         return new Geometry(type, measured);
     }
 
-    static WKTToken startList() {
+    static WktToken startList() {
         return START_LIST;
     }
 
-    static WKTToken endList() {
+    static WktToken endList() {
         return END_LIST;
     }
 
-    static WKTToken pointSquence(org.geolatte.geom.PointSequence sequence) {
+    static WktToken pointSquence(org.geolatte.geom.PointSequence sequence) {
         return new PointSequence(sequence);
     }
 
-    static WKTToken dimensionMarker(DimensionalFlag flag) {
+    static WktToken dimensionMarker(DimensionalFlag flag) {
         return new DimensionMarker(flag);
     }
 
-    public static WKTToken end() {
+    public static WktToken end() {
         return END;
     }
 
-    public static WKTToken elementSeparator() {
+    public static WktToken elementSeparator() {
         return ELEMENT_SEP;
     }
 
-    public static WKTToken empty() {
+    public static WktToken empty() {
         return EMPTY;
     }
 
-    static class Geometry extends WKTToken {
+    static class Geometry extends WktToken {
         private GeometryType geometryType;
         private boolean isMeasured;
 
@@ -86,19 +86,19 @@ abstract class WKTToken {
 
     }
 
-    static class End extends WKTToken {
+    static class End extends WktToken {
     }
 
-    static class StartList extends WKTToken {
+    static class StartList extends WktToken {
     }
 
-    static class EndList extends WKTToken {
+    static class EndList extends WktToken {
     }
 
-    static class Empty extends WKTToken {
+    static class Empty extends WktToken {
     }
 
-    static class PointSequence extends WKTToken {
+    static class PointSequence extends WktToken {
         private org.geolatte.geom.PointSequence points;
 
         PointSequence(org.geolatte.geom.PointSequence points) {
@@ -110,7 +110,7 @@ abstract class WKTToken {
         }
     }
 
-    static class DimensionMarker extends WKTToken {
+    static class DimensionMarker extends WktToken {
         private DimensionalFlag dimensionalFlag;
 
         DimensionMarker(DimensionalFlag flag) {
@@ -126,10 +126,10 @@ abstract class WKTToken {
         }
     }
 
-    static class ElementSeparator extends WKTToken {
+    static class ElementSeparator extends WktToken {
     }
 
-    static class TextToken extends WKTToken {
+    static class TextToken extends WktToken {
         private String text;
 
         TextToken(String text){
@@ -142,7 +142,7 @@ abstract class WKTToken {
         }
     }
 
-    static class NumberToken extends WKTToken {
+    static class NumberToken extends WktToken {
         private double number;
 
         public NumberToken(double number) {

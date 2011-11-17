@@ -27,14 +27,15 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.FixedSizePointSequenceBuilder;
 
 /**
- * A WKB Decoder for PostGIS EWKB (version Postgis 1.5).
+ * A Wkb Decoder for PostGIS EWKB (as implemented in Postgis 1.5).
+ *
  * <p/>
  * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class PGWKBDecoder15 {
+public class Postgisv15WkbDecoder {
 
     private int SRID = -1;
 
@@ -46,7 +47,7 @@ public class PGWKBDecoder15 {
     public Geometry decodeGeometry(Bytes bytes) {
         alignByteOrder(bytes);
         int typeCode = readTypeCode(bytes);
-        WKBGeometryType wkbType = WKBGeometryType.parse((byte) typeCode);
+        WkbGeometryType wkbType = WkbGeometryType.parse((byte) typeCode);
         readSRID(bytes, typeCode);
         DimensionalFlag flag = getCoordinateDimension(typeCode);
         switch (wkbType) {
@@ -160,8 +161,8 @@ public class PGWKBDecoder15 {
 
 
     private DimensionalFlag getCoordinateDimension(int typeCode) {
-        boolean hasM = (typeCode & PGWKBTypeMasks.M_FLAG) == PGWKBTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PGWKBTypeMasks.Z_FLAG) == PGWKBTypeMasks.Z_FLAG;
+        boolean hasM = (typeCode & Postgisv15WkbTypeMasks.M_FLAG) == Postgisv15WkbTypeMasks.M_FLAG;
+        boolean hasZ = (typeCode & Postgisv15WkbTypeMasks.Z_FLAG) == Postgisv15WkbTypeMasks.Z_FLAG;
         return DimensionalFlag.parse(hasZ, hasM);
     }
 
@@ -172,7 +173,7 @@ public class PGWKBDecoder15 {
     }
 
     private boolean hasSrid(int typeCode) {
-        return (typeCode & PGWKBTypeMasks.SRID_FLAG) == PGWKBTypeMasks.SRID_FLAG;
+        return (typeCode & Postgisv15WkbTypeMasks.SRID_FLAG) == Postgisv15WkbTypeMasks.SRID_FLAG;
     }
 
 
@@ -182,7 +183,7 @@ public class PGWKBDecoder15 {
 
     private void alignByteOrder(Bytes bytes) {
         byte orderByte = bytes.get();
-        WKBByteOrder byteOrder = WKBByteOrder.valueOf(orderByte);
+        WkbByteOrder byteOrder = WkbByteOrder.valueOf(orderByte);
         bytes.setWKBByteOrder(byteOrder);
     }
 

@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.codec.CRSWKTDecoder;
-import org.geolatte.geom.codec.WKTParseException;
+import org.geolatte.geom.codec.CrsWktDecoder;
+import org.geolatte.geom.codec.WktParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +58,7 @@ public class CrsRegistry {
         BufferedReader reader = createReader();
         try {
             String line = reader.readLine();
-            CRSWKTDecoder decoder = new CRSWKTDecoder();
+            CrsWktDecoder decoder = new CrsWktDecoder();
             while (line != null) {
                 addDefinition(line, decoder);
                 line = reader.readLine();
@@ -76,14 +76,14 @@ public class CrsRegistry {
         return new BufferedReader(new InputStreamReader(in));
     }
 
-    private static void addDefinition(String line, CRSWKTDecoder decoder) {
+    private static void addDefinition(String line, CrsWktDecoder decoder) {
         String[] tokens = line.split(DELIM);
         if (!"EPSG".equals(tokens[0])) return;
         Integer srid = Integer.valueOf(tokens[1]);
         try {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
             crsMap.put(srid, crs);
-        } catch (WKTParseException e) {
+        } catch (WktParseException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid,tokens[2], e.getMessage()));
         }
 

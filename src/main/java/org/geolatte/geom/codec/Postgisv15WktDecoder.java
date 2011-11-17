@@ -31,27 +31,27 @@ import java.util.regex.Pattern;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PGWKTDecoder15 {
+public class Postgisv15WktDecoder {
 
 
-    private final static WKTWordMatcher wordMatcher = new PGWKTWordMatcher15();
+    private final static WktWordMatcher WORD_MATCHER = new Postgisv15WktWordMatcher();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
 
     private String wktString;
-    private WKTTokenizer tokenizer;
-    private WKTToken currentToken;
+    private WktTokenizer tokenizer;
+    private WktToken currentToken;
     private PointSequence currentPointSequence = null;
     private int SRID = -1;
 
     public Geometry decode(String wkt) {
-        if (wkt == null || wkt.isEmpty()) throw new WKTParseException("Null or empty string passed");
+        if (wkt == null || wkt.isEmpty()) throw new WktParseException("Null or empty string passed");
         splitSRIDAndWKT(wkt);
         initializeTokenizer();
         return matchesGeometry();
     }
 
     private void initializeTokenizer() {
-        this.tokenizer = new WKTTokenizer(this.wktString, wordMatcher);
+        this.tokenizer = new WktTokenizer(this.wktString, WORD_MATCHER);
         nextToken();
     }
 
@@ -66,10 +66,10 @@ public class PGWKTDecoder15 {
     }
 
     private Geometry matchesGeometry() {
-        if (!(currentToken instanceof WKTToken.Geometry)) {
-            throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        if (!(currentToken instanceof WktToken.Geometry)) {
+            throw new WktParseException(buildWrongSymbolAtPositionMsg());
         }
-        GeometryType type = ((WKTToken.Geometry) currentToken).getType();
+        GeometryType type = ((WktToken.Geometry) currentToken).getType();
         nextToken();
         switch (type) {
             case POINT:
@@ -87,7 +87,7 @@ public class PGWKTDecoder15 {
             case MULTI_POLYGON:
                 return matchesMultiPolygon();
         }
-        throw new WKTParseException("Unsupported geometry type in WKT: " + type);
+        throw new WktParseException("Unsupported geometry type in Wkt: " + type);
     }
 
     private Geometry matchesMultiPolygon() {
@@ -102,7 +102,7 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return MultiPolygon.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private Geometry matchesMultiLineString() {
@@ -117,7 +117,7 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return MultiLineString.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private Geometry matchesMultiPoint() {
@@ -132,7 +132,7 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return MultiPoint.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private GeometryCollection matchesGeometryCollection() {
@@ -147,7 +147,7 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return GeometryCollection.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private Polygon matchesPolygonText() {
@@ -163,11 +163,11 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return Polygon.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private void matchesListDelimiter() {
-        if (currentToken instanceof WKTToken.ElementSeparator) {
+        if (currentToken instanceof WktToken.ElementSeparator) {
             nextToken();
         }
     }
@@ -179,7 +179,7 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return LineString.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private Point matchesPointText() {
@@ -189,14 +189,14 @@ public class PGWKTDecoder15 {
         if (matchesEmpty()) {
             return Point.createEmpty();
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
 
     }
 
     private boolean matchesPoints() {
         if (matchesStartList()) {
             this.currentPointSequence = matchesPointSequence();
-            if (!matchesEndList()) throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+            if (!matchesEndList()) throw new WktParseException(buildWrongSymbolAtPositionMsg());
             return true;
         }
         this.currentPointSequence = null;
@@ -204,7 +204,7 @@ public class PGWKTDecoder15 {
     }
 
     private boolean matchesEmpty() {
-        if (currentToken instanceof WKTToken.Empty) {
+        if (currentToken instanceof WktToken.Empty) {
             nextToken();
             return true;
         }
@@ -212,7 +212,7 @@ public class PGWKTDecoder15 {
     }
 
     private boolean matchesEndList() {
-        if (currentToken instanceof WKTToken.EndList) {
+        if (currentToken instanceof WktToken.EndList) {
             nextToken();
             return true;
         }
@@ -220,16 +220,16 @@ public class PGWKTDecoder15 {
     }
 
     private PointSequence matchesPointSequence() {
-        if (currentToken instanceof WKTToken.PointSequence) {
-            PointSequence points = ((WKTToken.PointSequence) currentToken).getPoints();
+        if (currentToken instanceof WktToken.PointSequence) {
+            PointSequence points = ((WktToken.PointSequence) currentToken).getPoints();
             nextToken();
             return points;
         }
-        throw new WKTParseException(buildWrongSymbolAtPositionMsg());
+        throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
     private boolean matchesStartList() {
-        if (currentToken instanceof WKTToken.StartList) {
+        if (currentToken instanceof WktToken.StartList) {
             nextToken();
             return true;
         }
@@ -242,7 +242,7 @@ public class PGWKTDecoder15 {
 
 
     private String buildWrongSymbolAtPositionMsg() {
-        return "Wrong symbol at position: " + tokenizer.position() + " in WKT: " + wktString;
+        return "Wrong symbol at position: " + tokenizer.position() + " in Wkt: " + wktString;
     }
 
 }

@@ -31,10 +31,10 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class PGWKBEncoder15 {
+public class Postgisv15WkbEncoder {
 
 
-    public Bytes encode(Geometry geom, WKBByteOrder wbo) {
+    public Bytes encode(Geometry geom, WkbByteOrder wbo) {
         Bytes output = Bytes.allocate(calculateSize(geom, true));
         if (wbo != null) {
             output.setWKBByteOrder(wbo);
@@ -45,7 +45,7 @@ public class PGWKBEncoder15 {
     }
 
     private void writeGeometry(Geometry geom, Bytes output) {
-        geom.accept(new WKBVisitor(output));
+        geom.accept(new WkbVisitor(output));
     }
 
     protected int calculateSize(Geometry geom, boolean includeSRID) {
@@ -96,12 +96,12 @@ public class PGWKBEncoder15 {
     }
 }
 
-class WKBVisitor implements GeometryVisitor {
+class WkbVisitor implements GeometryVisitor {
 
     private final Bytes output;
     private boolean hasWrittenSRID = false;
 
-    WKBVisitor(Bytes bytes) {
+    WkbVisitor(Bytes bytes) {
         this.output = bytes;
     }
 
@@ -209,11 +209,11 @@ class WKBVisitor implements GeometryVisitor {
         int typeCode = getGeometryType(geometry);
         boolean hasSRID = (geometry.getSRID() > 0);
         if (hasSRID && !hasWrittenSRID)
-            typeCode |= PGWKBTypeMasks.SRID_FLAG;
+            typeCode |= Postgisv15WkbTypeMasks.SRID_FLAG;
         if (dimension.isMeasured())
-            typeCode |= PGWKBTypeMasks.M_FLAG;
+            typeCode |= Postgisv15WkbTypeMasks.M_FLAG;
         if (dimension.is3D())
-            typeCode |= PGWKBTypeMasks.Z_FLAG;
+            typeCode |= Postgisv15WkbTypeMasks.Z_FLAG;
         output.putUInt(typeCode);
         if (hasSRID && !hasWrittenSRID) {
             output.putInt(geometry.getSRID());
@@ -222,7 +222,7 @@ class WKBVisitor implements GeometryVisitor {
     }
 
     protected int getGeometryType(Geometry geometry) {
-        WKBGeometryType type = WKBGeometryType.forClass(geometry.getClass());
+        WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
         if (type == null)
             throw new UnsupportedConversionException(String.format("Can't convert geometries of type %s", geometry.getClass().getCanonicalName()));
         return type.getTypeCode();

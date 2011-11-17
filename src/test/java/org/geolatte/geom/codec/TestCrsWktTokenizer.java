@@ -29,39 +29,39 @@ import static org.junit.Assert.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/4/11
  */
-public class TestCRSWKTTokenizer {
+public class TestCrsWktTokenizer {
 
     private String wkt = "   GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]";
 
     @Test
     public void testGEOGCSWords() {
-        WKTTokenizer tokenizer = new WKTTokenizer(wkt, new CRSWKTWordMatcher(), '[', ']', false);
+        WktTokenizer tokenizer = new WktTokenizer(wkt, new CrsWktWordMatcher(), '[', ']', false);
         //read type coordinate system
         assertTrue(tokenizer.moreTokens());
-        assertEquals(CRSWKTToken.GEOGCS, tokenizer.nextToken());
+        assertEquals(CrsWktToken.GEOGCS, tokenizer.nextToken());
 
         //read coordinate system
         assertTrue(tokenizer.moreTokens());
-        assertTrue(tokenizer.nextToken() instanceof WKTToken.StartList);
+        assertTrue(tokenizer.nextToken() instanceof WktToken.StartList);
 
         //read coordinate system name
         assertTrue(tokenizer.moreTokens());
-        WKTToken token = tokenizer.nextToken();
+        WktToken token = tokenizer.nextToken();
         assertNotNull(token);
-        assertEquals(WKTToken.TextToken.class, token.getClass());
-        WKTToken.TextToken textToken = ((WKTToken.TextToken)token);
+        assertEquals(WktToken.TextToken.class, token.getClass());
+        WktToken.TextToken textToken = ((WktToken.TextToken)token);
         assertEquals("WGS 84", textToken.getText());
 
         //read seperator
         assertTrue(tokenizer.moreTokens());
         token = tokenizer.nextToken();
-        assertEquals(WKTToken.ElementSeparator.class, token.getClass());
+        assertEquals(WktToken.ElementSeparator.class, token.getClass());
 
         //read Datum
         assertTrue(tokenizer.moreTokens());
         token = tokenizer.nextToken();
-        assertEquals(CRSWKTToken.class, token.getClass());
-        assertEquals(CRSWKTToken.DATUM, token);
+        assertEquals(CrsWktToken.class, token.getClass());
+        assertEquals(CrsWktToken.DATUM, token);
 
 
     }

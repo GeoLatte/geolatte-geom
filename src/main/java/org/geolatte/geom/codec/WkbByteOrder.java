@@ -21,17 +21,46 @@
 
 package org.geolatte.geom.codec;
 
+import java.nio.ByteOrder;
+
 /**
- * Bit masks for PostGIS WKB Encoder/Decoder.
- *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/19/11
+ *         creation-date: Oct 29, 2010
  */
-public class PGWKBTypeMasks {
+public enum WkbByteOrder {
 
-    public static final int Z_FLAG = 0x80000000;
-    public static final int M_FLAG = 0x40000000;
-    public static final int SRID_FLAG = 0x20000000;
+    XDR(ByteOrder.BIG_ENDIAN, (byte) 0),
+    NDR(ByteOrder.LITTLE_ENDIAN, (byte) 1);
 
+    private ByteOrder order;
+    private byte orderByte;
+
+    private WkbByteOrder(ByteOrder order, byte orderByte) {
+        this.order = order;
+        this.orderByte = orderByte;
+    }
+
+
+    public static WkbByteOrder valueOf(byte orderByte) {
+        for (WkbByteOrder wbo : values()) {
+            if (orderByte == wbo.byteValue()) return wbo;
+        }
+        throw new IllegalArgumentException("Order byte must be 0 or 1");
+    }
+
+    ByteOrder getByteOrder() {
+        return this.order;
+    }
+
+    byte byteValue() {
+        return orderByte;
+    }
+
+    static WkbByteOrder valueOf(ByteOrder byteOrder) {
+        for (WkbByteOrder wkbOrder : values()) {
+            if (wkbOrder.getByteOrder() == byteOrder) return wkbOrder;
+        }
+        throw new IllegalArgumentException();
+    }
 
 }

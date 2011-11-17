@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PGWKTWordMatcher15 extends WKTWordMatcher {
+public class Postgisv15WktWordMatcher extends WktWordMatcher {
 
     private static final String EMPTY = "EMPTY";
     private final static Pattern EMPTY_RE = Pattern.compile(EMPTY, Pattern.CASE_INSENSITIVE);
@@ -62,12 +62,12 @@ public class PGWKTWordMatcher15 extends WKTWordMatcher {
     }
 
     @Override
-    public WKTToken match(CharSequence wkt, int currentPos, int endPos) {
-        if (matchesEmpty(wkt, currentPos, endPos)) return WKTToken.empty();
+    public WktToken match(CharSequence wkt, int currentPos, int endPos) {
+        if (matchesEmpty(wkt, currentPos, endPos)) return WktToken.empty();
         for (Type type : GEOMETRY_REGEXES.keySet()) {
             if (matches(type, wkt, currentPos, endPos)) return toToken(type);
         }
-        throw new WKTParseException(String.format("Invalid word %s in wkt tekst %s", wkt.subSequence(currentPos, endPos), wkt));
+        throw new WktParseException(String.format("Invalid word %s in wkt tekst %s", wkt.subSequence(currentPos, endPos), wkt));
     }
 
     @Override
@@ -78,7 +78,7 @@ public class PGWKTWordMatcher15 extends WKTWordMatcher {
                 return GEOMETRY_REGEXES.get(type).pattern();
             }
         }
-        throw new UnsupportedConversionException("Conversion of geometries of type " + geometry.getGeometryType() + " to WKT is not supported.");
+        throw new UnsupportedConversionException("Conversion of geometries of type " + geometry.getGeometryType() + " to Wkt is not supported.");
     }
 
 
@@ -111,8 +111,8 @@ public class PGWKTWordMatcher15 extends WKTWordMatcher {
         return m.matches();
     }
 
-    private WKTToken toToken(Type type) {
-        return WKTToken.geometryTag(type.geometryType, type.isMeasured);
+    private WktToken toToken(Type type) {
+        return WktToken.geometryTag(type.geometryType, type.isMeasured);
     }
 }
 
