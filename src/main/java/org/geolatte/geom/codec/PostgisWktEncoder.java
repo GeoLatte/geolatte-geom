@@ -30,32 +30,33 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
+ * Encodes geometries to
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class Postgisv15WktEncoder {
+public class PostgisWktEncoder {
 
-    private final static WktWordMatcher WKT_WORDS = new Postgisv15WktWordMatcher();
+    private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
 
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
     private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
-    StringBuffer builder = new StringBuffer();
-    NumberFormat formatter;
+    private final StringBuffer builder = new StringBuffer();
+    private final NumberFormat formatter;
 
     private static final int MAX_FRACTIONAL_DIGITS = 24;
     private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
-    public Postgisv15WktEncoder() {
+    public PostgisWktEncoder() {
         formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
         formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
     }
 
     public String encode(Geometry geometry) {
-        addSrid(geometry);
+        addSridIfValid(geometry);
         addGeometry(geometry);
         return result();
     }
 
-    private void addSrid(Geometry geometry) {
+    private void addSridIfValid(Geometry geometry) {
         if (geometry.getSRID() < 1) return;
         this.builder.append("SRID=")
                 .append(geometry.getSRID())

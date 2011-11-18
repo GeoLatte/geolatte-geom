@@ -22,6 +22,8 @@
 package org.geolatte.geom.codec;
 
 /**
+ * Thrown when the WKT cannot be parsed (is syntactically incorrect).
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class WktParseException extends RuntimeException {

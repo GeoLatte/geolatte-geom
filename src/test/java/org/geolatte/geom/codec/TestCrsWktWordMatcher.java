@@ -31,33 +31,31 @@ import static org.junit.Assert.*;
  */
 public class TestCrsWktWordMatcher {
 
-    private CrsWktWordMatcher matcher = new CrsWktWordMatcher();
+    private CrsWktVariant matcher = new CrsWktVariant();
 
     @Test
     public void testMatchingProjectedCRS(){
         String test = "PROJCS";
-        WktToken token = matcher.match(test, 0, test.length());
+        WktToken token = matcher.matchKeyword(test, 0, test.length());
         assertNotNull(token);
-        assertTrue(token instanceof CrsWktToken);
-        assertEquals(CrsWktToken.PROJCS, token);
+        assertTrue(token instanceof WktKeywordToken);
+        assertEquals(CrsWktVariant.PROJCS, token);
     }
 
     @Test
     public void testMatchingGeoGCSCRS(){
         String test = " GEOGCS  ";
-        WktToken token = matcher.match(test, 1, 7);
+        WktToken token = matcher.matchKeyword(test, 1, 7);
         assertNotNull(token);
-        assertTrue(token instanceof CrsWktToken);
-        assertEquals(CrsWktToken.GEOGCS, token);
+        assertEquals(CrsWktVariant.GEOGCS, token);
     }
 
         @Test
     public void testMatchingGeoAXIS(){
         String test = " AXIS  ";
-        WktToken token = matcher.match(test, 1, 5);
+        WktToken token = matcher.matchKeyword(test, 1, 5);
         assertNotNull(token);
-        assertTrue(token instanceof CrsWktToken);
-        assertEquals(CrsWktToken.AXIS, token);
+        assertEquals(CrsWktVariant.AXIS, token);
     }
 
     @Test
@@ -65,7 +63,7 @@ public class TestCrsWktWordMatcher {
         String test = "BLABLA";
 
         try {
-            matcher.match(test, 0, test.length());
+            matcher.matchKeyword(test, 0, test.length());
             fail();
         }catch(WktParseException e){
             //OK

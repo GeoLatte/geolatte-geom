@@ -21,34 +21,33 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
 
 /**
- *  A Utility class for encoding/decoding WKB geometry representations.
+ * The <code>WktKeywordToken</code> for the type of geometry.
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/19/11
  */
-public class Wkt {
+public class WktGeometryToken extends WktKeywordToken {
+    private final GeometryType geometryType;
+    private final boolean isMeasured;
 
-    /**
-     * Decodes the specified String to a <code>Geometry</code>.
-     *
-     * @param wkt
-     * @return
-     */
-    public static Geometry fromWkt(String wkt) {
-        PostgisWktDecoder decoder = new PostgisWktDecoder();
-        return decoder.decode(wkt);
+    public WktGeometryToken(String word, GeometryType tag, boolean measured) {
+        super(word);
+        this.geometryType = tag;
+        this.isMeasured = measured;
     }
 
-    /**
-     * Encodes a <code>Geometry</code> to a WKT representation.
-     *
-     * @param geometry
-     * @return
-     */
-    public static String toWkt(Geometry geometry) {
-        PostgisWktEncoder encoder = new PostgisWktEncoder();
-        return encoder.encode(geometry);
+    GeometryType getType() {
+        return this.geometryType;
+    }
+
+    boolean isMeasured() {
+        return this.isMeasured;
+    }
+
+    public String toString(){
+        return this.getType().toString() + (isMeasured() ? " M" : "");
     }
 }

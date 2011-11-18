@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class TestPostgisv15WktEncoderDecoder {
+public class TestPostgisWktEncoderDecoder {
 
     CodecTestCases testcases = new CodecTestCases();
 
@@ -95,6 +95,7 @@ public class TestPostgisv15WktEncoderDecoder {
         String wkt = testcases.getWKT(CodecTestCases.POINT_WITH_SRID);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
+        assertTrue("Result of 4-dim point wkt is not measured.", geom.isMeasured());
         assertEquals(testcases.getExpected(CodecTestCases.POINT_WITH_SRID), geom);
         testEncoding(wkt, geom);
     }

@@ -24,6 +24,8 @@ package org.geolatte.geom.codec;
 import java.nio.ByteOrder;
 
 /**
+ * Indicates the byte-order of a WKB representation.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
@@ -32,8 +34,8 @@ public enum WkbByteOrder {
     XDR(ByteOrder.BIG_ENDIAN, (byte) 0),
     NDR(ByteOrder.LITTLE_ENDIAN, (byte) 1);
 
-    private ByteOrder order;
-    private byte orderByte;
+    private final ByteOrder order;
+    private final byte orderByte;
 
     private WkbByteOrder(ByteOrder order, byte orderByte) {
         this.order = order;

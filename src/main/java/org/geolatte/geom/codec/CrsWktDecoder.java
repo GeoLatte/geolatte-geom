@@ -30,56 +30,60 @@ import java.util.List;
 /**
  * A decoder for Coordinate Reference System definitions in WKT.
  *
- * <p> The current implementation ensures that the postgis CRS WKT's are correctly interpreted. There are therefore
+ * <p> The current implementation ensures that the postgis CRS WKT's are correctly interpreted. There are
  * some minor differences with the OGC specification. </p>
+ *
+ * <p>This decoder uses a recursive-decent parsing approach.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CrsWktDecoder {
+public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem> {
 
-    private WktToken currentToken;
-    private WktTokenizer tokenizer;
+    private final static CrsWktVariant CRS_TOKENS =  new CrsWktVariant();
 
+    public CrsWktDecoder() {
+        super(CRS_TOKENS);
+    }
 
     /**
-     * Decodes a WKT representation of a coordinate Reference system.
-     *
-     * @param wkt
+     * Decodes a WKT representation of a <code>CoordinateReferenceSystem</code>.
+     * @param wkt the WKT string to decode
      * @return
      */
-    public CoordinateReferenceSystem decode(String wkt) {
-        tokenizer = new WktTokenizer(wkt, new CrsWktWordMatcher(), '[', ']', false);
+    public CoordinateReferenceSystem decode(String wkt){
+        setTokenizer(new WktTokenizer(wkt, getWktVariant(), false));
         nextToken();
         return matchesCRS();
     }
 
     private CoordinateReferenceSystem matchesCRS() {
-        if (currentToken == CrsWktToken.PROJCS) {
+        if (currentToken == CrsWktVariant.PROJCS) {
             return matchesProjectedCRS();
-        } else if (currentToken == CrsWktToken.GEOGCS) {
+        } else if (currentToken == CrsWktVariant.GEOGCS) {
             return matchesGeographicCRS();
-        } else if (currentToken == CrsWktToken.GEOCCS) {
+        } else if (currentToken == CrsWktVariant.GEOCCS) {
             return matchesGeocentricCRS();
         }
         throw new WktParseException("Expected Wkt Token PROJCS, GEOGCS or GEOCCS");
     }
 
+    //currently not used in Postgis
     private CoordinateReferenceSystem matchesGeocentricCRS() {
-        return null;   //TODO -- add implementation?
+        throw new UnsupportedConversionException("Currently not implemented");
     }
 
     private GeographicCoordinateReferenceSystem matchesGeographicCRS() {
         String crsName = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         GeodeticDatum datum = matchesDatum();
-        matchesListDelimiter();
+        matchesElemSeparator();
         PrimeMeridian primem = matchesPrimem();
-        matchesListDelimiter();
+        matchesElemSeparator();
         Unit unit = matchesUnit(Unit.Type.ANGULAR);
         CoordinateSystemAxis[] twinAxes = optionalMatchesTwinAxis(unit, GeographicCoordinateReferenceSystem.class);
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         GeographicCoordinateReferenceSystem system = new GeographicCoordinateReferenceSystem(srid, crsName, twinAxes);
         system.setDatum(datum);
         system.setPrimeMeridian(primem);
@@ -88,14 +92,14 @@ public class CrsWktDecoder {
 
      private CoordinateReferenceSystem matchesProjectedCRS() {
         String crsName = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         GeographicCoordinateReferenceSystem geogcs = matchesGeographicCRS();
-        matchesListDelimiter();
+        matchesElemSeparator();
         Unit unit;
         Projection projection;
         List<CRSParameter> parameters;
         // spatial_reference.sql contains both variants of ProjCRS Wkt
-        if (currentToken == CrsWktToken.UNIT) {
+        if (currentToken == CrsWktVariant.UNIT) {
             unit = matchesUnit(Unit.Type.LINEAR);
             projection = matchesProjection();
             parameters = optionalMatchesParameters();
@@ -106,8 +110,7 @@ public class CrsWktDecoder {
         }
         int srid = optionalMatchesAuthority();
         CoordinateSystemAxis[] twinAxes = optionalMatchesTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
-        ProjectedCoordinateReferenceSystem result = new ProjectedCoordinateReferenceSystem(srid, crsName, geogcs, projection, parameters, twinAxes);
-        return result;
+        return new ProjectedCoordinateReferenceSystem(srid, crsName, geogcs, projection, parameters, twinAxes);
     }
 
     private List<CRSParameter> optionalMatchesParameters() {
@@ -121,37 +124,37 @@ public class CrsWktDecoder {
     }
 
     private CRSParameter optionalMatchParameter(){
-        matchesListDelimiter();
-        if (currentToken != CrsWktToken.PARAMETER) {
+        matchesElemSeparator();
+        if (currentToken != CrsWktVariant.PARAMETER) {
             return null;
         }
         nextToken();
         String name = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         double value = matchesNumber();
-        matchesEndList();
+        matchesCloseList();
         return new CRSParameter(name, value);
     }
 
     private Projection matchesProjection(){
-        matchesListDelimiter();
-        if (currentToken != CrsWktToken.PROJECTION) {
-            throw new WktParseException("Expected PROJECTION keyword, found " + toString(currentToken));
+        matchesElemSeparator();
+        if (currentToken != CrsWktVariant.PROJECTION) {
+            throw new WktParseException("Expected PROJECTION keyword, found " + currentToken.toString());
         }
         String name = matchesName();
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         return new Projection(srid, name);
     }
 
     private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] optionalMatchesTwinAxis(Unit unit, Class<T> crsClass) {
-        matchesListDelimiter();
-        if (currentToken != CrsWktToken.AXIS) {
+        matchesElemSeparator();
+        if (currentToken != CrsWktVariant.AXIS) {
             return defaultCRS(unit, crsClass);
         }
         CoordinateSystemAxis[] twinAxes = new CoordinateSystemAxis[2];
         twinAxes[0] = matchesAxis(unit);
-        matchesListDelimiter();
+        matchesElemSeparator();
         twinAxes[1] = matchesAxis(unit);
         return twinAxes;
     }
@@ -185,95 +188,95 @@ public class CrsWktDecoder {
     }
 
     private CoordinateSystemAxis matchesAxis(Unit unit) {
-        if (currentToken != CrsWktToken.AXIS) {
-            throw new WktParseException("Expected AXIS keyword, found " + toString(currentToken));
+        if (currentToken != CrsWktVariant.AXIS) {
+            throw new WktParseException("Expected AXIS keyword, found " + currentToken.toString());
         }
         String name = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         CoordinateSystemAxisDirection direction = CoordinateSystemAxisDirection.valueOf(currentToken.toString());
         nextToken();
-        matchesEndList();
+        matchesCloseList();
         return new CoordinateSystemAxis(name, direction, unit);
     }
 
     private Unit matchesUnit(Unit.Type type) {
-        if (currentToken != CrsWktToken.UNIT) {
-            throw new WktParseException("Expected UNIT keyword, found " + toString(currentToken));
+        if (currentToken != CrsWktVariant.UNIT) {
+            throw new WktParseException("Expected UNIT keyword, found " + currentToken.toString());
         }
         String name = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         double cf = matchesNumber();
-        matchesListDelimiter();
+        matchesElemSeparator();
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         return new Unit(srid, name, type, cf);
     }
 
     private PrimeMeridian matchesPrimem() {
-        if (currentToken != CrsWktToken.PRIMEM) {
-            throw new WktParseException("Expected PRIMEM keyword, received " + toString(currentToken));
+        if (currentToken != CrsWktVariant.PRIMEM) {
+            throw new WktParseException("Expected PRIMEM keyword, received " + currentToken.toString());
         }
         String name = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         double longitude = matchesNumber();
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         return new PrimeMeridian(srid, name, longitude);
     }
 
     private GeodeticDatum matchesDatum() {
-        if (currentToken != CrsWktToken.DATUM) {
+        if (currentToken != CrsWktVariant.DATUM) {
             throw new WktParseException("Expected DATUM token.");
         }
         String datumName = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         Ellipsoid ellipsoid = matchesSpheroid();
         double[] toWGS84 = optionalMatchesToWGS84();
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         return new GeodeticDatum(srid, ellipsoid, datumName, toWGS84);
     }
 
     private double[] optionalMatchesToWGS84() {
-        matchesListDelimiter();
-        if (currentToken != CrsWktToken.TOWGS84)
+        matchesElemSeparator();
+        if (currentToken != CrsWktVariant.TOWGS84)
             return new double[0];
         nextToken();
         double[] toWGS = new double[7];
-        matchesStartList();
+        matchesOpenList();
         for (int i = 0; i < 7; i++) {
             toWGS[i] = matchesNumber();
-            matchesListDelimiter();
+            matchesElemSeparator();
         }
-        matchesEndList();
+        matchesCloseList();
         return toWGS;
     }
 
     private Ellipsoid matchesSpheroid() {
-        if (currentToken != CrsWktToken.SPHEROID){
-            throw new WktParseException("Expected SPHEROID keyword, but received " + toString(currentToken));
+        if (currentToken != CrsWktVariant.SPHEROID){
+            throw new WktParseException("Expected SPHEROID keyword, but received " + currentToken.toString());
         }
         String ellipsoidName = matchesName();
-        matchesListDelimiter();
+        matchesElemSeparator();
         double semiMajorAxis = matchesNumber();
-        matchesListDelimiter();
+        matchesElemSeparator();
         double inverseFlattening = matchesNumber();
         int srid = optionalMatchesAuthority();
-        matchesEndList();
+        matchesCloseList();
         return new Ellipsoid(srid, ellipsoidName,semiMajorAxis, inverseFlattening);
     }
 
     private int optionalMatchesAuthority() {
-        matchesListDelimiter();
-        if (currentToken != CrsWktToken.AUTHORITY)
+        matchesElemSeparator();
+        if (currentToken != CrsWktVariant.AUTHORITY)
             return -1;
 
         nextToken();
-        matchesStartList();
+        matchesOpenList();
         String authority = matchesText();
-        matchesListDelimiter();
+        matchesElemSeparator();
         String value = matchesText();
-        matchesEndList();
+        matchesCloseList();
         if (authority.equals("EPSG")) {
             try {
                 return Integer.parseInt(value);
@@ -286,64 +289,10 @@ public class CrsWktDecoder {
 
     private String matchesName() {
         nextToken();
-        matchesStartList();
+        matchesOpenList();
         return matchesText();
     }
 
-    private String matchesText() {
-        if (currentToken instanceof WktToken.TextToken) {
-            String text = ((WktToken.TextToken) currentToken).getText();
-            nextToken();
-            return text;
-        }
-        throw new WktParseException("Expected text token, received " + toString(currentToken));
-    }
 
-
-    //TODO -- these methods are shared with other decoders, move these abstract WKTDecoder class
-    private void nextToken() {
-        currentToken = tokenizer.nextToken();
-    }
-
-    private boolean matchesStartList() {
-        if (currentToken instanceof WktToken.StartList) {
-            nextToken();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean matchesEndList() {
-        if (currentToken instanceof WktToken.EndList) {
-            nextToken();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean matchesListDelimiter() {
-        if (currentToken instanceof WktToken.ElementSeparator) {
-            nextToken();
-            return true;
-        }
-        return false;
-    }
-
-    private double matchesNumber(){
-        if (currentToken instanceof WktToken.NumberToken) {
-            double value = ((WktToken.NumberToken)currentToken).getNumber();
-            nextToken();
-            return value;
-        }
-        throw new WktParseException("Expected a number ; received " + toString(currentToken));
-    }
-
-
-    private String toString(WktToken token){
-        if (token instanceof CrsWktToken) {
-            return token.toString();
-        }
-        return token.getClass().getSimpleName();
-    }
 
 }

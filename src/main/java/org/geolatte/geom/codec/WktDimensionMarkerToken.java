@@ -22,18 +22,33 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.Geometry;
 
 /**
+ * Marks the presence of Z- and/or M-coordinates in the WKT representation.
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * <p>This is not used in the Postgis EWKT format. So currently it is unused.</p>
+ *
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/19/11
  */
-public abstract class WktWordMatcher {
+class WktDimensionMarkerToken extends WktKeywordToken {
 
+    private final DimensionalFlag dimensionalFlag;
 
-    public abstract WktToken match(CharSequence wkt, int currentPos, int endPos);
+    public WktDimensionMarkerToken(String pattern, DimensionalFlag flag) {
+        super("pattern");
+        this.dimensionalFlag = flag;
+    }
 
-    public abstract String wordFor(Geometry geometry);
+    public boolean isMeasured() {
+        return this.dimensionalFlag.isMeasured();
+    }
 
-    public abstract String wordFor(DimensionalFlag flag);
+    public boolean is3D() {
+        return this.dimensionalFlag.is3D();
+    }
+
+    public String toString(){
+        return this.dimensionalFlag.toString();
+    }
 }

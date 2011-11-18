@@ -23,7 +23,6 @@ package org.geolatte.geom.codec;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
@@ -40,7 +39,7 @@ import java.nio.ByteOrder;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
-public class Bytes {
+public class ByteBuffer {
 
     /**
      * byte size for unsigned int
@@ -53,31 +52,31 @@ public class Bytes {
     public static final int DOUBLE_SIZE = 8;
 
     static final long UINT_MAX_VALUE = 4294967295L;
-    final private ByteBuffer buffer;
+    final private java.nio.ByteBuffer buffer;
 
-    private Bytes(ByteBuffer buffer) {
+    private ByteBuffer(java.nio.ByteBuffer buffer) {
         this.buffer = buffer;
     }
 
     /**
-     * Creates a <code>Bytes</code> instance from a hexadecimal string.
+     * Creates a <code>ByteBuffer</code> from a hexadecimal string.
      *
      * <p>Every two chars in the string are interpreted as the hexadecimal representation of a byte.
      * If the string length is odd, the last character will be ignored.</p>
      * @param text the bytes represented in hexadecimal
      * @return
      */
-    public static Bytes from(String text) {
+    public static ByteBuffer from(String text) {
         if (text == null) throw new IllegalArgumentException("Null not allowed.");
         int size = text.length() / 2; // this will drop the last char, if text is not even.
         byte[] byteArray = new byte[size];
-        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
+        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(byteArray);
         for (int i = 0; i < text.length() - 1; i += 2) {
             byte b = (byte) Integer.parseInt(text.substring(i, i + 2), 16);
             buffer.put(b);
         }
         buffer.rewind();
-        return new Bytes(buffer);
+        return new ByteBuffer(buffer);
     }
 
     /**
@@ -111,23 +110,23 @@ public class Bytes {
     }
 
     /**
-     * Creates a <code>Bytes</code> instance from byte array.
+     * Creates a <code>ByteBuffer</code> instance from byte array.
      *
      * @param bytes
      * @return
      */
-    public static Bytes from(byte[] bytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        return new Bytes(buffer);
+    public static ByteBuffer from(byte[] bytes) {
+        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(bytes);
+        return new ByteBuffer(buffer);
     }
 
     /**
-     * Creates an empty <code>Bytes</code> instance of the specified capacity
+     * Creates an empty <code>ByteBuffer</code> instance of the specified capacity
      * @param capacity capacity of the returned instance
-     * @return a new <code>Bytes</code> instance of the specified capacity
+     * @return a new <code>ByteBuffer</code> instance of the specified capacity
      */
-    public static Bytes allocate(int capacity) {
-        return new Bytes(ByteBuffer.allocate(capacity));
+    public static ByteBuffer allocate(int capacity) {
+        return new ByteBuffer(java.nio.ByteBuffer.allocate(capacity));
     }
 
     /**
@@ -144,7 +143,7 @@ public class Bytes {
     }
 
     /**
-     * Puts the specified byte in this <code>Bytes</code> instance
+     * Puts the specified byte in this <code>ByteBuffer</code>
      *
      * @param value
      */
@@ -166,7 +165,7 @@ public class Bytes {
     }
 
     /**
-     * Returns the limit of the <code>Bytes</code> instance.
+     * Returns the limit of the <code>ByteBuffer</code> .
      * @return
      */
     protected int limit() {
@@ -174,7 +173,7 @@ public class Bytes {
     }
 
     /**
-     * Rewinds this instance.
+     * Rewinds the buffer
      *
      * <p>After rewind, the next get() or put() will take place on the first element of this instance. </p>
      */
@@ -183,7 +182,7 @@ public class Bytes {
     }
 
     /**
-     * Reports if this instance is empty (holds no bytes).
+     * Reports if this buffer is empty (holds no bytes).
      *
      * @return
      */
@@ -301,8 +300,8 @@ public class Bytes {
     }
 
     /**
-     * Returns the next 4 bytes as an unsigned integer, taking into account the byte-order.
-     * @return
+     * Interprets the next 4 bytes as an unsigned integer, taking into account the byte-order, and returns it as a long.
+     * @return the value of the 4-byte unsigned integer at the current location as a long
      */
     public long getUInt() {
         try {
@@ -347,10 +346,8 @@ public class Bytes {
         return this.buffer.array();
     }
 
-
-
     //This is used for testing purposes
-    protected boolean hasSameContent(Bytes other) {
+    protected boolean hasSameContent(ByteBuffer other) {
         if (other == null) return false;
         if (other.isEmpty() != this.isEmpty()) return false;
         if (this.limit() != other.limit()) return false;

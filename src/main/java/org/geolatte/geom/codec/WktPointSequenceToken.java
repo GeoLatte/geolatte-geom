@@ -21,17 +21,28 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.PointSequence;
+
 /**
- * Bit masks for PostGIS Wkb Encoder/Decoder.
+ * A <code>WktToken</code> for point sequences in the input text.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/19/11
+ *         creation-date: 11/19/11
  */
-public class Postgisv15WkbTypeMasks {
+public class WktPointSequenceToken implements WktToken {
 
-    public static final int Z_FLAG = 0x80000000;
-    public static final int M_FLAG = 0x40000000;
-    public static final int SRID_FLAG = 0x20000000;
+    private final PointSequence points;
 
+    public WktPointSequenceToken(org.geolatte.geom.PointSequence points) {
+        this.points = points;
+    }
+
+    public PointSequence getPoints() {
+        return this.points;
+    }
+
+    public String toString(){
+        return this.points.toString();
+    }
 
 }

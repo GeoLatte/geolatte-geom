@@ -22,6 +22,8 @@
 package org.geolatte.geom.codec;
 
 /**
+ * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 12, 2010
  */
@@ -31,7 +33,4 @@ public class UnsupportedConversionException extends RuntimeException {
         super(msg);
     }
 
-    public UnsupportedConversionException() {
-        super();
-    }
 }

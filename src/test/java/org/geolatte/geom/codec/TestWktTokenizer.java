@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class TestWktTokenizer {
-    private WktWordMatcher words = new Postgisv15WktWordMatcher();
+    private WktVariant words = new PostgisWktVariant();
 
 
     @Test
@@ -46,11 +46,11 @@ public class TestWktTokenizer {
         String wkt = "POINT EMPTY";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.Empty);
+        assertTrue(tokens.nextToken() instanceof WktEmptyGeometryToken);
     }
 
 
@@ -59,18 +59,18 @@ public class TestWktTokenizer {
         String wkt = "POINT (20 33.3)";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.moreTokens());
-        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
+        WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertEquals(tokens.nextToken() ,words.getCloseList());
         assertFalse(tokens.moreTokens());
     }
 
@@ -79,19 +79,19 @@ public class TestWktTokenizer {
         String wkt = "POINT (20 33.3 .24)";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.moreTokens());
-        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
+        WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertEquals(0.24, pstoken.getPoints().getZ(0), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertEquals(tokens.nextToken(), words.getCloseList());
         assertFalse(tokens.moreTokens());
     }
 
@@ -100,19 +100,19 @@ public class TestWktTokenizer {
         String wkt = "POINTM (20 33.3 .24)";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
         assertTrue(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.moreTokens());
-        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
+        WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(1, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
         assertEquals(0.24, pstoken.getPoints().getM(0), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertEquals(tokens.nextToken(), words.getCloseList());
         assertFalse(tokens.moreTokens());
     }
 
@@ -121,13 +121,13 @@ public class TestWktTokenizer {
         String wkt = "LINESTRING(20 33.3 .24 , .1 2 3)";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.LINE_STRING, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
+        assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.moreTokens());
-        WktToken.PointSequence pstoken = (WktToken.PointSequence) (tokens.nextToken());
+        WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(2, pstoken.getPoints().size());
         assertEquals(20, pstoken.getPoints().getX(0), Math.ulp(20d));
         assertEquals(33.3, pstoken.getPoints().getY(0), Math.ulp(20d));
@@ -136,7 +136,7 @@ public class TestWktTokenizer {
         assertEquals(2d, pstoken.getPoints().getY(1), Math.ulp(20d));
         assertEquals(3d, pstoken.getPoints().getZ(1), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertEquals(tokens.nextToken() ,words.getCloseList());
         assertFalse(tokens.moreTokens());
     }
 
@@ -145,18 +145,18 @@ public class TestWktTokenizer {
         String wkt = "POLYGON((5 5, 1 0, 1 1 ,0 1, 3 3),(0.25 0.25, 0.25 0.5, 0.5 0.5, 0.5 0.25, 0.25 0.25))";
         WktTokenizer tokens = new WktTokenizer(wkt, words);
         assertTrue(tokens.moreTokens());
-        WktToken.Geometry token = (WktToken.Geometry) (tokens.nextToken());
+        WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POLYGON, token.getType());
         assertFalse(token.isMeasured());
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WktToken.PointSequence);
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
-        assertTrue(tokens.nextToken() instanceof WktToken.ElementSeparator);
-        assertTrue(tokens.nextToken() instanceof WktToken.StartList);
-        assertTrue(tokens.nextToken() instanceof WktToken.PointSequence);
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
-        assertTrue(tokens.nextToken() instanceof WktToken.EndList);
+        assertEquals(tokens.nextToken(), words.getOpenList());
+        assertEquals(tokens.nextToken(), words.getOpenList());
+        assertTrue(tokens.nextToken() instanceof WktPointSequenceToken);
+        assertEquals(tokens.nextToken(), words.getCloseList());
+        assertEquals(tokens.nextToken(), words.getElemSep());
+        assertEquals(tokens.nextToken(), words.getOpenList());
+        assertTrue(tokens.nextToken() instanceof WktPointSequenceToken);
+        assertEquals(tokens.nextToken(), words.getCloseList());
+        assertEquals(tokens.nextToken(), words.getCloseList());
         assertFalse(tokens.moreTokens());
     }
 

@@ -32,36 +32,37 @@ import static org.junit.Assert.*;
 public class TestCrsWktTokenizer {
 
     private String wkt = "   GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]";
+    private CrsWktVariant symbols = new CrsWktVariant();
 
     @Test
     public void testGEOGCSWords() {
-        WktTokenizer tokenizer = new WktTokenizer(wkt, new CrsWktWordMatcher(), '[', ']', false);
+        WktTokenizer tokenizer = new WktTokenizer(wkt, symbols, false);
         //read type coordinate system
         assertTrue(tokenizer.moreTokens());
-        assertEquals(CrsWktToken.GEOGCS, tokenizer.nextToken());
+        assertEquals(CrsWktVariant.GEOGCS, tokenizer.nextToken());
 
         //read coordinate system
         assertTrue(tokenizer.moreTokens());
-        assertTrue(tokenizer.nextToken() instanceof WktToken.StartList);
+        assertEquals(symbols.getOpenList(), tokenizer.nextToken());
 
         //read coordinate system name
         assertTrue(tokenizer.moreTokens());
         WktToken token = tokenizer.nextToken();
         assertNotNull(token);
-        assertEquals(WktToken.TextToken.class, token.getClass());
-        WktToken.TextToken textToken = ((WktToken.TextToken)token);
+        assertEquals(WktTextToken.class, token.getClass());
+        WktTextToken textToken = ((WktTextToken)token);
         assertEquals("WGS 84", textToken.getText());
 
         //read seperator
         assertTrue(tokenizer.moreTokens());
         token = tokenizer.nextToken();
-        assertEquals(WktToken.ElementSeparator.class, token.getClass());
+        assertEquals(token, symbols.getElemSep());
 
         //read Datum
         assertTrue(tokenizer.moreTokens());
         token = tokenizer.nextToken();
-        assertEquals(CrsWktToken.class, token.getClass());
-        assertEquals(CrsWktToken.DATUM, token);
+        assertEquals(WktKeywordToken.class, token.getClass());
+        assertEquals(CrsWktVariant.DATUM, token);
 
 
     }

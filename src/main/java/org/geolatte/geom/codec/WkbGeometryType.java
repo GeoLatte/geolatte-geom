@@ -24,6 +24,8 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.*;
 
 /**
+ * <code>WkbGeometryType</code> values indicate the Geometry type of a WKB representation.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/19/11
  */
@@ -46,8 +48,8 @@ public enum WkbGeometryType {
 
     MULTI_LINE_STRING(5, MultiLineString.class);
 
-    private int wkbType;
-    private Class<? extends Geometry> geometryClass;
+    private final int wkbType;
+    private final Class<? extends Geometry> geometryClass;
 
     private WkbGeometryType(int type, Class<? extends Geometry> geometryClass) {
         this.wkbType = type;

@@ -29,19 +29,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * A decoder for the Postgis WKT/EWKT representations as used in Postgis 1.0 to 1.5+.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class Postgisv15WktDecoder {
+public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
 
-    private final static WktWordMatcher WORD_MATCHER = new Postgisv15WktWordMatcher();
+    private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
 
     private String wktString;
-    private WktTokenizer tokenizer;
-    private WktToken currentToken;
     private PointSequence currentPointSequence = null;
     private int SRID = -1;
+
+    public PostgisWktDecoder() {
+        super(WKT_GEOM_TOKENS);
+    }
 
     public Geometry decode(String wkt) {
         if (wkt == null || wkt.isEmpty()) throw new WktParseException("Null or empty string passed");
@@ -51,7 +55,7 @@ public class Postgisv15WktDecoder {
     }
 
     private void initializeTokenizer() {
-        this.tokenizer = new WktTokenizer(this.wktString, WORD_MATCHER);
+        setTokenizer(new WktTokenizer(this.wktString, getWktVariant()));
         nextToken();
     }
 
@@ -66,10 +70,10 @@ public class Postgisv15WktDecoder {
     }
 
     private Geometry matchesGeometry() {
-        if (!(currentToken instanceof WktToken.Geometry)) {
+        if (!(currentToken instanceof WktGeometryToken)) {
             throw new WktParseException(buildWrongSymbolAtPositionMsg());
         }
-        GeometryType type = ((WktToken.Geometry) currentToken).getType();
+        GeometryType type = ((WktGeometryToken) currentToken).getType();
         nextToken();
         switch (type) {
             case POINT:
@@ -91,11 +95,11 @@ public class Postgisv15WktDecoder {
     }
 
     private Geometry matchesMultiPolygon() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             List<Polygon> polygons = new ArrayList<Polygon>();
-            while (!matchesEndList()) {
+            while (!matchesCloseList()) {
                 polygons.add(matchesPolygonText());
-                matchesListDelimiter();
+                matchesElemSeparator();
             }
             return MultiPolygon.create(polygons.toArray(new Polygon[polygons.size()]), SRID);
         }
@@ -106,11 +110,11 @@ public class Postgisv15WktDecoder {
     }
 
     private Geometry matchesMultiLineString() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             List<LineString> lineStrings = new ArrayList<LineString>();
-            while (!matchesEndList()) {
+            while (!matchesCloseList()) {
                 lineStrings.add(matchesLineStringText());
-                matchesListDelimiter();
+                matchesElemSeparator();
             }
             return MultiLineString.create(lineStrings.toArray(new LineString[lineStrings.size()]), SRID);
         }
@@ -121,11 +125,11 @@ public class Postgisv15WktDecoder {
     }
 
     private Geometry matchesMultiPoint() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             List<Point> points = new ArrayList<Point>();
-            while (!matchesEndList()) {
+            while (!matchesCloseList()) {
                 points.add(matchesPointText());
-                matchesListDelimiter();
+                matchesElemSeparator();
             }
             return MultiPoint.create(points.toArray(new Point[points.size()]), SRID);
         }
@@ -136,11 +140,11 @@ public class Postgisv15WktDecoder {
     }
 
     private GeometryCollection matchesGeometryCollection() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             List<Geometry> geometries = new ArrayList<Geometry>();
-            while (!matchesEndList()) {
+            while (!matchesCloseList()) {
                 geometries.add(matchesGeometry());
-                matchesListDelimiter();
+                matchesElemSeparator();
             }
             return GeometryCollection.create(geometries.toArray(new Geometry[geometries.size()]), SRID);
         }
@@ -151,11 +155,11 @@ public class Postgisv15WktDecoder {
     }
 
     private Polygon matchesPolygonText() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             List<LinearRing> rings = new ArrayList<LinearRing>();
-            while (!matchesEndList()) {
+            while (!matchesCloseList()) {
                 matchesPoints();
-                matchesListDelimiter();
+                matchesElemSeparator();
                 rings.add(LinearRing.create(currentPointSequence, SRID));
             }
             return Polygon.create(rings.toArray(new LinearRing[rings.size()]), SRID);
@@ -164,12 +168,6 @@ public class Postgisv15WktDecoder {
             return Polygon.createEmpty();
         }
         throw new WktParseException(buildWrongSymbolAtPositionMsg());
-    }
-
-    private void matchesListDelimiter() {
-        if (currentToken instanceof WktToken.ElementSeparator) {
-            nextToken();
-        }
     }
 
     private LineString matchesLineStringText() {
@@ -194,9 +192,9 @@ public class Postgisv15WktDecoder {
     }
 
     private boolean matchesPoints() {
-        if (matchesStartList()) {
+        if (matchesOpenList()) {
             this.currentPointSequence = matchesPointSequence();
-            if (!matchesEndList()) throw new WktParseException(buildWrongSymbolAtPositionMsg());
+            if (!matchesCloseList()) throw new WktParseException(buildWrongSymbolAtPositionMsg());
             return true;
         }
         this.currentPointSequence = null;
@@ -204,15 +202,7 @@ public class Postgisv15WktDecoder {
     }
 
     private boolean matchesEmpty() {
-        if (currentToken instanceof WktToken.Empty) {
-            nextToken();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean matchesEndList() {
-        if (currentToken instanceof WktToken.EndList) {
+        if (currentToken == WKT_GEOM_TOKENS.getEmpty()) {
             nextToken();
             return true;
         }
@@ -220,29 +210,16 @@ public class Postgisv15WktDecoder {
     }
 
     private PointSequence matchesPointSequence() {
-        if (currentToken instanceof WktToken.PointSequence) {
-            PointSequence points = ((WktToken.PointSequence) currentToken).getPoints();
+        if (currentToken instanceof WktPointSequenceToken) {
+            PointSequence points = ((WktPointSequenceToken) currentToken).getPoints();
             nextToken();
             return points;
         }
         throw new WktParseException(buildWrongSymbolAtPositionMsg());
     }
 
-    private boolean matchesStartList() {
-        if (currentToken instanceof WktToken.StartList) {
-            nextToken();
-            return true;
-        }
-        return false;
-    }
-
-    private void nextToken() {
-        currentToken = tokenizer.nextToken();
-    }
-
-
     private String buildWrongSymbolAtPositionMsg() {
-        return "Wrong symbol at position: " + tokenizer.position() + " in Wkt: " + wktString;
+        return "Wrong symbol at position: " + getTokenizerPosition() + " in Wkt: " + wktString;
     }
 
 }

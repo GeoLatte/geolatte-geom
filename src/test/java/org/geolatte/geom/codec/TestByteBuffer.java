@@ -31,13 +31,13 @@ import static org.junit.Assert.fail;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
-public class TestBytes {
+public class TestByteBuffer {
 
     @Test
     public void testBytesFromString() {
 
         String byteTxt = "0120E6FF";
-        Bytes bStream = Bytes.from(byteTxt);
+        ByteBuffer bStream = ByteBuffer.from(byteTxt);
 
         assertEquals(4, bStream.limit());
 
@@ -51,7 +51,7 @@ public class TestBytes {
     @Test
     public void test_bytes_from_odd_length_string() {
         String byteTxt = "0120E6FFE";
-        Bytes bStream = Bytes.from(byteTxt);
+        ByteBuffer bStream = ByteBuffer.from(byteTxt);
         assertEquals(4, bStream.limit());
 
     }
@@ -59,7 +59,7 @@ public class TestBytes {
     @Test
     public void test_throws_NumberFormatException_if_string_not_hexadecimal() {
         try {
-            Bytes.from("02FFKK");
+            ByteBuffer.from("02FFKK");
             fail();
         } catch (NumberFormatException e) {
             //OK
@@ -68,15 +68,15 @@ public class TestBytes {
 
     @Test
     public void test_return_empty_Bytes_on_empty_string() {
-        Bytes bytes = Bytes.from("");
-        assertTrue(bytes.isEmpty());
-        assertEquals(0, bytes.limit());
+        ByteBuffer byteBuffer = ByteBuffer.from("");
+        assertTrue(byteBuffer.isEmpty());
+        assertEquals(0, byteBuffer.limit());
     }
 
     @Test
     public void test_throw_IllegalArgumentException_on_null_string() {
         try {
-            Bytes bytes = Bytes.from((String) null);
+            ByteBuffer byteBuffer = ByteBuffer.from((String) null);
             fail();
         } catch (IllegalArgumentException e) {
             //OK
@@ -87,8 +87,8 @@ public class TestBytes {
     @Test
     public void test_toString() {
         String hxStr = "037FB4C7";
-        Bytes bytes = Bytes.from(hxStr);
-        assertEquals(hxStr, bytes.toString());
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
+        assertEquals(hxStr, byteBuffer.toString());
 
     }
 
@@ -97,9 +97,9 @@ public class TestBytes {
         String hxStr = "037FB4C7";
         int expectedValue = 58700999;
 
-        Bytes bytes = Bytes.from(hxStr);
-        bytes.setWKBByteOrder(WkbByteOrder.XDR);
-        assertEquals(expectedValue, bytes.getInt());
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        assertEquals(expectedValue, byteBuffer.getInt());
     }
 
     @Test
@@ -108,13 +108,13 @@ public class TestBytes {
         byte[] byteArray = new byte[]{0x03, 0x7F, (byte) 0xB4, (byte) 0xC7};
         int expectedValue = 58700999;
 
-        Bytes bytes = Bytes.from(hxStr);
-        bytes.setWKBByteOrder(WkbByteOrder.XDR);
-        assertEquals(expectedValue, bytes.getInt());
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        assertEquals(expectedValue, byteBuffer.getInt());
 
-        Bytes bytesFromArray = Bytes.from(byteArray);
-        bytesFromArray.setWKBByteOrder(WkbByteOrder.XDR);
-        assertEquals(expectedValue, bytesFromArray.getInt());
+        ByteBuffer byteBufferFromArray = ByteBuffer.from(byteArray);
+        byteBufferFromArray.setWKBByteOrder(WkbByteOrder.XDR);
+        assertEquals(expectedValue, byteBufferFromArray.getInt());
     }
 
     @Test
@@ -122,17 +122,17 @@ public class TestBytes {
         String hxStr = "C7B47F03";
         int expectedValue = 58700999;
 
-        Bytes bytes = Bytes.from(hxStr);
-        bytes.setWKBByteOrder(WkbByteOrder.NDR);
-        assertEquals(expectedValue, bytes.getInt());
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
+        assertEquals(expectedValue, byteBuffer.getInt());
     }
 
     @Test
     public void test_insufficient_bytes_for_retrieving_long_throws_exception() {
         String hxStr = "C7B47F03";
-        Bytes bytes = Bytes.from(hxStr);
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
         try {
-            Long lng = bytes.getLong();
+            Long lng = byteBuffer.getLong();
         } catch (RuntimeException e) {
             //OK
         }
@@ -142,116 +142,116 @@ public class TestBytes {
     @Test
     public void test_get_unsigned_as_long() {
         String hxStr = "FFFFFFFF";
-        Bytes bytes = Bytes.from(hxStr);
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
         long expected = 4294967295L;
-        assertEquals(expected, bytes.getUInt());
+        assertEquals(expected, byteBuffer.getUInt());
 
-        bytes = Bytes.from("80000000");
-        assertEquals(2147483648L, bytes.getUInt());
+        byteBuffer = ByteBuffer.from("80000000");
+        assertEquals(2147483648L, byteBuffer.getUInt());
 
-        bytes = Bytes.from("00000001");
-        assertEquals(1L, bytes.getUInt());
+        byteBuffer = ByteBuffer.from("00000001");
+        assertEquals(1L, byteBuffer.getUInt());
 
-        bytes = Bytes.from("7FFFFFFF");
-        assertEquals(2147483647L, bytes.getUInt());
+        byteBuffer = ByteBuffer.from("7FFFFFFF");
+        assertEquals(2147483647L, byteBuffer.getUInt());
 
     }
 
     @Test
     public void test_retrieve_byteorder() {
         String hxStr = "FFFFFFFF";
-        Bytes bytes = Bytes.from(hxStr);
-        bytes.setWKBByteOrder(WkbByteOrder.XDR);
-        assertEquals(WkbByteOrder.XDR, bytes.getWKBByteOrder());
-        bytes.setWKBByteOrder(WkbByteOrder.NDR);
-        assertEquals(WkbByteOrder.NDR, bytes.getWKBByteOrder());
+        ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        assertEquals(WkbByteOrder.XDR, byteBuffer.getWKBByteOrder());
+        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
+        assertEquals(WkbByteOrder.NDR, byteBuffer.getWKBByteOrder());
     }
 
     @Test
     public void test_create_bytes_having_specified_size() {
-        Bytes bytes = Bytes.allocate(100);
-        assertEquals(100, bytes.capacity());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(100);
+        assertEquals(100, byteBuffer.capacity());
     }
 
     @Test
     public void test_put_xdr_double() {
         double expected = 1234.56789;
-        Bytes bytes = Bytes.allocate(8);
-        bytes.setWKBByteOrder(WkbByteOrder.XDR);
-        bytes.putDouble(expected);
-        bytes.rewind();
-        double d = bytes.getDouble();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        byteBuffer.putDouble(expected);
+        byteBuffer.rewind();
+        double d = byteBuffer.getDouble();
         assertEquals(expected, d);
     }
 
     @Test
     public void test_put_ndr_double() {
         double expected = 1234.56789;
-        Bytes bytes = Bytes.allocate(8);
-        bytes.setWKBByteOrder(WkbByteOrder.NDR);
-        bytes.putDouble(expected);
-        bytes.rewind();
-        double d = bytes.getDouble();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
+        byteBuffer.putDouble(expected);
+        byteBuffer.rewind();
+        double d = byteBuffer.getDouble();
         assertEquals(expected, d);
     }
 
     @Test
     public void test_put_byte() {
         byte expected = (byte) 0xFF;
-        Bytes bytes = Bytes.allocate(1);
-        bytes.put(expected);
-        bytes.rewind();
-        assertEquals(expected, bytes.get());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1);
+        byteBuffer.put(expected);
+        byteBuffer.rewind();
+        assertEquals(expected, byteBuffer.get());
     }
 
     @Test
     public void test_put_int() {
         int expected = 0xFF;
-        Bytes bytes = Bytes.allocate(4);
-        bytes.putInt(expected);
-        bytes.rewind();
-        assertEquals(expected, bytes.getInt());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.putInt(expected);
+        byteBuffer.rewind();
+        assertEquals(expected, byteBuffer.getInt());
     }
 
     @Test
     public void test_put_long() {
         long expected = Long.MAX_VALUE;
-        Bytes bytes = Bytes.allocate(8);
-        bytes.putLong(expected);
-        bytes.rewind();
-        assertEquals(expected, bytes.getLong());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+        byteBuffer.putLong(expected);
+        byteBuffer.rewind();
+        assertEquals(expected, byteBuffer.getLong());
     }
 
 
     @Test
     public void test_put_float() {
         float expected = 1234.567f;
-        Bytes bytes = Bytes.allocate(4);
-        bytes.putFloat(expected);
-        bytes.rewind();
-        assertEquals(expected, bytes.getFloat());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.putFloat(expected);
+        byteBuffer.rewind();
+        assertEquals(expected, byteBuffer.getFloat());
     }
 
     @Test
     public void test_put_uint() {
         long expected = 4294967295L;
-        Bytes bytes = Bytes.allocate(4);
-        bytes.putUInt(expected);
-        bytes.rewind();
-        assertEquals(expected, bytes.getUInt());
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.putUInt(expected);
+        byteBuffer.rewind();
+        assertEquals(expected, byteBuffer.getUInt());
     }
 
     @Test
     public void test_put_too_large_value_in_uint_throws_exception() {
-        long value = Bytes.UINT_MAX_VALUE;
-        Bytes bytes = Bytes.allocate(4);
-        bytes.putUInt(value);
-        bytes.rewind();
-        assertEquals(value, bytes.getUInt());
+        long value = ByteBuffer.UINT_MAX_VALUE;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+        byteBuffer.putUInt(value);
+        byteBuffer.rewind();
+        assertEquals(value, byteBuffer.getUInt());
         value++;
-        Bytes bytes2 = Bytes.allocate(4);
+        ByteBuffer byteBuffer2 = ByteBuffer.allocate(4);
         try {
-            bytes2.putUInt(value);
+            byteBuffer2.putUInt(value);
             fail();
         } catch (RuntimeException e) {
             //OK

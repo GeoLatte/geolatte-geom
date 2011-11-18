@@ -21,34 +21,26 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
-
 /**
- *  A Utility class for encoding/decoding WKB geometry representations.
+ * A <code>WktToken</code> for numbers.
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/19/11
  */
-public class Wkt {
+public class WktNumberToken implements WktToken {
 
-    /**
-     * Decodes the specified String to a <code>Geometry</code>.
-     *
-     * @param wkt
-     * @return
-     */
-    public static Geometry fromWkt(String wkt) {
-        PostgisWktDecoder decoder = new PostgisWktDecoder();
-        return decoder.decode(wkt);
+    private final double number;
+
+    public WktNumberToken(double number) {
+        super();
+        this.number = number;
     }
 
-    /**
-     * Encodes a <code>Geometry</code> to a WKT representation.
-     *
-     * @param geometry
-     * @return
-     */
-    public static String toWkt(Geometry geometry) {
-        PostgisWktEncoder encoder = new PostgisWktEncoder();
-        return encoder.encode(geometry);
+    public double getNumber() {
+        return this.number;
+    }
+
+    public String toString(){
+        return String.valueOf(this.number);
     }
 }

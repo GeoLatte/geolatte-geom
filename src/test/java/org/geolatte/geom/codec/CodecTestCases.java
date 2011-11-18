@@ -52,7 +52,7 @@ public class CodecTestCases {
 
 
     public final Map<Integer, String> wktcases = new HashMap<Integer, String>();
-    public final Map<Integer, Bytes> wkbcases = new HashMap<Integer, Bytes>();
+    public final Map<Integer, ByteBuffer> wkbcases = new HashMap<Integer, ByteBuffer>();
     public final Map<Integer, Geometry> expected = new HashMap<Integer, Geometry>();
 
 
@@ -172,7 +172,7 @@ public class CodecTestCases {
 
     public void addCase(Integer key, String wkt, String wkb, Geometry geom) {
         this.wktcases.put(key, wkt);
-        this.wkbcases.put(key, Bytes.from(wkb));
+        this.wkbcases.put(key, ByteBuffer.from(wkb));
         this.expected.put(key, geom);
     }
 
@@ -184,7 +184,7 @@ public class CodecTestCases {
         return this.expected.get(name);
     }
 
-    public Bytes getWKB(Integer name) {
+    public ByteBuffer getWKB(Integer name) {
         return this.wkbcases.get(name);
     }
 

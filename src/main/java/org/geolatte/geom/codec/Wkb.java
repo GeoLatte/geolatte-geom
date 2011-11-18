@@ -24,23 +24,44 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.Geometry;
 
 /**
+ * A Utility class for encoding/decoding WKB geometry representations.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
 public class Wkb {
 
-    public static Bytes toWkb(Geometry geometry) {
+    /**
+     * Encodes a <code>Geometry</code> to a WKB representation using the NDR (little-endian)  byte-order.
+     *
+     * @param geometry
+     * @return
+     */
+    public static ByteBuffer toWkb(Geometry geometry) {
         return toWkb(geometry, WkbByteOrder.NDR);
     }
 
-    public static Bytes toWkb(Geometry geometry, WkbByteOrder byteOrder) {
-        Postgisv15WkbEncoder encoder = new Postgisv15WkbEncoder();
+    /**
+     * Encodes a <code>Geometry</code> to a WKB representation using the specified byte-order.
+     *
+     * @param geometry
+     * @param byteOrder
+     * @return
+     */
+    public static ByteBuffer toWkb(Geometry geometry, WkbByteOrder byteOrder) {
+        PostgisWkbEncoder encoder = new PostgisWkbEncoder();
         return encoder.encode(geometry, byteOrder);
     }
 
-    public static Geometry fromWkb(Bytes bytes) {
-        Postgisv15WkbDecoder decoder = new Postgisv15WkbDecoder();
-        return decoder.decode(bytes);
+    /**
+     * Decodes a <code>ByteBuffer</code> buffer to a Geometry.
+     *
+     * @param byteBuffer
+     * @return
+     */
+    public static Geometry fromWkb(ByteBuffer byteBuffer) {
+        PostgisWkbDecoder decoder = new PostgisWkbDecoder();
+        return decoder.decode(byteBuffer);
     }
 
 }

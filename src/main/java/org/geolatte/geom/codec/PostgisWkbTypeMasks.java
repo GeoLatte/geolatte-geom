@@ -21,34 +21,28 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
-
 /**
- *  A Utility class for encoding/decoding WKB geometry representations.
+ * Bit masks for PostGIS Wkb Encoder/Decoder.
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 4/19/11
  */
-public class Wkt {
+public class PostgisWkbTypeMasks {
 
     /**
-     * Decodes the specified String to a <code>Geometry</code>.
-     *
-     * @param wkt
-     * @return
+     * Indicates the presence of Z-coordinates in the WKB
      */
-    public static Geometry fromWkt(String wkt) {
-        PostgisWktDecoder decoder = new PostgisWktDecoder();
-        return decoder.decode(wkt);
-    }
+    public static final int Z_FLAG = 0x80000000;
 
     /**
-     * Encodes a <code>Geometry</code> to a WKT representation.
-     *
-     * @param geometry
-     * @return
+     * Indicates the presence of M-coordinates in the WKB
      */
-    public static String toWkt(Geometry geometry) {
-        PostgisWktEncoder encoder = new PostgisWktEncoder();
-        return encoder.encode(geometry);
-    }
+    public static final int M_FLAG = 0x40000000;
+
+    /**
+     * Indicates the presence of a SRID in the WKB
+     */
+    public static final int SRID_FLAG = 0x20000000;
+
+
 }

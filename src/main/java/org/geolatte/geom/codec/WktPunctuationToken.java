@@ -21,34 +21,27 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
-
 /**
- *  A Utility class for encoding/decoding WKB geometry representations.
+ * A WktToken that consists of a single char  to indicate grouping (list open/close), or
+ * to delimit values.
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/18/11
  */
-public class Wkt {
+public class WktPunctuationToken implements WktToken {
 
-    /**
-     * Decodes the specified String to a <code>Geometry</code>.
-     *
-     * @param wkt
-     * @return
-     */
-    public static Geometry fromWkt(String wkt) {
-        PostgisWktDecoder decoder = new PostgisWktDecoder();
-        return decoder.decode(wkt);
+    private final char punctuationChar;
+
+    public WktPunctuationToken(char c){
+        this.punctuationChar = c;
     }
 
-    /**
-     * Encodes a <code>Geometry</code> to a WKT representation.
-     *
-     * @param geometry
-     * @return
-     */
-    public static String toWkt(Geometry geometry) {
-        PostgisWktEncoder encoder = new PostgisWktEncoder();
-        return encoder.encode(geometry);
+    public char getChar(){
+        return this.punctuationChar;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(punctuationChar);
     }
 }

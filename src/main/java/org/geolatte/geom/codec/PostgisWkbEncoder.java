@@ -31,11 +31,11 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class Postgisv15WkbEncoder {
+public class PostgisWkbEncoder {
 
 
-    public Bytes encode(Geometry geom, WkbByteOrder wbo) {
-        Bytes output = Bytes.allocate(calculateSize(geom, true));
+    public ByteBuffer encode(Geometry geom, WkbByteOrder wbo) {
+        ByteBuffer output = ByteBuffer.allocate(calculateSize(geom, true));
         if (wbo != null) {
             output.setWKBByteOrder(wbo);
         }
@@ -44,12 +44,12 @@ public class Postgisv15WkbEncoder {
         return output;
     }
 
-    private void writeGeometry(Geometry geom, Bytes output) {
+    private void writeGeometry(Geometry geom, ByteBuffer output) {
         geom.accept(new WkbVisitor(output));
     }
 
-    protected int calculateSize(Geometry geom, boolean includeSRID) {
-        int size = 1 + Bytes.UINT_SIZE; //size for order byte + type field
+    private int calculateSize(Geometry geom, boolean includeSRID) {
+        int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
         if (geom.getSRID() > 0 && includeSRID) size += 4;
         if (geom instanceof GeometryCollection) {
             size += sizeOfGeometryCollection((GeometryCollection) geom);
@@ -60,18 +60,18 @@ public class Postgisv15WkbEncoder {
         } else if (geom instanceof PolyHedralSurface) {
             size += getPolyHedralSurfaceSize((PolyHedralSurface) geom);
         } else {
-            size += Bytes.UINT_SIZE; //to hold number of points
+            size += ByteBuffer.UINT_SIZE; //to hold number of points
             size += getPointByteSize(geom) * geom.getNumPoints();
         }
         return size;
     }
 
     private int getPointByteSize(Geometry geom) {
-        return geom.getCoordinateDimension() * Bytes.DOUBLE_SIZE;
+        return geom.getCoordinateDimension() * ByteBuffer.DOUBLE_SIZE;
     }
 
     private int getPolyHedralSurfaceSize(PolyHedralSurface geom) {
-        int size = Bytes.UINT_SIZE;
+        int size = ByteBuffer.UINT_SIZE;
         for (int i = 0; i < geom.getNumPatches(); i++) {
             size += getPolygonSize(geom.getPatchN(i));
         }
@@ -80,29 +80,28 @@ public class Postgisv15WkbEncoder {
 
     private int getPolygonSize(Polygon geom) {
         //to hold the number of linear rings
-        int size = Bytes.UINT_SIZE;
+        int size = ByteBuffer.UINT_SIZE;
         //for each linear ring, a UINT holds the number of points
-        size += geom.isEmpty() ? 0 : Bytes.UINT_SIZE * (geom.getNumInteriorRing() + 1);
+        size += geom.isEmpty() ? 0 : ByteBuffer.UINT_SIZE * (geom.getNumInteriorRing() + 1);
         size += getPointByteSize(geom) * geom.getNumPoints();
         return size;
     }
 
     private int sizeOfGeometryCollection(GeometryCollection collection) {
-        int size = Bytes.UINT_SIZE;
+        int size = ByteBuffer.UINT_SIZE;
         for (Geometry g : collection) {
             size += calculateSize(g, false);
         }
         return size;
     }
-}
 
-class WkbVisitor implements GeometryVisitor {
+    private static class WkbVisitor implements GeometryVisitor {
 
-    private final Bytes output;
+    private final ByteBuffer output;
     private boolean hasWrittenSRID = false;
 
-    WkbVisitor(Bytes bytes) {
-        this.output = bytes;
+    WkbVisitor(ByteBuffer byteBuffer) {
+        this.output = byteBuffer;
     }
 
     @Override
@@ -183,17 +182,17 @@ class WkbVisitor implements GeometryVisitor {
         writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
     }
 
-    private void writeNumRings(Polygon geom, Bytes bytes) {
-        bytes.putUInt(geom.isEmpty() ? 0 : geom.getNumInteriorRing() + 1);
+    private void writeNumRings(Polygon geom, ByteBuffer byteBuffer) {
+        byteBuffer.putUInt(geom.isEmpty() ? 0 : geom.getNumInteriorRing() + 1);
     }
 
-    protected void writePoint(double[] coordinates, Bytes output) {
+    protected void writePoint(double[] coordinates, ByteBuffer output) {
         for (double coordinate : coordinates) {
             output.putDouble(coordinate);
         }
     }
 
-    protected void writePoints(PointSequence points, int coordinateDimension, Bytes output) {
+    protected void writePoints(PointSequence points, int coordinateDimension, ByteBuffer output) {
         double[] coordinates = new double[coordinateDimension];
         for (int i = 0; i < points.size(); i++) {
             points.getCoordinates(coordinates, i);
@@ -201,19 +200,19 @@ class WkbVisitor implements GeometryVisitor {
         }
     }
 
-    protected void writeByteOrder(Bytes output) {
+    protected void writeByteOrder(ByteBuffer output) {
         output.put(output.getWKBByteOrder().byteValue());
     }
 
-    protected void writeTypeCodeAndSRID(Geometry geometry, DimensionalFlag dimension, Bytes output) {
+    protected void writeTypeCodeAndSRID(Geometry geometry, DimensionalFlag dimension, ByteBuffer output) {
         int typeCode = getGeometryType(geometry);
         boolean hasSRID = (geometry.getSRID() > 0);
         if (hasSRID && !hasWrittenSRID)
-            typeCode |= Postgisv15WkbTypeMasks.SRID_FLAG;
+            typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
         if (dimension.isMeasured())
-            typeCode |= Postgisv15WkbTypeMasks.M_FLAG;
+            typeCode |= PostgisWkbTypeMasks.M_FLAG;
         if (dimension.is3D())
-            typeCode |= Postgisv15WkbTypeMasks.Z_FLAG;
+            typeCode |= PostgisWkbTypeMasks.Z_FLAG;
         output.putUInt(typeCode);
         if (hasSRID && !hasWrittenSRID) {
             output.putInt(geometry.getSRID());
@@ -229,4 +228,7 @@ class WkbVisitor implements GeometryVisitor {
     }
 
 }
+}
+
+
 
