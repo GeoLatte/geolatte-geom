@@ -26,6 +26,8 @@ import org.geolatte.geom.FixedSizePointSequenceBuilder;
 import org.geolatte.geom.PointSequenceBuilder;
 
 /**
+ * A tokenizer for WKT representations.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class WktTokenizer {

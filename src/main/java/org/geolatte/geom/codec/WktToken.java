@@ -25,6 +25,8 @@ import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.GeometryType;
 
 /**
+ * A token in a WKT representation.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 abstract class WktToken {
@@ -35,6 +37,13 @@ abstract class WktToken {
     private static final WktToken EMPTY = new Empty();
     private static final WktToken ELEMENT_SEP = new ElementSeparator();
 
+    /**
+     * Returns the WKT token that identifies the specified geometry type.
+     *
+     * @param type
+     * @param measured
+     * @return
+     */
     static WktToken geometryTag(GeometryType type, boolean measured) {
         return new Geometry(type, measured);
     }
@@ -55,14 +64,28 @@ abstract class WktToken {
         return new DimensionMarker(flag);
     }
 
+    /**
+     * Returns the token that ends the WKT representation.
+     *
+     * @return
+     */
     public static WktToken end() {
         return END;
     }
 
+    /**
+     * Returns the token that separates elements in a WKT representation.
+     * @return
+     */
     public static WktToken elementSeparator() {
         return ELEMENT_SEP;
     }
 
+    /**
+     * Returns the token taht identifies that the geometry is empty.
+     *
+     * @return
+     */
     public static WktToken empty() {
         return EMPTY;
     }

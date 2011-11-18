@@ -25,7 +25,7 @@ import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
 
 /**
- * A Word make
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public abstract class WktWordMatcher {
