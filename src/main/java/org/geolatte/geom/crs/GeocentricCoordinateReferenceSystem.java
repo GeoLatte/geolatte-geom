@@ -27,7 +27,7 @@ package org.geolatte.geom.crs;
  */
 public class GeocentricCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    GeocentricCoordinateReferenceSystem(int SRID, String name) {
+    public GeocentricCoordinateReferenceSystem(int SRID, String name) {
         super(SRID, name);
     }
 

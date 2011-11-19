@@ -22,49 +22,34 @@
 package org.geolatte.geom.crs;
 
 /**
+ * An axis of a <code>CoordinateSystem.</code>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
 public class CoordinateSystemAxis {
 
-
-    //Common axes for ellipsoidal and spherical Coordinate Systems
-    public static final CoordinateSystemAxis LONG = new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
-    public static final CoordinateSystemAxis LAT = new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
-    public static final CoordinateSystemAxis ELLIPSOIDAL_HEIGTH = new CoordinateSystemAxis("ellipsoidal height", CoordinateSystemAxisDirection.UP, Unit.METER);
-    //TODO -- check the axis direction for radius.
-    public static final CoordinateSystemAxis GEOCENTRIC_RADIUS = new CoordinateSystemAxis("geocentric radius", CoordinateSystemAxisDirection.GeocentricZ, Unit.METER);
-
-    public static final CoordinateSystemAxis GEOCENTRIC_X = new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.GeocentricX, Unit.METER);
-    public static final CoordinateSystemAxis GEOCENTRIC_Y = new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.GeocentricY, Unit.METER);
-    public static final CoordinateSystemAxis GEOCENTRIC_Z = new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, Unit.METER);
-
-    //Common axes for cartesian projected coordinate systems
-    public static final CoordinateSystemAxis X = new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER);
-    public static final CoordinateSystemAxis Y = new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER);
-    public static final CoordinateSystemAxis Z = new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.UP, Unit.METER);
-    public static final CoordinateSystemAxis M = new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.UP, Unit.METER);
-
-
-    //Common axes for map projection Coordinate Systems
-    public static final CoordinateSystemAxis N = new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.METER);
-    public static final CoordinateSystemAxis S = new CoordinateSystemAxis("Southing", CoordinateSystemAxisDirection.SOUTH, Unit.METER);
-    public static final CoordinateSystemAxis E = new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.METER);
-    public static final CoordinateSystemAxis W = new CoordinateSystemAxis("Westing", CoordinateSystemAxisDirection.WEST, Unit.METER);
-
-
-
-
     private final String axisName;
     private final CoordinateSystemAxisDirection coordinateSystemAxisDirection;
     private final Unit unit;
 
+    /**
+     * Creates an instance.
+     *
+     * @param axisName the name for this axis
+     * @param coordinateSystemAxisDirection the direction for this axis
+     * @param unit the unit of this axis
+     */
     public CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Unit unit) {
         this.axisName = axisName;
         this.coordinateSystemAxisDirection = coordinateSystemAxisDirection;
         this.unit = unit;
     }
 
+    /**
+     * Returns the name of this axis.
+     * @return
+     */
     public String getAxisName() {
         return axisName;
     }

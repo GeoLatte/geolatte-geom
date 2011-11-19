@@ -26,12 +26,11 @@ import org.geolatte.geom.crs.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO -- add OGC specification reference.
 /**
  * A decoder for Coordinate Reference System definitions in WKT.
  *
  * <p> The current implementation ensures that the postgis CRS WKT's are correctly interpreted. There are
- * some minor differences with the OGC specification. </p>
+ * some minor differences with the OGC specification: "Coordinate Transformation Services (rev. 1.00)". </p>
  *
  * <p>This decoder uses a recursive-decent parsing approach.</p>
  *
@@ -97,7 +96,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         matchesElemSeparator();
         Unit unit;
         Projection projection;
-        List<CRSParameter> parameters;
+        List<CrsParameter> parameters;
         // spatial_reference.sql contains both variants of ProjCRS Wkt
         if (currentToken == CrsWktVariant.UNIT) {
             unit = matchesUnit(Unit.Type.LINEAR);
@@ -113,9 +112,9 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         return new ProjectedCoordinateReferenceSystem(srid, crsName, geogcs, projection, parameters, twinAxes);
     }
 
-    private List<CRSParameter> optionalMatchesParameters() {
-        List<CRSParameter> parameters = new ArrayList<CRSParameter>();
-        CRSParameter parameter = optionalMatchParameter();
+    private List<CrsParameter> optionalMatchesParameters() {
+        List<CrsParameter> parameters = new ArrayList<CrsParameter>();
+        CrsParameter parameter = optionalMatchParameter();
         while (parameter != null) {
             parameters.add( parameter );
             parameter = optionalMatchParameter();
@@ -123,7 +122,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         return parameters;
     }
 
-    private CRSParameter optionalMatchParameter(){
+    private CrsParameter optionalMatchParameter(){
         matchesElemSeparator();
         if (currentToken != CrsWktVariant.PARAMETER) {
             return null;
@@ -133,7 +132,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         matchesElemSeparator();
         double value = matchesNumber();
         matchesCloseList();
-        return new CRSParameter(name, value);
+        return new CrsParameter(name, value);
     }
 
     private Projection matchesProjection(){

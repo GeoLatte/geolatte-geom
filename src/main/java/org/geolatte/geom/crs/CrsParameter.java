@@ -25,12 +25,12 @@ package org.geolatte.geom.crs;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CRSParameter {
+public class CrsParameter {
 
     private final String name;
     private final double value;
 
-    public CRSParameter(String name, double value) {
+    public CrsParameter(String name, double value) {
         this.name = name;
         this.value = value;
     }
@@ -48,7 +48,7 @@ public class CRSParameter {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CRSParameter that = (CRSParameter) o;
+        CrsParameter that = (CrsParameter) o;
 
         if (Double.compare(that.value, value) != 0) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
@@ -68,7 +68,7 @@ public class CRSParameter {
 
     @Override
     public String toString() {
-        return "CRSParameter{" +
+        return "CrsParameter{" +
                 "name='" + name + '\'' +
                 ", value=" + value +
                 '}';

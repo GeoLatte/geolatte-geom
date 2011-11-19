@@ -21,6 +21,10 @@
 
 package org.geolatte.geom.crs;
 
+/**
+ * Describes the units of a <code>CoordinateSystemAxis</code>.
+ *
+ */
 public class Unit {
 
     public static enum Type {
@@ -45,6 +49,14 @@ public class Unit {
 
     private final double conversionFactor;
 
+    /**
+     * Creates an instance.
+     *
+     * @param srid
+     * @param name
+     * @param type
+     * @param conversionFactor
+     */
     public Unit(int srid, String name, Type type, double conversionFactor) {
         this.srid = srid;
         this.name = name;
@@ -73,14 +85,19 @@ public class Unit {
         return conversionFactor;
     }
 
+    /**
+     * Returns the conventional name for this <code>Unit</code>.
+     * @return
+     */
     public String getName() {
         return name;
     }
 
-    public int getSrid() {
-        return srid;
-    }
-
+    /**
+     * Returns true if this <code>Unit</code> is angular.
+     *
+     * @return
+     */
     public boolean isAngular() {
         return this.type == Type.ANGULAR;
     }

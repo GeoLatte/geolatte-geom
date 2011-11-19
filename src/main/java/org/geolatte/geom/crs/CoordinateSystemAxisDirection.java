@@ -22,7 +22,8 @@
 package org.geolatte.geom.crs;
 
 /**
- * The
+ * Enumerates the possible values of direction for a <code>CoordinateSystemAxis</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */

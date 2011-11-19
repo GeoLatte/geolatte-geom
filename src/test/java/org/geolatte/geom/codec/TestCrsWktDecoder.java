@@ -129,15 +129,15 @@ public class TestCrsWktDecoder {
 
         //check the projection
         assertEquals(new Projection(-1, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
-        List<CRSParameter> parameters = projCRS.getParameters();
-        List<CRSParameter> expectedParameters = new ArrayList<CRSParameter>();
-        expectedParameters.add ( new CRSParameter("standard_parallel_1",51.16666723333333));
-        expectedParameters.add ( new CRSParameter("standard_parallel_2",49.8333339));
-        expectedParameters.add ( new CRSParameter("latitude_of_origin",90));
-        expectedParameters.add ( new CRSParameter("central_meridian",4.367486666666666));
-        expectedParameters.add ( new CRSParameter("false_easting",150000.013));
-        expectedParameters.add ( new CRSParameter("false_northing",5400088.438));
-        assertArrayEquals(expectedParameters.toArray(new CRSParameter[]{}), parameters.toArray(new CRSParameter[]{}));
+        List<CrsParameter> parameters = projCRS.getParameters();
+        List<CrsParameter> expectedParameters = new ArrayList<CrsParameter>();
+        expectedParameters.add ( new CrsParameter("standard_parallel_1",51.16666723333333));
+        expectedParameters.add ( new CrsParameter("standard_parallel_2",49.8333339));
+        expectedParameters.add ( new CrsParameter("latitude_of_origin",90));
+        expectedParameters.add ( new CrsParameter("central_meridian",4.367486666666666));
+        expectedParameters.add ( new CrsParameter("false_easting",150000.013));
+        expectedParameters.add ( new CrsParameter("false_northing",5400088.438));
+        assertArrayEquals(expectedParameters.toArray(new CrsParameter[]{}), parameters.toArray(new CrsParameter[]{}));
 
         //check the authority
         assertEquals(31370, projCRS.getSRID());

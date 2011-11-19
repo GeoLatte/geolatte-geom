@@ -24,6 +24,9 @@ package org.geolatte.geom.crs;
 import java.util.Arrays;
 
 /**
+ * A coordinate system.
+ *
+ * <p>A coordinate system is characterized by its <code>CoordinateSystemAxis</code>es (in order).</p>
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
@@ -31,6 +34,14 @@ public class CoordinateSystem {
 
     protected final CoordinateSystemAxis[] axes;
 
+    /**
+     * Constructs an <code>CoordinateSystem</code>.
+     *
+     * <p><code>CoordinateSystem</code>s are characterized by their <code>CoordinateSystemAxis</code>es. </p>
+     *
+     * @param axes the sequence (at least two) of its <code>CoordinateSystem</code>es.
+     * @throws IllegalArgumentException when less than two axes are specified.
+     */
     public CoordinateSystem(CoordinateSystemAxis... axes) {
         if (axes == null || axes.length < 2) {
             throw new IllegalArgumentException("Require at least 2 axes");
@@ -38,17 +49,27 @@ public class CoordinateSystem {
         this.axes = axes;
     }
 
+    /**
+     * Returns the <code>CoordinateSystemAxis</code>es of this <code>CoordinateSystem</code> (in order).
+     * @return
+     */
     public CoordinateSystemAxis[] getAxes() {
         return Arrays.copyOf(axes, axes.length);
     }
 
+    /**
+     * Returns the coordinate dimension, i.e. the number of axes in this coordinate system.
+     * @return
+     */
     public int getCoordinateDimension() {
         return this.axes.length;
     }
 
-
-
-
+    /**
+     * Returns the position of the specified <code>CoordinateSystemAxis</code> in this <code>CoordinateSystem</code>.
+     * @param axis
+     * @return
+     */
     public int getAxisIndex(CoordinateSystemAxis axis) {
         int i = 0;
         for (CoordinateSystemAxis a : axes) {
@@ -58,11 +79,23 @@ public class CoordinateSystem {
         return -1;
     }
 
+    /**
+     * Returns the <code>CoordinateSystemAxis</code> at the specified position.
+     *
+     * @param index
+     * @return
+     */
     public CoordinateSystemAxis getAxis(int index) {
         return this.axes[index];
     }
 
-    public Unit getAxisUnits(int index){
+    /**
+     * Returns the <code>Unit</code> of the axis at the specified position.
+     *
+     * @param index
+     * @return
+     */
+    public Unit getAxisUnit(int index){
         return this.axes[index].getUnit();
     }
 

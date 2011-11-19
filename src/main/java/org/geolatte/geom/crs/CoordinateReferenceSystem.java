@@ -22,6 +22,8 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A Coordinate Reference System.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -31,24 +33,48 @@ public abstract class CoordinateReferenceSystem {
     private final String name;
     private final CoordinateSystem coordinateSystem;
 
+    /**
+     * Constructs a <code>CoordinateReferenceSystem</code>.
+     *
+     * @param SRID the SRID that identifies this
+     * @param name
+     * @param axes
+     */
     CoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes){
         this.SRID = SRID;
         this.name = name;
         this.coordinateSystem = new CoordinateSystem(axes);
     }
 
+    //TODO - replace with CsrId (see GEOM-5)
     public int getSRID() {
         return SRID;
     }
 
+    /**
+     * Returns the name of this <code>CoordinateReferenceSystem</code>.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
+     *
+     * @return
+     */
     public CoordinateSystem getCoordinateSystem() {
         return coordinateSystem;
     }
 
+    /**
+     * Return the <code>CoordinateSystemAxis</code>es associated with this <code>CoordinateRefereeceSystem</code>.
+     *
+     * @return an array of <code>CoordinateSystemAxis</code>es.
+     *
+     */
     public CoordinateSystemAxis[] getAxes(){
         return coordinateSystem.getAxes();
     }
