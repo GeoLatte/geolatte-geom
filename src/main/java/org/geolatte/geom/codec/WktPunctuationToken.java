@@ -22,15 +22,26 @@
 package org.geolatte.geom.codec;
 
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * A WktToken that consists of a single char  to indicate grouping (list open/close), or
+ * to delimit values.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/18/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class WktPunctuationToken implements WktToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    private final char punctuationChar;
+
+    public WktPunctuationToken(char c){
+        this.punctuationChar = c;
     }
 
+    public char getChar(){
+        return this.punctuationChar;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(punctuationChar);
+    }
 }

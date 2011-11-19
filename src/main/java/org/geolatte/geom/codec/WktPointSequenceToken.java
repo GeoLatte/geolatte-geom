@@ -21,16 +21,28 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.PointSequence;
+
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * A <code>WktToken</code> for point sequences in the input text.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class WktPointSequenceToken implements WktToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    private final PointSequence points;
+
+    public WktPointSequenceToken(org.geolatte.geom.PointSequence points) {
+        this.points = points;
+    }
+
+    public PointSequence getPoints() {
+        return this.points;
+    }
+
+    public String toString(){
+        return this.points.toString();
     }
 
 }

@@ -21,16 +21,33 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.GeometryType;
+
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * The <code>WktKeywordToken</code> for the type of geometry.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class WktGeometryToken extends WktKeywordToken {
+    private final GeometryType geometryType;
+    private final boolean isMeasured;
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    public WktGeometryToken(String word, GeometryType tag, boolean measured) {
+        super(word);
+        this.geometryType = tag;
+        this.isMeasured = measured;
     }
 
+    GeometryType getType() {
+        return this.geometryType;
+    }
+
+    boolean isMeasured() {
+        return this.isMeasured;
+    }
+
+    public String toString(){
+        return this.getType().toString() + (isMeasured() ? " M" : "");
+    }
 }

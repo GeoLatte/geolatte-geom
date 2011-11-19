@@ -22,15 +22,29 @@
 package org.geolatte.geom.codec;
 
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * A text token (e.g. the name of a coordinate reference system).
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class WktTextToken implements WktToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    private final String text;
+
+    public WktTextToken(String text) {
+        super();
+        this.text = text;
     }
 
+    /**
+     * Returns the text of this token.
+     *
+     * @return the text
+     */
+    public String getText() {
+        return this.text;
+    }
 }
+
+
+

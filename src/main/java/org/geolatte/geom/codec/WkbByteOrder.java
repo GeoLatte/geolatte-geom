@@ -21,16 +21,48 @@
 
 package org.geolatte.geom.codec;
 
+import java.nio.ByteOrder;
+
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * Indicates the byte-order of a WKB representation.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: Oct 29, 2010
  */
-public class UnsupportedConversionException extends RuntimeException {
+public enum WkbByteOrder {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    XDR(ByteOrder.BIG_ENDIAN, (byte) 0),
+    NDR(ByteOrder.LITTLE_ENDIAN, (byte) 1);
+
+    private final ByteOrder order;
+    private final byte orderByte;
+
+    private WkbByteOrder(ByteOrder order, byte orderByte) {
+        this.order = order;
+        this.orderByte = orderByte;
+    }
+
+
+    public static WkbByteOrder valueOf(byte orderByte) {
+        for (WkbByteOrder wbo : values()) {
+            if (orderByte == wbo.byteValue()) return wbo;
+        }
+        throw new IllegalArgumentException("Order byte must be 0 or 1");
+    }
+
+    ByteOrder getByteOrder() {
+        return this.order;
+    }
+
+    byte byteValue() {
+        return orderByte;
+    }
+
+    static WkbByteOrder valueOf(ByteOrder byteOrder) {
+        for (WkbByteOrder wkbOrder : values()) {
+            if (wkbOrder.getByteOrder() == byteOrder) return wkbOrder;
+        }
+        throw new IllegalArgumentException();
     }
 
 }

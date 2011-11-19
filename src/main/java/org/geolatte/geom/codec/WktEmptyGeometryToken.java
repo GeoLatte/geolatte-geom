@@ -22,15 +22,18 @@
 package org.geolatte.geom.codec;
 
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * The <code>WktKeyWordToken</code> for empty point lists.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+class WktEmptyGeometryToken extends WktKeywordToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    protected WktEmptyGeometryToken() {
+        super("EMPTY");
     }
 
+    public String toString(){
+        return "EMPTY";
+    }
 }

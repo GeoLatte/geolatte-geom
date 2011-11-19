@@ -21,7 +21,7 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.Bytes;
+import org.geolatte.geom.codec.ByteBuffer;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -71,5 +71,5 @@ public interface GeometryOperations {
 
     GeometryOperation<String> createToWKTOp(Geometry geometry);
 
-    GeometryOperation<Bytes> createToWKBOp(Geometry geometry);
+    GeometryOperation<ByteBuffer> createToWKBOp(Geometry geometry);
 }

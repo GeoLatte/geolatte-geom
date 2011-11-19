@@ -53,7 +53,7 @@ public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSyst
 
     public Unit getUnit() {
 
-        //TODO -- this should no longer be necessary. CRS always has at least two coordinate axes
+        //TODO -- this should no longer be necessary. CrsRegistry always has at least two coordinate axes
         if (getAxes() == null || getAxes().length == 0) {
             return Unit.UNKNOWN;
         }

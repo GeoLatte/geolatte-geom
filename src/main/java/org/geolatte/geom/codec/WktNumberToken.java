@@ -22,15 +22,25 @@
 package org.geolatte.geom.codec;
 
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * A <code>WktToken</code> for numbers.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class WktNumberToken implements WktToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    private final double number;
+
+    public WktNumberToken(double number) {
+        super();
+        this.number = number;
     }
 
+    public double getNumber() {
+        return this.number;
+    }
+
+    public String toString(){
+        return String.valueOf(this.number);
+    }
 }

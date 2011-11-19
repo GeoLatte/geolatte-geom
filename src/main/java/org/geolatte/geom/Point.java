@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Arrays;
 
 /**
@@ -36,6 +38,40 @@ public class Point extends Geometry {
         return new Point(sequence, SRID);
     }
 
+    public static Point create2D(double x, double y, int SRID) {
+        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), SRID);
+    }
+
+    public static Point create3D(double x, double y, double z, int SRID) {
+        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), SRID);
+    }
+
+    public static Point create2DM(double x, double y, double m, int SRID) {
+        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), SRID);
+    }
+
+    public static Point create3DM(double x, double y, double z, double m, int SRID) {
+        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), SRID);
+    }
+
+    public static Point create2D(double x, double y) {
+        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), CrsId.UNDEFINED.getCode());
+    }
+
+    public static Point create3D(double x, double y, double z) {
+        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), CrsId.UNDEFINED.getCode());
+    }
+
+    public static Point create2DM(double x, double y, double m) {
+        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), CrsId.UNDEFINED.getCode());
+    }
+
+    public static Point create3DM(double x, double y, double z, double m) {
+        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), CrsId.UNDEFINED.getCode());
+    }
+
+
+    //TODO -- limit visibility to package
     public static Point create(double[] coordinates, DimensionalFlag dimensionalFlag, int SRID) {
         if (coordinates == null || coordinates.length == 0) {
             return EMPTY;
@@ -94,7 +130,6 @@ public class Point extends Geometry {
     }
 
     //TODO -- is this still necessary?? If Geometry's equals not enough?
-    @Override
     public boolean equals(Object o){
         if (this == o) return true;
         if (! (o instanceof Point)){

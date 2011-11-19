@@ -21,16 +21,34 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.DimensionalFlag;
+
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * Marks the presence of Z- and/or M-coordinates in the WKT representation.
+ *
+ * <p>This is not used in the Postgis EWKT format. So currently it is unused.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 11/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+class WktDimensionMarkerToken extends WktKeywordToken {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+    private final DimensionalFlag dimensionalFlag;
+
+    public WktDimensionMarkerToken(String pattern, DimensionalFlag flag) {
+        super("pattern");
+        this.dimensionalFlag = flag;
     }
 
+    public boolean isMeasured() {
+        return this.dimensionalFlag.isMeasured();
+    }
+
+    public boolean is3D() {
+        return this.dimensionalFlag.is3D();
+    }
+
+    public String toString(){
+        return this.dimensionalFlag.toString();
+    }
 }
