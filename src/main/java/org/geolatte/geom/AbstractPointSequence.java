@@ -68,17 +68,14 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
         }
     }
 
-    @Override
     public DimensionalFlag getDimensionalFlag() {
         return this.dimensionalFlag;
     }
 
-    @Override
     public boolean is3D(){
         return this.dimensionalFlag.is3D();
     }
 
-    @Override
     public boolean isMeasured(){
         return this.dimensionalFlag.isMeasured();
     }
@@ -86,7 +83,6 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     /*
    This overrides the CoordinateSequence notion of dimension
     */
-    @Override
     public int getDimension() {
         return getCoordinateDimension();
     }
@@ -120,27 +116,22 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
         }
     }
 
-    @Override
     public double getX(int i) {
         return getCoordinate(i, CoordinateAccessor.X);
     }
 
-    @Override
     public double getY(int i) {
         return getCoordinate(i, CoordinateAccessor.Y);
     }
 
-    @Override
     public double getZ(int i) {
         return getCoordinate(i, CoordinateAccessor.Z);
     }
 
-    @Override
     public double getM(int i) {
         return getCoordinate(i, CoordinateAccessor.M);
     }
 
-    @Override
     public Coordinate getCoordinate(int i) {
         DimensionalCoordinate co = new DimensionalCoordinate(getDimensionalFlag());
         co.x = getX(i);
@@ -152,12 +143,10 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
         return co;
     }
 
-    @Override
     public Coordinate getCoordinateCopy(int i) {
         return getCoordinate(i);
     }
 
-    @Override
     public void getCoordinate(int i, Coordinate coordinate) {
         coordinate.x = getX(i);
         coordinate.y = getY(i);

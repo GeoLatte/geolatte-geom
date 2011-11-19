@@ -22,15 +22,27 @@
 package org.geolatte.geom.codec;
 
 /**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
+ * Bit masks for PostGIS Wkb Encoder/Decoder.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
+ *         creation-date: 4/19/11
  */
-public class UnsupportedConversionException extends RuntimeException {
+public class PostgisWkbTypeMasks {
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
-    }
+    /**
+     * Indicates the presence of Z-coordinates in the WKB
+     */
+    public static final int Z_FLAG = 0x80000000;
+
+    /**
+     * Indicates the presence of M-coordinates in the WKB
+     */
+    public static final int M_FLAG = 0x40000000;
+
+    /**
+     * Indicates the presence of a SRID in the WKB
+     */
+    public static final int SRID_FLAG = 0x20000000;
+
 
 }

@@ -21,16 +21,34 @@
 
 package org.geolatte.geom.codec;
 
-/**
- * Thrown when the WKT/WKB representation is not supported by the encoder or decoder.
- *
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 12, 2010
- */
-public class UnsupportedConversionException extends RuntimeException {
+import org.geolatte.geom.Geometry;
 
-    public UnsupportedConversionException(String msg) {
-        super(msg);
+/**
+ *  A Utility class for encoding/decoding WKB geometry representations.
+ *
+ * @author Karel Maesen, Geovise BVBA, 2011
+ */
+public class Wkt {
+
+    /**
+     * Decodes the specified String to a <code>Geometry</code>.
+     *
+     * @param wkt
+     * @return
+     */
+    public static Geometry fromWkt(String wkt) {
+        PostgisWktDecoder decoder = new PostgisWktDecoder();
+        return decoder.decode(wkt);
     }
 
+    /**
+     * Encodes a <code>Geometry</code> to a WKT representation.
+     *
+     * @param geometry
+     * @return
+     */
+    public static String toWkt(Geometry geometry) {
+        PostgisWktEncoder encoder = new PostgisWktEncoder();
+        return encoder.encode(geometry);
+    }
 }

@@ -23,7 +23,7 @@ package org.geolatte.geom;
 
 import com.vividsolutions.jts.operation.BoundaryOp;
 import com.vividsolutions.jts.operation.IsSimpleOp;
-import org.geolatte.geom.codec.Bytes;
+import org.geolatte.geom.codec.ByteBuffer;
 import org.geolatte.geom.jts.JTS;
 
 /**
@@ -152,7 +152,7 @@ public class JTSGeometryOperations implements GeometryOperations {
     }
 
     @Override
-    public GeometryOperation<Bytes> createToWKBOp(Geometry geometry) {
+    public GeometryOperation<ByteBuffer> createToWKBOp(Geometry geometry) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

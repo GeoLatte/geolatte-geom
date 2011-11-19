@@ -21,7 +21,7 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.Bytes;
+import org.geolatte.geom.codec.ByteBuffer;
 
 import java.io.Serializable;
 
@@ -236,7 +236,7 @@ public abstract class Geometry implements Serializable{
     }
 
     public byte[] asBinary() {
-        GeometryOperation<Bytes> operation = getGeometryOperations().createToWKBOp(this);
+        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWKBOp(this);
         return operation.execute().toByteArray();
     }
 
