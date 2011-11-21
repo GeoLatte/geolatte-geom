@@ -19,21 +19,17 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom;
+package org.geolatte.geom.jts;
 
 /**
- * A Builder for <code>Geometry</code>s.
+ * Unit tests for the JTS conversion
  *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/21/11
  */
-public interface GeometryBuilder<T extends Geometry> {
+public class TestJTS {
 
-    public void addPoint(double[] coordinates);
 
-    public void setSRID(int srid);
 
-    public void startGeometry(GeometryType type, int numElements, boolean is3D, boolean isMeasured);
-
-    public T build();
 
 }

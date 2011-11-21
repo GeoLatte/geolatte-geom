@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
+ * A <code>Coordinate</code> with an associated <code>DimensionalFlag</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/6/11
  */

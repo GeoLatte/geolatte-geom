@@ -44,7 +44,7 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
     }
 
     @Override
-    public PointSequenceBuilder add(double x, double y) {
+    public PointSequenceBuilder add2D(double x, double y) {
         if (dimensionalFlag != DimensionalFlag.XY)
             throw new IllegalStateException("Attempting to add 2D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
@@ -53,7 +53,7 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
     }
 
     @Override
-    public PointSequenceBuilder addZ(double x, double y, double z) {
+    public PointSequenceBuilder add3D(double x, double y, double z) {
         if (dimensionalFlag != DimensionalFlag.XYZ)
             throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
@@ -63,7 +63,7 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
     }
 
     @Override
-    public PointSequenceBuilder addM(double x, double y, double m) {
+    public PointSequenceBuilder add2DM(double x, double y, double m) {
         if (dimensionalFlag != DimensionalFlag.XYM)
             throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
@@ -73,7 +73,7 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
     }
 
     @Override
-    public PointSequenceBuilder add(double x, double y, double z, double m) {
+    public PointSequenceBuilder add3DM(double x, double y, double z, double m) {
         if (dimensionalFlag != DimensionalFlag.XYZM)
             throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);

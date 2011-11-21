@@ -87,7 +87,7 @@ public class JTS {
     }
 
     /**
-     * Primary facotry method that converts a geolatte geometry into an equivalent jts geometry
+     * Primary factory method that converts a geolatte geometry into an equivalent jts geometry
      * @param geometry the geolatte geometry to start from
      * @return the equivalent JTS geometry
      */

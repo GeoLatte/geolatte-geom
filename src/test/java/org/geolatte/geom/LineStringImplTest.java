@@ -196,9 +196,9 @@ public class LineStringImplTest {
         points[0] = -1d;
         points[1] = -1d;
         builder.add(points);
-        builder.add(1, -1);
-        builder.add(-1, 1);
-        builder.add(1, 1);
+        builder.add2D(1, -1);
+        builder.add2D(-1, 1);
+        builder.add2D(1, 1);
         return builder.toPointSequence();
     }
 
