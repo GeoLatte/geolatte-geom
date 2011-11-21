@@ -25,7 +25,7 @@ package org.geolatte.geom.crs;
  * Describes the units of a <code>CoordinateSystemAxis</code>.
  *
  */
-public class Unit {
+public class Unit extends CrsIdentifiable {
 
     public static enum Type {
         LINEAR,
@@ -33,17 +33,12 @@ public class Unit {
     }
 
     //common units
-    public final static Unit DEGREE = new Unit(9122, "degree", Type.ANGULAR, 0.01745329251994328);
-    public final static Unit RADIAN = new Unit(9101, "radian", Type.ANGULAR, 1);
-    public final static Unit METER = new Unit(9001, "metre", Type.LINEAR, 1);
+    public final static Unit DEGREE = new Unit(new CrsId("EPSG",9122), "degree", Type.ANGULAR, 0.01745329251994328);
+    public final static Unit RADIAN = new Unit(new CrsId("EPSG", 9101), "radian", Type.ANGULAR, 1);
+    public final static Unit METER = new Unit(new CrsId("EPSG", 9001), "metre", Type.LINEAR, 1);
 
     //this is used when the units can't be determined.
-    public final static Unit UNKNOWN = new Unit(-1, "unknown", Type.LINEAR, 1);
-
-
-    private final int srid;
-
-    private final String name;
+    public final static Unit UNKNOWN = new Unit(CrsId.UNDEFINED, "unknown", Type.LINEAR, 1);
 
     private final Type type;
 
@@ -52,14 +47,13 @@ public class Unit {
     /**
      * Creates an instance.
      *
-     * @param srid
+     * @param crsId
      * @param name
      * @param type
      * @param conversionFactor
      */
-    public Unit(int srid, String name, Type type, double conversionFactor) {
-        this.srid = srid;
-        this.name = name;
+    public Unit(CrsId crsId, String name, Type type, double conversionFactor) {
+        super(crsId, name);
         this.type = type;
         this.conversionFactor = conversionFactor;
     }
@@ -86,14 +80,6 @@ public class Unit {
     }
 
     /**
-     * Returns the conventional name for this <code>Unit</code>.
-     * @return
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * Returns true if this <code>Unit</code> is angular.
      *
      * @return
@@ -105,13 +91,12 @@ public class Unit {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Unit)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         Unit unit = (Unit) o;
 
         if (Double.compare(unit.conversionFactor, conversionFactor) != 0) return false;
-        if (srid != unit.srid) return false;
-        if (name != null ? !name.equals(unit.name) : unit.name != null) return false;
         if (type != unit.type) return false;
 
         return true;
@@ -119,10 +104,8 @@ public class Unit {
 
     @Override
     public int hashCode() {
-        int result;
+        int result = super.hashCode();
         long temp;
-        result = srid;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (type != null ? type.hashCode() : 0);
         temp = conversionFactor != +0.0d ? Double.doubleToLongBits(conversionFactor) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
@@ -132,9 +115,9 @@ public class Unit {
     @Override
     public String toString() {
         return "Unit{" +
-                "srid=" + srid +
-                ", name='" + name + '\'' +
-                ", type=" + type +
+                "SRID=" + getCrsId().toString() +
+                "type=" + type +
+                ", conversionFactor=" + conversionFactor +
                 '}';
     }
 }

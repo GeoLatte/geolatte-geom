@@ -37,7 +37,7 @@ public class TestCRS {
     public void testCreateCRSFromEPSGCode(){
         CoordinateReferenceSystem crs = CrsRegistry.create(4326);
         assertNotNull(crs);
-        assertEquals(4326,crs.getSRID());
+        assertEquals(4326,crs.getCrsId().getCode());
         assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
         assertEquals("WGS 84", crs.getName());
         crs.getCoordinateSystem();

@@ -30,8 +30,8 @@ public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSyst
     private GeodeticDatum datum;
     private PrimeMeridian primem;
 
-    public GeographicCoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes) {
-        super(SRID, name, axes);
+    public GeographicCoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
+        super(crsId, name, axes);
     }
 
     public void setDatum(GeodeticDatum datum) {

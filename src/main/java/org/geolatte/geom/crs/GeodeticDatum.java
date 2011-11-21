@@ -21,34 +21,25 @@
 
 package org.geolatte.geom.crs;
 
+import java.util.Arrays;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class GeodeticDatum {
+public class GeodeticDatum extends CrsIdentifiable {
 
     private final Ellipsoid ellipsoid;
-    private final String name;
-    private final int SRID;
     private final double[] toWGS84;
 
-    public GeodeticDatum(int SRID, Ellipsoid ellipsoid, String name, double[] toWGS84){
-        this.SRID = SRID;
-        this.name = name;
+    public GeodeticDatum(CrsId crsId, Ellipsoid ellipsoid, String name, double[] toWGS84){
+        super(crsId, name);
         this.ellipsoid = ellipsoid;
         this.toWGS84 = toWGS84;
     }
 
     public Ellipsoid getEllipsoid() {
         return ellipsoid;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSRID() {
-        return SRID;
     }
 
     public double[] getToWGS84(){
@@ -58,22 +49,22 @@ public class GeodeticDatum {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof GeodeticDatum)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         GeodeticDatum that = (GeodeticDatum) o;
 
-        if (SRID != that.SRID) return false;
         if (ellipsoid != null ? !ellipsoid.equals(that.ellipsoid) : that.ellipsoid != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (!Arrays.equals(toWGS84, that.toWGS84)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = ellipsoid != null ? ellipsoid.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + SRID;
+        int result = super.hashCode();
+        result = 31 * result + (ellipsoid != null ? ellipsoid.hashCode() : 0);
+        result = 31 * result + (toWGS84 != null ? Arrays.hashCode(toWGS84) : 0);
         return result;
     }
 }

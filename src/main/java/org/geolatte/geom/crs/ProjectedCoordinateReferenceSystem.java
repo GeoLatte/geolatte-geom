@@ -35,8 +35,8 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
     private final List<CrsParameter> parameters;
 
 
-    public ProjectedCoordinateReferenceSystem(int SRID, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CrsParameter> parameters, CoordinateSystemAxis... axes) {
-        super(SRID, name, axes);
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CrsParameter> parameters, CoordinateSystemAxis... axes) {
+        super(crsId, name, axes);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;

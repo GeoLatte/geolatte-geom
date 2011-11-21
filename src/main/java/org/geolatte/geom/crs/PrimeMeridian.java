@@ -25,20 +25,13 @@ package org.geolatte.geom.crs;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/4/11
  */
-public class PrimeMeridian {
+public class PrimeMeridian extends CrsIdentifiable {
 
-    private final int srid;
-    private final String name;
     private final double longitude;
 
-    public PrimeMeridian(int srid, String name, double longitude) {
-        this.srid = srid;
-        this.name = name;
+    public PrimeMeridian(CrsId crsId, String name, double longitude) {
+        super(crsId, name);
         this.longitude = longitude;
-    }
-
-    public int getSrid() {
-        return srid;
     }
 
     public double getLongitude() {
@@ -48,23 +41,20 @@ public class PrimeMeridian {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PrimeMeridian)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PrimeMeridian that = (PrimeMeridian) o;
 
         if (Double.compare(that.longitude, longitude) != 0) return false;
-        if (srid != that.srid) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result;
+        int result = super.hashCode();
         long temp;
-        result = srid;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
         temp = longitude != +0.0d ? Double.doubleToLongBits(longitude) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
