@@ -30,7 +30,7 @@ import org.geolatte.geom.jts.JTS;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
-public class JTSGeometryOperations implements GeometryOperations {
+class JTSGeometryOperations implements GeometryOperations {
 
 
     @Override

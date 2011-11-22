@@ -21,10 +21,6 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-
 import java.util.Arrays;
 
 
@@ -33,7 +29,7 @@ import java.util.Arrays;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PointSequenceFactory  implements CoordinateSequenceFactory {
+public class PointSequenceFactory {
 
     public static PointSequence createEmpty(){
         return EmptyPointSequence.INSTANCE;
@@ -43,27 +39,7 @@ public class PointSequenceFactory  implements CoordinateSequenceFactory {
         return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
     }
 
-    @Override
-    public CoordinateSequence create(Coordinate[] coordinates) {
-        DimensionalFlag flag = determineDimensionFlag(coordinates);
-        return AbstractPointSequence.fromCoordinateArray(coordinates, flag);
-    }
 
-    @Override
-    public CoordinateSequence create(CoordinateSequence coordSeq) {
-        return coordSeq;
-    }
-
-    @Override
-    public CoordinateSequence create(int size, int dimension) {
-        throw new UnsupportedOperationException();
-    }
-
-    private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
-        if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
-        return DimensionalFlag.XYZ;
-    }
 }
 
 

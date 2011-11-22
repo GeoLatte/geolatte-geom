@@ -25,7 +25,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
+abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     protected final DimensionalFlag dimensionalFlag;
 

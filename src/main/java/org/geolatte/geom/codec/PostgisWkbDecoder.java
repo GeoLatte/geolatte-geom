@@ -22,9 +22,7 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
-import org.geolatte.geom.FixedSizePointSequenceBuilder;
 
 /**
  * A Wkb Decoder for PostGIS EWKB (as implemented in Postgis 1.5).
@@ -131,7 +129,7 @@ public class PostgisWkbDecoder {
     }
 
     private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
-        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
         double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
             readPoint(byteBuffer, dimensionalFlag, coordinates);

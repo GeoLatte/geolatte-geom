@@ -24,6 +24,7 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geolatte.geom.jts.DimensionalCoordinate;
 
 import java.util.Iterator;
 
@@ -45,27 +46,6 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
             sequence.getCoordinate(i, coordinates[i]);
         }
         return coordinates;
-    }
-
-    public static CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim) {
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(coordinates.length, dim);
-        double[] ordinates = new double[dim.getCoordinateDimension()];
-        for (Coordinate co : coordinates) {
-            copy(co,ordinates, dim);
-            builder.add(ordinates);
-        }
-        return (CoordinateSequence)builder.toPointSequence();
-    }
-
-    private static void copy(Coordinate co, double[] ordinates, DimensionalFlag flag) {
-        ordinates[flag.getIndex(CoordinateAccessor.X)] = co.x;
-        ordinates[flag.getIndex(CoordinateAccessor.Y)] = co.y;
-        if (flag.is3D()) ordinates[flag.getIndex(CoordinateAccessor.Z)] = co.z;
-        if (flag.isMeasured()) {
-            ordinates[flag.getIndex(CoordinateAccessor.M)] = (co instanceof DimensionalCoordinate) ?
-                   ((DimensionalCoordinate)co).m :
-                    Double.NaN;
-        }
     }
 
     public DimensionalFlag getDimensionalFlag() {

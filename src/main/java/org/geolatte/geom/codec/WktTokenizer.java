@@ -22,8 +22,8 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.FixedSizePointSequenceBuilder;
 import org.geolatte.geom.PointSequenceBuilder;
+import org.geolatte.geom.PointSequenceBuilderFactory;
 
 /**
  * A tokenizer for WKT representations.
@@ -102,7 +102,7 @@ public class WktTokenizer {
         DimensionalFlag dimensionalFlag = countDimension();
         int numPoints = countPoints();
         double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
-        PointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);

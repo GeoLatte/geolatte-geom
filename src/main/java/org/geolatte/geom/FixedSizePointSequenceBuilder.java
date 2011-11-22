@@ -24,12 +24,12 @@ package org.geolatte.geom;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
+class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
 
     private int index = 0;
     private final double[] coordinates;
 
-    public FixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag) {
+    FixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag) {
         super(flag);
         this.coordinates = new double[capacity * flag.getCoordinateDimension()];
     }

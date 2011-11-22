@@ -42,7 +42,7 @@ public class JTS {
     private static final GeometryFactory jtsGeometryFactory;
 
     static {
-        jtsGeometryFactory = new GeometryFactory(new PointSequenceFactory());
+        jtsGeometryFactory = new GeometryFactory(new PointSequenceCoordinateSequenceFactory());
     }
 
     public static GeometryFactory geometryFactory() {
@@ -282,7 +282,7 @@ public class JTS {
             df = DimensionalFlag.XYZ;
             coord = new double[3];
         }
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(cs.size(), df);
+        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(cs.size(), df);
         for (int i = 0; i < cs.size(); i++) {
             for (int ci = 0; ci < coord.length; ci++) {
                 coord[ci] = cs.getOrdinate(i, ci);
