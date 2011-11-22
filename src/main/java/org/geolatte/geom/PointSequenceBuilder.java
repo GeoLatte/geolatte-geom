@@ -22,20 +22,35 @@
 package org.geolatte.geom;
 
 /**
+ * A builder for <code>PointSequence</code>s.
+ *
+ * <p>PointSequence</p>s are built by adding points in sequence.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public interface PointSequenceBuilder {
 
-   PointSequenceBuilder add(double[] coordinates);
+    /**
+     * Adds the specified coordinates to the <code>PointSequence</code> being built.
+     *
+     * @param coordinates the coordinates the
+     * @return the
+     */
+    PointSequenceBuilder add(double[] coordinates);
 
-   PointSequenceBuilder add2D(double x, double y);
+    /**
+     * @param x
+     * @param y
+     * @return
+     */
+    PointSequenceBuilder add2D(double x, double y);
 
-   PointSequenceBuilder add3D(double x, double y, double z);
+    PointSequenceBuilder add3D(double x, double y, double z);
 
-   PointSequenceBuilder add2DM(double x, double y, double m);
+    PointSequenceBuilder add2DM(double x, double y, double m);
 
-   PointSequenceBuilder add3DM(double x, double y, double z, double m);
+    PointSequenceBuilder add3DM(double x, double y, double z, double m);
 
-   PointSequence toPointSequence();
+    PointSequence toPointSequence();
 
 }

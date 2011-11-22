@@ -29,17 +29,17 @@ import java.util.Arrays;
 
 
 /**
- * An <code>CoordinateSequenceFactory</code> that creates PointSequences.
+ * A factory for <code>PointSequence</code>s.
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PointSequenceFactory implements CoordinateSequenceFactory {
+public class PointSequenceFactory  implements CoordinateSequenceFactory {
 
-    public PointSequence createEmpty(){
+    public static PointSequence createEmpty(){
         return EmptyPointSequence.INSTANCE;
     }
 
-    public PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
+    public static PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
         return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
     }
 

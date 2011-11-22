@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.jts;
 
+import org.junit.Test;
+
 /**
  * Unit tests for the JTS conversion
  *
@@ -30,6 +32,10 @@ package org.geolatte.geom.jts;
 public class TestJTS {
 
 
+    @Test
+    public void test(){
+        //TODO
+    }
 
 
 }

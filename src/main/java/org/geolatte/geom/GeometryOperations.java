@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.codec.ByteBuffer;
 
 /**
+ * A factory for <code>GeometryOperation</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */

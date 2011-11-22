@@ -22,15 +22,11 @@
 package org.geolatte.geom;
 
 /**
- * An operation that can be executed on <code>Geometry</code>.
- *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 5/3/11
- *
- * @param <R> the return type of the operation
+ *         creation-date: 11/22/11
  */
-public interface GeometryOperation<R> {
+public class PointSequenceBuilderFactory {
 
-    public R execute();
+//    public PointSequenceBuilder
 
 }
