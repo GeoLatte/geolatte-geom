@@ -48,9 +48,9 @@ class PackedPointSequence extends AbstractPointSequence {
 
 
     @Override
-    public double getCoordinate(int i, CoordinateAccessor accessor) {
+    public double getCoordinate(int i, CoordinateComponent component) {
         try {
-            int index = getDimensionalFlag().getIndex(accessor);
+            int index = getDimensionalFlag().getIndex(component);
             return index > -1 ? this.coordinates[i * getCoordinateDimension() + index] : Double.NaN;
         }catch(IndexOutOfBoundsException e){
             throw new IndexOutOfBoundsException(String.format("Index %d out of getPointSequenceElementAt 0..%d", i, size()-1));

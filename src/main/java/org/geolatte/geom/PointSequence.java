@@ -51,7 +51,7 @@ public interface PointSequence extends Iterable<Point>, Cloneable, Serializable 
 
     double getM(int i);
 
-    public double getCoordinate(int pointIndex, CoordinateAccessor accessor);
+    public double getCoordinate(int pointIndex, CoordinateComponent component);
 
     int size();
 

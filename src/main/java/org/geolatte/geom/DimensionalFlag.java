@@ -59,9 +59,11 @@ public enum DimensionalFlag {
         return (this == XYM ||this == XYZM);
     }
 
+    //TODO remove getIndex() -- doesn't belong here.
 
-    public int getIndex(CoordinateAccessor accessor) {
-        switch (accessor) {
+
+    public int getIndex(CoordinateComponent component) {
+        switch (component) {
             case X:
                 return 0;
             case Y:

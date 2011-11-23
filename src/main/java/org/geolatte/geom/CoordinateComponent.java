@@ -29,6 +29,6 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/30/11
  */
-public enum CoordinateAccessor {
+public enum CoordinateComponent {
         X, Y, Z, M;
 }

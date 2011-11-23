@@ -85,31 +85,31 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     public void getCoordinates(double[] coordinates, int i) {
         if (coordinates.length < this.dimensionalFlag.getCoordinateDimension())
             throw new IllegalArgumentException(String.format("Coordinate array must be at least of getLength %d", this.dimensionalFlag.getCoordinateDimension()));
-        coordinates[dimensionalFlag.getIndex(CoordinateAccessor.X)] = getX(i);
-        coordinates[dimensionalFlag.getIndex(CoordinateAccessor.Y)] = getY(i);
+        coordinates[dimensionalFlag.getIndex(CoordinateComponent.X)] = getX(i);
+        coordinates[dimensionalFlag.getIndex(CoordinateComponent.Y)] = getY(i);
         int ci = 2;
         if (is3D() ) {
-            coordinates[dimensionalFlag.getIndex(CoordinateAccessor.Z)]  = getZ(i);
+            coordinates[dimensionalFlag.getIndex(CoordinateComponent.Z)]  = getZ(i);
         }
         if (isMeasured()){
-            coordinates[dimensionalFlag.getIndex(CoordinateAccessor.M)] = getM(i);
+            coordinates[dimensionalFlag.getIndex(CoordinateComponent.M)] = getM(i);
         }
     }
 
     public double getX(int i) {
-        return getCoordinate(i, CoordinateAccessor.X);
+        return getCoordinate(i, CoordinateComponent.X);
     }
 
     public double getY(int i) {
-        return getCoordinate(i, CoordinateAccessor.Y);
+        return getCoordinate(i, CoordinateComponent.Y);
     }
 
     public double getZ(int i) {
-        return getCoordinate(i, CoordinateAccessor.Z);
+        return getCoordinate(i, CoordinateComponent.Z);
     }
 
     public double getM(int i) {
-        return getCoordinate(i, CoordinateAccessor.M);
+        return getCoordinate(i, CoordinateComponent.M);
     }
 
     public Coordinate getCoordinate(int i) {
@@ -141,19 +141,19 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     public double getOrdinate(int i, int ordinateIndex){
         switch(ordinateIndex) {
             case CoordinateSequence.X:
-                return getCoordinate(i, CoordinateAccessor.X);
+                return getCoordinate(i, CoordinateComponent.X);
             case CoordinateSequence.Y:
-                return getCoordinate(i, CoordinateAccessor.Y);
+                return getCoordinate(i, CoordinateComponent.Y);
             case CoordinateSequence.Z:
-                return getCoordinate(i, CoordinateAccessor.Z);
+                return getCoordinate(i, CoordinateComponent.Z);
             case CoordinateSequence.M:
-                return getCoordinate(i, CoordinateAccessor.M);
+                return getCoordinate(i, CoordinateComponent.M);
         }
         throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
     }
 
     @Override
-    public abstract double getCoordinate(int pointIndex, CoordinateAccessor accessor);
+    public abstract double getCoordinate(int pointIndex, CoordinateComponent accessor);
 
     @Override
     public void setOrdinate(int i, int ordinateIndex, double value) {
