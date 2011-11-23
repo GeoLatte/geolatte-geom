@@ -77,7 +77,7 @@ public class CodecTestCases {
                 Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, 4326));
 
         PointSequenceBuilder psb = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(2, DimensionalFlag.XY);
-        psb.add2D(-29.261, 66.000).add2D(-71.1074, -20.255);
+        psb.add(-29.261, 66.000).add(-71.1074, -20.255);
         Geometry expected = LineString.create(psb.toPointSequence(), -1);
         addCase(LINESTRING_2D,
                 "LINESTRING(-29.261 66,-71.1074 -20.255)",
@@ -85,7 +85,7 @@ public class CodecTestCases {
                 expected);
 
         psb = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb.add2D(0, 0).add2D(1, 0).add2D(1, 1).add2D(0, 1).add2D(0, 0);
+        psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         expected = Polygon.create(psb.toPointSequence(), -1);
         addCase(POLYGON_2D_NO_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0))",
@@ -93,9 +93,9 @@ public class CodecTestCases {
                 expected);
 
         PointSequenceBuilder psb1 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb1.add2D(0, 0).add2D(1, 0).add2D(1, 1).add2D(0, 1).add2D(0, 0);
+        psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         PointSequenceBuilder psb2 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb2.add2D(0.25, 0.25).add2D(0.25, 0.5).add2D(0.5, 0.5).add2D(0.5, 0.25).add2D(0.25, 0.25);
+        psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
         LinearRing[] rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), -1), LinearRing.create(psb2.toPointSequence(), -1)};
         expected = Polygon.create(rings, -1);
         addCase(POLYGON_2D_INNER_RINGS,
@@ -130,9 +130,9 @@ public class CodecTestCases {
                 MultiPoint.create(new Point[]{pnt1, pnt2}, -1));
 
         PointSequenceBuilder psl1 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(3, DimensionalFlag.XY);
-        psl1.add2D(1, 2).add2D(2, 3).add2D(4, 5);
+        psl1.add(1, 2).add(2, 3).add(4, 5);
         PointSequenceBuilder psl2 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(2, DimensionalFlag.XY);
-        psl2.add2D(6, 7).add2D(8, 9);
+        psl2.add(6, 7).add(8, 9);
         LineString[] linestrings = new LineString[2];
         linestrings[0] = LineString.create(psl1.toPointSequence(), -1);
         linestrings[1] = LineString.create(psl2.toPointSequence(), -1);
@@ -151,13 +151,13 @@ public class CodecTestCases {
 
 
         psb = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb.add2D(0, 0).add2D(1, 0).add2D(1, 1).add2D(0, 1).add2D(0, 0);
+        psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         Polygon[] polygons = new Polygon[2];
         polygons[0] = Polygon.create(psb.toPointSequence(), -1);
         psb1 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb1.add2D(0, 0).add2D(1, 0).add2D(1, 1).add2D(0, 1).add2D(0, 0);
+        psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         psb2 = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
-        psb2.add2D(0.25, 0.25).add2D(0.25, 0.5).add2D(0.5, 0.5).add2D(0.5, 0.25).add2D(0.25, 0.25);
+        psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
         rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), -1), LinearRing.create(psb2.toPointSequence(), -1)};
         polygons[1] = Polygon.create(rings, -1);
 

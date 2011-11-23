@@ -41,6 +41,7 @@ public class TestCRS {
         assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
         assertEquals("WGS 84", crs.getName());
         crs.getCoordinateSystem();
+        assertEquals("Lon",crs.getCoordinateSystem().getAxis(0).getAxisName());
     }
 
 }

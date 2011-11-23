@@ -43,13 +43,11 @@ public interface PointSequenceBuilder {
      * @param y
      * @return
      */
-    PointSequenceBuilder add2D(double x, double y);
+    PointSequenceBuilder add(double x, double y);
 
-    PointSequenceBuilder add3D(double x, double y, double z);
+    PointSequenceBuilder add(double x, double y, double zOrm);
 
-    PointSequenceBuilder add2DM(double x, double y, double m);
-
-    PointSequenceBuilder add3DM(double x, double y, double z, double m);
+    PointSequenceBuilder add(double x, double y, double z, double m);
 
     PointSequence toPointSequence();
 
