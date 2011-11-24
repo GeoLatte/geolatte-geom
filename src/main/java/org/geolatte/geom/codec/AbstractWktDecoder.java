@@ -24,11 +24,12 @@ package org.geolatte.geom.codec;
 /**
  * An abstract WKT decoder.
  *
+ * <p><code>AbstractWktDecoder</code>s are not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  *
- * @param <T> the return type of the decode() method.
+ * @param <T> the type of the decoded WKT.
  */
 public abstract class AbstractWktDecoder<T> {
 

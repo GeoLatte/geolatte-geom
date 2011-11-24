@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A decoder for the Postgis WKT/EWKT representations as used in Postgis 1.0 to 1.5+.
+ * A decoder for the Postgis WKT/EWKT representations as used in Postgis (at least 1.0 to 1.5+).
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
