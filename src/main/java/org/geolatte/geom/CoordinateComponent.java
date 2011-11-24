@@ -22,9 +22,13 @@
 package org.geolatte.geom;
 
 /**
- * An enumeration that corresponds to coordinate accessor methods.
+ * Enumerates the components of the coordinates of a point.
  *
- * <p>The accessor names are used to associate a  <code>CoordinateSystemAxis</code> to a coordinate accessor method.</p>
+ * <p>The X- and Y-components correspond to the first, resp. second <code>CoordinateSystemAxis</code>
+ * of the associated <code>CoordinateSystem</code>. These two components are always present.</p>
+ *
+ * <p>The Z- and M-components are optional. The Z-component is, if present, always the third component;
+ * if present, the M-component is either the third or fourth component.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/30/11

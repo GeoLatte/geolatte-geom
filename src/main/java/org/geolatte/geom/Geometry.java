@@ -53,7 +53,7 @@ public abstract class Geometry implements Serializable{
             }
             sequences[i] = (geometries[i]).getPoints();
         }
-        return new NestedPointSequence(sequences, DimensionalFlag.parse(is3D, isMeasured));
+        return new NestedPointSequence(sequences, DimensionalFlag.valueOf(is3D, isMeasured));
     }
 
     Geometry(GeometryOperations geometryOperations, int SRID){
@@ -96,7 +96,7 @@ public abstract class Geometry implements Serializable{
         }
         double[] coords = new double[getCoordinateDimension()];
         getPoints().getCoordinates(coords, index);
-        return Point.create(coords, DimensionalFlag.parse(is3D(), isMeasured()), getSRID());
+        return Point.create(coords, DimensionalFlag.valueOf(is3D(), isMeasured()), getSRID());
     }
 
     public abstract PointSequence getPoints();

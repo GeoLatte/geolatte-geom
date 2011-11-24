@@ -107,7 +107,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(Point geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
     }
@@ -115,7 +115,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(LineString geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumPoints());
         writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
@@ -124,7 +124,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(Polygon geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writeNumRings(geom, output);
         for (LinearRing ring : geom) {
@@ -135,7 +135,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(PolyHedralSurface geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumPatches());
         for (Polygon pg : geom) {
@@ -146,7 +146,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(GeometryCollection geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumGeometries());
         for (Geometry part : geom) {
@@ -172,7 +172,7 @@ public class PostgisWkbEncoder {
     @Override
     public void visit(LinearRing geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.parse(geom.is3D(), geom.isMeasured());
+        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         writeRing(geom);
     }

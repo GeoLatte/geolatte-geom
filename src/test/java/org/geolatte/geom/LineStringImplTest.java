@@ -203,8 +203,8 @@ public class LineStringImplTest {
     }
 
     LineString create(double[] coordinates, boolean is3D, boolean isMeasured) {
-        DimensionalFlag dimensionalFlag = DimensionalFlag.parse(is3D, isMeasured);
-        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.parse(is3D, isMeasured));
+        DimensionalFlag dimensionalFlag = DimensionalFlag.valueOf(is3D, isMeasured);
+        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.valueOf(is3D, isMeasured));
         int dim = dimensionalFlag.getCoordinateDimension();
         double[] point = new double[dim];
         for (int i = 0; i < coordinates.length/4; i++){

@@ -162,7 +162,7 @@ public class PostgisWkbDecoder {
     private DimensionalFlag getCoordinateDimension(int typeCode) {
         boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
         boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
-        return DimensionalFlag.parse(hasZ, hasM);
+        return DimensionalFlag.valueOf(hasZ, hasM);
     }
 
     private void readSRIDIfPresent(ByteBuffer byteBuffer, int typeCode) {
