@@ -22,6 +22,13 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A geo-centric <code>CoordinateReferenceSystem</code>.
+ *
+ * <p>A geo-centric coordinate system is defined as "A 3D coordinate system, with its origin at the centre of the Earth. The X axis points towards the
+ * prime meridian. The Y axis points East or West. The Z axis points North or South. By default the
+ * Z axis will point North, and the Y axis will point East (e.g. a right handed system), but you should
+ * check the axes for non-default values" (see [CTS-1.00], p. 62.). </p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/5/11
  */

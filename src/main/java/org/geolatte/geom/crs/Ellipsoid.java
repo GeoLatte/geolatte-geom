@@ -22,6 +22,12 @@
 package org.geolatte.geom.crs;
 
 /**
+ * An ellipsoid.
+ *
+ * <p>An ellipsoid is an approximation of the Earth's surface as a squashed sphere. A common
+ * synonym is "spheroid". (See [CTS-1.00], p. 22-23.) </p>
+ *
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -30,24 +36,43 @@ public class Ellipsoid extends CrsIdentifiable {
     private final double semiMajorAxis;
     private final double inverseFlattening;
 
+    /** constructs an instance
+     *
+     * @param crsId the identifier for this <code>Ellipsoid</code>
+     * @param name the commonly used name for this <code>Ellipsoid</code>
+     * @param semiMajorAxis the semi-major axis
+     * @param inverseFlattening
+     */
     public Ellipsoid(CrsId crsId, String name, double semiMajorAxis, double inverseFlattening) {
         super(crsId, name);
         this.semiMajorAxis = semiMajorAxis;
         this.inverseFlattening = inverseFlattening;
     }
 
+    /**
+     * Returns the semi-major axis of this <code>Ellipsoid.</code>
+     *
+     * <p> The semi-major axis is the equatorial radius in meters. [CTS-1.00], p. 61</p>
+     *
+     * @return the semi-major axis.
+     */
     public double getSemiMajorAxis() {
         return semiMajorAxis;
     }
 
+    /**
+     * Returns the inverse flattening.
+     *
+     * <p>The inverse flattening is related to the equatorial/polar radius by the formula ivf=re/(re-rp). For perfect spheres,
+     * this formula breaksdown, and a special IVF value of zero is used. [CTS-1.00], p.61</p>
+     *
+     * @return
+     */
     public double getInverseFlattening() {
         return inverseFlattening;
     }
 
-    // shouldn't equals/hashcode look at crsId uniquely??
-
-
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

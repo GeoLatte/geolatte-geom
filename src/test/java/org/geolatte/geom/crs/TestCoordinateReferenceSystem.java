@@ -35,7 +35,7 @@ public class TestCoordinateReferenceSystem {
     //test Equality
     @Test
     public void testEquality(){
-        CoordinateReferenceSystem crs1 = CrsRegistry.create(4326);
+        CoordinateReferenceSystem crs1 = CrsRegistry.getEPSG(4326);
         CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
                 CrsId.parse("4326"), crs1.getName(),crs1.getAxes());
         assertEquals(crs1, crs2);
@@ -45,7 +45,7 @@ public class TestCoordinateReferenceSystem {
     //test Equality
     @Test
     public void testInEquality(){
-        CoordinateReferenceSystem crs1 = CrsRegistry.create(4326);
+        CoordinateReferenceSystem crs1 = CrsRegistry.getEPSG(4326);
         CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
                 CrsId.parse("4326"), "Other name",crs1.getAxes());
         assertNotSame(crs1, crs2);

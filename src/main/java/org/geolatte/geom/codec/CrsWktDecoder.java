@@ -77,7 +77,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
     private GeographicCoordinateReferenceSystem matchesGeographicCRS() {
         String crsName = matchesName();
         matchesElemSeparator();
-        GeodeticDatum datum = matchesDatum();
+        Datum datum = matchesDatum();
         matchesElemSeparator();
         PrimeMeridian primem = matchesPrimem();
         matchesElemSeparator();
@@ -225,7 +225,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         return new PrimeMeridian(crsId, name, longitude);
     }
 
-    private GeodeticDatum matchesDatum() {
+    private Datum matchesDatum() {
         if (currentToken != CrsWktVariant.DATUM) {
             throw new WktParseException("Expected DATUM token.");
         }
@@ -235,7 +235,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         double[] toWGS84 = optionalMatchesToWGS84();
         CrsId crsId = optionalMatchesAuthority();
         matchesCloseList();
-        return new GeodeticDatum(crsId, ellipsoid, datumName, toWGS84);
+        return new Datum(crsId, ellipsoid, datumName, toWGS84);
     }
 
     private double[] optionalMatchesToWGS84() {

@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * A projected <code>CoordinateReferenceSystem</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */

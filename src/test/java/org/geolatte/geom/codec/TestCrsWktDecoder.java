@@ -59,7 +59,7 @@ public class TestCrsWktDecoder {
         assertEquals("WGS 84", geoCRS.getName());
 
         //verify the datum
-        GeodeticDatum datum = geoCRS.getDatum();
+        Datum datum = geoCRS.getDatum();
         assertEquals("WGS_1984", datum.getName());
         assertEquals(6326, datum.getCrsId().getCode());
 

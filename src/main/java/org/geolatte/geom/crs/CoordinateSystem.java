@@ -27,6 +27,7 @@ import java.util.Arrays;
  * A coordinate system.
  *
  * <p>A coordinate system is characterized by its <code>CoordinateSystemAxis</code>es (in order).</p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */

@@ -22,6 +22,8 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A parameter in the <code>Projection</code> of a <code>ProjectedCoordinateReferenceSystem</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -30,15 +32,29 @@ public class CrsParameter {
     private final String name;
     private final double value;
 
+    /**
+     * Constructs an instance with the given parameter name and value.
+     * @param name parameter name
+     * @param value parameter value
+     */
     public CrsParameter(String name, double value) {
         this.name = name;
         this.value = value;
     }
 
+    /**
+     * Returns the name of this parameter
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns value of this parameter.
+     * @return
+     */
     public double getValue() {
         return value;
     }

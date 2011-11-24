@@ -35,7 +35,7 @@ public class TestCRS {
 
     @Test
     public void testCreateCRSFromEPSGCode(){
-        CoordinateReferenceSystem crs = CrsRegistry.create(4326);
+        CoordinateReferenceSystem crs = CrsRegistry.getEPSG(4326);
         assertNotNull(crs);
         assertEquals(4326,crs.getCrsId().getCode());
         assertTrue(crs instanceof GeographicCoordinateReferenceSystem);

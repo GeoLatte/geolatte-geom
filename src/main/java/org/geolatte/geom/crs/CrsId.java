@@ -1,13 +1,16 @@
 package org.geolatte.geom.crs;
 
 /**
- * An identifier for a <code>CoordinateReferenceSystem</code>.
- * <p/>
- * <p>Another, commonly used, name for <code>CrsId</code> is SRID.</p>
- * <p/>
- * <p><code>CoordinateReferenceSystem</code>s are usually identified by their EPSG code. EPSG
- * is then the authority for the identifier. In this implementation, EPSG is therefore the default
- * authority.</p>
+ * An identifier for a <code>CoordinateReferenceSystem</code> or other object referenced in a
+ * <code>CoordinateReferenceSystem</code> definition.
+ *
+ * <p>A commonly used alternative name for <code>CrsId</code> is "SRID".</p>
+ *
+ * <p>A <code>CrsId</code> consists of the name of an authority and a numeric identifier. The authority is the
+ * organization that is responsible for managing the definition of the identified object. </p>
+ *
+ * <p>In practice, <code>CoordinateReferenceSystem</code>s are usually identified by their EPSG code, with <a href="http://www.epsg.org/">EPSG</a>
+ * the authority for the identifier. In this implementation, EPSG is the default authority.</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */

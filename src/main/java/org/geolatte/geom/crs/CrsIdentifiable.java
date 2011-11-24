@@ -26,7 +26,7 @@ package org.geolatte.geom.crs;
  *
  * <h2>Note on identity of <code>CrsIdentifiable</code>s:</h2>
  * <p>In theory the <code>CrsId</code> should identify uniquely the CoordinateReferenceSystem-related objects
- * (whether a CRS, a datum, r a projection, etc.). In practice this is often not the case. Two cases stand out. </p>
+ * (whether CRS, datum, projection, etc.). In practice this is often not the case. Two cases stand out. </p>
  * <ul>
  *  <li>users can add their own definitions on some type (e.g. <code>Projection</code>s, <code>Ellipsoid</code>s.</li>
  *  <li>some objects have multiple, inconsistent definitions, notably the "Google" projection system and the WGS-84 GeoGCS.</li>
@@ -41,6 +41,8 @@ abstract public class CrsIdentifiable {
     private final String name;
 
     /**
+     * Constructs an instance.
+     *
      * @param crsId
      * @param name
      */
