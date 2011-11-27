@@ -37,11 +37,19 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
     private final LinearRing[] rings;
     public static final Polygon EMPTY = new Polygon(new LinearRing[0], CrsId.UNDEFINED);
 
+    public static Polygon create(LinearRing[] rings, CrsId crsId, GeometryOperations geometryOperations) {
+        return new Polygon(rings, crsId, geometryOperations);
+    }
+
     public static Polygon create(LinearRing[] rings, CrsId crsId) {
-        return new Polygon(rings, crsId);
+        return new Polygon(rings, crsId, null);
     }
 
     public static Polygon create(PointSequence points, CrsId crsId){
+        return create(points, crsId, null);
+    }
+
+    public static Polygon create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations){
         return new Polygon(new LinearRing[]{LinearRing.create(points, crsId)}, crsId);
     }
 
@@ -67,7 +75,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
     }
 
     private void checkLinearRing(LineString ring) {
-        if (ring == null || ring.getGeometryType() != GeometryType.LINEAR_RING) throw new IllegalArgumentException("Invalid linear ring specified.");
+        if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
     }
 
     @Override

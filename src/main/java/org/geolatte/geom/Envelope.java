@@ -60,19 +60,19 @@ public class Envelope {
     }
 
     public Point lowerLeft() {
-        return createPoint(minX, minY);
+        return Point.create(minX, minY, crsId);
     }
 
     public Point upperRight() {
-        return createPoint(maxX, maxY);
+        return Point.create(maxX, maxY, crsId);
     }
 
     public Point upperLeft() {
-        return createPoint(minX, maxY);
+        return Point.create(minX, maxY, crsId);
     }
 
     public Point lowerRight() {
-        return createPoint(maxX, minY);
+        return Point.create(maxX, minY, crsId);
     }
 
 
@@ -138,10 +138,6 @@ public class Envelope {
 
     public boolean contains(Point p) {
         return getMinX() <= p.getX() && getMaxX() >= p.getX() && getMinY() <= p.getY() && getMaxY() >= p.getY();
-    }
-
-    private Point createPoint(double x, double y){
-        return Point.create(new double[]{x, y}, DimensionalFlag.XY, crsId.getCode());
     }
 
     @Override

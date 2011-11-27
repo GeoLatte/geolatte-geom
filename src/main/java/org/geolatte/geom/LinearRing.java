@@ -45,10 +45,12 @@ public class LinearRing extends LineString {
 
     protected LinearRing(LineString lineString) {
         super(lineString);
+        checkIsClosed();
     }
 
     protected LinearRing(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
         super(points, crsId, geometryOperations);
+        checkIsClosed();
     }
 
     @Override
@@ -59,5 +61,10 @@ public class LinearRing extends LineString {
     @Override
     public void accept(GeometryVisitor visitor) {
         visitor.visit(this);
+    }
+
+    private void checkIsClosed(){
+        if (isEmpty() || isClosed()) return;
+        throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed.");
     }
 }

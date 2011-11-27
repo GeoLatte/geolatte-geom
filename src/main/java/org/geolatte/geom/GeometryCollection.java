@@ -35,8 +35,12 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
 
     final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0],CrsId.UNDEFINED, null);
 
+    public static GeometryCollection create(Geometry[] geometries, CrsId crsId, GeometryOperations geometryOperations) {
+        return new GeometryCollection(geometries, crsId, geometryOperations);
+    }
+
     public static GeometryCollection create(Geometry[] geometries, CrsId crsId) {
-        return new GeometryCollection(geometries, crsId, null);
+        return create(geometries, crsId, null);
     }
 
     public static GeometryCollection createEmpty() {

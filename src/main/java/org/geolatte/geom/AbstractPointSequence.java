@@ -177,7 +177,6 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
 
     @Override
     public void accept(PointVisitor visitor) {
-        visitor.setCoordinateSystem(getDimensionalFlag());
         double[] coordinates = new double[getCoordinateDimension()];
         for (int i = 0; i < size(); i++) {
             getCoordinates(coordinates,i);
