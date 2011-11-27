@@ -22,7 +22,7 @@
 package org.geolatte.geom.crs;
 
 /**
- * A coordinate reference system projection.
+ * A projection from geographic coordinates to projected coordinates.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
