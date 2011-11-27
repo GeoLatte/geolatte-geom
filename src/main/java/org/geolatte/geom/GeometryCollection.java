@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Iterator;
 
 /**
@@ -31,19 +33,18 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
     protected final Geometry[] geometries;
     protected final PointSequence points;
 
-    final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0], 0);
+    final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0],CrsId.UNDEFINED, null);
 
-    public static GeometryCollection create(Geometry[] geometries, int SRID) {
-        return new GeometryCollection(geometries, SRID);
+    public static GeometryCollection create(Geometry[] geometries, CrsId crsId) {
+        return new GeometryCollection(geometries, crsId, null);
     }
 
     public static GeometryCollection createEmpty() {
         return EMPTY;
     }
 
-
-    GeometryCollection(Geometry[] geometries, int SRID) {
-        super(SRID);
+    protected GeometryCollection(Geometry[] geometries, CrsId crsId, GeometryOperations geometryOperations) {
+        super(crsId, geometryOperations);
         points = createAndCheckPointSequence(geometries);
         if (points.isEmpty()) {
             this.geometries = new Geometry[0];

@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CrsId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
     private String wktString;
     private PointSequence currentPointSequence = null;
-    private int SRID = -1;
+    private CrsId crsId = CrsId.UNDEFINED;
 
     public PostgisWktDecoder() {
         super(WKT_GEOM_TOKENS);
@@ -62,7 +63,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     private void splitSRIDAndWKT(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
-            SRID = Integer.parseInt(matcher.group(1));
+            crsId = CrsId.valueOf(Integer.parseInt(matcher.group(1)));
             this.wktString = wkt.substring(matcher.end());
         } else {
             this.wktString = wkt;
@@ -101,7 +102,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 polygons.add(matchesPolygonText());
                 matchesElemSeparator();
             }
-            return MultiPolygon.create(polygons.toArray(new Polygon[polygons.size()]), SRID);
+            return MultiPolygon.create(polygons.toArray(new Polygon[polygons.size()]), crsId);
         }
         if (matchesEmpty()) {
             return MultiPolygon.createEmpty();
@@ -116,7 +117,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 lineStrings.add(matchesLineStringText());
                 matchesElemSeparator();
             }
-            return MultiLineString.create(lineStrings.toArray(new LineString[lineStrings.size()]), SRID);
+            return MultiLineString.create(lineStrings.toArray(new LineString[lineStrings.size()]), crsId);
         }
         if (matchesEmpty()) {
             return MultiLineString.createEmpty();
@@ -131,7 +132,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 points.add(matchesPointText());
                 matchesElemSeparator();
             }
-            return MultiPoint.create(points.toArray(new Point[points.size()]), SRID);
+            return MultiPoint.create(points.toArray(new Point[points.size()]), crsId);
         }
         if (matchesEmpty()) {
             return MultiPoint.createEmpty();
@@ -146,7 +147,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 geometries.add(matchesGeometry());
                 matchesElemSeparator();
             }
-            return GeometryCollection.create(geometries.toArray(new Geometry[geometries.size()]), SRID);
+            return GeometryCollection.create(geometries.toArray(new Geometry[geometries.size()]), crsId);
         }
         if (matchesEmpty()) {
             return GeometryCollection.createEmpty();
@@ -160,9 +161,9 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
             while (!matchesCloseList()) {
                 matchesPoints();
                 matchesElemSeparator();
-                rings.add(LinearRing.create(currentPointSequence, SRID));
+                rings.add(LinearRing.create(currentPointSequence, crsId));
             }
-            return Polygon.create(rings.toArray(new LinearRing[rings.size()]), SRID);
+            return Polygon.create(rings.toArray(new LinearRing[rings.size()]), crsId);
         }
         if (matchesEmpty()) {
             return Polygon.createEmpty();
@@ -172,7 +173,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
     private LineString matchesLineStringText() {
         if (matchesPoints()) {
-            return LineString.create(currentPointSequence, SRID);
+            return LineString.create(currentPointSequence, crsId);
         }
         if (matchesEmpty()) {
             return LineString.createEmpty();
@@ -182,7 +183,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
     private Point matchesPointText() {
         if (matchesPoints()) {
-            return Point.create(currentPointSequence, SRID);
+            return Point.create(currentPointSequence, crsId);
         }
         if (matchesEmpty()) {
             return Point.createEmpty();

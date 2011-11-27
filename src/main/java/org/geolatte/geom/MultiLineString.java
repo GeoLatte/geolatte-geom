@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
@@ -28,18 +30,22 @@ package org.geolatte.geom;
 public class MultiLineString extends GeometryCollection {
 
 
-    public static final MultiLineString EMPTY = new MultiLineString(new LineString[0], 0);
+    public static final MultiLineString EMPTY = new MultiLineString(new LineString[0], CrsId.UNDEFINED, null);
 
-    public static MultiLineString create(LineString[] geometries, int SRID){
-        return new MultiLineString(geometries, SRID);
+    public static MultiLineString create(LineString[] geometries, CrsId crsId, GeometryOperations geometryOperations){
+        return new MultiLineString(geometries, crsId, geometryOperations);
+    }
+
+    public static MultiLineString create(LineString[] geometries, CrsId crsId) {
+        return create(geometries, crsId, null);
     }
 
     public static MultiLineString createEmpty() {
         return EMPTY;
     }
 
-    MultiLineString(LineString[] geometries, int SRID) {
-        super(geometries, SRID);
+    protected MultiLineString(LineString[] geometries, CrsId crsId, GeometryOperations geometryOperations) {
+        super(geometries, crsId, geometryOperations);
     }
 
     @Override

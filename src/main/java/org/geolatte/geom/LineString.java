@@ -21,19 +21,24 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class LineString extends Geometry {
 
-    public static final LineString EMPTY =  new LineString(null, 0);
+    public static final LineString EMPTY =  new LineString(null, CrsId.UNDEFINED, null);
 
     private final PointSequence points;
 
 
+    public static LineString create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+        return new LineString(points, crsId, geometryOperations);
+    }
 
-    public static LineString create(PointSequence points, int SRID){
-        return new LineString(points, SRID);
+    public static LineString create(PointSequence points, CrsId SRID){
+        return new LineString(points, SRID, null);
     }
 
     public static LineString createEmpty() {
@@ -45,12 +50,12 @@ public class LineString extends Geometry {
      * @param base
      */
     protected LineString(LineString base){
-        super(base.getGeometryOperations(), base.getSRID());
+        super(base.getCrsId(), base.getGeometryOperations());
         this.points = base.points;
     }
 
-    protected LineString(PointSequence points, int SRID){
-        super(SRID);
+    protected LineString(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+        super(crsId, geometryOperations);
         if (points == null){
             points = EmptyPointSequence.INSTANCE;
         }

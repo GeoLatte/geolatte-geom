@@ -22,16 +22,11 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geolatte.geom.*;
+import org.geolatte.geom.DimensionalFlag;
+import org.geolatte.geom.PointSequence;
+import org.geolatte.geom.PointSequenceBuilder;
+import org.geolatte.geom.PointSequenceBuilderFactory;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011 (original code)
@@ -55,32 +50,32 @@ public class JTS {
      * @return an equivalent geolatte geometry
      */
     public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
-        return from(jtsGeometry, jtsGeometry.getSRID());
+        return from(jtsGeometry,  CrsId.valueOf(jtsGeometry.getSRID()));
     }
 
     /**
      * Factory method that converts a JTS geometry into an equivalent geolatte geometry and allows the caller to
      * specify the srid value of the resulting geolatte geometry.
+     *
      * @param jtsGeometry the jtsGeometry
-     * @param SRID the SRID to use in the geolatte geometry. Note that if the SRID specified differs from the SRID
-     * in the given JTS geometry, the coordinates will *not* be converted automatically.
+     * @param crsId
      * @return A geolatte geometry that corresponds with the given JTS geometry
      */
-    public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry, int SRID) {
+    public static org.geolatte.geom.Geometry from(Geometry jtsGeometry, CrsId crsId) {
         if (jtsGeometry instanceof Point) {
-            return from((Point) jtsGeometry, SRID);
+            return from((Point) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof LineString) {
-            return from((LineString) jtsGeometry, SRID);
+            return from((LineString) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof Polygon) {
-            return from((Polygon) jtsGeometry, SRID);
+            return from((Polygon) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof MultiPoint) {
-            return from((MultiPoint) jtsGeometry, SRID);
+            return from((MultiPoint) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof MultiLineString) {
-            return from((MultiLineString) jtsGeometry, SRID);
+            return from((MultiLineString) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof MultiPolygon) {
-            return from((MultiPolygon) jtsGeometry, SRID);
+            return from((MultiPolygon) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof GeometryCollection) {
-            return from((GeometryCollection) jtsGeometry, SRID);
+            return from((GeometryCollection) jtsGeometry, crsId);
         } else {
             throw new JTSConversionException();
         }
@@ -119,78 +114,78 @@ public class JTS {
     /*
      * Converts a jts multipolygon into a geolatte multipolygon
      */
-    private static org.geolatte.geom.MultiPolygon from(MultiPolygon jtsGeometry, int SRID) {
+    private static org.geolatte.geom.MultiPolygon from(MultiPolygon jtsGeometry, CrsId crsId) {
         org.geolatte.geom.Polygon[] polygons = new org.geolatte.geom.Polygon[jtsGeometry.getNumGeometries()];
         for (int i =0; i< jtsGeometry.getNumGeometries(); i++) {
-            polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), SRID);
+            polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiPolygon.create(polygons, SRID);
+        return org.geolatte.geom.MultiPolygon.create(polygons, crsId);
     }
 
     /*
      * Converts a jts polygon into a geolatte polygon
      */
-    private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, int SRID) {
+    private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, CrsId crsId) {
         org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
-        org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), SRID);
-        rings[0] = org.geolatte.geom.LinearRing.create(extRing.getPoints(), extRing.getSRID());
+        org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), crsId);
+        rings[0] = org.geolatte.geom.LinearRing.create(extRing.getPoints(), extRing.getCrsId());
         for (int i = 1; i < rings.length; i++) {
-            org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), SRID);
-            rings[i] = org.geolatte.geom.LinearRing.create(intRing.getPoints(), extRing.getSRID());
+            org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crsId);
+            rings[i] = org.geolatte.geom.LinearRing.create(intRing.getPoints(), extRing.getCrsId());
         }
-        return org.geolatte.geom.Polygon.create(rings, jtsGeometry.getSRID());
+        return org.geolatte.geom.Polygon.create(rings, CrsId.valueOf(jtsGeometry.getSRID()));
     }
 
     /*
      * Converts a jts multilinestring into a geolatte multilinestring
      */
-    private static org.geolatte.geom.MultiLineString from(MultiLineString jtsGeometry, int SRID) {
+    private static org.geolatte.geom.MultiLineString from(MultiLineString jtsGeometry, CrsId crsId) {
         org.geolatte.geom.LineString[] linestrings = new org.geolatte.geom.LineString[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < linestrings.length; i++) {
-            linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), SRID);
+            linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiLineString.create(linestrings, jtsGeometry.getSRID());
+        return org.geolatte.geom.MultiLineString.create(linestrings, CrsId.valueOf(jtsGeometry.getSRID()));
     }
 
     /*
      * Converts a jts geometrycollection into a geolatte geometrycollection
      */
-    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, int SRID) {
+    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, CrsId crsId) {
         org.geolatte.geom.Geometry[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
         for (int i=0; i < jtsGeometry.getNumGeometries(); i++) {
-            geoms[i] = from(jtsGeometry.getGeometryN(i), SRID);
+            geoms[i] = from(jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.GeometryCollection.create(geoms, SRID);
+        return org.geolatte.geom.GeometryCollection.create(geoms, crsId);
     }
 
     /*
      * Converts a jts linestring into a geolatte linestring
      */
-    private static org.geolatte.geom.LineString from(LineString jtsLineString, int SRID) {
+    private static org.geolatte.geom.LineString from(LineString jtsLineString, CrsId crsId) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return org.geolatte.geom.LineString.create(toPointSequence(cs), SRID);
+        return org.geolatte.geom.LineString.create(toPointSequence(cs), crsId);
 
     }
 
     /*
      * Converts a jts multipoint into a geolatte multipoint
      */
-    private static org.geolatte.geom.MultiPoint from(MultiPoint jtsMultiPoint, int SRID) {
+    private static org.geolatte.geom.MultiPoint from(MultiPoint jtsMultiPoint, CrsId crsId) {
         if (jtsMultiPoint == null || jtsMultiPoint.getNumGeometries() == 0)
             return org.geolatte.geom.MultiPoint.createEmpty();
         org.geolatte.geom.Point[] points = new org.geolatte.geom.Point[jtsMultiPoint.getNumGeometries()];
         for (int i = 0; i < points.length; i++) {
-            points[i] = from((Point) jtsMultiPoint.getGeometryN(i), SRID);
+            points[i] = from((Point) jtsMultiPoint.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiPoint.create(points, SRID);
+        return org.geolatte.geom.MultiPoint.create(points, crsId);
     }
 
     /*
      * Converts a jts point into a geolatte point
      */
-    private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, int SRID) {
+    private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return org.geolatte.geom.Point.create(toPointSequence(cs), SRID);
+        return org.geolatte.geom.Point.create(toPointSequence(cs), crsId);
     }
 
     ///

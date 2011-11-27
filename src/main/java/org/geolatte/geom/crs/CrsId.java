@@ -23,8 +23,8 @@ public class CrsId {
      */
     final static public CrsId UNDEFINED = new CrsId("EPSG", -1);
 
-    final String authority;
-    final int code;
+    final private String authority;
+    final private int code;
 
     /**
      * Creates an instance from a <code>String</code> of the form "[<authority>:]<code>.
@@ -58,13 +58,16 @@ public class CrsId {
         }
     }
 
-    public CrsId(String authority, int code) {
-        this.authority = authority;
-        this.code = code;
+    public static CrsId valueOf(String authority, int code) {
+        return new CrsId(authority, code);
     }
 
-    public CrsId(int code){
-        this.authority = DEFAULT_AUTHORITY;
+    public static CrsId valueOf(int code) {
+        return new CrsId(CrsId.DEFAULT_AUTHORITY, code);
+    }
+
+    public CrsId(String authority, int code) {
+        this.authority = authority;
         this.code = code;
     }
 

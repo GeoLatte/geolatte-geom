@@ -24,6 +24,7 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.operation.BoundaryOp;
 import com.vividsolutions.jts.operation.IsSimpleOp;
 import org.geolatte.geom.codec.ByteBuffer;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
 
 /**
@@ -47,11 +48,11 @@ class JTSGeometryOperations implements GeometryOperations {
     @Override
     public GeometryOperation<Geometry> createBoundaryOp(Geometry geometry) {
         final BoundaryOp boundaryOp = new BoundaryOp(JTS.to(geometry));
-        final int SRID = geometry.getSRID();
+        final CrsId crsId = geometry.getCrsId();
         return new GeometryOperation<Geometry>(){
             @Override
             public Geometry execute() {
-                return JTS.from(boundaryOp.getBoundary(), SRID);
+                return JTS.from(boundaryOp.getBoundary(), crsId);
             }
         };
     }
