@@ -27,6 +27,7 @@ package org.geolatte.geom;
  */
 public class PointSequenceBuilderFactory {
 
+    //TODO make name (much) shorter: fixedSize en variableSize
     public static PointSequenceBuilder newFixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag){
         return new FixedSizePointSequenceBuilder(capacity, flag);
     }

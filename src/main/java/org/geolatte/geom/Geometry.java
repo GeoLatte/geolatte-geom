@@ -150,14 +150,13 @@ public abstract class Geometry implements Serializable {
         return operation.execute();
     }
 
-    public Geometry getEnvelope() {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createEnvelopeOp(this);
+    public Envelope getEnvelope() {
+        GeometryOperation<Envelope> operation = getGeometryOperations().createEnvelopeOp(this);
         return operation.execute();
     }
 
     public boolean disjoint(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createDisjointOp(this, other);
-        return operation.execute();
+        return !intersects(other);
     }
 
     public boolean intersects(Geometry other) {
@@ -176,8 +175,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public boolean within(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createWithinOp(this, other);
-        return operation.execute();
+        return other.contains(this);
     }
 
     public boolean contains(Geometry other) {
@@ -186,12 +184,12 @@ public abstract class Geometry implements Serializable {
     }
 
     public boolean overlaps(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createOverlaps(this, other);
+        GeometryOperation<Boolean> operation = getGeometryOperations().createOverlapsOp(this, other);
         return operation.execute();
     }
 
     public boolean relate(Geometry other, String matrix) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createRelateOp(this, other);
+        GeometryOperation<Boolean> operation = getGeometryOperations().createRelateOp(this, other, matrix);
         return operation.execute();
     }
 
@@ -216,7 +214,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public Geometry convexHull() {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createConvexHull(this);
+        GeometryOperation<Geometry> operation = getGeometryOperations().createConvexHullOp(this);
         return operation.execute();
     }
 

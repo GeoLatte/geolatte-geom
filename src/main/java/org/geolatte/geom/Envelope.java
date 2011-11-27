@@ -124,11 +124,11 @@ public class Envelope {
     }
 
     /**
-     * Checks whether this BoundingBox falls within the specified BoundingBox
+     * Checks whether this <code>Envelope</code> is contained within the specified BoundingBox
      *
      * @param bbox
      */
-    public boolean isWithin(Envelope bbox) {
+    public boolean within(Envelope bbox) {
         if (!this.getCrsId().equals(bbox.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         return bbox.getMinX() <= this.getMinX() &&
                 bbox.getMaxX() >= this.getMaxX() &&
@@ -136,8 +136,31 @@ public class Envelope {
                 bbox.getMaxY() >= this.getMaxY();
     }
 
+    /**
+     * Checks whether this <code>Envelope</code> contains the specifies <code>Envelope</code>.
+     * @param other
+     * @return
+     */
+    public boolean contains(Envelope other) {
+        return other.within(this);
+    }
+
     public boolean contains(Point p) {
         return getMinX() <= p.getX() && getMaxX() >= p.getX() && getMinY() <= p.getY() && getMaxY() >= p.getY();
+    }
+
+    /**
+     * The intersection of this <code>Envelope</code> and the other <code>Envelope</code>
+     * is not null
+     *
+     * @param other
+     * @return
+     */
+    public boolean intersects(Envelope other) {
+        return (other.minX >= this.minX && other.minX <= this.maxX ||
+                other.maxX >= this.minX && other.maxX <= this.maxX) &&
+            (other.minY >= this.minY && other.minY <= this.maxY ||
+                   other.maxY >= this.minY && other.maxY <= this.maxY);
     }
 
     @Override
@@ -169,5 +192,4 @@ public class Envelope {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
-
 }

@@ -133,7 +133,7 @@ public class JTS {
             org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crsId);
             rings[i] = org.geolatte.geom.LinearRing.create(intRing.getPoints(), extRing.getCrsId());
         }
-        return org.geolatte.geom.Polygon.create(rings, CrsId.valueOf(jtsGeometry.getSRID()));
+        return org.geolatte.geom.Polygon.create(rings, crsId);
     }
 
     /*

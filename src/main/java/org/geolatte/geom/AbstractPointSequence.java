@@ -167,7 +167,9 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
 
     @Override
     public Envelope expandEnvelope(Envelope envelope) {
-        throw new UnsupportedOperationException();
+        EnvelopeExpander expander = new EnvelopeExpander(envelope);
+        this.accept(expander);
+        return expander.result();
     }
 
     @Override
@@ -182,6 +184,24 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
             getCoordinates(coordinates,i);
             visitor.visit(coordinates);
         }
+    }
+
+    private static class EnvelopeExpander implements PointVisitor{
+
+        final private Envelope env;
+        EnvelopeExpander(Envelope env) {
+            this.env = env;
+        }
+
+        @Override
+        public void visit(double[] coordinates) {
+            this.env.expandToInclude(coordinates[0], coordinates[1]);
+        }
+
+        public Envelope result(){
+            return this.env;
+        }
+
     }
 
 }

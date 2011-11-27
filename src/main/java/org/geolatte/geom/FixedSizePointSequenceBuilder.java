@@ -35,11 +35,13 @@ class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
     }
 
     protected void add(double x) {
+        //TODO -- check that no index out of bounds can occur.
         this.coordinates[index++] = x;
     }
 
     @Override
     public PointSequence toPointSequence() {
+        //TODO -- check that index == coordinates.length (i.e. build is complete)
         return new PackedPointSequence(this.coordinates, this.dimensionalFlag);
     }
 
