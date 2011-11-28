@@ -71,10 +71,8 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
 
         CoordinateReferenceSystem that = (CoordinateReferenceSystem) o;
 
-        if (coordinateSystem != null ? !coordinateSystem.equals(that.coordinateSystem) : that.coordinateSystem != null)
-            return false;
+        return !(coordinateSystem != null ? !coordinateSystem.equals(that.coordinateSystem) : that.coordinateSystem != null);
 
-        return true;
     }
 
     @Override

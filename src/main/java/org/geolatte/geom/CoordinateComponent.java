@@ -34,5 +34,5 @@ package org.geolatte.geom;
  *         creation-date: 4/30/11
  */
 public enum CoordinateComponent {
-        X, Y, Z, M;
+        X, Y, Z, M
 }

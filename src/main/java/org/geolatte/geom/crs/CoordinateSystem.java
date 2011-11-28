@@ -33,7 +33,7 @@ import java.util.Arrays;
  */
 public class CoordinateSystem {
 
-    protected final CoordinateSystemAxis[] axes;
+    private final CoordinateSystemAxis[] axes;
 
     /**
      * Constructs an <code>CoordinateSystem</code>.

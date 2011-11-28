@@ -71,9 +71,8 @@ public class CoordinateSystemAxis {
 
         if (axisName != null ? !axisName.equals(that.axisName) : that.axisName != null) return false;
         if (coordinateSystemAxisDirection != that.coordinateSystemAxisDirection) return false;
-        if (unit != null ? !unit.equals(that.unit) : that.unit != null) return false;
+        return !(unit != null ? !unit.equals(that.unit) : that.unit != null);
 
-        return true;
     }
 
     @Override

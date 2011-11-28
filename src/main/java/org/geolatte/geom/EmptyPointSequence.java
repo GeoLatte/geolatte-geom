@@ -148,7 +148,6 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     @Override
     public void accept(PointVisitor visitor) {
-        return;
     }
 
 

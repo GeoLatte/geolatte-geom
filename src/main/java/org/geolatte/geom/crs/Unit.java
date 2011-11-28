@@ -29,7 +29,7 @@ public class Unit extends CrsIdentifiable {
 
     public static enum Type {
         LINEAR,
-        ANGULAR;
+        ANGULAR
     }
 
     //common units

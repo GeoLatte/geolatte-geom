@@ -90,9 +90,9 @@ public class Envelope {
     }
 
     public static Envelope union(Envelope b1, Envelope b2) {
-        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         if (b1 == null) return b2;
         if (b2 == null) return b1;
+        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         double minX = Math.min(b1.getMinX(), b2.getMinX());
         double minY = Math.min(b1.getMinY(), b2.getMinY());
         double maxX = Math.max(b1.getMaxX(), b2.getMaxX());

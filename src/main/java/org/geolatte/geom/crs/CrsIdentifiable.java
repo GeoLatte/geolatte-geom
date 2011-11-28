@@ -46,7 +46,7 @@ abstract public class CrsIdentifiable {
      * @param crsId
      * @param name
      */
-    public CrsIdentifiable(CrsId crsId, String name) {
+    protected CrsIdentifiable(CrsId crsId, String name) {
         this.crsId = crsId;
         this.name = name;
     }

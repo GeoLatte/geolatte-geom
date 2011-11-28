@@ -87,7 +87,6 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
             throw new IllegalArgumentException(String.format("Coordinate array must be at least of getLength %d", this.dimensionalFlag.getCoordinateDimension()));
         coordinates[dimensionalFlag.getIndex(CoordinateComponent.X)] = getX(i);
         coordinates[dimensionalFlag.getIndex(CoordinateComponent.Y)] = getY(i);
-        int ci = 2;
         if (is3D() ) {
             coordinates[dimensionalFlag.getIndex(CoordinateComponent.Z)]  = getZ(i);
         }
