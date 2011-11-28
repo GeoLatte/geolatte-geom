@@ -25,7 +25,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
+abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     protected final DimensionalFlag dimensionalFlag;
 
@@ -53,22 +53,12 @@ public abstract class AbstractPointSequenceBuilder implements PointSequenceBuild
     }
 
     @Override
-    public PointSequenceBuilder addZ(double x, double y, double z) {
-        if (dimensionalFlag != DimensionalFlag.XYZ)
+    public PointSequenceBuilder add(double x, double y, double zOrm) {
+        if (dimensionalFlag != DimensionalFlag.XYZ || dimensionalFlag != DimensionalFlag.XYM)
             throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
-        add(z);
-        return this;
-    }
-
-    @Override
-    public PointSequenceBuilder addM(double x, double y, double m) {
-        if (dimensionalFlag != DimensionalFlag.XYM)
-            throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
-        add(x);
-        add(y);
-        add(m);
+        add(zOrm);
         return this;
     }
 

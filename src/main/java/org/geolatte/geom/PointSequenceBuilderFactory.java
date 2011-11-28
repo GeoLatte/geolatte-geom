@@ -22,18 +22,18 @@
 package org.geolatte.geom;
 
 /**
- * A Builder for <code>Geometry</code>s.
- *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/22/11
  */
-public interface GeometryBuilder {
+public class PointSequenceBuilderFactory {
 
-    public void addPoint(double[] coordinates);
+    //TODO make name (much) shorter: fixedSize en variableSize
+    public static PointSequenceBuilder newFixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag){
+        return new FixedSizePointSequenceBuilder(capacity, flag);
+    }
 
-    public void setSRID(int srid);
-
-    public void startGeometry(GeometryType type, int numElements, boolean is3D, boolean isMeasured);
-
-    public Geometry build();
+    public static PointSequenceBuilder newVariableSizePointSequenceBuilder(DimensionalFlag flag) {
+        return new VariableSizePointSequenceBuilder(flag);
+    }
 
 }

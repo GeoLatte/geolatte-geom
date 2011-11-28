@@ -22,26 +22,17 @@
 package org.geolatte.geom;
 
 /**
- * An enumeration that corresponds to coordinate accessor methods.
+ * Enumerates the components of the coordinates of a point.
  *
- * <p>The accessor names are used to associate a  <code>CoordinateSystemAxis</code> to a coordinate accessor method.</p>
+ * <p>The X- and Y-components correspond to the first, resp. second <code>CoordinateSystemAxis</code>
+ * of the associated <code>CoordinateSystem</code>. These two components are always present.</p>
+ *
+ * <p>The Z- and M-components are optional. The Z-component is, if present, always the third component;
+ * if present, the M-component is either the third or fourth component.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/30/11
  */
-public enum CoordinateAccessor {
-        X, Y, Z, M;
-
-    //TODO -- clean out redundant code (see DimensionalFlag)
-//    public int getIndex(DimensionalFlag flag) {
-//        if (this == X) return 0;
-//        if (this == Y) return 1;
-//        if (this == Z)
-//            return (flag.is3D() ? -1: 2);
-//        if (this == M)
-//            return flag.isMeasured() ?
-//                     (flag.is3D() ? 3 : 2 ):
-//                      -1;
-//        return -1;
-//        }
+public enum CoordinateComponent {
+        X, Y, Z, M
 }

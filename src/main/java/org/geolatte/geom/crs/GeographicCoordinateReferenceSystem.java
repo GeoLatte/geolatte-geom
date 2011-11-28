@@ -22,23 +22,30 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A geographic <code>CoordinateReferenceSystem</code>.
+ *
+ * <p>A <code>GeographicCoordinateReferenceSystem</code> is defined as A coordinate system based on
+ * latitude and longitude. Some geographic coordinate systems are Lat/Lon, and some are Lon/Lat.
+ * You can find out which this is by examining the <code>CoordinateSystemAxis</code>es. You should also check the angular units,
+ * since not all geographic coordinate systems use degrees (see [CTS-1.00], p. 63).</p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
 public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSystem {
 
-    private GeodeticDatum datum;
+    private Datum datum;
     private PrimeMeridian primem;
 
-    public GeographicCoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes) {
-        super(SRID, name, axes);
+    public GeographicCoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
+        super(crsId, name, axes);
     }
 
-    public void setDatum(GeodeticDatum datum) {
+    public void setDatum(Datum datum) {
         this.datum = datum;
     }
 
-    public GeodeticDatum getDatum() {
+    public Datum getDatum() {
         return datum;
     }
 

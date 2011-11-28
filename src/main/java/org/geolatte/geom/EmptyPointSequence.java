@@ -102,7 +102,7 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
     }
 
     @Override
-    public double getCoordinate(int index, CoordinateAccessor accessor) {
+    public double getCoordinate(int index, CoordinateComponent component) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 
@@ -148,7 +148,6 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     @Override
     public void accept(PointVisitor visitor) {
-        return;
     }
 
 

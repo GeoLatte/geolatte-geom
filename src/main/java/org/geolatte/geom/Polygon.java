@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
 
 import java.util.Iterator;
@@ -34,25 +35,37 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
 
     private final PointSequence points;
     private final LinearRing[] rings;
-    public static final Polygon EMPTY = new Polygon(new LinearRing[0], 0);
+    public static final Polygon EMPTY = new Polygon(new LinearRing[0], CrsId.UNDEFINED);
 
-    public static Polygon create(LinearRing[] rings, int srid) {
-        return new Polygon(rings, srid);
+    public static Polygon create(LinearRing[] rings, CrsId crsId, GeometryOperations geometryOperations) {
+        return new Polygon(rings, crsId, geometryOperations);
     }
 
-    public static Polygon create(PointSequence points, int srid){
-        return new Polygon(new LinearRing[]{LinearRing.create(points, srid)},srid);
+    public static Polygon create(LinearRing[] rings, CrsId crsId) {
+        return new Polygon(rings, crsId, null);
+    }
+
+    public static Polygon create(PointSequence points, CrsId crsId){
+        return create(points, crsId, null);
+    }
+
+    public static Polygon create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations){
+        return new Polygon(new LinearRing[]{LinearRing.create(points, crsId)}, crsId);
     }
 
     public static Polygon createEmpty() {
         return EMPTY;
     }
 
-    Polygon(LinearRing[] rings, int SRID) {
-        super(SRID);
+    protected Polygon(LinearRing[] rings, CrsId SRID, GeometryOperations geometryOperations) {
+        super(SRID, geometryOperations);
         checkRings(rings);
         points = createAndCheckPointSequence(rings);
         this.rings = rings;
+    }
+
+    protected Polygon(LinearRing[] rings, CrsId crsId) {
+        this(rings, crsId, null);
     }
 
     private void checkRings(LineString[] holes) {
@@ -62,7 +75,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
     }
 
     private void checkLinearRing(LineString ring) {
-        if (ring == null || ring.getGeometryType() != GeometryType.LINEAR_RING) throw new IllegalArgumentException("Invalid linear ring specified.");
+        if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
     }
 
     @Override
@@ -113,7 +126,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
 
         return isEmpty()?
                 MultiLineString.EMPTY :
-                new MultiLineString(rings, rings[0].getSRID());
+                MultiLineString.create(rings, rings[0].getCrsId());
     }
 
 

@@ -21,49 +21,38 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-
 import java.util.Arrays;
 
 
 /**
- * An <code>CoordinateSequenceFactory</code> that creates PointSequences.
+ * A factory for <code>PointSequence</code>s.
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PointSequenceFactory implements CoordinateSequenceFactory {
+public class PointSequenceFactory {
 
-    public PointSequence createEmpty(){
+    /**
+     * Creates an empty <code>PointSequence</code>.
+     *
+     * @return an empty <code>PointSequence</code>
+     */
+    public static PointSequence createEmpty(){
         return EmptyPointSequence.INSTANCE;
     }
 
-    public PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
+    /**
+     * Creates a <code>PointSequence</code> from a coordinate array.
+     *
+     * <p>The coordinate array is copied to the new <code>PointSequence</code>.</p>
+     * @param coordinates the coordinates of the new <code>PointSequence</code>.
+     * @param dimensionalFlag the dimensions for the new <code>PointSequence</code>
+     * @return a <code>PointSequence</code> with the specified coordinates and having the specified <code>DimensionalFlag</code>.
+     */
+    public static PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
         return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
     }
 
-    @Override
-    public CoordinateSequence create(Coordinate[] coordinates) {
-        DimensionalFlag flag = determineDimensionFlag(coordinates);
-        return AbstractPointSequence.fromCoordinateArray(coordinates, flag);
-    }
 
-    @Override
-    public CoordinateSequence create(CoordinateSequence coordSeq) {
-        return coordSeq;
-    }
-
-    @Override
-    public CoordinateSequence create(int size, int dimension) {
-        throw new UnsupportedOperationException();
-    }
-
-    private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
-        if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
-        return DimensionalFlag.XYZ;
-    }
 }
 
 

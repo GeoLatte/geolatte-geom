@@ -22,6 +22,7 @@
 package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,12 +57,12 @@ public class LineStringImplTest {
         linestr3d = create(coordinates, true, false);
         linestr2dm = create(coordinates, false, true);
         linestr3dm = create(coordinates, true, true);
-        emptyLine = LineString.create(EmptyPointSequence.INSTANCE, 0);
+        emptyLine = LineString.create(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED);
         PointSequence closedSeq = new PackedPointSequence(new double[]{0,0,0,1,1,0,1,0,0,0,0,0}, DimensionalFlag.XYZ);
-        simpleClosed = LineString.create(closedSeq, 0);
-        nonSimpleClosed = LineString.create(createNonSimpleClosedPointSequence(),0);
+        simpleClosed = LineString.create(closedSeq, CrsId.UNDEFINED);
+        nonSimpleClosed = LineString.create(createNonSimpleClosedPointSequence(),CrsId.UNDEFINED);
         PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.XY);
-        line2d = LineString.create(lineSeq, -1);
+        line2d = LineString.create(lineSeq, CrsId.UNDEFINED);
 
     }
 
@@ -76,13 +77,13 @@ public class LineStringImplTest {
 
     @Test
     public void testPointN(){
-        Assert.assertEquals(Point.create(new double[]{0, 0}, DimensionalFlag.XY, -1), linestr2d.getPointN(0));
-        assertEquals(Point.create(new double[]{0, 0, 0}, DimensionalFlag.XYZ, -1) , linestr3d.getPointN(0));
-        assertEquals(Point.create(new double[]{0, 0, 0, 0}, DimensionalFlag.XYZM, -1) , linestr3dm.getPointN(0));
+        Assert.assertEquals(Point.create(0, 0, CrsId.UNDEFINED), linestr2d.getPointN(0));
+        assertEquals(Point.create3D(0, 0, 0, CrsId.UNDEFINED) , linestr3d.getPointN(0));
+        assertEquals(Point.create(0, 0, 0, 0, CrsId.UNDEFINED) , linestr3dm.getPointN(0));
 
-        assertEquals(Point.create(new double[]{2, -2}, DimensionalFlag.XY, -1) , linestr2d.getPointN(2));
-        assertEquals(Point.create(new double[]{2, -2, 3}, DimensionalFlag.XYZ, -1) , linestr3d.getPointN(2));
-        assertEquals(Point.create(new double[]{2, -2, 3, 4}, DimensionalFlag.XYZM, -1) , linestr3dm.getPointN(2));
+        assertEquals(Point.create(2, -2, CrsId.UNDEFINED) , linestr2d.getPointN(2));
+        assertEquals(Point.create3D(2, -2, 3, CrsId.UNDEFINED) , linestr3d.getPointN(2));
+        assertEquals(Point.create(2, -2, 3, 4, CrsId.UNDEFINED) , linestr3dm.getPointN(2));
 
         try{
             linestr3dm.getPointN(3);
@@ -109,18 +110,18 @@ public class LineStringImplTest {
     public void testStartPoint(){
         assertEquals(Point.createEmpty(), emptyLine.getStartPoint());
 
-        assertEquals(Point.create(new PackedPointSequence(new double[]{0, 0}, DimensionalFlag.XY), -1), linestr2d.getStartPoint());
-        assertEquals(Point.create(new PackedPointSequence(new double[]{0, 0, 0}, DimensionalFlag.XYZ), -1), linestr3d.getStartPoint());
-        assertEquals(Point.create(new PackedPointSequence(new double[]{0, 0, 0, 0}, DimensionalFlag.XYZM), -1), linestr3dm.getStartPoint());
+        assertEquals(Point.create(0, 0,CrsId.UNDEFINED), linestr2d.getStartPoint());
+        assertEquals(Point.create3D(0, 0, 0, CrsId.UNDEFINED), linestr3d.getStartPoint());
+        assertEquals(Point.create(0, 0, 0, 0, CrsId.UNDEFINED), linestr3dm.getStartPoint());
     }
 
     @Test
     public void testEndPoint(){
         assertEquals(Point.createEmpty(), emptyLine.getEndPoint());
 
-        assertEquals(Point.create(new PackedPointSequence(new double[]{2, -2}, DimensionalFlag.XY), -1), linestr2d.getEndPoint());
-        assertEquals(Point.create(new PackedPointSequence(new double[]{2, -2, 3}, DimensionalFlag.XYZ), -1), linestr3d.getEndPoint());
-        assertEquals(Point.create(new PackedPointSequence(new double[]{2, -2, 3, 4}, DimensionalFlag.XYZM), -1), linestr3dm.getEndPoint());
+        assertEquals(Point.create(2, -2, CrsId.UNDEFINED), linestr2d.getEndPoint());
+        assertEquals(Point.create3D(2, -2, 3, CrsId.UNDEFINED), linestr3d.getEndPoint());
+        assertEquals(Point.create(2, -2, 3, 4, CrsId.UNDEFINED), linestr3dm.getEndPoint());
     }
 
     @Test
@@ -165,7 +166,7 @@ public class LineStringImplTest {
     @Test
     public void testGetBoundary() {
         assertEquals(MultiPoint.EMPTY, simpleClosed.getBoundary());
-        assertEquals(MultiPoint.create(new Point[]{linestr2d.getStartPoint(), linestr2d.getEndPoint()}, -1), linestr2d.getBoundary());
+        assertEquals(MultiPoint.create(new Point[]{linestr2d.getStartPoint(), linestr2d.getEndPoint()}, CrsId.UNDEFINED), linestr2d.getBoundary());
     }
 
 //    @Test
@@ -203,8 +204,8 @@ public class LineStringImplTest {
     }
 
     LineString create(double[] coordinates, boolean is3D, boolean isMeasured) {
-        DimensionalFlag dimensionalFlag = DimensionalFlag.parse(is3D, isMeasured);
-        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.parse(is3D, isMeasured));
+        DimensionalFlag dimensionalFlag = DimensionalFlag.valueOf(is3D, isMeasured);
+        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.valueOf(is3D, isMeasured));
         int dim = dimensionalFlag.getCoordinateDimension();
         double[] point = new double[dim];
         for (int i = 0; i < coordinates.length/4; i++){
@@ -216,7 +217,7 @@ public class LineStringImplTest {
                 point[is3D ? CoordinateSequence.M : CoordinateSequence.M -1] = coordinates[i*4+3];
             sequenceBuilder.add(point);
         }
-        return LineString.create(sequenceBuilder.toPointSequence(),-1);
+        return LineString.create(sequenceBuilder.toPointSequence(),CrsId.UNDEFINED);
     }
 
 

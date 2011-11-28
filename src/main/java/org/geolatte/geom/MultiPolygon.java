@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
 
 /**
@@ -29,19 +30,22 @@ import org.geolatte.geom.jts.JTS;
  */
 public class MultiPolygon extends GeometryCollection {
 
-    static final MultiPolygon EMPTY = new MultiPolygon(new Polygon[0], 0);
+    static final MultiPolygon EMPTY = new MultiPolygon(new Polygon[0], CrsId.UNDEFINED, null);
 
-    public static MultiPolygon create(Polygon[] polygons, int SRID) {
-        return new MultiPolygon(polygons, SRID);
+    public static MultiPolygon create(Polygon[] polygons, CrsId crsId, GeometryOperations geometryOperations) {
+        return new MultiPolygon(polygons, crsId, geometryOperations);
     }
 
+    public static MultiPolygon create(Polygon[] polygons, CrsId crsId) {
+        return create(polygons, crsId, null);
+    }
 
     public static MultiPolygon createEmpty() {
         return EMPTY;
     }
 
-    MultiPolygon(Polygon[] polygons, int SRID) {
-        super(polygons, SRID);
+    protected MultiPolygon(Polygon[] polygons, CrsId crsId, GeometryOperations geometryOperations) {
+        super(polygons, crsId, geometryOperations);
     }
 
     @Override

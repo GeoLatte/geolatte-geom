@@ -19,11 +19,14 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom;
+package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.geolatte.geom.DimensionalFlag;
 
 /**
+ * A <code>Coordinate</code> with an associated <code>DimensionalFlag</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/6/11
  */
@@ -32,13 +35,13 @@ public class DimensionalCoordinate extends Coordinate {
     public double m;
     private final DimensionalFlag dimensionalFlag;
 
-    DimensionalCoordinate(DimensionalFlag dimensionalFlag){
+    public DimensionalCoordinate(DimensionalFlag dimensionalFlag){
         super();
         this.m = Double.NaN;
         this.dimensionalFlag = dimensionalFlag;
     }
 
-    DimensionalCoordinate(Coordinate c, double m, DimensionalFlag dimensionalFlag) {
+    public DimensionalCoordinate(Coordinate c, double m, DimensionalFlag dimensionalFlag) {
         super(c);
         this.m = m;
         this.dimensionalFlag = dimensionalFlag;

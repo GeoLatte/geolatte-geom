@@ -30,7 +30,8 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * Encodes geometries to
+ * Encodes geometries to Postgis WKT/EWKT representations.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PostgisWktEncoder {
@@ -45,11 +46,21 @@ public class PostgisWktEncoder {
     private static final int MAX_FRACTIONAL_DIGITS = 24;
     private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
+    /**
+     * Constructs an instance.
+     *
+     */
     public PostgisWktEncoder() {
         formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
         formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
     }
 
+    /**
+     * Encodes the specified <code>Geometry</code>.
+     *
+     * @param geometry the <code>Geometry</code> to encode
+     * @return the WKT representation of the geometry parameter value.
+     */
     public String encode(Geometry geometry) {
         addSridIfValid(geometry);
         addGeometry(geometry);

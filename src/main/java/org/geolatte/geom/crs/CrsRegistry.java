@@ -35,22 +35,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Repository for <code>CoordinateReferenceSystem</code>s.
-
+ * A repository for <code>CoordinateReferenceSystem</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
 public class CrsRegistry {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
-    private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
-    private static final String DELIM = "\\|";
+    final private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
+    final private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
+    final private static String DELIM = "\\|";
 
     static {
         try {
             loadCRS();
         } catch (IOException e) {
-            new RuntimeException("Can't read spatial ref system definitions.");
+            throw new RuntimeException("Can't read spatial ref system definitions.");
         }
     }
 
@@ -89,7 +89,19 @@ public class CrsRegistry {
 
     }
 
-    public static CoordinateReferenceSystem create(int SRID) {
-        return crsMap.get(SRID);
+    /**
+     * returns the <code>CoordinateReferenceSystem</code> for the specified EPSG code.
+     *
+     * @param epsgCode the EPSG code
+     * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
+     *  no such system is registered.
+     */
+    public static CoordinateReferenceSystem getEPSG(int epsgCode) {
+        return crsMap.get(epsgCode);
     }
+
+    //TODO implement method lower
+//    public static CoordinateReferenceSystem get(CrsId srcId){
+//
+//    }
 }

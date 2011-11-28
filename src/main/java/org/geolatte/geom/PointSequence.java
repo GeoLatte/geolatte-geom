@@ -30,6 +30,7 @@ import java.io.Serializable;
  */
 public interface PointSequence extends Iterable<Point>, Cloneable, Serializable {
 
+
     boolean is3D();
 
     boolean isMeasured();
@@ -42,8 +43,6 @@ public interface PointSequence extends Iterable<Point>, Cloneable, Serializable 
 
     void getCoordinates(double[] coordinates, int index);
 
-    public double getCoordinate(int pointIndex, CoordinateAccessor accessor);
-
     double getX(int i);
 
     double getY(int i);
@@ -51,6 +50,8 @@ public interface PointSequence extends Iterable<Point>, Cloneable, Serializable 
     double getZ(int i);
 
     double getM(int i);
+
+    public double getCoordinate(int pointIndex, CoordinateComponent component);
 
     int size();
 

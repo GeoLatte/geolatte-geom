@@ -60,19 +60,19 @@ public class Envelope {
     }
 
     public Point lowerLeft() {
-        return createPoint(minX, minY);
+        return Point.create(minX, minY, crsId);
     }
 
     public Point upperRight() {
-        return createPoint(maxX, maxY);
+        return Point.create(maxX, maxY, crsId);
     }
 
     public Point upperLeft() {
-        return createPoint(minX, maxY);
+        return Point.create(minX, maxY, crsId);
     }
 
     public Point lowerRight() {
-        return createPoint(maxX, minY);
+        return Point.create(maxX, minY, crsId);
     }
 
 
@@ -90,9 +90,9 @@ public class Envelope {
     }
 
     public static Envelope union(Envelope b1, Envelope b2) {
-        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         if (b1 == null) return b2;
         if (b2 == null) return b1;
+        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         double minX = Math.min(b1.getMinX(), b2.getMinX());
         double minY = Math.min(b1.getMinY(), b2.getMinY());
         double maxX = Math.max(b1.getMaxX(), b2.getMaxX());
@@ -124,11 +124,11 @@ public class Envelope {
     }
 
     /**
-     * Checks whether this BoundingBox falls within the specified BoundingBox
+     * Checks whether this <code>Envelope</code> is contained within the specified BoundingBox
      *
      * @param bbox
      */
-    public boolean isWithin(Envelope bbox) {
+    public boolean within(Envelope bbox) {
         if (!this.getCrsId().equals(bbox.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
         return bbox.getMinX() <= this.getMinX() &&
                 bbox.getMaxX() >= this.getMaxX() &&
@@ -136,12 +136,31 @@ public class Envelope {
                 bbox.getMaxY() >= this.getMaxY();
     }
 
+    /**
+     * Checks whether this <code>Envelope</code> contains the specifies <code>Envelope</code>.
+     * @param other
+     * @return
+     */
+    public boolean contains(Envelope other) {
+        return other.within(this);
+    }
+
     public boolean contains(Point p) {
         return getMinX() <= p.getX() && getMaxX() >= p.getX() && getMinY() <= p.getY() && getMaxY() >= p.getY();
     }
 
-    private Point createPoint(double x, double y){
-        return Point.create(new double[]{x, y}, DimensionalFlag.XY, crsId.getCode());
+    /**
+     * The intersection of this <code>Envelope</code> and the other <code>Envelope</code>
+     * is not null
+     *
+     * @param other
+     * @return
+     */
+    public boolean intersects(Envelope other) {
+        return (other.minX >= this.minX && other.minX <= this.maxX ||
+                other.maxX >= this.minX && other.maxX <= this.maxX) &&
+            (other.minY >= this.minY && other.minY <= this.maxY ||
+                   other.maxY >= this.minY && other.maxY <= this.maxY);
     }
 
     @Override
@@ -173,5 +192,4 @@ public class Envelope {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
-
 }

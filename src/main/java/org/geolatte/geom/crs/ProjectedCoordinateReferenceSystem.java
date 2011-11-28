@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * A projected <code>CoordinateReferenceSystem</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -32,17 +34,17 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
 
     private final Projection projection;
     private final GeographicCoordinateReferenceSystem geoCRS;
-    private final List<CRSParameter> parameters;
+    private final List<CrsParameter> parameters;
 
 
-    public ProjectedCoordinateReferenceSystem(int SRID, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CRSParameter> parameters, CoordinateSystemAxis... axes) {
-        super(SRID, name, axes);
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CrsParameter> parameters, CoordinateSystemAxis... axes) {
+        super(crsId, name, axes);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
     }
 
-    public List<CRSParameter> getParameters() {
+    public List<CrsParameter> getParameters() {
         return Collections.unmodifiableList(parameters);
     }
 

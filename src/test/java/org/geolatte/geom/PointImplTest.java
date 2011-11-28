@@ -21,12 +21,11 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -38,10 +37,11 @@ public class PointImplTest {
     PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.XYM);
     PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.XYZM);
 
-    Point point2D =  Point.create(seq2D, 4326);
-    Point point3D =  Point.create(seq3D, 4326);
-    Point point2DM = Point.create(seq2DM, 4326);
-    Point point3DM = Point.create(seq3DM, 4326);
+    CrsId wgs84 = CrsId.valueOf(4326);
+    Point point2D =  Point.create(seq2D, wgs84);
+    Point point3D =  Point.create(seq3D, wgs84);
+    Point point2DM = Point.create(seq2DM, wgs84);
+    Point point3DM = Point.create(seq3DM, wgs84);
     Point emptyPoint = Point.createEmpty();
 
     @Test
@@ -105,7 +105,7 @@ public class PointImplTest {
     @Test
     public void testSrid() throws Exception {
         assertEquals(4326, point2D.getSRID());
-//        assertEquals(4326, emptyPoint3DM.getSRID());
+//        assertEquals(4326, emptyPoint3DM.getCrsId());
     }
 
 
@@ -155,21 +155,21 @@ public class PointImplTest {
 
     @Test
     public void testEqualsAndHashCode(){
-        Point test2D = Point.create(new double[]{1, 2}, DimensionalFlag.XY, 4326);
+        Point test2D = Point.create(new double[]{1, 2}, DimensionalFlag.XY, wgs84);
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point test3D = Point.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, 4326);
+        Point test3D = Point.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, wgs84);
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point test2DM = Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, 4326);
+        Point test2DM = Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84);
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point test3DM = Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, 4326);
+        Point test3DM = Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, wgs84);
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2}, DimensionalFlag.XY, 0)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, 4326)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, 4326)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2}, DimensionalFlag.XY, CrsId.UNDEFINED)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84)));
+        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
     }
 
     @Test
@@ -177,7 +177,7 @@ public class PointImplTest {
         Point empty1 = Point.createEmpty();
         Point empty2 = Point.createEmpty();
         assertEquals(empty1, empty2);
-        Point empty3 = new Point(EmptyPointSequence.INSTANCE,0);
+        Point empty3 = new Point(EmptyPointSequence.INSTANCE,CrsId.UNDEFINED, null);
         assertEquals(empty1, empty3);
     }
 }

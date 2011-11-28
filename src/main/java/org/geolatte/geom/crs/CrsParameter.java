@@ -22,48 +22,51 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A parameter in the <code>Projection</code> of a <code>ProjectedCoordinateReferenceSystem</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class GeodeticDatum {
+public class CrsParameter {
 
-    private final Ellipsoid ellipsoid;
     private final String name;
-    private final int SRID;
-    private final double[] toWGS84;
+    private final double value;
 
-    public GeodeticDatum(int SRID, Ellipsoid ellipsoid, String name, double[] toWGS84){
-        this.SRID = SRID;
+    /**
+     * Constructs an instance with the given parameter name and value.
+     * @param name parameter name
+     * @param value parameter value
+     */
+    public CrsParameter(String name, double value) {
         this.name = name;
-        this.ellipsoid = ellipsoid;
-        this.toWGS84 = toWGS84;
+        this.value = value;
     }
 
-    public Ellipsoid getEllipsoid() {
-        return ellipsoid;
-    }
-
+    /**
+     * Returns the name of this parameter
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
-    public int getSRID() {
-        return SRID;
-    }
-
-    public double[] getToWGS84(){
-        return this.toWGS84;
+    /**
+     * Returns value of this parameter.
+     * @return
+     */
+    public double getValue() {
+        return value;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof GeodeticDatum)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        GeodeticDatum that = (GeodeticDatum) o;
+        CrsParameter that = (CrsParameter) o;
 
-        if (SRID != that.SRID) return false;
-        if (ellipsoid != null ? !ellipsoid.equals(that.ellipsoid) : that.ellipsoid != null) return false;
+        if (Double.compare(that.value, value) != 0) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
@@ -71,9 +74,19 @@ public class GeodeticDatum {
 
     @Override
     public int hashCode() {
-        int result = ellipsoid != null ? ellipsoid.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + SRID;
+        int result;
+        long temp;
+        result = name != null ? name.hashCode() : 0;
+        temp = value != +0.0d ? Double.doubleToLongBits(value) : 0L;
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CrsParameter{" +
+                "name='" + name + '\'' +
+                ", value=" + value +
+                '}';
     }
 }

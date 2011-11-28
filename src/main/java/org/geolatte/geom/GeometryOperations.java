@@ -24,52 +24,50 @@ package org.geolatte.geom;
 import org.geolatte.geom.codec.ByteBuffer;
 
 /**
+ * A factory for <code>GeometryOperation</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
 public interface GeometryOperations {
 
-    GeometryOperation<Boolean> createIsSimpleOp(Geometry geometry);
+    GeometryOperation<Boolean> createIsSimpleOp(final Geometry geometry);
 
-    GeometryOperation<Geometry> createBoundaryOp(Geometry geometry);
+    GeometryOperation<Geometry> createBoundaryOp(final Geometry geometry);
 
-    GeometryOperation<Geometry> createEnvelopeOp(Geometry geometry);
+    GeometryOperation<Envelope> createEnvelopeOp(final Geometry geometry);
 
-    GeometryOperation<Boolean> createDisjointOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createIntersectsOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Boolean> createIntersectsOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createTouchesOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Boolean> createTouchesOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createCrossesOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Boolean> createCrossesOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createContainsOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Boolean> createWithinOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createOverlapsOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Boolean> createContainsOp(Geometry geometry, Geometry other);
+    GeometryOperation<Boolean> createRelateOp(final Geometry geometry, final Geometry other, final String matrix);
 
-    GeometryOperation<Boolean> createOverlaps(Geometry geometry, Geometry other);
+    GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue);
 
-    GeometryOperation<Boolean> createRelateOp(Geometry geometry, Geometry other);
+    GeometryOperation<Geometry> createLocateBetween(final Geometry geometry, final double mStart, final double mEnd);
 
-    GeometryOperation<Geometry> createLocateAlongOp(Geometry geometry, double mValue);
+    GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Geometry> createLocateBetween(Geometry geometry, double mStart, double mEnd);
+    GeometryOperation<Geometry> createBufferOp(final Geometry geometry, final double distance);
 
-    GeometryOperation<Double> createDistanceOp(Geometry geometry, Geometry other);
+    GeometryOperation<Geometry> createConvexHullOp(final Geometry geometry);
 
-    GeometryOperation<Geometry> createBufferOp(Geometry geometry, double distance);
+    GeometryOperation<Geometry> createIntersectionOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Geometry> createConvexHull(Geometry geometry);
+    GeometryOperation<Geometry> createUnionOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Geometry> createIntersectionOp(Geometry geometry, Geometry other);
+    GeometryOperation<Geometry> createDifferenceOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Geometry> createUnionOp(Geometry geometry, Geometry other);
+    GeometryOperation<Geometry> createSymDifferenceOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<Geometry> createDifferenceOp(Geometry geometry, Geometry other);
+    GeometryOperation<String> createToWktOp(final Geometry geometry);
 
-    GeometryOperation<Geometry> createSymDifferenceOp(Geometry geometry, Geometry other);
-
-    GeometryOperation<String> createToWKTOp(Geometry geometry);
-
-    GeometryOperation<ByteBuffer> createToWKBOp(Geometry geometry);
+    GeometryOperation<ByteBuffer> createToWkbOp(final Geometry geometry);
 }
