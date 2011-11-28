@@ -239,12 +239,12 @@ public abstract class Geometry implements Serializable {
     }
 
     public String asText() {
-        GeometryOperation<String> operation = getGeometryOperations().createToWKTOp(this);
+        GeometryOperation<String> operation = getGeometryOperations().createToWktOp(this);
         return operation.execute();
     }
 
     public byte[] asBinary() {
-        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWKBOp(this);
+        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWkbOp(this);
         return operation.execute().toByteArray();
     }
 

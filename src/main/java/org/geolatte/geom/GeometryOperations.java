@@ -67,7 +67,7 @@ public interface GeometryOperations {
 
     GeometryOperation<Geometry> createSymDifferenceOp(final Geometry geometry, final Geometry other);
 
-    GeometryOperation<String> createToWKTOp(final Geometry geometry);
+    GeometryOperation<String> createToWktOp(final Geometry geometry);
 
-    GeometryOperation<ByteBuffer> createToWKBOp(final Geometry geometry);
+    GeometryOperation<ByteBuffer> createToWkbOp(final Geometry geometry);
 }

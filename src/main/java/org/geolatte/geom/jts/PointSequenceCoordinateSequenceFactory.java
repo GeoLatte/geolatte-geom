@@ -54,6 +54,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
         if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
         if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
+        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.XY;
         return DimensionalFlag.XYZ;
     }
 
