@@ -60,11 +60,11 @@ class NestedPointSequence extends AbstractPointSequence {
     //TODO implement a custom getCoordinates(int, double[]) method;
 
     @Override
-    public double getCoordinate(int index, CoordinateAccessor accessor) {
+    public double getCoordinate(int index, CoordinateComponent component) {
         int childOffset = index ;
         for (PointSequence child : children()){
             if (childOffset < child.size()){
-                return child.getCoordinate(childOffset, accessor);
+                return child.getCoordinate(childOffset, component);
             } else {
                 childOffset -= child.size();
             }

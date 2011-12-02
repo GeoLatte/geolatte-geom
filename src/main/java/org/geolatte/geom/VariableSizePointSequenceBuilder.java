@@ -27,12 +27,12 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
+class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
 
     private double[] coordinates;
     private int index = 0;
 
-    public VariableSizePointSequenceBuilder(DimensionalFlag flag) {
+    VariableSizePointSequenceBuilder(DimensionalFlag flag) {
         super(flag);
         this.coordinates = new double[flag.getCoordinateDimension() * 10];
     }

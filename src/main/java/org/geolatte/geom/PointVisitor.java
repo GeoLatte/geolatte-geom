@@ -22,12 +22,17 @@
 package org.geolatte.geom;
 
 /**
+ * A visitor for <code>Point</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
 public interface PointVisitor {
 
+    /**
+     * Visits the point
+     * @param coordinates the coordinates of the point
+     */
     public void visit(double[] coordinates);
 
-    void setCoordinateSystem(DimensionalFlag dimensionalFlag);
 }

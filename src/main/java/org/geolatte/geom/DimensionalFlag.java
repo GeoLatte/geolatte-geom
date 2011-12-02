@@ -22,59 +22,106 @@
 package org.geolatte.geom;
 
 /**
+ * Indicates the coordinate dimension of the points of a <code>PointSequence</code> or <code>Geometry</code> and whether
+ * the coordinates have Z- and/or M-components.
+ *
+ * <p> The coordinate dimension is the number of components in a coordinate. Points are 2-, 3- or 4-dimensional.</p>
+
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/6/11
  *
  */
 public enum DimensionalFlag {
+    /**
+     * Indicates 2 dimensions (X,Y)
+     */
+    XY(2, -1, -1),
 
-    XY(2),
-    XYZ(3),
-    XYM(3),
-    XYZM(4);
+    /**
+     * Indicates 3 dimensions (X,Y,Z). The Z-coordinate is typically used to represent altitude.
+     */
+    XYZ(3, 2, -1),
+    /**
+     * Indicates 3 dimensions (X,Y,M). The M-coordinate represents a measurement.
+     */
+    XYM(3, -1, 2),
+
+    /**
+     * Indicates 4 dimensions (X,Y,M,Z).
+     */
+    XYZM(4, 2, 3);
 
     private final int dimension;
+    private final int zComponent;
+    private final int mComponent;
 
-    private DimensionalFlag(int dimension) {
+    private DimensionalFlag(int dimension, int zComponent, int mComponent) {
         this.dimension = dimension;
+        this.zComponent = zComponent;
+        this.mComponent = mComponent;
     }
 
 
-    public static DimensionalFlag parse(boolean is3D, boolean isMeasured) {
+    /**
+     * Returns an appropriate <code>DimensionalFlag</code> depending on whether coordinates have
+     * a Z- and/or M-coordinate component
+     *
+     * @param is3D specifies that coordinates have a Z-component
+     * @param isMeasured specifies that coordinates have an M-component
+     * @return
+     */
+    public static DimensionalFlag valueOf(boolean is3D, boolean isMeasured) {
         if (!isMeasured && !is3D) return XY;
         if (!isMeasured && is3D) return XYZ;
         if (isMeasured && !is3D) return XYM;
         return XYZM;
     }
 
+    /**
+     * Returns the coordinate dimension of this <code>DimensionalFlag</code>.
+     *
+     * <p>The coordinate dimension is the number of components in a coordinate.</p>
+     * @return 2 for XY, 3 for XYZ or XYM, 4 for XYZM.
+     */
     public int getCoordinateDimension() {
         return this.dimension;
     }
 
+    /**
+     * Returns true for <code>DimensionalFlag</code>s for coordinates with a Z-component.
+     * @return true for XYZ or XYZM
+     */
     public boolean is3D() {
         return (this == XYZ ||this == XYZM);
     }
 
+    /**
+     * Returns true for <code>DimensionalFlag</code>s for coordinates with an M-component.
+     *
+     * @return true for XYM or XYZM
+     */
     public boolean isMeasured() {
         return (this == XYM ||this == XYZM);
     }
 
 
-    public int getIndex(CoordinateAccessor accessor) {
-        switch (accessor) {
+    /**
+     * Returns the (zero-based) position in a coordinate tuple of the specified <code>CoordinateComponent</code>.
+     *
+     * @param component the compoment for which to return the position
+     * @return
+     */
+    public int getIndex(CoordinateComponent component) {
+        switch (component) {
             case X:
                 return 0;
             case Y:
                 return 1;
             case Z:
-                return ( this == XYZ || this == XYZM) ? 2 : -1;
+                return zComponent;
             case M:
-                if (this == XYM)
-                    return 2;
-                else if (this == XYZM)
-                    return 3;
-                else
-                    return -1;
+                return mComponent;
         }
         return -1;
     }

@@ -27,6 +27,8 @@ import org.geolatte.geom.GeometryType;
 import java.util.*;
 
 /**
+ * Punctuation and keywords for Postgis EWKT/WKT representations.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PostgisWktVariant extends WktVariant {

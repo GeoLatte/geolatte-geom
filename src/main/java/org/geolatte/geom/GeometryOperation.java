@@ -22,8 +22,12 @@
 package org.geolatte.geom;
 
 /**
+ * An operation that can be executed on <code>Geometry</code>.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
+ *
+ * @param <R> the return type of the operation
  */
 public interface GeometryOperation<R> {
 

@@ -22,9 +22,8 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.*;
-import org.geolatte.geom.FixedSizePointSequenceBuilder;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * A Wkb Decoder for PostGIS EWKB (as implemented in Postgis 1.5).
@@ -37,7 +36,7 @@ import org.geolatte.geom.FixedSizePointSequenceBuilder;
  */
 public class PostgisWkbDecoder {
 
-    private int SRID = -1;
+    private CrsId crsId = CrsId.UNDEFINED;
 
     /**
      * Decodes a Postgis WKB representation of a <code>Geometry</code>.
@@ -82,7 +81,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (LineString) decodeGeometry(byteBuffer);
         }
-        return MultiLineString.create(geometries,SRID);
+        return MultiLineString.create(geometries, crsId);
     }
 
 
@@ -92,7 +91,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (Point) decodeGeometry(byteBuffer);
         }
-        return MultiPoint.create(geometries, SRID);
+        return MultiPoint.create(geometries, crsId);
     }
 
     private MultiPolygon decodeMultiPolygon(ByteBuffer byteBuffer) {
@@ -101,7 +100,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (Polygon) decodeGeometry(byteBuffer);
         }
-        return MultiPolygon.create(geometries, SRID);
+        return MultiPolygon.create(geometries, crsId);
     }
 
     private GeometryCollection decodeGeometryCollection(ByteBuffer byteBuffer) {
@@ -110,28 +109,28 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = decodeGeometry(byteBuffer);
         }
-        return GeometryCollection.create(geometries,SRID);
+        return GeometryCollection.create(geometries, crsId);
     }
 
     private Polygon decodePolygon(ByteBuffer byteBuffer, DimensionalFlag flag) {
         int numRings = byteBuffer.getInt();
-        LinearRing[] rings = readPolygonRings(numRings, byteBuffer, flag, SRID);
-        return Polygon.create(rings, SRID);
+        LinearRing[] rings = readPolygonRings(numRings, byteBuffer, flag, crsId);
+        return Polygon.create(rings, crsId);
     }
 
     private LineString decodeLineString(ByteBuffer byteBuffer, DimensionalFlag flag) {
         int numPoints = byteBuffer.getInt();
         PointSequence points = readPoints(numPoints, byteBuffer, flag);
-        return LineString.create(points, SRID);
+        return LineString.create(points, crsId);
     }
 
     private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
         PointSequence points = readPoints(1, byteBuffer, flag);
-        return Point.create(points, SRID);
+        return Point.create(points, crsId);
     }
 
     private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
-        FixedSizePointSequenceBuilder psBuilder = new FixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
         double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
             readPoint(byteBuffer, dimensionalFlag, coordinates);
@@ -146,30 +145,30 @@ public class PostgisWkbDecoder {
         }
     }
 
-    private LinearRing[] readPolygonRings(int numRings, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, int SRID) {
+    private LinearRing[] readPolygonRings(int numRings, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
         LinearRing[] rings = new LinearRing[numRings];
         for (int i = 0; i < numRings; i++) {
-            rings[i] = readRing(byteBuffer, dimensionalFlag, SRID);
+            rings[i] = readRing(byteBuffer, dimensionalFlag, crsId);
         }
         return rings;
     }
 
-    private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, int SRID) {
+    private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
         int numPoints = byteBuffer.getInt();
         PointSequence ps = readPoints(numPoints,byteBuffer, dimensionalFlag);
-        return LinearRing.create(ps, SRID);
+        return LinearRing.create(ps, crsId);
     }
 
 
     private DimensionalFlag getCoordinateDimension(int typeCode) {
         boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
         boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
-        return DimensionalFlag.parse(hasZ, hasM);
+        return DimensionalFlag.valueOf(hasZ, hasM);
     }
 
     private void readSRIDIfPresent(ByteBuffer byteBuffer, int typeCode) {
         if (hasSrid(typeCode)) {
-            SRID = byteBuffer.getInt();
+            crsId = CrsId.valueOf(byteBuffer.getInt());
         }
     }
 

@@ -23,25 +23,36 @@ package org.geolatte.geom.crs;
 
 import org.junit.Test;
 
+import static junit.framework.Assert.assertNotSame;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ *         creation-date: 11/21/11
  */
-public class TestCRS {
+public class TestCoordinateReferenceSystem {
 
+    //test Equality
     @Test
-    public void testCreateCRSFromEPSGCode(){
-        CoordinateReferenceSystem crs = CrsRegistry.getEPSG(4326);
-        assertNotNull(crs);
-        assertEquals(4326,crs.getCrsId().getCode());
-        assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
-        assertEquals("WGS 84", crs.getName());
-        crs.getCoordinateSystem();
-        assertEquals("Lon",crs.getCoordinateSystem().getAxis(0).getAxisName());
+    public void testEquality(){
+        CoordinateReferenceSystem crs1 = CrsRegistry.getEPSG(4326);
+        CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
+                CrsId.parse("4326"), crs1.getName(),crs1.getAxes());
+        assertEquals(crs1, crs2);
+        assertEquals(crs1.hashCode(), crs2.hashCode());
     }
+
+    //test Equality
+    @Test
+    public void testInEquality(){
+        CoordinateReferenceSystem crs1 = CrsRegistry.getEPSG(4326);
+        CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
+                CrsId.parse("4326"), "Other name",crs1.getAxes());
+        assertNotSame(crs1, crs2);
+        crs2 = new GeographicCoordinateReferenceSystem(
+                CrsId.parse("4326"), crs1.getName(), crs1.getAxes()[1], crs1.getAxes()[0]);
+        assertNotSame(crs1, crs2);
+    }
+
 
 }

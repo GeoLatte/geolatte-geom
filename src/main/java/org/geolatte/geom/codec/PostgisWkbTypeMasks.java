@@ -30,17 +30,17 @@ package org.geolatte.geom.codec;
 public class PostgisWkbTypeMasks {
 
     /**
-     * Indicates the presence of Z-coordinates in the WKB
+     * Mask for testing the presence of Z-coordinates in the WKB
      */
     public static final int Z_FLAG = 0x80000000;
 
     /**
-     * Indicates the presence of M-coordinates in the WKB
+     * Mask for testing the presence of M-coordinates in the WKB
      */
     public static final int M_FLAG = 0x40000000;
 
     /**
-     * Indicates the presence of a SRID in the WKB
+     * Mask for testing the presence of a SRID in the WKB
      */
     public static final int SRID_FLAG = 0x20000000;
 

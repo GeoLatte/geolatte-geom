@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,12 +37,13 @@ public class MultiPointImplTest {
 
     MultiPoint pnt1;
     MultiPoint pnt2;
+    CrsId wgs84 = CrsId.valueOf(4326);
 
     @Before
     public void setUp(){
 
-        this.pnt1 = new MultiPoint(createPointsAllDifferent(5, 4326), 4326);
-        this.pnt2 = new MultiPoint(createPointsNotAllDifferent(5, 4326), 4326);
+        this.pnt1 = MultiPoint.create(createPointsAllDifferent(5, wgs84), wgs84);
+        this.pnt2 = MultiPoint.create(createPointsNotAllDifferent(5, wgs84), wgs84);
     }
 
     @Test
@@ -74,7 +76,7 @@ public class MultiPointImplTest {
     @Test
     public void testGetGeometryN() throws Exception {
         for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(Point.create(new double[]{i, i}, DimensionalFlag.XY, 4326), pnt1.getGeometryN(i));
+            Assert.assertEquals(Point.create(i, i, wgs84), pnt1.getGeometryN(i));
         }
     }
 
@@ -84,20 +86,20 @@ public class MultiPointImplTest {
         assertFalse(pnt2.isSimple());
     }
 
-    private Point[] createPointsNotAllDifferent(int size, int srid) {
+    private Point[] createPointsNotAllDifferent(int size, CrsId crsId) {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(new double[]{i, i}, DimensionalFlag.XY, srid);
+            points[i] = Point.create(i, i, crsId);
         }
         points[0] = points[size -1];
         return points;
     }
 
-    private Point[] createPointsAllDifferent(int size, int srid) {
+    private Point[] createPointsAllDifferent(int size, CrsId crsId) {
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(new double[]{i, i}, DimensionalFlag.XY, srid);
+            points[i] = Point.create(i, i,crsId);
         }
         return points;
     }

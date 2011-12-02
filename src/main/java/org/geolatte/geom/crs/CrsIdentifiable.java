@@ -22,21 +22,52 @@
 package org.geolatte.geom.crs;
 
 /**
- * A projection from geographic coordinates to projected coordinates.
+ * Abstract base class for classes the are identified by a <code>CrsId</code> (e.g. by EPSG-code).
+ *
+ * <h2>Note on identity of <code>CrsIdentifiable</code>s:</h2>
+ * <p>In theory the <code>CrsId</code> should identify uniquely the CoordinateReferenceSystem-related objects
+ * (whether CRS, datum, projection, etc.). In practice this is often not the case. Two cases stand out. </p>
+ * <ul>
+ *  <li>users can add their own definitions on some type (e.g. <code>Projection</code>s, <code>Ellipsoid</code>s.</li>
+ *  <li>some objects have multiple, inconsistent definitions, notably the "Google" projection system and the WGS-84 GeoGCS.</li>
+ * </ul>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ *         creation-date: 11/21/11
  */
-public class Projection {
-
-    //TODO -- change this class to contain the CrsParameters -- and introducte superclass CrsIdentifiable
+abstract public class CrsIdentifiable {
 
     private final CrsId crsId;
     private final String name;
 
-    public Projection(CrsId crsId, String name) {
+    /**
+     * Constructs an instance.
+     *
+     * @param crsId
+     * @param name
+     */
+    protected CrsIdentifiable(CrsId crsId, String name) {
         this.crsId = crsId;
         this.name = name;
+    }
+
+
+    /**
+     * Returns the identifier for this <code>CoordinateReferenceSystem</code>.
+     *
+     * @return
+     */
+    public CrsId getCrsId() {
+        return crsId;
+    }
+
+    /**
+     * Returns the name of this <code>CoordinateReferenceSystem</code>.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
     @Override
@@ -44,9 +75,9 @@ public class Projection {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Projection that = (Projection) o;
+        CrsIdentifiable that = (CrsIdentifiable) o;
 
-        if (!crsId.equals(that.crsId)) return false;
+        if (crsId != null ? !crsId.equals(that.crsId) : that.crsId != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
@@ -54,16 +85,8 @@ public class Projection {
 
     @Override
     public int hashCode() {
-        int result = crsId.hashCode();
+        int result = crsId != null ? crsId.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Projection{" +
-                "SRID=" + crsId +
-                ", name='" + name + '\'' +
-                '}';
     }
 }

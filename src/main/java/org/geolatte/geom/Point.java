@@ -30,57 +30,59 @@ import java.util.Arrays;
  */
 public class Point extends Geometry {
 
-    static final Point EMPTY = new Point(EmptyPointSequence.INSTANCE,0);
+    static final Point EMPTY = new Point(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED, null);
 
     private final PointSequence points;
 
-    public static Point create(PointSequence sequence, int SRID) {
-        return new Point(sequence, SRID);
+    public static Point create(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
+        return new Point(sequence, crsId, geometryOperations);
     }
 
-    public static Point create2D(double x, double y, int SRID) {
-        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), SRID);
+    public static Point create(PointSequence sequence, CrsId crsId) {
+        return new Point(sequence, crsId, null);
     }
 
-    public static Point create3D(double x, double y, double z, int SRID) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), SRID);
+    public static Point create(double x, double y, CrsId crsId) {
+        return create(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), crsId);
     }
 
-    public static Point create2DM(double x, double y, double m, int SRID) {
-        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), SRID);
+    public static Point create3D(double x, double y, double z, CrsId crsId) {
+        return create(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), crsId);
     }
 
-    public static Point create3DM(double x, double y, double z, double m, int SRID) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), SRID);
+    public static Point createMeasured(double x, double y, double m, CrsId crsId) {
+        return create(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), crsId);
     }
 
-    public static Point create2D(double x, double y) {
-        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), CrsId.UNDEFINED.getCode());
+    public static Point create(double x, double y, double z, double m, CrsId crsId) {
+        return create(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), crsId);
+    }
+
+    public static Point create(double x, double y) {
+        return create(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), CrsId.UNDEFINED);
     }
 
     public static Point create3D(double x, double y, double z) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), CrsId.UNDEFINED.getCode());
+        return create(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), CrsId.UNDEFINED);
     }
 
-    public static Point create2DM(double x, double y, double m) {
-        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), CrsId.UNDEFINED.getCode());
+    public static Point createMeasured(double x, double y, double m) {
+        return create(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), CrsId.UNDEFINED);
     }
 
-    public static Point create3DM(double x, double y, double z, double m) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), CrsId.UNDEFINED.getCode());
+    public static Point create(double x, double y, double z, double m) {
+        return create(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), CrsId.UNDEFINED);
     }
 
-
-    //TODO -- limit visibility to package
-    public static Point create(double[] coordinates, DimensionalFlag dimensionalFlag, int SRID) {
+    static Point create(double[] coordinates, DimensionalFlag dimensionalFlag, CrsId crsId) {
         if (coordinates == null || coordinates.length == 0) {
             return EMPTY;
         }
-        return new Point(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag), SRID);
+        return create(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag), crsId);
     }
 
-    Point(PointSequence sequence,int SRID){
-        super(SRID);
+    Point(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
+        super(crsId, geometryOperations);
         this.points = sequence;
     }
 
@@ -127,44 +129,6 @@ public class Point extends Geometry {
     @Override
     public Geometry getBoundary() {
         return EMPTY;
-    }
-
-    //TODO -- is this still necessary?? If Geometry's equals not enough?
-    public boolean equals(Object o){
-        if (this == o) return true;
-        if (! (o instanceof Point)){
-            return false;
-        }
-        Point otherPoint = (Point)o;
-        if (this.isEmpty() != otherPoint.isEmpty() ) return false;
-        if (this.isEmpty()) return true;
-        if (this.isMeasured() != otherPoint.isMeasured()) return false;
-        if (this.is3D() != otherPoint.is3D()) return false;
-        return this.getSRID() == otherPoint.getSRID() &&
-                this.getX() == otherPoint.getX() &&
-                this.getY() == otherPoint.getY() &&
-                (!is3D() || this.getZ() == otherPoint.getZ()) &&
-                (!isMeasured() || this.getM() == otherPoint.getM());
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        temp = getX() != +0.0d ? Double.doubleToLongBits(getX()) : 0L;
-        result = (int) (temp ^ (temp >>> 32));
-        temp = getY() != +0.0d ? Double.doubleToLongBits(getY()) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        if (is3D()) {
-            temp = getZ() != +0.0d ? Double.doubleToLongBits(getZ()) : 0L;
-            result = 31 * result + (int) (temp ^ (temp >>> 32));
-        }
-        if (isMeasured()) {
-            temp = getM() != +0.0d ? Double.doubleToLongBits(getM()) : 0L;
-            result = 31 * result + (int) (temp ^ (temp >>> 32));
-        }
-        result = 31 * result + getSRID();
-        return result;
     }
 
     @Override

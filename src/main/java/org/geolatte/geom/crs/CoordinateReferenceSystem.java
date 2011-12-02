@@ -22,34 +22,63 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A Coordinate Reference System.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public abstract class CoordinateReferenceSystem {
+public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
 
-    private final int SRID;
-    private final String name;
     private final CoordinateSystem coordinateSystem;
 
-    CoordinateReferenceSystem(int SRID, String name, CoordinateSystemAxis... axes){
-        this.SRID = SRID;
-        this.name = name;
+    /**
+     * Constructs a <code>CoordinateReferenceSystem</code>.
+     *
+     * @param crsId identifies the <code>CrsId</code> for the new instance.
+     * @param name
+     * @param axes
+     */
+    CoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
+        super(crsId, name);
         this.coordinateSystem = new CoordinateSystem(axes);
     }
 
-    public int getSRID() {
-        return SRID;
-    }
 
-    public String getName() {
-        return name;
-    }
-
+    /**
+     * Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
+     *
+     * @return
+     */
     public CoordinateSystem getCoordinateSystem() {
         return coordinateSystem;
     }
 
+    /**
+     * Return the <code>CoordinateSystemAxis</code>es associated with this <code>CoordinateRefereeceSystem</code>.
+     *
+     * @return an array of <code>CoordinateSystemAxis</code>es.
+     *
+     */
     public CoordinateSystemAxis[] getAxes(){
         return coordinateSystem.getAxes();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        CoordinateReferenceSystem that = (CoordinateReferenceSystem) o;
+
+        return !(coordinateSystem != null ? !coordinateSystem.equals(that.coordinateSystem) : that.coordinateSystem != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (coordinateSystem != null ? coordinateSystem.hashCode() : 0);
+        return result;
     }
 }

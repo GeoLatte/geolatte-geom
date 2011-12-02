@@ -26,7 +26,7 @@ import org.geolatte.geom.DimensionalFlag;
 /**
  * Marks the presence of Z- and/or M-coordinates in the WKT representation.
  *
- * <p>This is not used in the Postgis EWKT format. So currently it is unused.</p>
+ * <p>Note: this is not used in the Postgis EWKT format. So currently it is unused.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11

@@ -19,36 +19,23 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom;
+package org.geolatte.geom.jts;
+
+import org.junit.Test;
 
 /**
- * A builder for <code>PointSequence</code>s.
+ * Unit tests for the JTS conversion
  *
- * <p>PointSequence</p>s are built by adding points in sequence.
- *
- * @author Karel Maesen, Geovise BVBA, 2011
+ * @author Karel Maesen, Geovise BVBA
+ *         creation-date: 11/21/11
  */
-public interface PointSequenceBuilder {
+public class TestJTS {
 
-    /**
-     * Adds the specified coordinates to the <code>PointSequence</code> being built.
-     *
-     * @param coordinates the coordinates the
-     * @return the
-     */
-    PointSequenceBuilder add(double[] coordinates);
 
-    /**
-     * @param x
-     * @param y
-     * @return
-     */
-    PointSequenceBuilder add(double x, double y);
+    @Test
+    public void test(){
+        //TODO
+    }
 
-    PointSequenceBuilder add(double x, double y, double zOrm);
-
-    PointSequenceBuilder add(double x, double y, double z, double m);
-
-    PointSequence toPointSequence();
 
 }

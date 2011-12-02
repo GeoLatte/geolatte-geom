@@ -21,24 +21,36 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
 public class LinearRing extends LineString {
 
-    public final static LinearRing EMPTY = new LinearRing(null, 0);
+    public final static LinearRing EMPTY = new LinearRing(null, CrsId.UNDEFINED, null);
 
-    public static LinearRing create(PointSequence points, int SRID){
-        return new LinearRing(points, SRID);
+    public static LinearRing create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+        return new LinearRing(points, crsId, geometryOperations);
     }
 
-    public LinearRing(LineString lineString) {
+    public static LinearRing create(PointSequence points, CrsId crsId){
+        return new LinearRing(points, crsId, null);
+    }
+
+    public static LinearRing create(LineString lineString) {
+        return new LinearRing(lineString);
+    }
+
+    protected LinearRing(LineString lineString) {
         super(lineString);
+        checkIsClosed();
     }
 
-    protected LinearRing(PointSequence points, int SRID) {
-        super(points, SRID);
+    protected LinearRing(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+        super(points, crsId, geometryOperations);
+        checkIsClosed();
     }
 
     @Override
@@ -49,5 +61,10 @@ public class LinearRing extends LineString {
     @Override
     public void accept(GeometryVisitor visitor) {
         visitor.visit(this);
+    }
+
+    private void checkIsClosed(){
+        if (isEmpty() || isClosed()) return;
+        throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed.");
     }
 }

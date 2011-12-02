@@ -22,25 +22,40 @@
 package org.geolatte.geom.crs;
 
 /**
+ * A prime meridian.
+ *
+ * <p>A prime meridian is defined by [CTS-1.00] as follows: "[The prime meridian] defines the meridian used to take
+ * longitude measurements from.  The units of the longitude must be inferred from the context. If [this object] occurs
+ * inside a [geographic coordinate reference system], then the longitude units will match those of
+ * the geographic coordinate system. If [it] occurs inside a [geo-centric coordinate reference system], then the units
+ * will be in degrees. The longitude value defines the angle of the prime meridian relative to the Greenwich Meridian.
+ * A positive value indicates the prime meridian is East of Greenwich, and a negative value indicates
+ * the prime meridian is West of Greenwich </p>
+ *
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/4/11
  */
-public class PrimeMeridian {
+public class PrimeMeridian extends CrsIdentifiable {
 
-    private final int srid;
-    private final String name;
     private final double longitude;
 
-    public PrimeMeridian(int srid, String name, double longitude) {
-        this.srid = srid;
-        this.name = name;
+    /**
+     * Constructs an instance
+     * @param crsId the identifier for the new prime meridian
+     * @param name the common name  for the new prime meridian
+     * @param longitude the angle of the new prime meridian relative to Greenwich Meridian
+     */
+    public PrimeMeridian(CrsId crsId, String name, double longitude) {
+        super(crsId, name);
         this.longitude = longitude;
     }
 
-    public int getSrid() {
-        return srid;
-    }
-
+    /**
+     * Returns the angle of this meridian relative to Greenwich Meridian.
+     *
+     * @return
+     */
     public double getLongitude() {
         return longitude;
     }
@@ -48,23 +63,20 @@ public class PrimeMeridian {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PrimeMeridian)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         PrimeMeridian that = (PrimeMeridian) o;
 
         if (Double.compare(that.longitude, longitude) != 0) return false;
-        if (srid != that.srid) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result;
+        int result = super.hashCode();
         long temp;
-        result = srid;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
         temp = longitude != +0.0d ? Double.doubleToLongBits(longitude) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;

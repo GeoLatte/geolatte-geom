@@ -59,19 +59,19 @@ public class TestCrsWktDecoder {
         assertEquals("WGS 84", geoCRS.getName());
 
         //verify the datum
-        GeodeticDatum datum = geoCRS.getDatum();
+        Datum datum = geoCRS.getDatum();
         assertEquals("WGS_1984", datum.getName());
-        assertEquals(6326, datum.getSRID());
+        assertEquals(6326, datum.getCrsId().getCode());
 
         //verify the ellipsoid
         Ellipsoid ellipsoid = datum.getEllipsoid();
         assertEquals("WGS 84", ellipsoid.getName());
         assertEquals(6378137, ellipsoid.getSemiMajorAxis(), Math.ulp(100));
         assertEquals(298.257223563, ellipsoid.getInverseFlattening(), Math.ulp(100));
-        assertEquals(7030, ellipsoid.getSRID());
+        assertEquals(7030, ellipsoid.getCrsId().getCode());
 
         //verify the prime meridian
-        assertEquals(new PrimeMeridian(8901, "Greenwich", 0d), geoCRS.getPrimeMeridian());
+        assertEquals(new PrimeMeridian(CrsId.parse("8901"), "Greenwich", 0d), geoCRS.getPrimeMeridian());
 
         //verify the angular units
         assertTrue(geoCRS.getUnit().isAngular());
@@ -83,7 +83,7 @@ public class TestCrsWktDecoder {
         assertEquals(new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE), geoCRS.getAxes()[1]);
 
         //verify the srid code
-        assertEquals(4326, geoCRS.getSRID());
+        assertEquals(4326, geoCRS.getCrsId().getCode());
 
     }
 
@@ -100,13 +100,13 @@ public class TestCrsWktDecoder {
         assertEquals("WGS 84", ellipsoid.getName());
         assertEquals(6378137, ellipsoid.getSemiMajorAxis(), Math.ulp(100));
         assertEquals(298.257223563, ellipsoid.getInverseFlattening(), Math.ulp(100));
-        assertEquals(-1, ellipsoid.getSRID());
+        assertEquals(-1, ellipsoid.getCrsId().getCode());
 
         //verify the Axis
         assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.DEGREE), geoCRS.getAxes()[0]);
         assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE), geoCRS.getAxes()[1]);
 
-        assertEquals(4326, geoCRS.getSRID());
+        assertEquals(4326, geoCRS.getCrsId().getCode());
 
 
     }
@@ -120,7 +120,7 @@ public class TestCrsWktDecoder {
         ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem)system;
 
         //check the geo-CrsRegistry
-        assertEquals(4313, projCRS.getGeographicCoordinateSystem().getSRID());
+        assertEquals(4313, projCRS.getGeographicCoordinateSystem().getCrsId().getCode());
         GeographicCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
         double[] expected = new double[]{106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1};
         for (int i = 0 ; i < expected.length; i++ ){
@@ -128,19 +128,19 @@ public class TestCrsWktDecoder {
         }
 
         //check the projection
-        assertEquals(new Projection(-1, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
-        List<CRSParameter> parameters = projCRS.getParameters();
-        List<CRSParameter> expectedParameters = new ArrayList<CRSParameter>();
-        expectedParameters.add ( new CRSParameter("standard_parallel_1",51.16666723333333));
-        expectedParameters.add ( new CRSParameter("standard_parallel_2",49.8333339));
-        expectedParameters.add ( new CRSParameter("latitude_of_origin",90));
-        expectedParameters.add ( new CRSParameter("central_meridian",4.367486666666666));
-        expectedParameters.add ( new CRSParameter("false_easting",150000.013));
-        expectedParameters.add ( new CRSParameter("false_northing",5400088.438));
-        assertArrayEquals(expectedParameters.toArray(new CRSParameter[]{}), parameters.toArray(new CRSParameter[]{}));
+        assertEquals(new Projection(CrsId.UNDEFINED, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
+        List<CrsParameter> parameters = projCRS.getParameters();
+        List<CrsParameter> expectedParameters = new ArrayList<CrsParameter>();
+        expectedParameters.add ( new CrsParameter("standard_parallel_1",51.16666723333333));
+        expectedParameters.add ( new CrsParameter("standard_parallel_2",49.8333339));
+        expectedParameters.add ( new CrsParameter("latitude_of_origin",90));
+        expectedParameters.add ( new CrsParameter("central_meridian",4.367486666666666));
+        expectedParameters.add ( new CrsParameter("false_easting",150000.013));
+        expectedParameters.add ( new CrsParameter("false_northing",5400088.438));
+        assertArrayEquals(expectedParameters.toArray(new CrsParameter[]{}), parameters.toArray(new CrsParameter[]{}));
 
         //check the authority
-        assertEquals(31370, projCRS.getSRID());
+        assertEquals(31370, projCRS.getCrsId().getCode());
 
         //check the axes
         assertEquals(new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER) , projCRS.getCoordinateSystem().getAxis(0));

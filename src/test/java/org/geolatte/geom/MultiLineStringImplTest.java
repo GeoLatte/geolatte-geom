@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,20 +45,20 @@ public class MultiLineStringImplTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = LineString.create(new PackedPointSequence(c1, DimensionalFlag.XYM), 0);
-    LineString ls2 = LineString.create(new PackedPointSequence(c2, DimensionalFlag.XYM), 0);
-    LineString ls3 = LineString.create(new PackedPointSequence(c3, DimensionalFlag.XYM), 0);
-    LineString lcs = LineString.create(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), 0);
-    LineString lcns = LineString.create(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), 0);
+    LineString ls1 = LineString.create(new PackedPointSequence(c1, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls2 = LineString.create(new PackedPointSequence(c2, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls3 = LineString.create(new PackedPointSequence(c3, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString lcs = LineString.create(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString lcns = LineString.create(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
 
 
     @Before
     public void setUp() {
-        ml1 = new MultiLineString(new LineString[]{ls1, ls2}, 0);
-        ml2 = new MultiLineString(new LineString[]{ls2, ls3}, 0);
-        empty = new MultiLineString(null, 0);
-        closedSimple = new MultiLineString(new LineString[]{lcs}, 0);
-        MultiLineString closedNonSimple = new MultiLineString(new LineString[]{lcs,lcns}, 0);
+        ml1 = MultiLineString.create(new LineString[]{ls1, ls2}, CrsId.UNDEFINED);
+        ml2 = MultiLineString.create(new LineString[]{ls2, ls3}, CrsId.UNDEFINED);
+        empty = MultiLineString.createEmpty();
+        closedSimple = MultiLineString.create(new LineString[]{lcs}, CrsId.UNDEFINED);
+        MultiLineString closedNonSimple = MultiLineString.create(new LineString[]{lcs,lcns}, CrsId.UNDEFINED);
     }
 
     @Test

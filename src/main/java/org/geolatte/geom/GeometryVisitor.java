@@ -22,27 +22,73 @@
 package org.geolatte.geom;
 
 /**
+ * A visitor for <code>Geometry</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/22/11
  */
 public interface GeometryVisitor {
 
+    /**
+     * Visits a <code>Point</code>
+     * @param point
+     */
     public void visit(Point point);
 
+    /**
+     * Visits a <code>LineString</code>.
+     *
+     * @param lineString
+     */
     public void  visit(LineString lineString);
 
+    /**
+     * Visits a <code>Polygon</code>.
+     *
+     * @param polygon
+     */
     public void visit(Polygon polygon);
 
+    /**
+     * Visits a <code>GeometryCollection</code>.
+     *
+     * @param collection
+     */
     public void visit(GeometryCollection collection);
 
+    /**
+     * Visits a <code>MultLineString</code>.
+     *
+     * @param multiLineString
+     */
     public void visit(MultiLineString multiLineString);
 
+    /**
+     * Visists a <code>MultiPoint</code>.
+     *
+     * @param multiPoint
+     */
     public void visit(MultiPoint multiPoint);
 
+    /**
+     * Visits a <code>MultiPolygon</code>.
+     *
+     * @param multiPolygon
+     */
     public void visit(MultiPolygon multiPolygon);
 
+    /**
+     * Visits a <code>LinearRing</code>.
+     *
+     * @param linearRing
+     */
     public void visit(LinearRing linearRing);
 
+    /**
+     * Visits a <code>PolyHedralSurface</code>.
+     *
+     * @param surface
+     */
     public void visit(PolyHedralSurface surface);
 
 }

@@ -6,6 +6,5 @@ It is intended as a drop-in replacement for the Java Topology Suite (JTS) geomet
 - support for several dialects of WKT/WKB (Postgis, Sql Server, SFS 1.21)
 - pluggable, extendable Geometry operations
 - CRS-awareness (knowledge of coordinate reference system (projected/geodetic, angular units of metres)
-- Configurable which accessor (getX() / getY()) corresponds to which coordinate system axis
 
 

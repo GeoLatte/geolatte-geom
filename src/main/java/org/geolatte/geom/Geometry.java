@@ -22,15 +22,16 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.codec.ByteBuffer;
+import org.geolatte.geom.crs.CrsId;
 
 import java.io.Serializable;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public abstract class Geometry implements Serializable{
+public abstract class Geometry implements Serializable {
 
-    private final int SRID;
+    private final CrsId crsId;
 
     private final GeometryOperations geometryOperations;
 
@@ -38,41 +39,42 @@ public abstract class Geometry implements Serializable{
     protected static PointSequence createAndCheckPointSequence(Geometry[] geometries) {
         if (geometries == null || geometries.length == 0) return EmptyPointSequence.INSTANCE;
         PointSequence[] sequences = new PointSequence[geometries.length];
-        boolean is3D=false;
+        boolean is3D = false;
         boolean isMeasured = false;
-        int srid = -1;
-        for (int i = 0; i < geometries.length; i++){
-            if (geometries[i] == null) throw new IllegalArgumentException("Geometry array must not contain null-entries.");
+        CrsId srid = CrsId.UNDEFINED;
+        for (int i = 0; i < geometries.length; i++) {
+            if (geometries[i] == null)
+                throw new IllegalArgumentException("Geometry array must not contain null-entries.");
             if (i == 0) {
                 is3D = geometries[i].is3D();
                 isMeasured = geometries[i].isMeasured();
-                srid = geometries[i].getSRID();
-            }  else if ( (is3D != geometries[i].is3D()) || (isMeasured != geometries[i].isMeasured()) ||
-                    (srid != geometries[i].getSRID())) {
+                srid = geometries[i].getCrsId();
+            } else if ((is3D != geometries[i].is3D()) || (isMeasured != geometries[i].isMeasured()) ||
+                    (!srid.equals(geometries[i].getCrsId()))) {
                 throw new IllegalArgumentException("Geometries must all have same srid and dimension");
             }
             sequences[i] = (geometries[i]).getPoints();
         }
-        return new NestedPointSequence(sequences, DimensionalFlag.parse(is3D, isMeasured));
+        return new NestedPointSequence(sequences, DimensionalFlag.valueOf(is3D, isMeasured));
     }
 
-    Geometry(GeometryOperations geometryOperations, int SRID){
-        this.SRID = SRID;
-        this.geometryOperations = geometryOperations;
-    }
-
-    Geometry(int SRID){
-        this.SRID = SRID;
-        this.geometryOperations = new JTSGeometryOperations();
+    protected Geometry(CrsId crsId, GeometryOperations geometryOperations) {
+        this.crsId = (crsId == null ? CrsId.UNDEFINED : crsId);
+        this.geometryOperations = (geometryOperations == null ? new JTSGeometryOperations() : geometryOperations);
     }
 
     public int getCoordinateDimension() {
         return getPoints().getCoordinateDimension();
     }
 
-    public int getSRID() {
-        return SRID;
+    public CrsId getCrsId() {
+        return crsId;
     }
+
+    public int getSRID(){
+        return crsId.getCode();
+    }
+
 
     public boolean is3D() {
         return getPoints().is3D();
@@ -82,7 +84,7 @@ public abstract class Geometry implements Serializable{
         return getPoints().isMeasured();
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return this.getPoints().isEmpty();
     }
 
@@ -96,7 +98,7 @@ public abstract class Geometry implements Serializable{
         }
         double[] coords = new double[getCoordinateDimension()];
         getPoints().getCoordinates(coords, index);
-        return Point.create(coords, DimensionalFlag.parse(is3D(), isMeasured()), getSRID());
+        return Point.create(coords, DimensionalFlag.valueOf(is3D(), isMeasured()), getCrsId());
     }
 
     public abstract PointSequence getPoints();
@@ -106,16 +108,17 @@ public abstract class Geometry implements Serializable{
         if (this == o) return true;
         if (o == null || !Geometry.class.isAssignableFrom(o.getClass())) return false;
         //empty geometries are always true
-        Geometry otherGeometry = (Geometry)o;
+        Geometry otherGeometry = (Geometry) o;
         if (isEmpty() && otherGeometry.isEmpty()) return true;
 
         if (this.getGeometryType() != otherGeometry.getGeometryType()) return false;
+        if (!this.getCrsId().equals(otherGeometry.getCrsId())) return false;
 
-        if (this instanceof GeometryCollection){
-            GeometryCollection thisGC = (GeometryCollection)this;
-            GeometryCollection otherGC = (GeometryCollection)otherGeometry;
+        if (this instanceof GeometryCollection) {
+            GeometryCollection thisGC = (GeometryCollection) this;
+            GeometryCollection otherGC = (GeometryCollection) otherGeometry;
             if (thisGC.getNumGeometries() != otherGC.getNumGeometries()) return false;
-            for (int i = 0; i < thisGC.getNumGeometries(); i++){
+            for (int i = 0; i < thisGC.getNumGeometries(); i++) {
                 if (!thisGC.getGeometryN(i).equals(otherGC.getGeometryN(i))) return false;
             }
             return true;
@@ -123,6 +126,13 @@ public abstract class Geometry implements Serializable{
             if (this.getNumPoints() != otherGeometry.getNumPoints()) return false;
             return (this.getPoints().equals(otherGeometry.getPoints()));
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = crsId != null ? crsId.hashCode() : 0;
+        result = 31 * result + this.getPoints().hashCode();
+        return result;
     }
 
     public abstract GeometryType getGeometryType();
@@ -140,14 +150,13 @@ public abstract class Geometry implements Serializable{
         return operation.execute();
     }
 
-    public Geometry getEnvelope() {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createEnvelopeOp(this);
+    public Envelope getEnvelope() {
+        GeometryOperation<Envelope> operation = getGeometryOperations().createEnvelopeOp(this);
         return operation.execute();
     }
 
     public boolean disjoint(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createDisjointOp(this, other);
-        return operation.execute();
+        return !intersects(other);
     }
 
     public boolean intersects(Geometry other) {
@@ -166,8 +175,7 @@ public abstract class Geometry implements Serializable{
     }
 
     public boolean within(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createWithinOp(this, other);
-        return operation.execute();
+        return other.contains(this);
     }
 
     public boolean contains(Geometry other) {
@@ -176,12 +184,12 @@ public abstract class Geometry implements Serializable{
     }
 
     public boolean overlaps(Geometry other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createOverlaps(this, other);
+        GeometryOperation<Boolean> operation = getGeometryOperations().createOverlapsOp(this, other);
         return operation.execute();
     }
 
     public boolean relate(Geometry other, String matrix) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createRelateOp(this, other);
+        GeometryOperation<Boolean> operation = getGeometryOperations().createRelateOp(this, other, matrix);
         return operation.execute();
     }
 
@@ -206,7 +214,7 @@ public abstract class Geometry implements Serializable{
     }
 
     public Geometry convexHull() {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createConvexHull(this);
+        GeometryOperation<Geometry> operation = getGeometryOperations().createConvexHullOp(this);
         return operation.execute();
     }
 
@@ -231,21 +239,21 @@ public abstract class Geometry implements Serializable{
     }
 
     public String asText() {
-        GeometryOperation<String> operation = getGeometryOperations().createToWKTOp(this);
+        GeometryOperation<String> operation = getGeometryOperations().createToWktOp(this);
         return operation.execute();
     }
 
     public byte[] asBinary() {
-        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWKBOp(this);
+        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWkbOp(this);
         return operation.execute().toByteArray();
     }
 
-    public String toString(){
+    public String toString() {
         StringBuilder builder = new StringBuilder("SRID=")
                 .append(getSRID())
                 .append(";")
                 .append(getGeometryType());
-        if(isMeasured()) builder.append("M");
+        if (isMeasured()) builder.append("M");
         builder.append(getPoints());
         return builder.toString();
 
@@ -255,7 +263,7 @@ public abstract class Geometry implements Serializable{
 
     public abstract void accept(GeometryVisitor visitor);
 
-    protected GeometryOperations getGeometryOperations(){
+    protected GeometryOperations getGeometryOperations() {
         return this.geometryOperations;
     }
 }

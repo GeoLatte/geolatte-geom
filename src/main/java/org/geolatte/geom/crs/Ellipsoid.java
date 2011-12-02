@@ -22,60 +22,74 @@
 package org.geolatte.geom.crs;
 
 /**
+ * An ellipsoid.
+ *
+ * <p>An ellipsoid is an approximation of the Earth's surface as a squashed sphere. A common
+ * synonym is "spheroid". (See [CTS-1.00], p. 22-23.) </p>
+ *
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class Ellipsoid {
+public class Ellipsoid extends CrsIdentifiable {
 
-    private final int SRID;
-    private final String name;
     private final double semiMajorAxis;
     private final double inverseFlattening;
 
-    public Ellipsoid(int SRID, String name, double semiMajorAxis, double inverseFlattening) {
-        this.SRID = SRID;
-        this.name = name;
+    /** constructs an instance
+     *
+     * @param crsId the identifier for this <code>Ellipsoid</code>
+     * @param name the commonly used name for this <code>Ellipsoid</code>
+     * @param semiMajorAxis the semi-major axis
+     * @param inverseFlattening
+     */
+    public Ellipsoid(CrsId crsId, String name, double semiMajorAxis, double inverseFlattening) {
+        super(crsId, name);
         this.semiMajorAxis = semiMajorAxis;
         this.inverseFlattening = inverseFlattening;
     }
 
-    public int getSRID() {
-        return SRID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
+    /**
+     * Returns the semi-major axis of this <code>Ellipsoid.</code>
+     *
+     * <p> The semi-major axis is the equatorial radius in meters. [CTS-1.00], p. 61</p>
+     *
+     * @return the semi-major axis.
+     */
     public double getSemiMajorAxis() {
         return semiMajorAxis;
     }
 
+    /**
+     * Returns the inverse flattening.
+     *
+     * <p>The inverse flattening is related to the equatorial/polar radius by the formula ivf=re/(re-rp). For perfect spheres,
+     * this formula breaksdown, and a special IVF value of zero is used. [CTS-1.00], p.61</p>
+     *
+     * @return
+     */
     public double getInverseFlattening() {
         return inverseFlattening;
     }
 
-    @Override
+  @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         Ellipsoid ellipsoid = (Ellipsoid) o;
 
-        if (SRID != ellipsoid.SRID) return false;
         if (Double.compare(ellipsoid.inverseFlattening, inverseFlattening) != 0) return false;
         if (Double.compare(ellipsoid.semiMajorAxis, semiMajorAxis) != 0) return false;
-        if (name != null ? !name.equals(ellipsoid.name) : ellipsoid.name != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result;
+        int result = super.hashCode();
         long temp;
-        result = SRID;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
         temp = semiMajorAxis != +0.0d ? Double.doubleToLongBits(semiMajorAxis) : 0L;
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = inverseFlattening != +0.0d ? Double.doubleToLongBits(inverseFlattening) : 0L;
