@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PointImplTest {
+public class PointTest {
 
     PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.XY);
     PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.XYZ);
