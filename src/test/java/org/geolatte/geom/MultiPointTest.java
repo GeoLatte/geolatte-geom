@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
-public class MultiPointImplTest {
+public class MultiPointTest {
 
     MultiPoint pnt1;
     MultiPoint pnt2;

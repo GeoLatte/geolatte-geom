@@ -35,6 +35,10 @@ public class LinearRing extends LineString {
         return new LinearRing(points, crsId, geometryOperations);
     }
 
+    public static LinearRing createEmpty(){
+        return EMPTY;
+    }
+
     public static LinearRing create(PointSequence points, CrsId crsId){
         return new LinearRing(points, crsId, null);
     }
@@ -64,7 +68,7 @@ public class LinearRing extends LineString {
     }
 
     private void checkIsClosed(){
-        if (isEmpty() || isClosed()) return;
-        throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed.");
+        if (isEmpty() || (isClosed() && getNumPoints() > 3)) return;
+        throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed or contains < 4 points.");
     }
 }

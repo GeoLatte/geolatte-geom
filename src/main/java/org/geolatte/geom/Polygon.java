@@ -68,14 +68,15 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
         this(rings, crsId, null);
     }
 
-    private void checkRings(LineString[] holes) {
-        for (LineString hole : holes){
-            checkLinearRing(hole);
+    private void checkRings(LineString[] rings) {
+        for (LineString ring : rings){
+            checkLinearRing(ring);
         }
     }
 
     private void checkLinearRing(LineString ring) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
+        if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
     }
 
     @Override

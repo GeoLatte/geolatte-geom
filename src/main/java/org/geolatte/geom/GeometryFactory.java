@@ -150,7 +150,7 @@ public class GeometryFactory {
      * @param lineStrings the constituent <code>LineString</code>s of the new <code>MultiLineString</code>.
      * @return
      */
-    public MultiLineString create(LineString[] lineStrings) {
+    public MultiLineString createMultiLineString(LineString[] lineStrings) {
         return MultiLineString.create(lineStrings, crsId, geometryOperations);
     }
 
@@ -160,7 +160,7 @@ public class GeometryFactory {
      * @param polygons the constituent <code>Polygon</code>s of the new <code>MultiPolygon</code>.
      * @return
      */
-    public MultiPolygon create(Polygon[] polygons) {
+    public MultiPolygon createMultiPolygon(Polygon[] polygons) {
         return MultiPolygon.create(polygons, crsId, geometryOperations);
     }
 

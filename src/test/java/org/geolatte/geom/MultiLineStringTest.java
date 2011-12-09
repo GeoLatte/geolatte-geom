@@ -32,7 +32,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
-public class MultiLineStringImplTest {
+public class MultiLineStringTest {
 
     private MultiLineString ml1;
     private MultiLineString ml2;
