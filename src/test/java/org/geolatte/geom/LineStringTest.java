@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class LineStringImplTest {
+public class LineStringTest {
 
 
 

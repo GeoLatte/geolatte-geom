@@ -27,7 +27,10 @@ import org.geolatte.geom.crs.CrsId;
 import java.io.Serializable;
 
 /**
+ * The base class for <code>Geometry</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
+ *
  */
 public abstract class Geometry implements Serializable {
 
@@ -63,35 +66,81 @@ public abstract class Geometry implements Serializable {
         this.geometryOperations = (geometryOperations == null ? new JTSGeometryOperations() : geometryOperations);
     }
 
+    /**
+     * Returns the coordinate dimension of this <code>Geometry</code>
+     *
+     * <p>The coordinate dimension is the number of components in the coordinates of the points in
+     * this <code>Geometry</code>. </p>
+     *
+     * @return the coordinate dimension
+     */
     public int getCoordinateDimension() {
         return getPoints().getCoordinateDimension();
     }
 
+    /**
+     * Returns the reference to the coordinate reference system of this <code>Geometry</code>
+     *
+     * @return
+     */
     public CrsId getCrsId() {
         return crsId;
     }
 
+    /**
+     * Returns the numeric identifier of the coordinate reference system of this <code>Geometry</code>.
+     *
+     * <p>A SRID is usually interpreted as meaning the EPSG-code for the coordinate reference system. In this
+     * implementation, this is not enforced.</p>
+     *
+     * @return
+     */
     public int getSRID(){
         return crsId.getCode();
     }
 
-
+    /**
+     * Tests whether this <code>Geometry</code> has Z-coordinates.
+     *
+     * @return true if this instance has Z-coordinates.
+     */
     public boolean is3D() {
         return getPoints().is3D();
     }
 
+    /**
+     * Tests  whether this <code>Geometry</code> has M-coordinates.
+     *
+     * @return true if this instance has M-coordinates.
+     */
     public boolean isMeasured() {
         return getPoints().isMeasured();
     }
 
+    /**
+     * Tests whether this <code>Geometry</code> corresponds to the empty set.
+     *
+     * @return
+     */
     public boolean isEmpty() {
         return this.getPoints().isEmpty();
     }
 
+    /**
+     * Returns the number of points in the <code>PointSequence</code> of this <code>Geometry</code>.
+     *
+     * @return
+     */
     public int getNumPoints() {
         return getPoints().size();
     }
 
+    /**
+     * Returns the point at the specified index in the <code>PointSequence</code> of this <code>Geometry</code>.
+     *
+     * @param index the position in the <code>PointSequence</code> (first point is at index 0).
+     * @return
+     */
     public Point getPointN(int index) {
         if (index >= getPoints().size()) {
             throw new IndexOutOfBoundsException();
@@ -101,6 +150,11 @@ public abstract class Geometry implements Serializable {
         return Point.create(coords, DimensionalFlag.valueOf(is3D(), isMeasured()), getCrsId());
     }
 
+    /**
+     * Returns the associated <code>PointSequence</code>.
+     *
+     * @return
+     */
     public abstract PointSequence getPoints();
 
     @Override
@@ -135,26 +189,49 @@ public abstract class Geometry implements Serializable {
         return result;
     }
 
+    /**
+     * Returns the type of this <code>Geometry</code>.
+     * @return
+     */
     public abstract GeometryType getGeometryType();
 
+    /**
+     * Tests if this <code>Geometry</code> has no anomalous geometric points such as
+     * self-intersections or self tagency.
+     *
+     * @return
+     */
     public boolean isSimple() {
-//        IsSimpleOp op = new IsSimpleOp(JTS.to(this));
-//        return op.isSimple();
         GeometryOperation<Boolean> op = getGeometryOperations().createIsSimpleOp(this);
         return op.execute();
     }
 
+    /**
+     * Returns the boundary of this <code>Geometry</code>.
+     *
+     * @return
+     */
     public Geometry getBoundary() {
-//        return JTS.from(JTS.to(this).getBoundary());
         GeometryOperation<Geometry> operation = getGeometryOperations().createBoundaryOp(this);
         return operation.execute();
     }
 
+    /**
+     * Returns the <code>Envelope</code> of this <code>Geometry</code>.
+     *
+     * @return
+     */
     public Envelope getEnvelope() {
         GeometryOperation<Envelope> operation = getGeometryOperations().createEnvelopeOp(this);
         return operation.execute();
     }
 
+    /**
+     * Tests whether this <code>Geometry</code> is spatially disjoint from the specified <code>Geometry</code>.
+     *
+     * @param other
+     * @return
+     */
     public boolean disjoint(Geometry other) {
         return !intersects(other);
     }
