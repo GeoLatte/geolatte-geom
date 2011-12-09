@@ -54,7 +54,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     @Override
     public PointSequenceBuilder add(double x, double y, double zOrm) {
-        if (dimensionalFlag != DimensionalFlag.XYZ || dimensionalFlag != DimensionalFlag.XYM)
+        if (dimensionalFlag != DimensionalFlag.XYZ && dimensionalFlag != DimensionalFlag.XYM)
             throw new IllegalStateException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);

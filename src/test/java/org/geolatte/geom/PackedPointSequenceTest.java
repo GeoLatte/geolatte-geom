@@ -409,20 +409,4 @@ public class PackedPointSequenceTest {
         Assert.assertEquals(testSeq3DM, testSeq3DM.clone());
     }
 
-
-    //TODO -- restore accessor mapping
-//    @Test
-//    public void testCoordinatePointAccessorConsistentWithCSAxisOrder(){
-//
-//        DimensionalFlag cs = new DimensionalFlag(CoordinateSystemAxis.Z, CoordinateSystemAxis.M, CoordinateSystemAxis.Y, CoordinateSystemAxis.X);
-//        PackedPointSequence pointSequence = new PackedPointSequence(new double[]{1, 2, 3, 4}, cs);
-//        assertTrue(pointSequence.is3D());
-//        assertTrue(pointSequence.isMeasured());
-//        assertEquals(4d, pointSequence.getX(0), Math.ulp(100d));
-//        assertEquals(3d, pointSequence.getY(0), Math.ulp(100d));
-//        assertEquals(1d, pointSequence.getZ(0), Math.ulp(100d));
-//        assertEquals(2d, pointSequence.getM(0), Math.ulp(100d));
-//
-//    }
-
 }
