@@ -106,6 +106,38 @@ public class JTS {
         }
     }
 
+    /**
+     * Converts a JTS <code>Envelope</code> to a geolatte <code>Envelope</code>.
+     * @param jtsEnvelope the JTS Envelope to convert
+     * @return the corresponding geolatte Envelope.
+     */
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope){
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+                jtsEnvelope.getMaxY());
+    }
+
+    /**
+     * Converts a JTS <code>Envelope</code> to a geolatte <code>Envelope</code> with the
+     * specified CRS.
+     *
+     * @param jtsEnvelope the JTS Envelope to convert.
+     * @param crsId the <code>CrsId</code> to use for the return value.
+     * @return the corresponding geolatte Envelope, having the CRS specified in the crsId parameter.
+     */
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope, CrsId crsId){
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+                jtsEnvelope.getMaxY(), crsId);
+    }
+
+    /**
+     * Converts a Geolatte <code>Envelope</code> to a JTS <code>Envelope</code>.
+     * @param env the geolatte Envelope.
+     * @return the corresponding JTS Envelope.
+     */
+    public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope env) {
+        return new com.vividsolutions.jts.geom.Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
+    }
+
 
     ///
     ///  Helpermethods: jts --> geolatte
