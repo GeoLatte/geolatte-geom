@@ -33,7 +33,7 @@ public class PointSequenceBuilderTest {
 
     @Test
     public void testMethodInvocationInconsistentWithDimensionalFlagThrowsIllegalStateException() {
-        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(2,DimensionalFlag.XY);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         builder.add(1.0, 1.0);
         try {
             builder.add(1.0, 1.0, 1.0);
@@ -46,14 +46,14 @@ public class PointSequenceBuilderTest {
 
     @Test
     public void testAdding3DOr3DMCoordinates() {
-        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(2,DimensionalFlag.XYZ);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYZ);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);
             fail("Adding 2D point to 3D PointSequence should throw IllegalStateException");
         }catch(IllegalStateException e){
         }
-        builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(2,DimensionalFlag.XYM);
+        builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYM);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);

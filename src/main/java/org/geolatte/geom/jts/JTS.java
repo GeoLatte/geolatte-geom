@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.*;
 import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.PointSequence;
 import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilderFactory;
+import org.geolatte.geom.PointSequenceBuilders;
 import org.geolatte.geom.crs.CrsId;
 
 /**
@@ -309,7 +309,7 @@ public class JTS {
             df = DimensionalFlag.XYZ;
             coord = new double[3];
         }
-        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(cs.size(), df);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df);
         for (int i = 0; i < cs.size(); i++) {
             for (int ci = 0; ci < coord.length; ci++) {
                 coord[ci] = cs.getOrdinate(i, ci);

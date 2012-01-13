@@ -59,7 +59,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim) {
-        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(coordinates.length, dim);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(coordinates.length, dim);
         double[] ordinates = new double[dim.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
             copy(co,ordinates, dim);
