@@ -58,23 +58,23 @@ public class CodecTestCases {
     public CodecTestCases() {
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
-                Point.create(1, 1, CrsId.UNDEFINED));
+                Points.create(1, 1, CrsId.UNDEFINED));
         addCase(POINT_3D,
                 "POINT(1 2 3)",
                 "0101000080000000000000F03F00000000000000400000000000000840",
-                Point.create3D(1, 2, 3, CrsId.UNDEFINED));
+                Points.create3D(1, 2, 3, CrsId.UNDEFINED));
         addCase(POINT_3DM,
                 "POINT(1 2 3 4)",
                 "01010000C0000000000000F03F000000000000004000000000000008400000000000001040",
-                Point.create(1, 2, 3, 4, CrsId.UNDEFINED));
+                Points.create(1, 2, 3, 4, CrsId.UNDEFINED));
         addCase(POINT_2DM,
                 "POINTM(1 2 4)",
                 "0101000040000000000000F03F00000000000000400000000000001040",
-                Point.createMeasured(1, 2, 4, CrsId.UNDEFINED));
+                Points.createMeasured(1, 2, 4, CrsId.UNDEFINED));
         addCase(POINT_WITH_SRID,
                 "SRID=4326;POINT(1 2 3 4)",
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
-                Point.create(1, 2, 3, 4, CrsId.valueOf(4326)));
+                Points.create(1, 2, 3, 4, CrsId.valueOf(4326)));
 
         PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
@@ -104,8 +104,8 @@ public class CodecTestCases {
                 expected);
 
 
-        Point pnt1 = Point.create(1, 1, CrsId.UNDEFINED);
-        Point pnt2 = Point.create(2, 2, CrsId.UNDEFINED);
+        Point pnt1 = Points.create(1, 1, CrsId.UNDEFINED);
+        Point pnt2 = Points.create(2, 2, CrsId.UNDEFINED);
         expected = GeometryCollection.create(new Geometry[]{pnt1, pnt2},CrsId.UNDEFINED);
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
@@ -122,8 +122,8 @@ public class CodecTestCases {
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
                 MultiPoint.create(new Point[]{pnt1, pnt2}, CrsId.UNDEFINED));
 
-        pnt1 = Point.create(1, 2, CrsId.valueOf(4326));
-        pnt2 = Point.create(3, 4, CrsId.valueOf(4326));
+        pnt1 = Points.create(1, 2, CrsId.valueOf(4326));
+        pnt2 = Points.create(3, 4, CrsId.valueOf(4326));
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",

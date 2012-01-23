@@ -217,7 +217,7 @@ public class JTS {
      */
     private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return org.geolatte.geom.Point.create(toPointSequence(cs), crsId);
+        return new org.geolatte.geom.Point(toPointSequence(cs), crsId);
     }
 
     ///

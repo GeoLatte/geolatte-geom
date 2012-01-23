@@ -183,10 +183,10 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
     private Point matchesPointText() {
         if (matchesPoints()) {
-            return Point.create(currentPointSequence, crsId);
+            return new Point(currentPointSequence, crsId);
         }
         if (matchesEmpty()) {
-            return Point.createEmpty();
+            return Points.createEmpty();
         }
         throw new WktParseException(buildWrongSymbolAtPositionMsg());
 

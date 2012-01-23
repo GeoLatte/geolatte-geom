@@ -38,11 +38,11 @@ public class PointTest {
     PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.XYZM);
 
     CrsId wgs84 = CrsId.valueOf(4326);
-    Point point2D =  Point.create(seq2D, wgs84);
-    Point point3D =  Point.create(seq3D, wgs84);
-    Point point2DM = Point.create(seq2DM, wgs84);
-    Point point3DM = Point.create(seq3DM, wgs84);
-    Point emptyPoint = Point.createEmpty();
+    Point point2D =  new Point(seq2D, wgs84);
+    Point point3D =  new Point(seq3D, wgs84);
+    Point point2DM = new Point(seq2DM, wgs84);
+    Point point3DM = new Point(seq3DM, wgs84);
+    Point emptyPoint = Points.createEmpty();
 
     @Test
     public void testGetX() throws Exception {
@@ -149,33 +149,33 @@ public class PointTest {
 
     @Test
     public void testEmptyPointsAreAlwaysEqual(){
-        Point empty = Point.createEmpty();
+        Point empty = Points.createEmpty();
         assertTrue(empty.equals(emptyPoint));
     }
 
     @Test
     public void testEqualsAndHashCode(){
-        Point test2D = Point.create(new double[]{1, 2}, DimensionalFlag.XY, wgs84);
+        Point test2D = Points.create(new double[]{1, 2}, DimensionalFlag.XY, wgs84);
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point test3D = Point.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, wgs84);
+        Point test3D = Points.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, wgs84);
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point test2DM = Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84);
+        Point test2DM = Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84);
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point test3DM = Point.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, wgs84);
+        Point test3DM = Points.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, wgs84);
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2}, DimensionalFlag.XY, CrsId.UNDEFINED)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84)));
-        assertFalse(point2D.equals(Point.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2}, DimensionalFlag.XY, CrsId.UNDEFINED)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
     }
 
     @Test
     public void testEqualsAndHashCodeOnEmptyPoints(){
-        Point empty1 = Point.createEmpty();
-        Point empty2 = Point.createEmpty();
+        Point empty1 = Points.createEmpty();
+        Point empty2 = Points.createEmpty();
         assertEquals(empty1, empty2);
         Point empty3 = new Point(EmptyPointSequence.INSTANCE,CrsId.UNDEFINED, null);
         assertEquals(empty1, empty3);

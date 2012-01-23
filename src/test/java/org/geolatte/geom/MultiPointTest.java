@@ -76,7 +76,7 @@ public class MultiPointTest {
     @Test
     public void testGetGeometryN() throws Exception {
         for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(Point.create(i, i, wgs84), pnt1.getGeometryN(i));
+            Assert.assertEquals(Points.create(i, i, wgs84), pnt1.getGeometryN(i));
         }
     }
 
@@ -90,7 +90,7 @@ public class MultiPointTest {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(i, i, crsId);
+            points[i] = Points.create(i, i, crsId);
         }
         points[0] = points[size -1];
         return points;
@@ -99,7 +99,7 @@ public class MultiPointTest {
     private Point[] createPointsAllDifferent(int size, CrsId crsId) {
         Point[] points = new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Point.create(i, i,crsId);
+            points[i] = Points.create(i, i, crsId);
         }
         return points;
     }

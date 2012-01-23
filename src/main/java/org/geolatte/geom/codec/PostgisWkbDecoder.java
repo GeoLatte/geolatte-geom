@@ -126,7 +126,7 @@ public class PostgisWkbDecoder {
 
     private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
         PointSequence points = readPoints(1, byteBuffer, flag);
-        return Point.create(points, crsId);
+        return new Point(points, crsId);
     }
 
     private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
