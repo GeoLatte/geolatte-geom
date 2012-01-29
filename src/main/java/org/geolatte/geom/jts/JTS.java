@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.*;
 import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.PointSequence;
 import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilderFactory;
+import org.geolatte.geom.PointSequenceBuilders;
 import org.geolatte.geom.crs.CrsId;
 
 /**
@@ -104,6 +104,38 @@ public class JTS {
         } else {
             throw new JTSConversionException();
         }
+    }
+
+    /**
+     * Converts a JTS <code>Envelope</code> to a geolatte <code>Envelope</code>.
+     * @param jtsEnvelope the JTS Envelope to convert
+     * @return the corresponding geolatte Envelope.
+     */
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope){
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+                jtsEnvelope.getMaxY());
+    }
+
+    /**
+     * Converts a JTS <code>Envelope</code> to a geolatte <code>Envelope</code> with the
+     * specified CRS.
+     *
+     * @param jtsEnvelope the JTS Envelope to convert.
+     * @param crsId the <code>CrsId</code> to use for the return value.
+     * @return the corresponding geolatte Envelope, having the CRS specified in the crsId parameter.
+     */
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope, CrsId crsId){
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+                jtsEnvelope.getMaxY(), crsId);
+    }
+
+    /**
+     * Converts a Geolatte <code>Envelope</code> to a JTS <code>Envelope</code>.
+     * @param env the geolatte Envelope.
+     * @return the corresponding JTS Envelope.
+     */
+    public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope env) {
+        return new com.vividsolutions.jts.geom.Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
     }
 
 
@@ -185,7 +217,7 @@ public class JTS {
      */
     private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return org.geolatte.geom.Point.create(toPointSequence(cs), crsId);
+        return new org.geolatte.geom.Point(toPointSequence(cs), crsId);
     }
 
     ///
@@ -277,7 +309,7 @@ public class JTS {
             df = DimensionalFlag.XYZ;
             coord = new double[3];
         }
-        PointSequenceBuilder builder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(cs.size(), df);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df);
         for (int i = 0; i < cs.size(); i++) {
             for (int ci = 0; ci < coord.length; ci++) {
                 coord[ci] = cs.getOrdinate(i, ci);

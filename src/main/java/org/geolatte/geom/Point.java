@@ -23,8 +23,6 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CrsId;
 
-import java.util.Arrays;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
@@ -34,60 +32,17 @@ public class Point extends Geometry {
 
     private final PointSequence points;
 
-    public static Point create(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
-        return new Point(sequence, crsId, geometryOperations);
+    public static Point createEmpty() {
+        return EMPTY;
     }
 
-    public static Point create(PointSequence sequence, CrsId crsId) {
-        return new Point(sequence, crsId, null);
-    }
-
-    public static Point create(double x, double y, CrsId crsId) {
-        return create(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), crsId);
-    }
-
-    public static Point create3D(double x, double y, double z, CrsId crsId) {
-        return create(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), crsId);
-    }
-
-    public static Point createMeasured(double x, double y, double m, CrsId crsId) {
-        return create(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), crsId);
-    }
-
-    public static Point create(double x, double y, double z, double m, CrsId crsId) {
-        return create(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), crsId);
-    }
-
-    public static Point create(double x, double y) {
-        return create(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.XY), CrsId.UNDEFINED);
-    }
-
-    public static Point create3D(double x, double y, double z) {
-        return create(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.XYZ), CrsId.UNDEFINED);
-    }
-
-    public static Point createMeasured(double x, double y, double m) {
-        return create(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    }
-
-    public static Point create(double x, double y, double z, double m) {
-        return create(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.XYZM), CrsId.UNDEFINED);
-    }
-
-    static Point create(double[] coordinates, DimensionalFlag dimensionalFlag, CrsId crsId) {
-        if (coordinates == null || coordinates.length == 0) {
-            return EMPTY;
-        }
-        return create(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag), crsId);
-    }
-
-    Point(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
+    public Point(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
         super(crsId, geometryOperations);
         this.points = sequence;
     }
 
-    public static Point createEmpty(){
-        return EMPTY;
+    public Point(PointSequence sequence, CrsId crsId) {
+        this(sequence, crsId, null);
     }
 
     @Override
@@ -149,5 +104,4 @@ public class Point extends Geometry {
     public void accept(GeometryVisitor visitor) {
         visitor.visit(this);
     }
-
 }

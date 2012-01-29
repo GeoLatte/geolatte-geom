@@ -126,11 +126,11 @@ public class PostgisWkbDecoder {
 
     private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
         PointSequence points = readPoints(1, byteBuffer, flag);
-        return Point.create(points, crsId);
+        return new Point(points, crsId);
     }
 
     private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilderFactory.newFixedSizePointSequenceBuilder(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag);
         double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
             readPoint(byteBuffer, dimensionalFlag, coordinates);

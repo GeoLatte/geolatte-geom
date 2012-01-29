@@ -60,19 +60,19 @@ public class Envelope {
     }
 
     public Point lowerLeft() {
-        return Point.create(minX, minY, crsId);
+        return Points.create(minX, minY, crsId);
     }
 
     public Point upperRight() {
-        return Point.create(maxX, maxY, crsId);
+        return Points.create(maxX, maxY, crsId);
     }
 
     public Point upperLeft() {
-        return Point.create(minX, maxY, crsId);
+        return Points.create(minX, maxY, crsId);
     }
 
     public Point lowerRight() {
-        return Point.create(maxX, minY, crsId);
+        return Points.create(maxX, minY, crsId);
     }
 
 

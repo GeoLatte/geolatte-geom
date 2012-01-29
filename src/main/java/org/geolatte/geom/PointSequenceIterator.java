@@ -50,7 +50,7 @@ public class PointSequenceIterator implements Iterator<Point> {
     @Override
     public Point next() {
         if (hasNext()){
-            return Point.create(createSingleElementPointSequenceFrom(sequence, index++), CrsId.UNDEFINED);
+            return new Point(createSingleElementPointSequenceFrom(sequence, index++), CrsId.UNDEFINED);
         }
         throw new NoSuchElementException();
     }

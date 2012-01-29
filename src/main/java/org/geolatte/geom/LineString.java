@@ -88,14 +88,14 @@ public class LineString extends Geometry {
 
     public Point getStartPoint() {
         return isEmpty()?
-                Point.createEmpty() :
+                Points.createEmpty() :
                 getPointN(0);
     }
 
 
     public Point getEndPoint() {
         return isEmpty()?
-                Point.createEmpty() :
+                Points.createEmpty() :
                 getPointN(getNumPoints() - 1);
     }
 

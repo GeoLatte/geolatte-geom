@@ -25,14 +25,13 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/22/11
  */
-public class PointSequenceBuilderFactory {
+public class PointSequenceBuilders {
 
-    //TODO make name (much) shorter: fixedSize en variableSize
-    public static PointSequenceBuilder newFixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag){
-        return new FixedSizePointSequenceBuilder(capacity, flag);
+    public static PointSequenceBuilder fixedSized(int numPoints, DimensionalFlag flag){
+        return new FixedSizePointSequenceBuilder(numPoints, flag);
     }
 
-    public static PointSequenceBuilder newVariableSizePointSequenceBuilder(DimensionalFlag flag) {
+    public static PointSequenceBuilder variableSized(DimensionalFlag flag) {
         return new VariableSizePointSequenceBuilder(flag);
     }
 
