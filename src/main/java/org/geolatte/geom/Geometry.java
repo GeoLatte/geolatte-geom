@@ -147,7 +147,7 @@ public abstract class Geometry implements Serializable {
         }
         double[] coords = new double[getCoordinateDimension()];
         getPoints().getCoordinates(coords, index);
-        return Point.create(coords, DimensionalFlag.valueOf(is3D(), isMeasured()), getCrsId());
+        return Points.create(coords, DimensionalFlag.valueOf(is3D(), isMeasured()), getCrsId());
     }
 
     /**

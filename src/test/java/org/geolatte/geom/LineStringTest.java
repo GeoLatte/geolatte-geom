@@ -77,13 +77,13 @@ public class LineStringTest {
 
     @Test
     public void testPointN(){
-        Assert.assertEquals(Point.create(0, 0, CrsId.UNDEFINED), linestr2d.getPointN(0));
-        assertEquals(Point.create3D(0, 0, 0, CrsId.UNDEFINED) , linestr3d.getPointN(0));
-        assertEquals(Point.create(0, 0, 0, 0, CrsId.UNDEFINED) , linestr3dm.getPointN(0));
+        Assert.assertEquals(Points.create(0, 0, CrsId.UNDEFINED), linestr2d.getPointN(0));
+        assertEquals(Points.create3D(0, 0, 0, CrsId.UNDEFINED), linestr3d.getPointN(0));
+        assertEquals(Points.create(0, 0, 0, 0, CrsId.UNDEFINED), linestr3dm.getPointN(0));
 
-        assertEquals(Point.create(2, -2, CrsId.UNDEFINED) , linestr2d.getPointN(2));
-        assertEquals(Point.create3D(2, -2, 3, CrsId.UNDEFINED) , linestr3d.getPointN(2));
-        assertEquals(Point.create(2, -2, 3, 4, CrsId.UNDEFINED) , linestr3dm.getPointN(2));
+        assertEquals(Points.create(2, -2, CrsId.UNDEFINED), linestr2d.getPointN(2));
+        assertEquals(Points.create3D(2, -2, 3, CrsId.UNDEFINED), linestr3d.getPointN(2));
+        assertEquals(Points.create(2, -2, 3, 4, CrsId.UNDEFINED), linestr3dm.getPointN(2));
 
         try{
             linestr3dm.getPointN(3);
@@ -108,20 +108,20 @@ public class LineStringTest {
 
     @Test
     public void testStartPoint(){
-        assertEquals(Point.createEmpty(), emptyLine.getStartPoint());
+        assertEquals(Points.createEmpty(), emptyLine.getStartPoint());
 
-        assertEquals(Point.create(0, 0,CrsId.UNDEFINED), linestr2d.getStartPoint());
-        assertEquals(Point.create3D(0, 0, 0, CrsId.UNDEFINED), linestr3d.getStartPoint());
-        assertEquals(Point.create(0, 0, 0, 0, CrsId.UNDEFINED), linestr3dm.getStartPoint());
+        assertEquals(Points.create(0, 0, CrsId.UNDEFINED), linestr2d.getStartPoint());
+        assertEquals(Points.create3D(0, 0, 0, CrsId.UNDEFINED), linestr3d.getStartPoint());
+        assertEquals(Points.create(0, 0, 0, 0, CrsId.UNDEFINED), linestr3dm.getStartPoint());
     }
 
     @Test
     public void testEndPoint(){
-        assertEquals(Point.createEmpty(), emptyLine.getEndPoint());
+        assertEquals(Points.createEmpty(), emptyLine.getEndPoint());
 
-        assertEquals(Point.create(2, -2, CrsId.UNDEFINED), linestr2d.getEndPoint());
-        assertEquals(Point.create3D(2, -2, 3, CrsId.UNDEFINED), linestr3d.getEndPoint());
-        assertEquals(Point.create(2, -2, 3, 4, CrsId.UNDEFINED), linestr3dm.getEndPoint());
+        assertEquals(Points.create(2, -2, CrsId.UNDEFINED), linestr2d.getEndPoint());
+        assertEquals(Points.create3D(2, -2, 3, CrsId.UNDEFINED), linestr3d.getEndPoint());
+        assertEquals(Points.create(2, -2, 3, 4, CrsId.UNDEFINED), linestr3dm.getEndPoint());
     }
 
     @Test

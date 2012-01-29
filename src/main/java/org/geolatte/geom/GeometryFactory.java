@@ -76,7 +76,7 @@ public class GeometryFactory {
      * @return the <code>Point</code> with the specified coordinates
      */
     public Point createPoint(PointSequence points) {
-        return Point.create(points, this.crsId, this.geometryOperations);
+        return new Point(points, this.crsId, this.geometryOperations);
     }
 
     /**
