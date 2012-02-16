@@ -32,15 +32,6 @@ public class LineString extends Geometry {
 
     private final PointSequence points;
 
-
-    public static LineString create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
-        return new LineString(points, crsId, geometryOperations);
-    }
-
-    public static LineString create(PointSequence points, CrsId SRID){
-        return new LineString(points, SRID, null);
-    }
-
     public static LineString createEmpty() {
         return EMPTY;
     }
@@ -54,12 +45,16 @@ public class LineString extends Geometry {
         this.points = base.points;
     }
 
-    protected LineString(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+    public LineString(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
         super(crsId, geometryOperations);
         if (points == null){
             points = EmptyPointSequence.INSTANCE;
         }
         this.points = points;
+    }
+
+    public LineString(PointSequence points, CrsId crsId) {
+        this(points, crsId, null);
     }
 
 

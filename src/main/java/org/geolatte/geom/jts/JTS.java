@@ -151,7 +151,7 @@ public class JTS {
         for (int i =0; i< jtsGeometry.getNumGeometries(); i++) {
             polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiPolygon.create(polygons, crsId);
+        return new org.geolatte.geom.MultiPolygon(polygons);
     }
 
     /*
@@ -160,12 +160,12 @@ public class JTS {
     private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, CrsId crsId) {
         org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
         org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), crsId);
-        rings[0] = org.geolatte.geom.LinearRing.create(extRing.getPoints(), extRing.getCrsId());
+        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPoints(), extRing.getCrsId());
         for (int i = 1; i < rings.length; i++) {
             org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crsId);
-            rings[i] = org.geolatte.geom.LinearRing.create(intRing.getPoints(), extRing.getCrsId());
+            rings[i] = new org.geolatte.geom.LinearRing(intRing.getPoints(), extRing.getCrsId());
         }
-        return org.geolatte.geom.Polygon.create(rings, crsId);
+        return new org.geolatte.geom.Polygon(rings);
     }
 
     /*
@@ -176,7 +176,7 @@ public class JTS {
         for (int i = 0; i < linestrings.length; i++) {
             linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiLineString.create(linestrings, CrsId.valueOf(jtsGeometry.getSRID()));
+        return new org.geolatte.geom.MultiLineString(linestrings);
     }
 
     /*
@@ -187,7 +187,7 @@ public class JTS {
         for (int i=0; i < jtsGeometry.getNumGeometries(); i++) {
             geoms[i] = from(jtsGeometry.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.GeometryCollection.create(geoms, crsId);
+        return new org.geolatte.geom.GeometryCollection(geoms);
     }
 
     /*
@@ -195,7 +195,7 @@ public class JTS {
      */
     private static org.geolatte.geom.LineString from(LineString jtsLineString, CrsId crsId) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return org.geolatte.geom.LineString.create(toPointSequence(cs), crsId);
+        return new org.geolatte.geom.LineString(toPointSequence(cs), crsId);
 
     }
 
@@ -209,7 +209,7 @@ public class JTS {
         for (int i = 0; i < points.length; i++) {
             points[i] = from((Point) jtsMultiPoint.getGeometryN(i), crsId);
         }
-        return org.geolatte.geom.MultiPoint.create(points, crsId);
+        return new org.geolatte.geom.MultiPoint(points);
     }
 
     /*

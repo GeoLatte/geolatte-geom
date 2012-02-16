@@ -86,7 +86,7 @@ public class GeometryFactory {
      * @return
      */
     public LineString createLineString(PointSequence points) {
-        return LineString.create(points, crsId, geometryOperations);
+        return new LineString(points, crsId, geometryOperations);
     }
 
     /**
@@ -107,7 +107,7 @@ public class GeometryFactory {
      * @return
      */
     public Polygon createPolygon(PointSequence points) {
-        return Polygon.create(points, this.crsId, this.geometryOperations);
+        return new Polygon(new LinearRing[]{new LinearRing(points,this.crsId, this.geometryOperations)});
     }
 
     /**
@@ -121,7 +121,7 @@ public class GeometryFactory {
      * @return
      */
     public Polygon createPolygon(LinearRing[] rings) {
-        return Polygon.create(rings, this.crsId, this.geometryOperations);
+        return new Polygon(rings);
     }
 
     /**
@@ -131,7 +131,7 @@ public class GeometryFactory {
      * @return
      */
     public GeometryCollection createGeometryCollection(Geometry[] geometries) {
-        return GeometryCollection.create(geometries, crsId, geometryOperations);
+        return new GeometryCollection(geometries);
     }
 
     /**
@@ -141,7 +141,7 @@ public class GeometryFactory {
      * @return
      */
     public MultiPoint createMultiPoint(Point[] points) {
-        return MultiPoint.create(points, crsId, geometryOperations);
+        return new MultiPoint(points);
     }
 
     /**
@@ -151,7 +151,7 @@ public class GeometryFactory {
      * @return
      */
     public MultiLineString createMultiLineString(LineString[] lineStrings) {
-        return MultiLineString.create(lineStrings, crsId, geometryOperations);
+        return new MultiLineString(lineStrings);
     }
 
     /**
@@ -161,7 +161,7 @@ public class GeometryFactory {
      * @return
      */
     public MultiPolygon createMultiPolygon(Polygon[] polygons) {
-        return MultiPolygon.create(polygons, crsId, geometryOperations);
+        return new MultiPolygon(polygons);
     }
 
 

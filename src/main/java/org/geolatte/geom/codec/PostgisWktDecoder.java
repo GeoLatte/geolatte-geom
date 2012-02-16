@@ -102,7 +102,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 polygons.add(matchesPolygonText());
                 matchesElemSeparator();
             }
-            return MultiPolygon.create(polygons.toArray(new Polygon[polygons.size()]), crsId);
+            return new MultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
         }
         if (matchesEmpty()) {
             return MultiPolygon.createEmpty();
@@ -117,7 +117,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 lineStrings.add(matchesLineStringText());
                 matchesElemSeparator();
             }
-            return MultiLineString.create(lineStrings.toArray(new LineString[lineStrings.size()]), crsId);
+            return new MultiLineString(lineStrings.toArray(new LineString[lineStrings.size()]));
         }
         if (matchesEmpty()) {
             return MultiLineString.createEmpty();
@@ -132,7 +132,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 points.add(matchesPointText());
                 matchesElemSeparator();
             }
-            return MultiPoint.create(points.toArray(new Point[points.size()]), crsId);
+            return new MultiPoint(points.toArray(new Point[points.size()]));
         }
         if (matchesEmpty()) {
             return MultiPoint.createEmpty();
@@ -147,7 +147,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
                 geometries.add(matchesGeometry());
                 matchesElemSeparator();
             }
-            return GeometryCollection.create(geometries.toArray(new Geometry[geometries.size()]), crsId);
+            return new GeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
         }
         if (matchesEmpty()) {
             return GeometryCollection.createEmpty();
@@ -161,9 +161,9 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
             while (!matchesCloseList()) {
                 matchesPoints();
                 matchesElemSeparator();
-                rings.add(LinearRing.create(currentPointSequence, crsId));
+                rings.add(new LinearRing(currentPointSequence, crsId));
             }
-            return Polygon.create(rings.toArray(new LinearRing[rings.size()]), crsId);
+            return new Polygon(rings.toArray(new LinearRing[rings.size()]));
         }
         if (matchesEmpty()) {
             return Polygon.createEmpty();
@@ -173,7 +173,7 @@ public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
     private LineString matchesLineStringText() {
         if (matchesPoints()) {
-            return LineString.create(currentPointSequence, crsId);
+            return new LineString(currentPointSequence, crsId);
         }
         if (matchesEmpty()) {
             return LineString.createEmpty();

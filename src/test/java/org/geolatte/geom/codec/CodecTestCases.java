@@ -78,7 +78,7 @@ public class CodecTestCases {
 
         PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
-        Geometry expected = LineString.create(psb.toPointSequence(),CrsId.UNDEFINED);
+        Geometry expected = new LineString(psb.toPointSequence(),CrsId.UNDEFINED);
         addCase(LINESTRING_2D,
                 "LINESTRING(-29.261 66,-71.1074 -20.255)",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
@@ -86,7 +86,7 @@ public class CodecTestCases {
 
         psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        expected = Polygon.create(psb.toPointSequence(), CrsId.UNDEFINED);
+        expected = new Polygon(psb.toPointSequence(), CrsId.UNDEFINED);
         addCase(POLYGON_2D_NO_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0))",
                 "0103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F00000000000000000000000000000000",
@@ -96,8 +96,8 @@ public class CodecTestCases {
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         PointSequenceBuilder psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
-        LinearRing[] rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), CrsId.UNDEFINED), LinearRing.create(psb2.toPointSequence(), CrsId.UNDEFINED)};
-        expected = Polygon.create(rings, CrsId.UNDEFINED);
+        LinearRing[] rings = new LinearRing[]{new LinearRing(psb1.toPointSequence(), CrsId.UNDEFINED), new LinearRing(psb2.toPointSequence(), CrsId.UNDEFINED)};
+        expected = new Polygon(rings);
         addCase(POLYGON_2D_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0),(0.25 0.25,0.25 0.5,0.5 0.5,0.5 0.25,0.25 0.25))",
                 "0103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
@@ -106,7 +106,7 @@ public class CodecTestCases {
 
         Point pnt1 = Points.create(1, 1, CrsId.UNDEFINED);
         Point pnt2 = Points.create(2, 2, CrsId.UNDEFINED);
-        expected = GeometryCollection.create(new Geometry[]{pnt1, pnt2},CrsId.UNDEFINED);
+        expected = new GeometryCollection(new Geometry[]{pnt1, pnt2});
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
                 "0107000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
@@ -120,51 +120,51 @@ public class CodecTestCases {
         addCase(MULTIPOINT_2D,
                 "MULTIPOINT((1 1),(2 2))",
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
-                MultiPoint.create(new Point[]{pnt1, pnt2}, CrsId.UNDEFINED));
+                new MultiPoint(new Point[]{pnt1, pnt2}));
 
         pnt1 = Points.create(1, 2, CrsId.valueOf(4326));
         pnt2 = Points.create(3, 4, CrsId.valueOf(4326));
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
-                MultiPoint.create(new Point[]{pnt1, pnt2}, CrsId.valueOf(4326)));
+                new MultiPoint(new Point[]{pnt1, pnt2}));
 
         PointSequenceBuilder psl1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XY);
         psl1.add(1, 2).add(2, 3).add(4, 5);
         PointSequenceBuilder psl2 = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         psl2.add(6, 7).add(8, 9);
         LineString[] linestrings = new LineString[2];
-        linestrings[0] = LineString.create(psl1.toPointSequence(), CrsId.UNDEFINED);
-        linestrings[1] = LineString.create(psl2.toPointSequence(), CrsId.UNDEFINED);
+        linestrings[0] = new LineString(psl1.toPointSequence(), CrsId.UNDEFINED);
+        linestrings[1] = new LineString(psl2.toPointSequence(), CrsId.UNDEFINED);
         addCase(MULTILINESTRING_2D,
                 "MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "010500000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
-                , MultiLineString.create(linestrings, CrsId.UNDEFINED));
+                , new MultiLineString(linestrings));
 
         linestrings = new LineString[2];
-        linestrings[0] = LineString.create(psl1.toPointSequence(), CrsId.valueOf(4326));
-        linestrings[1] = LineString.create(psl2.toPointSequence(), CrsId.valueOf(4326));
+        linestrings[0] = new LineString(psl1.toPointSequence(), CrsId.valueOf(4326));
+        linestrings[1] = new LineString(psl2.toPointSequence(), CrsId.valueOf(4326));
         addCase(MULTILINESTRING_2D_WITH_SRID,
                 "SRID=4326;MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "0105000020E610000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
-                , MultiLineString.create(linestrings, CrsId.valueOf(4326)));
+                , new MultiLineString(linestrings));
 
 
         psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         Polygon[] polygons = new Polygon[2];
-        polygons[0] = Polygon.create(psb.toPointSequence(), CrsId.UNDEFINED);
+        polygons[0] = new Polygon(psb.toPointSequence(), CrsId.UNDEFINED);
         psb1 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XY);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
-        rings = new LinearRing[]{LinearRing.create(psb1.toPointSequence(), CrsId.UNDEFINED), LinearRing.create(psb2.toPointSequence(), CrsId.UNDEFINED)};
-        polygons[1] = Polygon.create(rings, CrsId.UNDEFINED);
+        rings = new LinearRing[]{new LinearRing(psb1.toPointSequence(), CrsId.UNDEFINED), new LinearRing(psb2.toPointSequence(), CrsId.UNDEFINED)};
+        polygons[1] = new Polygon(rings);
 
         addCase(MULTIPOLYGON_2D,
                 "MULTIPOLYGON(((0 0,1 0,1 1,0 1,0 0)),((0 0,1 0,1 1,0 1,0 0),(0.25 0.25,0.25 0.5,0.5 0.5,0.5 0.25,0.25 0.25)))",
                 "0106000000020000000103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F000000000000000000000000000000000103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
-                MultiPolygon.create(polygons, CrsId.UNDEFINED));
+                new MultiPolygon(polygons));
 
     }
 

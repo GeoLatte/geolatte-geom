@@ -57,12 +57,12 @@ public class LineStringTest {
         linestr3d = create(coordinates, true, false);
         linestr2dm = create(coordinates, false, true);
         linestr3dm = create(coordinates, true, true);
-        emptyLine = LineString.create(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED);
+        emptyLine = new LineString(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED);
         PointSequence closedSeq = new PackedPointSequence(new double[]{0,0,0,1,1,0,1,0,0,0,0,0}, DimensionalFlag.XYZ);
-        simpleClosed = LineString.create(closedSeq, CrsId.UNDEFINED);
-        nonSimpleClosed = LineString.create(createNonSimpleClosedPointSequence(),CrsId.UNDEFINED);
+        simpleClosed = new LineString(closedSeq, CrsId.UNDEFINED);
+        nonSimpleClosed = new LineString(createNonSimpleClosedPointSequence(),CrsId.UNDEFINED);
         PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.XY);
-        line2d = LineString.create(lineSeq, CrsId.UNDEFINED);
+        line2d = new LineString(lineSeq, CrsId.UNDEFINED);
 
     }
 
@@ -166,7 +166,7 @@ public class LineStringTest {
     @Test
     public void testGetBoundary() {
         assertEquals(MultiPoint.EMPTY, simpleClosed.getBoundary());
-        assertEquals(MultiPoint.create(new Point[]{linestr2d.getStartPoint(), linestr2d.getEndPoint()}, CrsId.UNDEFINED), linestr2d.getBoundary());
+        assertEquals(new MultiPoint(new Point[]{linestr2d.getStartPoint(), linestr2d.getEndPoint()}), linestr2d.getBoundary());
     }
 
 //    @Test
@@ -176,7 +176,7 @@ public class LineStringTest {
 //        builder.add(new double[]{1,0,1});
 //        builder.add(new double[]{2,0,2});
 //        builder.add(new double[]{3,0,3});
-//        LineString ls = LineString.create(builder.toPointSequence(), -1);
+//        LineString ls = new LineString(builder.toPointSequence(), -1);
 //        MultiLineString result = ls.locateBetween(0.5, 1.5);
 //        assertFalse(result.isEmpty());
 //        assertEquals(1, result.getNumGeometries());
@@ -217,7 +217,7 @@ public class LineStringTest {
                 point[is3D ? CoordinateSequence.M : CoordinateSequence.M -1] = coordinates[i*4+3];
             sequenceBuilder.add(point);
         }
-        return LineString.create(sequenceBuilder.toPointSequence(),CrsId.UNDEFINED);
+        return new LineString(sequenceBuilder.toPointSequence(),CrsId.UNDEFINED);
     }
 
 
