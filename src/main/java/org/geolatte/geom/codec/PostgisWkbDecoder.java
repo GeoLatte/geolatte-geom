@@ -81,7 +81,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (LineString) decodeGeometry(byteBuffer);
         }
-        return MultiLineString.create(geometries, crsId);
+        return new MultiLineString(geometries);
     }
 
 
@@ -91,7 +91,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (Point) decodeGeometry(byteBuffer);
         }
-        return MultiPoint.create(geometries, crsId);
+        return new MultiPoint(geometries);
     }
 
     private MultiPolygon decodeMultiPolygon(ByteBuffer byteBuffer) {
@@ -100,7 +100,7 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = (Polygon) decodeGeometry(byteBuffer);
         }
-        return MultiPolygon.create(geometries, crsId);
+        return new MultiPolygon(geometries);
     }
 
     private GeometryCollection decodeGeometryCollection(ByteBuffer byteBuffer) {
@@ -109,19 +109,19 @@ public class PostgisWkbDecoder {
         for (int i = 0; i < geometries.length; i++) {
             geometries[i] = decodeGeometry(byteBuffer);
         }
-        return GeometryCollection.create(geometries, crsId);
+        return new GeometryCollection(geometries);
     }
 
     private Polygon decodePolygon(ByteBuffer byteBuffer, DimensionalFlag flag) {
         int numRings = byteBuffer.getInt();
         LinearRing[] rings = readPolygonRings(numRings, byteBuffer, flag, crsId);
-        return Polygon.create(rings, crsId);
+        return new Polygon(rings);
     }
 
     private LineString decodeLineString(ByteBuffer byteBuffer, DimensionalFlag flag) {
         int numPoints = byteBuffer.getInt();
         PointSequence points = readPoints(numPoints, byteBuffer, flag);
-        return LineString.create(points, crsId);
+        return new LineString(points, crsId);
     }
 
     private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
@@ -156,7 +156,7 @@ public class PostgisWkbDecoder {
     private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
         int numPoints = byteBuffer.getInt();
         PointSequence ps = readPoints(numPoints,byteBuffer, dimensionalFlag);
-        return LinearRing.create(ps, crsId);
+        return new LinearRing(ps, crsId);
     }
 
 

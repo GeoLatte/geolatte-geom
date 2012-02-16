@@ -42,8 +42,8 @@ public class MultiPointTest {
     @Before
     public void setUp(){
 
-        this.pnt1 = MultiPoint.create(createPointsAllDifferent(5, wgs84), wgs84);
-        this.pnt2 = MultiPoint.create(createPointsNotAllDifferent(5, wgs84), wgs84);
+        this.pnt1 = new MultiPoint(createPointsAllDifferent(5, wgs84));
+        this.pnt2 = new MultiPoint(createPointsNotAllDifferent(5, wgs84));
     }
 
     @Test

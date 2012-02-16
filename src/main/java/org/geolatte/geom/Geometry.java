@@ -151,6 +151,31 @@ public abstract class Geometry implements Serializable {
     }
 
     /**
+     * Extracts the first <code>CrsId</code> from an array of <code>Geometry</code>s if
+     * the array is non-null and not empty. Otherwise returns <code>CrsId.UNDEFINED</code>.
+     *
+     */
+    protected static CrsId getCrsId(Geometry[] geometries){
+        if (geometries == null || geometries.length == 0) {
+            return CrsId.UNDEFINED;
+        }
+        return geometries[0].getCrsId();
+    }
+
+    /**
+     * Extracts the first <code>GeometryOperations</code> from an array of <code>Geometry</code>s if
+     * the array is non-null and not empty. Otherwise returns <code>Null</code>.
+     */
+    protected static GeometryOperations getGeometryOperations(Geometry[] geometries){
+        if (geometries == null || geometries.length == 0) {
+            return null;
+        }
+        return geometries[0].getGeometryOperations();
+    }
+
+
+
+    /**
      * Returns the associated <code>PointSequence</code>.
      *
      * @return

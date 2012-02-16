@@ -40,14 +40,14 @@ public class PolygonTest {
     public void testEmptyRingsThrowIllegalArgumentException(){
         try {
             LinearRing shell = LinearRing.createEmpty();
-            Polygon polygon = Polygon.create(new LinearRing[]{shell}, CrsId.UNDEFINED);
+            Polygon polygon = new Polygon(new LinearRing[]{shell});
             fail("Polygon with empty shell should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
 
         try {
-            LinearRing shell = LinearRing.create(shellPoints, CrsId.UNDEFINED);
+            LinearRing shell = new LinearRing(shellPoints, CrsId.UNDEFINED);
             LinearRing emptyInner = LinearRing.createEmpty();
-            Polygon polygon = Polygon.create(new LinearRing[]{shell, emptyInner}, CrsId.UNDEFINED);
+            Polygon polygon = new Polygon(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
     }

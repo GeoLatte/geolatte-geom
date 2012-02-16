@@ -39,23 +39,20 @@ public class LinearRing extends LineString {
         return EMPTY;
     }
 
-    public static LinearRing create(PointSequence points, CrsId crsId){
-        return new LinearRing(points, crsId, null);
-    }
-
-    public static LinearRing create(LineString lineString) {
-        return new LinearRing(lineString);
-    }
-
     protected LinearRing(LineString lineString) {
         super(lineString);
         checkIsClosed();
     }
 
-    protected LinearRing(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
+    public LinearRing(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
         super(points, crsId, geometryOperations);
         checkIsClosed();
     }
+
+    public LinearRing(PointSequence points, CrsId crsId) {
+        this(points, crsId, null);
+    }
+
 
     @Override
     public GeometryType getGeometryType() {
