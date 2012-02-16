@@ -311,7 +311,10 @@ class JTSGeometryOperations implements GeometryOperations {
 
     private static class EnvelopeVisitor implements PointVisitor {
 
-        double xMin,yMin, xMax,yMax;
+        double xMin = Double.POSITIVE_INFINITY;
+        double yMin = Double.POSITIVE_INFINITY;
+        double xMax = Double.NEGATIVE_INFINITY;
+        double yMax = Double.NEGATIVE_INFINITY;
         CrsId crsId;
 
         EnvelopeVisitor(CrsId crsId){

@@ -157,10 +157,8 @@ public class Envelope {
      * @return
      */
     public boolean intersects(Envelope other) {
-        return (other.minX >= this.minX && other.minX <= this.maxX ||
-                other.maxX >= this.minX && other.maxX <= this.maxX) &&
-            (other.minY >= this.minY && other.minY <= this.maxY ||
-                   other.maxY >= this.minY && other.maxY <= this.maxY);
+        return !(this.maxX < other.minX || this.minX > other.maxX
+                || this.maxY < other.minY || this.minY > other.maxY);
     }
 
     @Override

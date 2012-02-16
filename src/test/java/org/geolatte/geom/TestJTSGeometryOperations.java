@@ -44,6 +44,22 @@ public class TestJTSGeometryOperations {
     }
 
     @Test
+    public void testCreateEnvelopeOpOnlyNegative() {
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        psBuilder.add(-101, -97).add(-98, -95).add(-90, -108).add(-91, -101);
+        LineString lineString = LineString.create(psBuilder.toPointSequence(), null);
+        assertEquals(new Envelope(-101, -108, -90, -95), ops.createEnvelopeOp(lineString).execute());
+    }
+
+    @Test
+    public void testCreateEnvelopeOpOnlyPositive() {
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        psBuilder.add(99, 103).add(102, 105).add(110, 92).add(109, 99);
+        LineString lineString = LineString.create(psBuilder.toPointSequence(), null);
+        assertEquals(new Envelope(99, 92, 110, 105), ops.createEnvelopeOp(lineString).execute());
+    }
+
+    @Test
     public void testIntersectsOp() {
         PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
         psBuilder.add(1, 1).add(2, 2);
