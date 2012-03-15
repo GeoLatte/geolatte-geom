@@ -44,7 +44,7 @@ public class LinearRingTest {
 
     @Test
     public void testValidLinearRing() {
-        LinearRing valid = LinearRing.create(validPoints, CrsId.UNDEFINED);
+        LinearRing valid = new LinearRing(validPoints, CrsId.UNDEFINED);
         assertNotNull(valid);
         assertFalse(valid.isEmpty());
         assertEquals(CrsId.UNDEFINED, valid.getCrsId());
@@ -54,7 +54,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingShouldHaveAtLeast4Points() {
         try {
-            LinearRing invalid = LinearRing.create(tooFewPoints, CrsId.UNDEFINED);
+            LinearRing invalid = new LinearRing(tooFewPoints, CrsId.UNDEFINED);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -63,8 +63,8 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringShouldHaveAtLeast4Points() {
         try {
-            LineString l = LineString.create(tooFewPoints, CrsId.UNDEFINED);
-            LinearRing.create(l);
+            LineString l = new LineString(tooFewPoints, CrsId.UNDEFINED);
+            new LinearRing(l);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -73,7 +73,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingMustBeClosed() {
         try {
-            LinearRing invalid = LinearRing.create(notClosedPoints, CrsId.UNDEFINED);
+            LinearRing invalid = new LinearRing(notClosedPoints, CrsId.UNDEFINED);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }
@@ -82,8 +82,8 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringMustBeClosed() {
         try {
-            LineString l = LineString.create(notClosedPoints, CrsId.UNDEFINED);
-            LinearRing.create(l);
+            LineString l = new LineString(notClosedPoints, CrsId.UNDEFINED);
+            new LinearRing(l);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }

@@ -21,30 +21,20 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class MultiPoint extends GeometryCollection {
 
 
-    protected static final MultiPoint EMPTY = new MultiPoint(new Point[0],CrsId.UNDEFINED, null);
-
-    public static MultiPoint create(Point[] points, CrsId SRID, GeometryOperations geometryOperations) {
-        return new MultiPoint(points, SRID, geometryOperations);
-    }
-
-    public static MultiPoint create(Point[] points, CrsId crsId) {
-        return create(points, crsId, null);
-    }
+    protected static final MultiPoint EMPTY = new MultiPoint(new Point[0]);
 
     public static MultiPoint createEmpty() {
         return EMPTY;
     }
 
-    protected MultiPoint(Point[] points, CrsId crsId, GeometryOperations geometryOperations) {
-        super(points, crsId, geometryOperations);
+    public MultiPoint(Point[] points) {
+        super(points);
     }
 
     @Override

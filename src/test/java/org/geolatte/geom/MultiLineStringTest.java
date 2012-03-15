@@ -45,20 +45,20 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = LineString.create(new PackedPointSequence(c1, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString ls2 = LineString.create(new PackedPointSequence(c2, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString ls3 = LineString.create(new PackedPointSequence(c3, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString lcs = LineString.create(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString lcns = LineString.create(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls1 = new LineString(new PackedPointSequence(c1, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls2 = new LineString(new PackedPointSequence(c2, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls3 = new LineString(new PackedPointSequence(c3, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString lcs = new LineString(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString lcns = new LineString(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
 
 
     @Before
     public void setUp() {
-        ml1 = MultiLineString.create(new LineString[]{ls1, ls2}, CrsId.UNDEFINED);
-        ml2 = MultiLineString.create(new LineString[]{ls2, ls3}, CrsId.UNDEFINED);
+        ml1 = new MultiLineString(new LineString[]{ls1, ls2});
+        ml2 = new MultiLineString(new LineString[]{ls2, ls3});
         empty = MultiLineString.createEmpty();
-        closedSimple = MultiLineString.create(new LineString[]{lcs}, CrsId.UNDEFINED);
-        MultiLineString closedNonSimple = MultiLineString.create(new LineString[]{lcs,lcns}, CrsId.UNDEFINED);
+        closedSimple = new MultiLineString(new LineString[]{lcs});
+        MultiLineString closedNonSimple = new MultiLineString(new LineString[]{lcs,lcns});
     }
 
     @Test

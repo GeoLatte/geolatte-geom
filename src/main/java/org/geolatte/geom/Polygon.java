@@ -35,46 +35,35 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
 
     private final PointSequence points;
     private final LinearRing[] rings;
-    public static final Polygon EMPTY = new Polygon(new LinearRing[0], CrsId.UNDEFINED);
-
-    public static Polygon create(LinearRing[] rings, CrsId crsId, GeometryOperations geometryOperations) {
-        return new Polygon(rings, crsId, geometryOperations);
-    }
-
-    public static Polygon create(LinearRing[] rings, CrsId crsId) {
-        return new Polygon(rings, crsId, null);
-    }
-
-    public static Polygon create(PointSequence points, CrsId crsId){
-        return create(points, crsId, null);
-    }
-
-    public static Polygon create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations){
-        return new Polygon(new LinearRing[]{LinearRing.create(points, crsId)}, crsId);
-    }
+    public static final Polygon EMPTY = new Polygon(new LinearRing[0]);
 
     public static Polygon createEmpty() {
         return EMPTY;
     }
 
-    protected Polygon(LinearRing[] rings, CrsId SRID, GeometryOperations geometryOperations) {
-        super(SRID, geometryOperations);
+    public Polygon(PointSequence pointSequence, CrsId crsId, GeometryOperations ops){
+        this(new LinearRing[]{new LinearRing(pointSequence, crsId, ops)});
+    }
+
+    public Polygon(PointSequence pointSequence, CrsId crsId){
+        this(new LinearRing[]{new LinearRing(pointSequence, crsId, null)});
+    }
+
+    public Polygon(LinearRing[] rings) {
+        super(getCrsId(rings), getGeometryOperations(rings));
         checkRings(rings);
         points = createAndCheckPointSequence(rings);
         this.rings = rings;
     }
 
-    protected Polygon(LinearRing[] rings, CrsId crsId) {
-        this(rings, crsId, null);
-    }
 
-    private void checkRings(LineString[] rings) {
-        for (LineString ring : rings){
+    private void checkRings(LinearRing[] rings) {
+        for (LinearRing ring : rings){
             checkLinearRing(ring);
         }
     }
 
-    private void checkLinearRing(LineString ring) {
+    private void checkLinearRing(LinearRing ring) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
         if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
     }
@@ -127,7 +116,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing>{
 
         return isEmpty()?
                 MultiLineString.EMPTY :
-                MultiLineString.create(rings, rings[0].getCrsId());
+                new MultiLineString(rings);
     }
 
 
