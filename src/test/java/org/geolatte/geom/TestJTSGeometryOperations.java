@@ -60,6 +60,13 @@ public class TestJTSGeometryOperations {
     }
 
     @Test
+    public void testCreateEnvelopeOpOnEmpty() {
+        LineString lineString = LineString.EMPTY;
+        assertEquals(new Envelope(Double.NaN, Double.NaN, Double.NaN,Double.NaN), ops.createEnvelopeOp(lineString).execute());
+        assertEquals(Envelope.EMPTY, ops.createEnvelopeOp(lineString).execute());
+    }
+
+    @Test
     public void testIntersectsOp() {
         PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
         psBuilder.add(1, 1).add(2, 2);
