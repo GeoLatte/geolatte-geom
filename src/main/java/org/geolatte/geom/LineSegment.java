@@ -27,46 +27,21 @@ package org.geolatte.geom;
  */
 public class LineSegment {
 
-    final private PointSequence pointSequence;
-    final private int index;
 
-    public LineSegment(PointSequence pointSequence, int index) {
-        this.pointSequence = pointSequence;
-        this.index = index;
-        if (this.index  + 1 >= this.pointSequence.size())
-            throw new IllegalArgumentException(); //TODO -- error message
+    private final Point p0;
+    private final Point p1;
+
+    public LineSegment(Point p0, Point p1) {
+        this.p0 = p0;
+        this.p1 = p1;
     }
 
-    public double getStartX() {
-        return this.pointSequence.getX(index);
+    public Point getStartPoint() {
+        return p0;
     }
 
-    public double getStartY() {
-        return this.pointSequence.getY(index);
-    }
-
-    public double getStartZ() {
-        return this.pointSequence.getZ(index);
-    }
-
-    public double getStartM() {
-        return this.pointSequence.getM(index);
-    }
-
-    public double getEndX() {
-        return this.pointSequence.getX(index+1);
-    }
-
-    public double getEndY() {
-        return this.pointSequence.getY(index+1);
-    }
-
-    public double getEndZ() {
-        return this.pointSequence.getZ(index+1);
-    }
-
-    public double getEndM() {
-        return this.pointSequence.getM(index+1);
+    public Point getEndPoint() {
+        return p1;
     }
 
 }

@@ -184,7 +184,7 @@ class JTSGeometryOperations implements GeometryOperations {
 
     @Override
     public GeometryOperation<Geometry> createLocateAlongOp(Geometry geometry, double mValue) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
