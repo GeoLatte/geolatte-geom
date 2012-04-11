@@ -51,7 +51,7 @@ public interface GeometryOperations {
 
     GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue);
 
-    GeometryOperation<Geometry> createLocateBetween(final Geometry geometry, final double mStart, final double mEnd);
+    GeometryOperation<Geometry> createLocateBetweenOp(final Geometry geometry, final double startMeasure, final double endMeasure);
 
     GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other);
 

@@ -49,6 +49,8 @@ public interface PointSequenceBuilder {
 
     PointSequenceBuilder add(double x, double y, double z, double m);
 
+    PointSequenceBuilder add(Point pnt);
+
     PointSequence toPointSequence();
 
 }

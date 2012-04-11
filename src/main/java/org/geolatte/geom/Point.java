@@ -86,6 +86,7 @@ public class Point extends Geometry {
         return EMPTY;
     }
 
+    //TODO -- remove this (obsolete)
     @Override
     public String toString(){
         StringBuilder stbuf = new StringBuilder("SRID=").append(getSRID()).append(",");

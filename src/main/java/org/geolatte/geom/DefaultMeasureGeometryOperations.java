@@ -100,7 +100,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     private static class InterpolatingVisitor implements GeometryVisitor {
 
-        public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and (MultiLineString Geometries.";
+        public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
 
         final Point searchPoint;
         final double tolerance;

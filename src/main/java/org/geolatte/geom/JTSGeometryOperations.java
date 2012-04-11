@@ -42,22 +42,23 @@ import org.geolatte.geom.jts.JTS;
 class JTSGeometryOperations implements GeometryOperations {
 
     private static boolean envelopeIntersect(Geometry geometry1, Geometry geometry2) {
-        return(geometry1.getEnvelope().intersects(geometry2.getEnvelope()));
+        return (geometry1.getEnvelope().intersects(geometry2.getEnvelope()));
     }
 
     /**
      * Throws an <code>IllegalArgumentException</code> when class of parameter is <code>GeometryCollection</code>.
      * Subclasses of <code>GeometryCollection</code> do not trigger the Exception.
+     *
      * @param geom
      */
-    private static void checkNotGeometryCollection(Geometry geom){
+    private static void checkNotGeometryCollection(Geometry geom) {
         if (GeometryCollection.class.equals(geom.getClass())) {
             throw new IllegalArgumentException("GeometryCollection is not allowed");
         }
     }
 
     private static void checkCompatibleCRS(Geometry geometry, Geometry other) {
-        if (! geometry.getCrsId().equals(other.getCrsId())) {
+        if (!geometry.getCrsId().equals(other.getCrsId())) {
             throw new IllegalArgumentException("Geometries have different CRS's");
         }
     }
@@ -65,7 +66,7 @@ class JTSGeometryOperations implements GeometryOperations {
     @Override
     public GeometryOperation<Boolean> createIsSimpleOp(final Geometry geometry) {
         final IsSimpleOp isSimpleOp = new IsSimpleOp(JTS.to(geometry));
-        return new GeometryOperation<Boolean>(){
+        return new GeometryOperation<Boolean>() {
             @Override
             public Boolean execute() {
                 return isSimpleOp.isSimple();
@@ -77,7 +78,7 @@ class JTSGeometryOperations implements GeometryOperations {
     public GeometryOperation<Geometry> createBoundaryOp(final Geometry geometry) {
         final BoundaryOp boundaryOp = new BoundaryOp(JTS.to(geometry));
         final CrsId crsId = geometry.getCrsId();
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
                 return JTS.from(boundaryOp.getBoundary(), crsId);
@@ -87,7 +88,7 @@ class JTSGeometryOperations implements GeometryOperations {
 
     @Override
     public GeometryOperation<Envelope> createEnvelopeOp(final Geometry geometry) {
-        return new GeometryOperation<Envelope> (){
+        return new GeometryOperation<Envelope>() {
 
             @Override
             public Envelope execute() {
@@ -144,15 +145,15 @@ class JTSGeometryOperations implements GeometryOperations {
     @Override
     public GeometryOperation<Boolean> createContainsOp(final Geometry geometry, final Geometry other) {
         return new GeometryOperation<Boolean>() {
-                    @Override
-                    public Boolean execute() {
-                        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                        checkCompatibleCRS(geometry, other);
-                        if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
-                        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                        return relateOp.getIntersectionMatrix().isContains();
-                    }
-                };
+            @Override
+            public Boolean execute() {
+                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+                checkCompatibleCRS(geometry, other);
+                if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
+                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+                return relateOp.getIntersectionMatrix().isContains();
+            }
+        };
     }
 
     @Override
@@ -183,21 +184,30 @@ class JTSGeometryOperations implements GeometryOperations {
     }
 
     @Override
-    public GeometryOperation<Geometry> createLocateAlongOp(Geometry geometry, double mValue) {
-        return null;
+    public GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue) {
+        return createLocateBetweenOp(geometry, mValue, mValue);
     }
 
     @Override
-    public GeometryOperation<Geometry> createLocateBetween(Geometry geometry, double mStart, double mEnd) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public GeometryOperation<Geometry> createLocateBetweenOp(final Geometry geometry, final double startMeasure, final double endMeasure) {
+        return new GeometryOperation<Geometry>() {
+            @Override
+            public Geometry execute() {
+                if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
+                if (geometry.isEmpty()) return Point.EMPTY;
+                MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
+                geometry.accept(visitor);
+                return visitor.result();
+            }
+        };
     }
 
     @Override
     public GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Double>(){
+        return new GeometryOperation<Double>() {
             @Override
             public Double execute() {
-                final DistanceOp op =  new DistanceOp(JTS.to(geometry), JTS.to(other));
+                final DistanceOp op = new DistanceOp(JTS.to(geometry), JTS.to(other));
                 return op.distance();
             }
         };
@@ -216,7 +226,7 @@ class JTSGeometryOperations implements GeometryOperations {
 
     @Override
     public GeometryOperation<Geometry> createConvexHullOp(final Geometry geometry) {
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
                 final ConvexHull convexHull = new ConvexHull(JTS.to(geometry));
@@ -227,22 +237,22 @@ class JTSGeometryOperations implements GeometryOperations {
 
     @Override
     public GeometryOperation<Geometry> createIntersectionOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
-                if(geometry.isEmpty() || other.isEmpty()) return GeometryCollection.createEmpty();
+                if (geometry.isEmpty() || other.isEmpty()) return GeometryCollection.createEmpty();
                 checkNotGeometryCollection(geometry);
                 checkNotGeometryCollection(other);
                 checkCompatibleCRS(geometry, other);
                 com.vividsolutions.jts.geom.Geometry intersection = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.INTERSECTION);
-                return JTS.from( intersection, geometry.getCrsId());
+                return JTS.from(intersection, geometry.getCrsId());
             }
         };
     }
 
     @Override
     public GeometryOperation<Geometry> createUnionOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
                 if (geometry.isEmpty()) return other;
@@ -251,14 +261,14 @@ class JTSGeometryOperations implements GeometryOperations {
                 checkNotGeometryCollection(other);
                 checkCompatibleCRS(geometry, other);
                 com.vividsolutions.jts.geom.Geometry union = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.UNION);
-                return JTS.from( union, geometry.getCrsId());
+                return JTS.from(union, geometry.getCrsId());
             }
         };
     }
 
     @Override
     public GeometryOperation<Geometry> createDifferenceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
                 if (geometry.isEmpty()) return GeometryCollection.createEmpty();
@@ -267,14 +277,14 @@ class JTSGeometryOperations implements GeometryOperations {
                 checkNotGeometryCollection(other);
                 checkCompatibleCRS(geometry, other);
                 com.vividsolutions.jts.geom.Geometry difference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.DIFFERENCE);
-                return JTS.from( difference, geometry.getCrsId());
+                return JTS.from(difference, geometry.getCrsId());
             }
         };
     }
 
     @Override
     public GeometryOperation<Geometry> createSymDifferenceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>(){
+        return new GeometryOperation<Geometry>() {
             @Override
             public Geometry execute() {
                 if (geometry.isEmpty()) return other;
@@ -283,14 +293,14 @@ class JTSGeometryOperations implements GeometryOperations {
                 checkNotGeometryCollection(other);
                 checkCompatibleCRS(geometry, other);
                 com.vividsolutions.jts.geom.Geometry symDifference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.SYMDIFFERENCE);
-                return JTS.from( symDifference, geometry.getCrsId());
+                return JTS.from(symDifference, geometry.getCrsId());
             }
         };
     }
 
     @Override
     public GeometryOperation<String> createToWktOp(final Geometry geometry) {
-        return new GeometryOperation<String>(){
+        return new GeometryOperation<String>() {
             @Override
             public String execute() {
                 return Wkt.toWkt(geometry);
@@ -300,7 +310,7 @@ class JTSGeometryOperations implements GeometryOperations {
 
     @Override
     public GeometryOperation<ByteBuffer> createToWkbOp(final Geometry geometry) {
-        return new GeometryOperation<ByteBuffer>(){
+        return new GeometryOperation<ByteBuffer>() {
             @Override
             public ByteBuffer execute() {
                 return Wkb.toWkb(geometry);
@@ -317,7 +327,7 @@ class JTSGeometryOperations implements GeometryOperations {
         double yMax = Double.NEGATIVE_INFINITY;
         CrsId crsId;
 
-        EnvelopeVisitor(CrsId crsId){
+        EnvelopeVisitor(CrsId crsId) {
             this.crsId = crsId;
         }
 

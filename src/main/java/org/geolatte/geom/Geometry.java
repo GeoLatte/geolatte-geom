@@ -109,6 +109,15 @@ public abstract class Geometry implements Serializable {
     }
 
     /**
+     * Returns the <code>DimensionalFlag</code> of the Geometry
+     *
+     * @return the <code>DimensionalFlag</code> of its <code>PointSequence</code>
+     */
+    public DimensionalFlag getDimensionalFlag(){
+        return getPoints().getDimensionalFlag();
+    }
+
+    /**
      * Tests  whether this <code>Geometry</code> has M-coordinates.
      *
      * @return true if this instance has M-coordinates.
@@ -301,7 +310,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public Geometry locateBetween(double mStart, double mEnd) {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createLocateBetween(this, mStart, mEnd);
+        GeometryOperation<Geometry> operation = getGeometryOperations().createLocateBetweenOp(this, mStart, mEnd);
         return operation.execute();
     }
 
