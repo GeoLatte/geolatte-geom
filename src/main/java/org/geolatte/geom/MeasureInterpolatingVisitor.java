@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * A <code>GeometryVisitor</code> that derives a <code>Geometry</code>
  * by interpolating on the measure values of the visited <code>Geometries</code>.
- *
+ * <p/>
  * TODO -- rewrite (is copied from SQL/MM specs)
  * <p>Interpolation is used to determine any points on the 1-dimensional geometry with an m coordinate value
  * between SM and EM inclusively. The implementation-defined interpolation algorithm is used to estimate
@@ -45,7 +45,7 @@ import java.util.List;
  * disconnected points in the 1-dimensional geometry value with m coordinate values between SM and EM
  * inclusively are also added to the geometry collection. If no matching m coordinate values are found, then
  * an empty set of type ST_Point is returned.
-</p>
+ * </p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/10/12
@@ -104,7 +104,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             double rs = (startMeasure - p0.getM()) / (p1.getM() - p0.getM());
             double re = (endMeasure - p0.getM()) / (p1.getM() - p0.getM());
 
-            // set rs and re in the coordinate-order
+            // set rs and re in the coordinate-order (if r1,r2 in (0,1)
             // so order will be p0 -- p(r1) -- p(r2) -- p1, if
             // r1, r2 in [0, 1]
             double r1 = Math.min(rs, re);
@@ -132,7 +132,6 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
                 // previously added points (if any!)
                 startNewPointSequenceIfNotEmpty();
             }
-
         }
 
         PointSequence last = currentBuilder.toPointSequence();
@@ -179,39 +178,6 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
 
     @Override
     public void visit(GeometryCollection collection) {
-        for (Geometry geom : collection) {
-            if (geom instanceof Point) {
-                visit((Point) geom);
-            } else if (geom instanceof MultiPoint) {
-                visit((MultiPoint) geom);
-            } else if (geom instanceof LineString) {
-                visit((LineString) geom);
-            } else if (geom instanceof LinearRing) {
-                visit((LineString) geom);
-            } else if (geom instanceof MultiLineString) {
-                visit((MultiLineString) geom);
-            } else {
-                throw new IllegalArgumentException(INVALID_TYPE_MSG);
-            }
-        }
-    }
-
-    @Override
-    public void visit(MultiLineString multiLineString) {
-        visit((GeometryCollection) multiLineString);
-    }
-
-    @Override
-    public void visit(MultiPoint multiPoint) {
-        for (Geometry part : multiPoint) {
-            visit((Point) part);
-        }
-
-    }
-
-    @Override
-    public void visit(MultiPolygon multiPolygon) {
-        throw new IllegalArgumentException(INVALID_TYPE_MSG);
     }
 
     @Override

@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A set of operations on measuredTestLine <code>Geometry</code>s.
+ * A set of operations on measured <code>Geometry</code>s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/4/12

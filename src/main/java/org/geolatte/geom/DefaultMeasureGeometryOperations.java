@@ -119,7 +119,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         }
         @Override
         public void visit(Point point) {
-            if (searchPoint.equals(point)) {
+            if (searchPoint.getX() == point.getX() && searchPoint.getY() == point.getY()) {
                 mValue = point.getM();
             }
         }
@@ -145,38 +145,11 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
         @Override
         public void visit(GeometryCollection collection) {
-            for (Geometry part : collection) {
-                part.accept(this);
-                if (!Double.isNaN(mValue)) return;
-            }
-        }
-
-        @Override
-        public void visit(MultiLineString multiLineString) {
-            for (Geometry part : multiLineString) {
-                part.accept(this);
-            }
-        }
-
-        @Override
-        public void visit(MultiPoint multiPoint) {
-            for (Geometry part : multiPoint) {
-                Point pnt = (Point)part;
-                //TODO -- replace this with some equals2D() comparison
-                if (searchPoint.getX() == pnt.getX() && searchPoint.getY() == pnt.getY()) {
-                    mValue = pnt.getM();
-                }
-            }
-        }
-
-        @Override
-        public void visit(MultiPolygon multiPolygon) {
-            throw new IllegalArgumentException(INVALID_TYPE_MSG);
         }
 
         @Override
         public void visit(LinearRing linearRing) {
-            ((LineString) linearRing).accept(this);
+            visit((LineString) linearRing);
         }
 
         @Override

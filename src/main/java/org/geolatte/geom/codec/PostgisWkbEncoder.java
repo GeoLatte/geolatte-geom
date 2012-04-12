@@ -149,24 +149,6 @@ public class PostgisWkbEncoder {
         DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumGeometries());
-        for (Geometry part : geom) {
-            part.accept(this);
-        }
-    }
-
-    @Override
-    public void visit(MultiLineString multiLineString) {
-        visit((GeometryCollection) multiLineString);
-    }
-
-    @Override
-    public void visit(MultiPoint multiPoint) {
-        visit((GeometryCollection) multiPoint);
-    }
-
-    @Override
-    public void visit(MultiPolygon multiPolygon) {
-        visit((GeometryCollection) multiPolygon);
     }
 
     @Override
