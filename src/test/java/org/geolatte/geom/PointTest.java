@@ -172,6 +172,13 @@ public class PointTest {
         assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
     }
 
+    //TODO -- create a new unit test for these cases
+//        assertTrue(point3DM.equals(test3DM, DimensionalFlag.XY));
+//        assertTrue(point3DM.equals(test2D, DimensionalFlag.XY));
+//        assertTrue(point3DM.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84), DimensionalFlag.XYZ));
+//        assertFalse(point3DM.equals(Points.create(new double[]{2, 2, 3}, DimensionalFlag.XYZ, wgs84), DimensionalFlag.XYZ));
+
+
     @Test
     public void testEqualsAndHashCodeOnEmptyPoints(){
         Point empty1 = Points.createEmpty();

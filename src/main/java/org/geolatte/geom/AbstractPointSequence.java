@@ -80,18 +80,17 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     @Override
     public abstract PointSequence clone() ;
 
-    //TODO -- this can now be implemented much simpler now by a simple array copy
     @Override
     public void getCoordinates(double[] coordinates, int i) {
         if (coordinates.length < this.dimensionalFlag.getCoordinateDimension())
             throw new IllegalArgumentException(String.format("Coordinate array must be at least of getLength %d", this.dimensionalFlag.getCoordinateDimension()));
-        coordinates[dimensionalFlag.getIndex(CoordinateComponent.X)] = getX(i);
-        coordinates[dimensionalFlag.getIndex(CoordinateComponent.Y)] = getY(i);
+        coordinates[dimensionalFlag.X] = getX(i);
+        coordinates[dimensionalFlag.Y] = getY(i);
         if (is3D() ) {
-            coordinates[dimensionalFlag.getIndex(CoordinateComponent.Z)]  = getZ(i);
+            coordinates[dimensionalFlag.Z]  = getZ(i);
         }
         if (isMeasured()){
-            coordinates[dimensionalFlag.getIndex(CoordinateComponent.M)] = getM(i);
+            coordinates[dimensionalFlag.M] = getM(i);
         }
     }
 

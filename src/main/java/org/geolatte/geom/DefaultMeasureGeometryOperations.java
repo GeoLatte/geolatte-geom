@@ -26,6 +26,9 @@ package org.geolatte.geom;
  *         creation-date: 4/4/12
  */
 public class DefaultMeasureGeometryOperations implements MeasureGeometryOperations {
+
+    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.XY);
+
     @Override
     public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point) {
         if (geometry == null || point == null) throw new IllegalArgumentException("Parameters must not be NULL");
@@ -88,7 +91,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                     if (i > 0) {
                         length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
                     }
-                    coordinates[dimFlag.getIndex(CoordinateComponent.M)] = length;
+                    coordinates[dimFlag.M] = length;
                     builder.add(coordinates);
                     prevCoordinates[0] = coordinates[0]; prevCoordinates[1] = coordinates[1];
                 }
@@ -117,9 +120,10 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         double m(){
             return mValue;
         }
+
         @Override
         public void visit(Point point) {
-            if (searchPoint.getX() == point.getX() && searchPoint.getY() == point.getY()) {
+            if ( pntEq.equals(searchPoint, point)) {
                 mValue = point.getM();
             }
         }
