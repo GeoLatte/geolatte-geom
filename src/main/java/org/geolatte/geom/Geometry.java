@@ -34,6 +34,8 @@ import java.io.Serializable;
  */
 public abstract class Geometry implements Serializable {
 
+    private final static GeometryEquality geomEq = new GeometryPointEquality();
+
     private final CrsId crsId;
 
     private final GeometryOperations geometryOperations;
@@ -195,25 +197,9 @@ public abstract class Geometry implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Geometry.class.isAssignableFrom(o.getClass())) return false;
-        //empty geometries are always true
+
         Geometry otherGeometry = (Geometry) o;
-        if (isEmpty() && otherGeometry.isEmpty()) return true;
-
-        if (this.getGeometryType() != otherGeometry.getGeometryType()) return false;
-        if (!this.getCrsId().equals(otherGeometry.getCrsId())) return false;
-
-        if (this instanceof GeometryCollection) {
-            GeometryCollection thisGC = (GeometryCollection) this;
-            GeometryCollection otherGC = (GeometryCollection) otherGeometry;
-            if (thisGC.getNumGeometries() != otherGC.getNumGeometries()) return false;
-            for (int i = 0; i < thisGC.getNumGeometries(); i++) {
-                if (!thisGC.getGeometryN(i).equals(otherGC.getGeometryN(i))) return false;
-            }
-            return true;
-        } else {
-            if (this.getNumPoints() != otherGeometry.getNumPoints()) return false;
-            return (this.getPoints().equals(otherGeometry.getPoints()));
-        }
+        return geomEq.equals(this, otherGeometry);
     }
 
     @Override

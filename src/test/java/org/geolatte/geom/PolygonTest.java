@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -35,6 +37,12 @@ public class PolygonTest {
 
     PointSequence shellPoints = PointSequenceFactory.create(new double[]{0,0,10,0,10,10,0,10,0,0}, DimensionalFlag.XY);
     PointSequence innerPoints = PointSequenceFactory.create(new double[]{1,1,9,1,9,9,1,9,1,1}, DimensionalFlag.XY);
+
+    PointSequence shellPoints2 = PointSequenceFactory.create(new double[]{0,0,10,0,10,10,0,10,0,0}, DimensionalFlag.XY);
+    PointSequence innerPoints2 = PointSequenceFactory.create(new double[]{1,1,9,1,9,9,1,9,1,1}, DimensionalFlag.XY);
+
+    PointSequence shellPoints3 = PointSequenceFactory.create(new double[]{1,1,10,0,10,10,0,10,1,1}, DimensionalFlag.XY);
+
 
     @Test
     public void testEmptyRingsThrowIllegalArgumentException(){
@@ -50,6 +58,34 @@ public class PolygonTest {
             Polygon polygon = new Polygon(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
+    }
+
+    @Test
+    public void testPolygonEquality() {
+        LinearRing shell = new LinearRing(shellPoints, CrsId.UNDEFINED);
+        LinearRing inner = new LinearRing(innerPoints, CrsId.UNDEFINED);
+        Polygon polygon1 = new Polygon(new LinearRing[]{shell, inner});
+
+        shell = new LinearRing(shellPoints2, CrsId.UNDEFINED);
+        inner = new LinearRing(innerPoints2, CrsId.UNDEFINED);
+        Polygon polygon2 = new Polygon(new LinearRing[]{shell, inner});
+
+        shell = new LinearRing(shellPoints3, CrsId.UNDEFINED);
+        Polygon polygon3 = new Polygon(new LinearRing[]{shell, inner});
+
+
+        assertTrue(polygon1.equals(polygon1));
+        assertTrue(new GeometryPointEquality().equals(null, null));
+        assertFalse(polygon1.equals(null));
+
+        assertTrue(polygon1.equals(polygon2));
+        assertTrue(polygon2.equals(polygon1));
+
+        assertFalse(polygon1.equals(polygon3));
+        assertFalse(polygon3.equals(polygon1));
+
+        assertFalse(polygon1.equals(Points.create(1, 2)));
+
     }
 
 

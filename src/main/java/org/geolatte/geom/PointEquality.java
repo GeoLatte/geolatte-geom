@@ -22,6 +22,9 @@
 package org.geolatte.geom;
 
 /**
+ * A Test for <code>Point</code> equality.
+ *
+ * <p>Implementations must be thread-safe. </p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12

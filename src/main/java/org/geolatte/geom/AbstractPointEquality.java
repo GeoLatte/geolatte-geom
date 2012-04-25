@@ -37,6 +37,8 @@ abstract class AbstractPointEquality implements PointEquality {
         if (first == second) return true;   //Also if first and second are null?
                                             // Or should null arguments trigger IllegalArgumentException
         if ((first == null || second == null)) return false;
+        if (first.isEmpty() && second.isEmpty()) return true;
+        if (first.isEmpty() || second.isEmpty()) return false;
         if (!first.getCrsId().equals(second.getCrsId())) return false;
         if ( !equals(first.getX(), second.getX()) ) return false;
         if ( !equals(first.getY(), second.getY()) ) return false;

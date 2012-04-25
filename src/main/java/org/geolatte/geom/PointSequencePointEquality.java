@@ -49,6 +49,10 @@ public class PointSequencePointEquality implements PointSequenceEquality {
     public boolean equals(PointSequence first, PointSequence second) {
      
         if (first == second) return true;
+        if (first == null & second == null) return true;
+        if (first == null || second == null) return false;
+        if (first.isEmpty() && second.isEmpty()) return true;
+        if (first.isEmpty() || second.isEmpty()) return false;
         if (second == null || first == null) return false;
         if (first.size() != second.size()) return false;
 

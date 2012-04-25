@@ -24,6 +24,8 @@ package org.geolatte.geom;
 /**
  * A test for <code>PointSequence</code> equality.
  *
+ * <p>Implementations must be thread-safe.</p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12
  */
