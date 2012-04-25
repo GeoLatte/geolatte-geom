@@ -24,7 +24,6 @@ package org.geolatte.geom;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -38,7 +37,6 @@ public class TestJTSGeometryOperations {
     JTSGeometryOperations ops = new JTSGeometryOperations();
 
     //retrieve the test geometries from the TestDefaultMeasureGeometryOperations class
-    //TODO -- move the test measured geometries into a separate support class
     MeasuredTestCases tc = new MeasuredTestCases();
 
     @Test
@@ -401,11 +399,16 @@ public class TestJTSGeometryOperations {
 
     }
 
-    @Ignore // re-enable this unit test when we can test for approximate equality!
+
     @Test
     public void testLocateBetweenisNumericallyStable() {
         Geometry result = ops.createLocateBetweenOp(tc.caseD1D, 1d, 2d - 10 * Math.ulp(1.d)).execute();
-        assertEquals("Error in case d) for 1-Dim. geometry", Wkt.fromWkt("MULTILINESTRINGM((0.0 0.0 1.0 ,0.9999999999999978 0.9999999999999978 1.9999999999999978))"), result);
+        GeometryPointEquality geomEq = new GeometryPointEquality(
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, Math.ulp(10d)));
+        assertTrue("Error in case d) for 1-Dim. geometry",
+                geomEq.equals(
+                        Wkt.fromWkt("MULTILINESTRINGM((0.0 0.0 1.0 ,0.9999999999999978 0.9999999999999978 1.9999999999999978))"),
+                        result));
 
     }
 

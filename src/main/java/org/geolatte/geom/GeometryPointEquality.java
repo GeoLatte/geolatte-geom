@@ -97,7 +97,7 @@ public class GeometryPointEquality implements GeometryEquality {
     private boolean equals(GeometryCollection first, GeometryCollection second) {
         if (first.getNumGeometries() != second.getNumGeometries()) return false;
         for (int i = 0; i < first.getNumGeometries(); i++) {
-            if (! first.getGeometryN(i).equals(second.getGeometryN(i))) return false;
+            if (! equals(first.getGeometryN(i), second.getGeometryN(i))) return false;
         }
         return true;
     }

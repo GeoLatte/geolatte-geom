@@ -172,11 +172,15 @@ public class PointTest {
         assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
     }
 
-    //TODO -- create a new unit test for these cases
-//        assertTrue(point3DM.equals(test3DM, DimensionalFlag.XY));
-//        assertTrue(point3DM.equals(test2D, DimensionalFlag.XY));
-//        assertTrue(point3DM.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84), DimensionalFlag.XYZ));
-//        assertFalse(point3DM.equals(Points.create(new double[]{2, 2, 3}, DimensionalFlag.XYZ, wgs84), DimensionalFlag.XYZ));
+    @Test
+    public void testPointEquality() {
+        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactCoordinatePointEquality(DimensionalFlag.XY));
+        assertTrue(point3DM.equals(Points.create(1, 2, 3, 4, wgs84)));
+        assertTrue(eq2D.equals(point3DM, Points.create(1, 2, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create(2, 1, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create(1, 2, CrsId.UNDEFINED)));
+        assertFalse(point2D.equals(Points.createEmpty()));
+    }
 
 
     @Test
