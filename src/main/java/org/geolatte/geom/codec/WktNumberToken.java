@@ -27,7 +27,7 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-public class WktNumberToken implements WktToken {
+class WktNumberToken implements WktToken {
 
     private final double number;
 

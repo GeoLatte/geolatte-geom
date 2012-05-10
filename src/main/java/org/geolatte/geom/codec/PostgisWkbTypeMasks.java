@@ -27,7 +27,7 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/19/11
  */
-public class PostgisWkbTypeMasks {
+class PostgisWkbTypeMasks {
 
     /**
      * Mask for testing the presence of Z-coordinates in the WKB

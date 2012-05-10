@@ -31,6 +31,11 @@ package org.geolatte.geom;
  */
 public interface GeometryOperation<R> {
 
+    /**
+     * Executes the operation.
+     *
+     * @return the result of this operation
+     */
     public R execute();
 
 }

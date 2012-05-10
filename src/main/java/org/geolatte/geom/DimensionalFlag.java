@@ -53,13 +53,15 @@ public enum DimensionalFlag {
     XYZM(4, 2, 3);
 
     private final int dimension;
-    private final int zComponent;
-    private final int mComponent;
+    public final int X = 0;
+    public final int Y = 1;
+    public final int Z;
+    public final int M;
 
     private DimensionalFlag(int dimension, int zComponent, int mComponent) {
         this.dimension = dimension;
-        this.zComponent = zComponent;
-        this.mComponent = mComponent;
+        this.Z = zComponent;
+        this.M = mComponent;
     }
 
 
@@ -112,16 +114,16 @@ public enum DimensionalFlag {
      * @param component the compoment for which to return the position
      * @return
      */
-    public int getIndex(CoordinateComponent component) {
+    public int index(CoordinateComponent component) {
         switch (component) {
             case X:
                 return 0;
             case Y:
                 return 1;
             case Z:
-                return zComponent;
+                return Z;
             case M:
-                return mComponent;
+                return M;
         }
         return -1;
     }

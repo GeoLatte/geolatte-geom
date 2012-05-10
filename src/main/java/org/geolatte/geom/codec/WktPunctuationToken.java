@@ -28,7 +28,7 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/18/11
  */
-public class WktPunctuationToken implements WktToken {
+class WktPunctuationToken implements WktToken {
 
     private final char punctuationChar;
 

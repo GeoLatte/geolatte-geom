@@ -27,6 +27,12 @@ import java.util.List;
 /**
  * A projected <code>CoordinateReferenceSystem</code>.
  *
+ * <P>A projected coordinate reference system is a coordinate reference system derived
+ * from a two-dimensional geographic coordinate reference system by applying a map projection and
+ * using a Cartesian coordinate system. (see <a href="http://portal.opengeospatial.org/files/?artifact_id=39049">
+ OGC Abstract Specifications, Topic 2: Spatial Referencing By coordinates</a>, section 4 )
+</P>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
@@ -36,22 +42,50 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
     private final GeographicCoordinateReferenceSystem geoCRS;
     private final List<CrsParameter> parameters;
 
-
-    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS, Projection projection, List<CrsParameter> parameters, CoordinateSystemAxis... axes) {
+    /**
+     * Constructs a <code>ProjectedCoordinateReferenceSystem</code>.
+     *
+     *
+     * @param crsId      the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
+     * @param name       the commonly used name for this <code>CoordinateReferenceSystem</code>
+     * @param geoCRS     the <code>GeographicCoordinateReferenceSystem</code> for this projection
+     * @param projection the map projection method
+     * @param parameters the projection parameters for the projection method
+     * @param axes       the <code>CoordinateSystemAxis</code>es of the cartesian coordinate system for
+     *                   this <code>ProjectedCoordinateReferenceSystem</code>,
+     */
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
+                                              Projection projection, List<CrsParameter> parameters,
+                                              CoordinateSystemAxis... axes) {
         super(crsId, name, axes);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
     }
 
+    /**
+     * Returns the projection parameters
+     *
+     * @return a list of <code>CrsParameter</code>s.
+     */
     public List<CrsParameter> getParameters() {
         return Collections.unmodifiableList(parameters);
     }
 
+    /**
+     * Returns the base <code>GeographicCoordinateReferenceSystem</code> of this
+     * projected reference system.
+     *
+     * @return
+     */
     public GeographicCoordinateReferenceSystem getGeographicCoordinateSystem() {
         return geoCRS;
     }
 
+    /**
+     * Returns the map projection for this projected cooordinate system.
+     * @return
+     */
     public Projection getProjection() {
         return projection;
     }

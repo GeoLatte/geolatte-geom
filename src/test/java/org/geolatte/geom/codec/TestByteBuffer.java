@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.ByteOrder;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -98,7 +100,7 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBuffer.getInt());
     }
 
@@ -109,11 +111,11 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBuffer.getInt());
 
         ByteBuffer byteBufferFromArray = ByteBuffer.from(byteArray);
-        byteBufferFromArray.setWKBByteOrder(WkbByteOrder.XDR);
+        byteBufferFromArray.setWKBByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBufferFromArray.getInt());
     }
 
@@ -123,7 +125,7 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
+        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
         assertEquals(expectedValue, byteBuffer.getInt());
     }
 
@@ -161,10 +163,10 @@ public class TestByteBuffer {
     public void test_retrieve_byteorder() {
         String hxStr = "FFFFFFFF";
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
-        assertEquals(WkbByteOrder.XDR, byteBuffer.getWKBByteOrder());
-        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
-        assertEquals(WkbByteOrder.NDR, byteBuffer.getWKBByteOrder());
+        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
+        assertEquals(ByteOrder.XDR, byteBuffer.getWKBByteOrder());
+        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
+        assertEquals(ByteOrder.NDR, byteBuffer.getWKBByteOrder());
     }
 
     @Test
@@ -177,7 +179,7 @@ public class TestByteBuffer {
     public void test_put_xdr_double() {
         double expected = 1234.56789;
         ByteBuffer byteBuffer = ByteBuffer.allocate(8);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.XDR);
+        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
         byteBuffer.putDouble(expected);
         byteBuffer.rewind();
         double d = byteBuffer.getDouble();
@@ -188,7 +190,7 @@ public class TestByteBuffer {
     public void test_put_ndr_double() {
         double expected = 1234.56789;
         ByteBuffer byteBuffer = ByteBuffer.allocate(8);
-        byteBuffer.setWKBByteOrder(WkbByteOrder.NDR);
+        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
         byteBuffer.putDouble(expected);
         byteBuffer.rewind();
         double d = byteBuffer.getDouble();

@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Test;
@@ -34,6 +35,9 @@ import static org.junit.Assert.*;
 public class TestJTSGeometryOperations {
 
     JTSGeometryOperations ops = new JTSGeometryOperations();
+
+    //retrieve the test geometries from the TestDefaultMeasureGeometryOperations class
+    MeasuredTestCases tc = new MeasuredTestCases();
 
     @Test
     public void testCreateEnvelopeOp() {
@@ -57,6 +61,13 @@ public class TestJTSGeometryOperations {
         psBuilder.add(99, 103).add(102, 105).add(110, 92).add(109, 99);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         assertEquals(new Envelope(99, 92, 110, 105), ops.createEnvelopeOp(lineString).execute());
+    }
+
+    @Test
+    public void testCreateEnvelopeOpOnEmpty() {
+        LineString lineString = LineString.EMPTY;
+        assertEquals(new Envelope(Double.NaN, Double.NaN, Double.NaN, Double.NaN), ops.createEnvelopeOp(lineString).execute());
+        assertEquals(Envelope.EMPTY, ops.createEnvelopeOp(lineString).execute());
     }
 
     @Test
@@ -112,7 +123,7 @@ public class TestJTSGeometryOperations {
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
         psBuilder.add(0, 0).add(0, 4).add(4, 4).add(4, 0).add(0, 0);
-        Polygon polygon = new Polygon(psBuilder.toPointSequence(),null);
+        Polygon polygon = new Polygon(psBuilder.toPointSequence(), null);
         assertFalse(ops.createContainsOp(lineString, polygon).execute());
         assertTrue(ops.createContainsOp(polygon, lineString).execute());
     }
@@ -261,12 +272,144 @@ public class TestJTSGeometryOperations {
     }
 
     @Test
-    public void testWktOp(){
+    public void testWktOp() {
         PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
         builder.add(0, 0).add(6, 0).add(6, 6).add(0, 6).add(0, 0);
         Polygon pg1 = new Polygon(builder.toPointSequence(), null);
         String expected = "POLYGON((0 0,6 0,6 6,0 6,0 0))";
         assertEquals(expected, ops.createToWktOp(pg1).execute());
+    }
+
+    @Test
+    public void testLocateAlongOpOnEmptyLineStringReturnsEmptyGeometry() {
+        Geometry result = ops.createLocateAlongOp(tc.emptyLineString, 10d).execute();
+        assertTrue("Non-empty result on empty Geometry.", result.isEmpty());
+    }
+
+    @Test
+    public void testLocateAlongOpOnNullThrowsIllegalArgument() {
+        try {
+            Geometry result = ops.createLocateAlongOp(null, 10d).execute();
+            fail("No IllegalArgumentException thrown on NULL argument");
+        } catch (IllegalArgumentException e) {
+            //OK
+        }
+    }
+
+    @Test
+    public void testLocateBetweenOpOnNullThrowsIllegalArgument() {
+        try {
+            Geometry result = ops.createLocateBetweenOp(null, 10d, 12d).execute();
+            fail("No IllegalArgumentException thrown on NULL argument");
+        } catch (IllegalArgumentException e) {
+            //OK
+        }
+    }
+
+    @Test
+    public void testLocateBetweenOpOnEmptyLineStringReturnsEmptyGeometry() {
+        Geometry result = ops.createLocateBetweenOp(tc.emptyLineString, 10d, 12d).execute();
+        assertTrue("Non-empty result on empty Geometry.", result.isEmpty());
+    }
+
+    /**
+     * The next test method implements the test cases for 0-Dim. geometries
+     * listed in section 4.2.1.7.3 of the SQL/MM-Spatial Data spec.
+     */
+    @Test
+    public void testLocateAlongOn0DimensionalGeometries() {
+        Geometry result = ops.createLocateAlongOp(tc.caseD0A, 4d).execute();
+        assertEquals("Error in case a) for 0-Dim. geometry", tc.expectedForD0A, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD0B, 2d, 4d).execute();
+        assertEquals("Error in case b) for 0-Dim. geometry", tc.expectedForD0B, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD0C, 1d, 4d).execute();
+        assertEquals("Error in case c) for 0-Dim. geometry", tc.expectedForD0C, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD0D, 7d, 7d).execute();
+        assertEquals("Error in case d) for 0-Dim. geometry", tc.expectedForD0D, result);
+
+    }
+
+    /**
+     * The next test method implements the test cases for 0-Dim. geometries
+     * listed in section 4.2.1.7.4 of the SQL/MM-Spatial Data spec.
+     */
+    @Test
+    public void testLocateOn1DimensionalGeometriesSQLMMCompliant() {
+        Geometry result = ops.createLocateAlongOp(tc.caseD1A, 4d).execute();
+        assertEquals("Error in case a) for 1-Dim. geometry", tc.expectedForD1A, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1B, 2d, 4d).execute();
+        assertEquals("Error in case b) for 1-Dim. geometry", tc.expectedForD1B, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1B, 4d, 2d).execute();
+        assertEquals("Error in case b) for 1-Dim. geometry when start/end reversed", tc.expectedForD1B, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1C, 6d, 9d).execute();
+        assertEquals("Error in case c) for 1-Dim. geometry", tc.expectedForD1C, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1D, 1d, 2d).execute();
+        assertEquals("Error in case d) for 1-Dim. geometry", tc.expectedForD1D, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1E, 2d, 4d).execute();
+        assertEquals("Error in case e) for 1-Dim. geometry", tc.expectedForD1E, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1F, 1d, 3d).execute();
+        assertEquals("Error in case f) for 1-Dim. geometry", tc.expectedForD1F, result);
+
+        result = ops.createLocateBetweenOp(tc.caseD1G, 7d, 9d).execute();
+        assertEquals("Error in case g) for 1-Dim. geometry", tc.expectedForD1G, result);
+
+
+    }
+
+    @Test
+    public void testLocateOn1DimensionalGeometries() {
+        Geometry result = ops.createLocateBetweenOp(tc.caseLS1, 0.7d, 2.3d).execute();
+        assertEquals("Error in case 1-Dim. geometry with interpolation", tc.expectedForLS1, result);
+
+        result = ops.createLocateBetweenOp(tc.caseLS2, 0.7d, 2.5d).execute();
+        assertEquals("Error in case 1-Dim. geometry with interpolation on decreasing M", tc.expectedForLS2, result);
+
+        result = ops.createLocateBetweenOp(tc.caseLS3, -0.7d, -2.3d).execute();
+        assertEquals("Error in case 1-Dim. geometry with interpolation on decreasing M", tc.expectedForLS3, result);
+
+        result = ops.createLocateAlongOp(tc.caseLS1, 0.7d).execute();
+        assertEquals("Error in locateAlong on caseLS1", Wkt.fromWkt("MultipointM((0.7 0 0.7))"), result);
+
+        result = ops.createLocateAlongOp(tc.caseLS1, 1.0d).execute();
+        assertEquals("Error in locateAlong on caseLS1", Wkt.fromWkt("MultipointM((1 0 1))"), result);
+
+        result = ops.createLocateAlongOp(tc.caseLS1, 0.0d).execute();
+        assertEquals("Error in locateAlong on caseLS1", Wkt.fromWkt("MultipointM((0 0 0))"), result);
+
+
+        result = ops.createLocateAlongOp(tc.caseLS1, 4.0d).execute();
+        assertEquals("Error in locateAlong on caseLS1", Wkt.fromWkt("Point EMPTY"), result);
+
+        result = ops.createLocateBetweenOp(tc.caseLS4, 2.0d, 3.0d).execute();
+        assertEquals("Error in locateAlong on caseLS4", tc.expectedForLS4, result);
+
+        result = ops.createLocateBetweenOp(tc.caseLS5, 1.3d, 2.8d).execute();
+        assertEquals("Error in locateAlong on caseLS5", tc.expectedForLS5, result);
+
+        //TODO --add test cases for mixed type GeometryCollections as input for locateBetween/locateAlong
+
+    }
+
+
+    @Test
+    public void testLocateBetweenisNumericallyStable() {
+        Geometry result = ops.createLocateBetweenOp(tc.caseD1D, 1d, 2d - 10 * Math.ulp(1.d)).execute();
+        GeometryPointEquality geomEq = new GeometryPointEquality(
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, Math.ulp(10d)));
+        assertTrue("Error in case d) for 1-Dim. geometry",
+                geomEq.equals(
+                        Wkt.fromWkt("MULTILINESTRINGM((0.0 0.0 1.0 ,0.9999999999999978 0.9999999999999978 1.9999999999999978))"),
+                        result));
+
     }
 
 

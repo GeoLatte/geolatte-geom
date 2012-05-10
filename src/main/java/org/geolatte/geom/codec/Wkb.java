@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 
 /**
@@ -38,7 +40,7 @@ public class Wkb {
      * @return
      */
     public static ByteBuffer toWkb(Geometry geometry) {
-        return toWkb(geometry, WkbByteOrder.NDR);
+        return toWkb(geometry, ByteOrder.NDR);
     }
 
     /**
@@ -48,7 +50,7 @@ public class Wkb {
      * @param byteOrder
      * @return
      */
-    public static ByteBuffer toWkb(Geometry geometry, WkbByteOrder byteOrder) {
+    public static ByteBuffer toWkb(Geometry geometry, ByteOrder byteOrder) {
         PostgisWkbEncoder encoder = new PostgisWkbEncoder();
         return encoder.encode(geometry, byteOrder);
     }

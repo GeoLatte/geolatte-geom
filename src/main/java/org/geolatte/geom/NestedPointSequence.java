@@ -38,16 +38,16 @@ class NestedPointSequence extends AbstractPointSequence {
         this.size = calculateSize();
     }
 
-    private int calculateSize(){
+    private int calculateSize() {
         int size = 0;
-        for (PointSequence child : children()){
+        for (PointSequence child : children()) {
             size += child.size();
         }
         return size;
 
     }
 
-    private PointSequence[] children(){
+    private PointSequence[] children() {
         return this.children;
     }
 
@@ -57,13 +57,13 @@ class NestedPointSequence extends AbstractPointSequence {
         return this.children.length == 0;
     }
 
-    //TODO implement a custom getCoordinates(int, double[]) method;
+    //TODO implement a custom getCoordinates(int, double[]) method
 
     @Override
     public double getCoordinate(int index, CoordinateComponent component) {
-        int childOffset = index ;
-        for (PointSequence child : children()){
-            if (childOffset < child.size()){
+        int childOffset = index;
+        for (PointSequence child : children()) {
+            if (childOffset < child.size()) {
                 return child.getCoordinate(childOffset, component);
             } else {
                 childOffset -= child.size();
@@ -89,13 +89,16 @@ class NestedPointSequence extends AbstractPointSequence {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NestedPointSequence)) return false;
+        if (o == null || !(o instanceof PointSequence)) return false;
 
-        NestedPointSequence that = (NestedPointSequence) o;
+        PointSequence that = (PointSequence) o;
 
-        return Arrays.equals(children, that.children);
+        if (is3D() != that.is3D()) return false;
+        if (isMeasured() != that.isMeasured()) return false;
+        return new PointSequencePointEquality().equals(this, that);
+    }
 
-        }
+
 
     @Override
     public int hashCode() {
@@ -106,7 +109,7 @@ class NestedPointSequence extends AbstractPointSequence {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[");
-        for (int i = 0; i < children.length; i++){
+        for (int i = 0; i < children.length; i++) {
             if (i > 0) builder.append(",");
             builder.append(children()[i].toString());
         }

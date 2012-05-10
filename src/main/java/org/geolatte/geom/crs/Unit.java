@@ -27,6 +27,9 @@ package org.geolatte.geom.crs;
  */
 public class Unit extends CrsIdentifiable {
 
+    /**
+     * Type of <code>Unit</code>: Linear or Angular.
+     */
     public static enum Type {
         LINEAR,
         ANGULAR

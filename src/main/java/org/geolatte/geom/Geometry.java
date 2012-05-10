@@ -21,7 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.ByteBuffer;
 import org.geolatte.geom.crs.CrsId;
 
 import java.io.Serializable;
@@ -33,6 +32,8 @@ import java.io.Serializable;
  *
  */
 public abstract class Geometry implements Serializable {
+
+    private final static GeometryEquality geomEq = new GeometryPointEquality();
 
     private final CrsId crsId;
 
@@ -106,6 +107,15 @@ public abstract class Geometry implements Serializable {
      */
     public boolean is3D() {
         return getPoints().is3D();
+    }
+
+    /**
+     * Returns the <code>DimensionalFlag</code> of the Geometry
+     *
+     * @return the <code>DimensionalFlag</code> of its <code>PointSequence</code>
+     */
+    public DimensionalFlag getDimensionalFlag(){
+        return getPoints().getDimensionalFlag();
     }
 
     /**
@@ -186,25 +196,9 @@ public abstract class Geometry implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || !Geometry.class.isAssignableFrom(o.getClass())) return false;
-        //empty geometries are always true
+
         Geometry otherGeometry = (Geometry) o;
-        if (isEmpty() && otherGeometry.isEmpty()) return true;
-
-        if (this.getGeometryType() != otherGeometry.getGeometryType()) return false;
-        if (!this.getCrsId().equals(otherGeometry.getCrsId())) return false;
-
-        if (this instanceof GeometryCollection) {
-            GeometryCollection thisGC = (GeometryCollection) this;
-            GeometryCollection otherGC = (GeometryCollection) otherGeometry;
-            if (thisGC.getNumGeometries() != otherGC.getNumGeometries()) return false;
-            for (int i = 0; i < thisGC.getNumGeometries(); i++) {
-                if (!thisGC.getGeometryN(i).equals(otherGC.getGeometryN(i))) return false;
-            }
-            return true;
-        } else {
-            if (this.getNumPoints() != otherGeometry.getNumPoints()) return false;
-            return (this.getPoints().equals(otherGeometry.getPoints()));
-        }
+        return geomEq.equals(this, otherGeometry);
     }
 
     @Override
@@ -301,7 +295,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public Geometry locateBetween(double mStart, double mEnd) {
-        GeometryOperation<Geometry> operation = getGeometryOperations().createLocateBetween(this, mStart, mEnd);
+        GeometryOperation<Geometry> operation = getGeometryOperations().createLocateBetweenOp(this, mStart, mEnd);
         return operation.execute();
     }
 
@@ -351,14 +345,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder("SRID=")
-                .append(getSRID())
-                .append(";")
-                .append(getGeometryType());
-        if (isMeasured()) builder.append("M");
-        builder.append(getPoints());
-        return builder.toString();
-
+       return asText();
     }
 
     public abstract int getDimension();

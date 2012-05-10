@@ -57,8 +57,4 @@ public class MultiPoint extends GeometryCollection {
         return (Point)super.getGeometryN(num);
     }
 
-    @Override
-    public void accept(GeometryVisitor visitor) {
-        visitor.visit(this);
-    }
 }

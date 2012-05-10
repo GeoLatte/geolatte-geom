@@ -69,11 +69,11 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private void copy(Coordinate co, double[] ordinates, DimensionalFlag flag) {
-        ordinates[flag.getIndex(CoordinateComponent.X)] = co.x;
-        ordinates[flag.getIndex(CoordinateComponent.Y)] = co.y;
-        if (flag.is3D()) ordinates[flag.getIndex(CoordinateComponent.Z)] = co.z;
+        ordinates[flag.X] = co.x;
+        ordinates[flag.Y] = co.y;
+        if (flag.is3D()) ordinates[flag.Z] = co.z;
         if (flag.isMeasured()) {
-            ordinates[flag.getIndex(CoordinateComponent.M)] = (co instanceof DimensionalCoordinate) ?
+            ordinates[flag.M] = (co instanceof DimensionalCoordinate) ?
                    ((DimensionalCoordinate)co).m :
                     Double.NaN;
         }

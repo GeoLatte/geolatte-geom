@@ -27,7 +27,7 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-public class WktTextToken implements WktToken {
+class WktTextToken implements WktToken {
 
     private final String text;
 

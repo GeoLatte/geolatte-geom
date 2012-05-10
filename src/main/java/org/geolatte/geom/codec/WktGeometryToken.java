@@ -29,7 +29,7 @@ import org.geolatte.geom.GeometryType;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-public class WktGeometryToken extends WktKeywordToken {
+class WktGeometryToken extends WktKeywordToken {
     private final GeometryType geometryType;
     private final boolean isMeasured;
 
