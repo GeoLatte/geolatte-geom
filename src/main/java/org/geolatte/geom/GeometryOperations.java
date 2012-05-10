@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.ByteBuffer;
-
 /**
  * A factory for <code>GeometryOperation</code>s.
  *

@@ -32,7 +32,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-public class WktKeywordToken implements WktToken {
+class WktKeywordToken implements WktToken {
 
     private final Pattern pattern;
 

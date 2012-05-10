@@ -21,7 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.ByteBuffer;
 import org.geolatte.geom.crs.CrsId;
 
 import java.io.Serializable;

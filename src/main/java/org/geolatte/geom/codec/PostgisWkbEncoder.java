@@ -31,10 +31,10 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class PostgisWkbEncoder {
+class PostgisWkbEncoder {
 
 
-    public ByteBuffer encode(Geometry geom, WkbByteOrder wbo) {
+    public ByteBuffer encode(Geometry geom, ByteOrder wbo) {
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geom, true));
         if (wbo != null) {
             output.setWKBByteOrder(wbo);

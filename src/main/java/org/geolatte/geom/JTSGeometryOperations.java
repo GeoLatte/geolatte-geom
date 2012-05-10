@@ -29,7 +29,6 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import com.vividsolutions.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.vividsolutions.jts.operation.relate.RelateOp;
-import org.geolatte.geom.codec.ByteBuffer;
 import org.geolatte.geom.codec.Wkb;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CrsId;

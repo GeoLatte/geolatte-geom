@@ -31,7 +31,7 @@ package org.geolatte.geom.codec;
  *
  * @param <T> the type of the decoded WKT.
  */
-public abstract class AbstractWktDecoder<T> {
+abstract class AbstractWktDecoder<T> {
 
     protected WktToken currentToken;
     private WktTokenizer tokenizer;
@@ -50,8 +50,8 @@ public abstract class AbstractWktDecoder<T> {
     abstract public T decode(String wkt);
 
 
-    //TODO -- make the decode method concrete, and remove the need for setTokenizer(), e.g. by
-    //introducing a WktTokenizerFactory
+    //TODO -- make the decode method concrete, and remove the need for setTokenizer(), e.g. by introducing a WktTokenizerFactory
+    //TODO -- most of the logic of PostgisWktDecoder should be moved to this method.
 
     protected void setTokenizer(WktTokenizer tokenizer){
         this.tokenizer = tokenizer;

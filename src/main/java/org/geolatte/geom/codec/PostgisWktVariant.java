@@ -31,7 +31,7 @@ import java.util.*;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PostgisWktVariant extends WktVariant {
+class PostgisWktVariant extends WktVariant {
 
     private static final WktEmptyGeometryToken EMPTY = new WktEmptyGeometryToken();
 

@@ -31,7 +31,7 @@ import java.util.Set;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CrsWktVariant extends WktVariant {
+class CrsWktVariant extends WktVariant {
 
     public static final WktKeywordToken PROJCS = new WktKeywordToken("PROJCS");
     public static final WktKeywordToken PROJECTION = new WktKeywordToken("PROJECTION");

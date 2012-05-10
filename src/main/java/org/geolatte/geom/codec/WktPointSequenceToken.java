@@ -29,7 +29,7 @@ import org.geolatte.geom.PointSequence;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-public class WktPointSequenceToken implements WktToken {
+class WktPointSequenceToken implements WktToken {
 
     private final PointSequence points;
 
