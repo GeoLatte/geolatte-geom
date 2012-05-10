@@ -51,48 +51,55 @@ public class Vector {
         double t = Vector.dot(d, ymp0, true);
         double dd = Vector.dot(d, d);
         if (t <= 0) {
-            return new double[]{Vector.dot(ymp0,ymp0),t/dd};
+            return new double[]{Vector.dot(ymp0, ymp0), t / dd};
         }
-        if (t >= dd){
-            Point ymp1 = Vector.substract(y,p1);
-            return new double[]{Vector.dot(ymp1, ymp1), t/dd};
+        if (t >= dd) {
+            Point ymp1 = Vector.substract(y, p1);
+            return new double[]{Vector.dot(ymp1, ymp1), t / dd};
         }
-        return new double[]{Vector.dot(ymp0, ymp0) - (t*t/dd), t/dd};
+        return new double[]{Vector.dot(ymp0, ymp0) - (t * t / dd), t / dd};
     }
 
     /**
-     * Returns the dot-product of the specified <code>Point</code>s.
+     * Returns the dot-product of the specified <code>Point</code>s
      *
-     * <p>If both <code>Point</code>s are 3D, then the dot-product will be  </p>
-     * @param p0
-     * @param p1
-     * @return
+     * @param p0 first operand
+     * @param p1 second operand
+     * @return the dot-product of p0 and p1
      */
     public static double dot(Point p0, Point p1) {
         return dot(p0, p1, false);
     }
 
     /**
-     * Returns the dot-product of the specified <code>Point</code>s, but ignoring any Z-coordinate values.
+     * Returns the dot-product of the specified <code>Point</code>s
      *
-     * @param p0
-     * @param p1
-     * @param limit2D
-     * @return
+     * <p>If limit2D is set to true, Z-coordinates will be ignored so that the product is calculated in 2D.</p>
+     * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
+     *
+     * @param p0      first operand
+     * @param p1      second operand
+     * @param limit2D if true, the dot-product will be in 2D.
+     * @return the dot-product of p0 and p1.
      */
     public static double dot(Point p0, Point p1, boolean limit2D) {
-        if (limit2D || !p0.is3D() || !p1.is3D()){
-           return p0.getX()*p1.getX() + p0.getY()*p1.getY();
+        if (limit2D || !p0.is3D() || !p1.is3D()) {
+            return p0.getX() * p1.getX() + p0.getY() * p1.getY();
         } else {
-            return p0.getX()*p1.getX() + p0.getY()*p1.getY() + p0.getZ()*p1.getZ();
+            return p0.getX() * p1.getX() + p0.getY() * p1.getY() + p0.getZ() * p1.getZ();
         }
     }
 
     /**
-     *Adds two <code>Point</code>s.
+     * Adds two <code>Point</code>s.
      *
+     * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
+     *
+     * @param p0 first operand
+     * @param p1 second operand
+     * @returns the sum of p0 and p1.
      */
-    public static Point add(Point p0, Point p1){
+    public static Point add(Point p0, Point p1) {
         if (p0.is3D() && p1.is3D()) {
             return Points.create3D(p0.getX() + p1.getX(), p0.getY() + p1.getY(), p0.getZ() + p1.getZ());
         } else {
@@ -100,7 +107,16 @@ public class Vector {
         }
     }
 
-    public static Point substract(Point p0, Point p1){
+    /**
+     * Subtracts two <code>Point</code>s.
+     *
+     * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
+     *
+     * @param p0 first operand
+     * @param p1 second operand
+     * @returns the Point x = p0 - p1.
+     */
+    public static Point substract(Point p0, Point p1) {
         if (p0.is3D() && p1.is3D()) {
             return Points.create3D(p0.getX() - p1.getX(), p0.getY() - p1.getY(), p0.getZ() - p1.getZ());
         } else {

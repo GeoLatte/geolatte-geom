@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A set of operations on measured <code>Geometry</code>s.
+ * A set of operations on measured (2DM/3DM) <code>Geometry</code>s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/4/12
@@ -51,13 +51,5 @@ public interface MeasureGeometryOperations {
      */
     public GeometryOperation<Geometry> createMeasureOnLengthOp(Geometry geometry, boolean keepBeginMeasure);
 
-//    /**
-//     * Creates a <code>GeometryOperation</code> that checks whether the specified <code>Geometry</code>
-//     * coordinates increase or decrease monotonically.
-//     *
-//     * @param geometry the <code>Geometry</code> to check.
-//     * @return a <code>GeometryOperation</code> that returns true of the measures in-/decrease monotonically.
-//     */
-//    public GeometryOperation<Boolean> createCheckMonotoneOp(Geometry geometry);
 
 }

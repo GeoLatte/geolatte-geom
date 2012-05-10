@@ -22,6 +22,12 @@
 package org.geolatte.geom;
 
 /**
+ * Default implementation of {@link MeasureGeometryOperations}.
+ *
+ * <p>This implementation conforms to the SQL/MM and SFA 1.2.1 specifications. See
+ * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access -
+ * Part 1: common architecture</a>, sec. 6.1.2.6 </p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/4/12
  */
