@@ -58,23 +58,54 @@ public class CrsId {
         }
     }
 
+    /**
+     * Returns an instance having the specified authority and code.
+     *
+     * @param authority the authority that assigned the code
+     * @param code the code for the <code>CoordinateReferenceSystem</code>
+     * @return a <code>CrsId</code> for the specified authority and code.
+     */
     public static CrsId valueOf(String authority, int code) {
         return new CrsId(authority, code);
     }
 
+    /**
+     * Returns a <code>CrsId</code> with the specified code and the
+     * EPSG as authority.
+     *
+     * @param code the code for the <code>CrsId</code>.
+     * @return a <code>CrsId</code> for the specified code,and EPSG as authority.
+     */
     public static CrsId valueOf(int code) {
         return new CrsId(CrsId.DEFAULT_AUTHORITY, code);
     }
 
+    /**
+     * Creates an instance having the specified authority and code.
+     *
+     * @param authority the authority that assigned the code
+     * @param code the code for the <code>CoordinateReferenceSystem</code>
+     * @return a <code>CrsId</code> for the specified authority and code.
+     */
     public CrsId(String authority, int code) {
         this.authority = authority;
         this.code = code;
     }
 
+    /**
+     * Returns the authority for this <code>CrsId</code>.
+     *
+     * @return a String representing the authority for this <code>CrsId</code>
+     */
     public String getAuthority() {
         return authority;
     }
 
+    /**
+     * Returns the code for this <code>CrsId</code>.
+     *
+     * @return the numeric code for this <code>CrsId</code>
+     */
     public int getCode() {
         return code;
     }

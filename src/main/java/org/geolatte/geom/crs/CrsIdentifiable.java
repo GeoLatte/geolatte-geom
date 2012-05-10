@@ -23,14 +23,11 @@ package org.geolatte.geom.crs;
 
 /**
  * Abstract base class for classes the are identified by a <code>CrsId</code> (e.g. by EPSG-code).
- *
- * <h2>Note on identity of <code>CrsIdentifiable</code>s:</h2>
+ * <p/>
+ * <h3>Warning: identity of <code>CrsIdentifiable</code>s:</h3>
  * <p>In theory the <code>CrsId</code> should identify uniquely the CoordinateReferenceSystem-related objects
- * (whether CRS, datum, projection, etc.). In practice this is often not the case. Two cases stand out. </p>
- * <ul>
- *  <li>users can add their own definitions on some type (e.g. <code>Projection</code>s, <code>Ellipsoid</code>s.</li>
- *  <li>some objects have multiple, inconsistent definitions, notably the "Google" projection system and the WGS-84 GeoGCS.</li>
- * </ul>
+ * (whether CRS, datum, projection, etc.). In practice this is not always the case. Users, for example, can add their own
+ * definitions of some type (<code>Projection</code>s or <code>Ellipsoid</code>s).
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/21/11
