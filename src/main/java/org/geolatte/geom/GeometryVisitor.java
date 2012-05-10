@@ -24,6 +24,7 @@ package org.geolatte.geom;
 /**
  * A visitor for <code>Geometry</code>s.
  *
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/22/11
  */
@@ -52,31 +53,14 @@ public interface GeometryVisitor {
     /**
      * Visits a <code>GeometryCollection</code>.
      *
+     * <p>The collection will pass the visitor to it
+     * constituent parts. </p>
+     *
      * @param collection
      */
     public void visit(GeometryCollection collection);
 
-    /**
-     * Visits a <code>MultLineString</code>.
-     *
-     * @param multiLineString
-     */
-    public void visit(MultiLineString multiLineString);
-
-    /**
-     * Visists a <code>MultiPoint</code>.
-     *
-     * @param multiPoint
-     */
-    public void visit(MultiPoint multiPoint);
-
-    /**
-     * Visits a <code>MultiPolygon</code>.
-     *
-     * @param multiPolygon
-     */
-    public void visit(MultiPolygon multiPolygon);
-
+    //TODO is this necessary? Does not visit(LineString) suffice?
     /**
      * Visits a <code>LinearRing</code>.
      *

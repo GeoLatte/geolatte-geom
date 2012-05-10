@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
 
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();

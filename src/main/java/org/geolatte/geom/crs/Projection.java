@@ -22,7 +22,7 @@
 package org.geolatte.geom.crs;
 
 /**
- * A projection from geographic coordinates to projected coordinates.
+ * A projection from geographic coordinates to projected coordinates in a Cartesian plan.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11

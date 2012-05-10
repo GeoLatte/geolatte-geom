@@ -68,8 +68,4 @@ public class MultiLineString extends GeometryCollection {
         return GeometryType.MULTI_LINE_STRING;
     }
 
-    @Override
-    public void accept(GeometryVisitor visitor) {
-        visitor.visit(this);
-    }
 }

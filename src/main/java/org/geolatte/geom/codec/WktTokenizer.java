@@ -33,7 +33,7 @@ import org.geolatte.geom.PointSequenceBuilders;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class WktTokenizer {
+class WktTokenizer {
 
     private final CharSequence wkt;
     private final WktVariant variant;

@@ -34,7 +34,7 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class PostgisWkbDecoder {
+class PostgisWkbDecoder {
 
     private CrsId crsId = CrsId.UNDEFINED;
 
@@ -183,7 +183,7 @@ public class PostgisWkbDecoder {
 
     private void alignByteOrder(ByteBuffer byteBuffer) {
         byte orderByte = byteBuffer.get();
-        WkbByteOrder byteOrder = WkbByteOrder.valueOf(orderByte);
+        ByteOrder byteOrder = ByteOrder.valueOf(orderByte);
         byteBuffer.setWKBByteOrder(byteOrder);
     }
 

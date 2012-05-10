@@ -137,7 +137,7 @@ public class MultiLineStringTest {
 
         @Override
         public void visit(LineString lineString) {
-            //To change body of implemented methods use File | Settings | File Templates.
+            length += lineString.getLength();
         }
 
         @Override
@@ -147,22 +147,6 @@ public class MultiLineStringTest {
 
         @Override
         public void visit(GeometryCollection collection) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        public void visit(MultiLineString multiLineString) {
-                for(Geometry g : multiLineString){
-                    length += ((LineString)g).getLength();
-                }
-            }
-
-        @Override
-        public void visit(MultiPoint multiPoint) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(MultiPolygon multiPolygon) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

@@ -401,6 +401,17 @@ public class PackedPointSequenceTest {
 
     }
 
+
+    //TODO -- correct unit tests
+//    @Test
+//    public void testEqualsDimensionallyLimited(){
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, -1,2, -2}, DimensionalFlag.XY), DimensionalFlag.XY));
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYZ), DimensionalFlag.XY));
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 1, -1, 2, 2, -2, 3}, DimensionalFlag.XYZ), DimensionalFlag.XY));
+//        assertFalse(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 2, -1, 2, 2, -2, 3}, DimensionalFlag.XYZ), DimensionalFlag.XY));
+//    }
+
+
     @Test
     public void testClone() {
         Assert.assertEquals(testSeq2D, testSeq2D.clone());

@@ -30,15 +30,16 @@ class PackedPointSequence extends AbstractPointSequence {
 
     private final double[] coordinates;
 
-    PackedPointSequence(double[] coordinates, DimensionalFlag dimensionalFlag){
+
+    PackedPointSequence(double[] coordinates, DimensionalFlag dimensionalFlag) {
         super(dimensionalFlag);
         if (coordinates == null) {
             this.coordinates = new double[0];
         } else {
             this.coordinates = coordinates;
         }
-        if ( (this.coordinates.length % getCoordinateDimension()) != 0 )
-                throw new IllegalArgumentException(String.format("coordinate array size should be a multiple of %d. Current size = %d", getCoordinateDimension(), this.coordinates.length));
+        if ((this.coordinates.length % getCoordinateDimension()) != 0)
+            throw new IllegalArgumentException(String.format("coordinate array size should be a multiple of %d. Current size = %d", getCoordinateDimension(), this.coordinates.length));
     }
 
     @Override
@@ -50,35 +51,36 @@ class PackedPointSequence extends AbstractPointSequence {
     @Override
     public double getCoordinate(int i, CoordinateComponent component) {
         try {
-            int index = getDimensionalFlag().getIndex(component);
+            int index = getDimensionalFlag().index(component);
             return index > -1 ? this.coordinates[i * getCoordinateDimension() + index] : Double.NaN;
-        }catch(IndexOutOfBoundsException e){
-            throw new IndexOutOfBoundsException(String.format("Index %d out of getPointSequenceElementAt 0..%d", i, size()-1));
+        } catch (IndexOutOfBoundsException e) {
+            throw new IndexOutOfBoundsException(String.format("Index %d out of getPointSequenceElementAt 0..%d", i, size() - 1));
         }
     }
 
     @Override
     public int size() {
-        return this.coordinates.length/getCoordinateDimension();
+        return this.coordinates.length / getCoordinateDimension();
     }
 
     @Override
-    public PointSequence clone(){
+    public PointSequence clone() {
         return this; //this is valid since a PackedPointSequence is immutable.
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || !(o instanceof PackedPointSequence)) return false;
+        if (o == null || !(o instanceof PointSequence)) return false;
 
-        PackedPointSequence that = (PackedPointSequence) o;
+        PointSequence that = (PointSequence) o;
 
         if (is3D() != that.is3D()) return false;
         if (isMeasured() != that.isMeasured()) return false;
-        return Arrays.equals(coordinates, that.coordinates);
+        return new PointSequencePointEquality().equals(this, that);
+    }
 
-        }
+
 
     @Override
     public int hashCode() {
@@ -89,21 +91,22 @@ class PackedPointSequence extends AbstractPointSequence {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder builder = new StringBuilder("[");
-        for (int i = 0; i < size();i++){
+        for (int i = 0; i < size(); i++) {
             if (i > 0) builder.append(",");
-            addCoordinate(i,builder);
+            addCoordinate(i, builder);
         }
         builder.append("]");
         return builder.toString();
     }
 
-    private void addCoordinate(int index, StringBuilder builder){
-        builder.append(getOrdinate(index,0)).append(" ")
-            .append(getOrdinate(index,1)).append(" ");
-        if(is3D()) builder.append(getOrdinate(index, 2)).append(" ");
-        if(isMeasured()) builder.append(getOrdinate(index, 3)).append(" ");
+    private void addCoordinate(int index, StringBuilder builder) {
+        builder.append(getOrdinate(index, 0)).append(" ")
+                .append(getOrdinate(index, 1)).append(" ");
+        if (is3D()) builder.append(getOrdinate(index, 2)).append(" ");
+        if (isMeasured()) builder.append(getOrdinate(index, 3)).append(" ");
     }
+
 
 }

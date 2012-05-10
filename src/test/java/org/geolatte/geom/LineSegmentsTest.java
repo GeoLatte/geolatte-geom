@@ -42,8 +42,8 @@ public class LineSegmentsTest {
         int cnt = 0;
         double startX = 1.0d;
         for (LineSegment ls : new LineSegments(sequence)) {
-            assertEquals(startX, ls.getStartX(), Math.ulp(1.0d));
-            startX = ls.getEndX();
+            assertEquals(startX, ls.getStartPoint().getX(), Math.ulp(1.0d));
+            startX = ls.getEndPoint().getX();
             cnt++;
         }
         assertEquals(2, cnt);

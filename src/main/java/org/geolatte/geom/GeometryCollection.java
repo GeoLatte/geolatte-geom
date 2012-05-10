@@ -96,8 +96,17 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
         };
     }
 
+    /**
+     * Accepts the <code>GeometryVisitor</code>, and
+     * will pass it to it's constituent <code>Geometries</code>.
+     *
+     * @param visitor
+     */
     @Override
     public void accept(GeometryVisitor visitor) {
         visitor.visit(this);
+        for (Geometry part : this) {
+            part.accept(visitor);
+        }
     }
 }

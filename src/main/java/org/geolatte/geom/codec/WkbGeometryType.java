@@ -29,7 +29,7 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/19/11
  */
-public enum WkbGeometryType {
+enum WkbGeometryType {
 
 
     POINT(1, Point.class),

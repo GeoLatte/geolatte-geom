@@ -19,11 +19,10 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
-import java.nio.ByteOrder;
 
 /**
  * A byte buffer class.
@@ -51,7 +50,11 @@ public class ByteBuffer {
      */
     public static final int DOUBLE_SIZE = 8;
 
-    static final long UINT_MAX_VALUE = 4294967295L;
+    /**
+     * Max. permissible value for an unsigned int.
+     */
+    public static final long UINT_MAX_VALUE = 4294967295L;
+
     final private java.nio.ByteBuffer buffer;
 
     private ByteBuffer(java.nio.ByteBuffer buffer) {
@@ -165,10 +168,11 @@ public class ByteBuffer {
     }
 
     /**
-     * Returns the limit of the <code>ByteBuffer</code> .
+     * Returns the limit of the <code>ByteBuffer</code>.
+     *
      * @return
      */
-    protected int limit() {
+    public int limit() {
         return this.buffer.limit();
     }
 
@@ -195,7 +199,7 @@ public class ByteBuffer {
      *
      * @param wbo
      */
-    public void setWKBByteOrder(WkbByteOrder wbo) {
+    public void setWKBByteOrder(ByteOrder wbo) {
         this.buffer.order(wbo.getByteOrder());
     }
 
@@ -253,6 +257,7 @@ public class ByteBuffer {
 
     /**
      * Returns the next 4 bytes as a float, taking into account the byte-order.
+     *
      * @return
      */
     public float getFloat() {
@@ -265,6 +270,7 @@ public class ByteBuffer {
 
     /**
      * Appends the specified float-value as 4 bytes to this instance, respecting the byte-order.
+     *
      * @param value
      */
     public void putFloat(float value) {
@@ -277,6 +283,7 @@ public class ByteBuffer {
 
      /**
      * Returns the next 8 bytes as a double, taking into account the byte-order.
+      *
      * @return
      */
     public double getDouble() {
@@ -289,6 +296,7 @@ public class ByteBuffer {
 
     /**
      * Appends the specified double-value as 8 bytes to this instance, respecting the byte-order.
+     *
      * @param value
      */
     public void putDouble(Double value) {
@@ -333,21 +341,27 @@ public class ByteBuffer {
      *
      * @return
      */
-    public WkbByteOrder getWKBByteOrder() {
-        ByteOrder order = this.buffer.order();
-        return WkbByteOrder.valueOf(order);
+    public ByteOrder getWKBByteOrder() {
+        java.nio.ByteOrder order = this.buffer.order();
+        return ByteOrder.valueOf(order);
     }
 
     /**
      * Returns this instance as a byte array.
+     *
      * @return
      */
     public byte[] toByteArray(){
         return this.buffer.array();
     }
 
-    //This is used for testing purposes
-    protected boolean hasSameContent(ByteBuffer other) {
+    /**
+     * Used for testing purposes.
+     *
+     * @param other another <code>ByteBuffer</code>
+     * @return true if both buffers contain the same bytes, false otherwise
+     */
+    public boolean hasSameContent(ByteBuffer other) {
         if (other == null) return false;
         if (other.isEmpty() != this.isEmpty()) return false;
         if (this.limit() != other.limit()) return false;

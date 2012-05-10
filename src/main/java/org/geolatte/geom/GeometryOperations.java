@@ -21,13 +21,15 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.codec.ByteBuffer;
-
 /**
  * A factory for <code>GeometryOperation</code>s.
  *
+ * <p>The semantics of the operations is as specified in
+ * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access - Part 1: common architecture</a>
+ * </p>
+ *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 5/3/11
+ *
  */
 public interface GeometryOperations {
 
@@ -51,7 +53,7 @@ public interface GeometryOperations {
 
     GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue);
 
-    GeometryOperation<Geometry> createLocateBetween(final Geometry geometry, final double mStart, final double mEnd);
+    GeometryOperation<Geometry> createLocateBetweenOp(final Geometry geometry, final double startMeasure, final double endMeasure);
 
     GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other);
 

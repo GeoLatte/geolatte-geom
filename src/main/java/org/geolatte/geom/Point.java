@@ -87,20 +87,6 @@ public class Point extends Geometry {
     }
 
     @Override
-    public String toString(){
-        StringBuilder stbuf = new StringBuilder("SRID=").append(getSRID()).append(",");
-        stbuf.append(getX()).append(",").append(getY());
-        if (is3D()) {
-            stbuf.append(", Z=").append(getZ());
-        }
-        if (isMeasured()){
-            stbuf.append(", M=").append(getM());
-        }
-        return stbuf.toString();
-
-    }
-
-    @Override
     public void accept(GeometryVisitor visitor) {
         visitor.visit(this);
     }

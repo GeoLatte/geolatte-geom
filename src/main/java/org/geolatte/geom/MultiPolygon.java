@@ -72,9 +72,4 @@ public class MultiPolygon extends GeometryCollection {
         return GeometryType.MULTI_POLYGON;
     }
 
-    @Override
-    public void accept(GeometryVisitor visitor) {
-        visitor.visit(this);
-    }
-
 }

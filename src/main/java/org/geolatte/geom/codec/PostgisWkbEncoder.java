@@ -31,10 +31,10 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class PostgisWkbEncoder {
+class PostgisWkbEncoder {
 
 
-    public ByteBuffer encode(Geometry geom, WkbByteOrder wbo) {
+    public ByteBuffer encode(Geometry geom, ByteOrder wbo) {
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geom, true));
         if (wbo != null) {
             output.setWKBByteOrder(wbo);
@@ -149,24 +149,6 @@ public class PostgisWkbEncoder {
         DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
         writeTypeCodeAndSRID(geom, dimension, output);
         output.putUInt(geom.getNumGeometries());
-        for (Geometry part : geom) {
-            part.accept(this);
-        }
-    }
-
-    @Override
-    public void visit(MultiLineString multiLineString) {
-        visit((GeometryCollection) multiLineString);
-    }
-
-    @Override
-    public void visit(MultiPoint multiPoint) {
-        visit((GeometryCollection) multiPoint);
-    }
-
-    @Override
-    public void visit(MultiPolygon multiPolygon) {
-        visit((GeometryCollection) multiPolygon);
     }
 
     @Override

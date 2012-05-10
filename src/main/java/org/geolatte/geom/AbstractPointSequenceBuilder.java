@@ -73,5 +73,24 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
         return this;
     }
 
+    @Override
+    public PointSequenceBuilder add(Point point) {
+        if (point.is3D() != dimensionalFlag.is3D() || point.isMeasured() != dimensionalFlag.isMeasured()) {
+             throw new IllegalStateException("Attempting to add Point to pointsequence with inconsistent DimensionalFlag");
+        }
+        double[] coords = getPointCoordinates(point);
+        for (int i = 0; i < coords.length; i++) {
+            add(coords[i]);
+        }
+        return this;
+    }
+
+    private double[] getPointCoordinates(Point point) {
+        PointSequence points = point.getPoints();
+        double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
+        points.getCoordinates(coords, 0);
+        return coords;
+    }
+
     protected abstract void add(double val);
 }

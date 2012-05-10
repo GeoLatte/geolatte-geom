@@ -34,7 +34,7 @@ import java.util.Locale;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PostgisWktEncoder {
+class PostgisWktEncoder {
 
     private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
 
