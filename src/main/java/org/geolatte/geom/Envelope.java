@@ -182,7 +182,7 @@ public class Envelope {
         if (!(o instanceof Envelope)) return false;
         Envelope that = (Envelope) o;
         if (this.isEmpty() && that.isEmpty()) return true;
-        if (this.getCrsId() != that.getCrsId()) return false;
+        if (!this.getCrsId().equals(that.getCrsId()) ) return false;
         if (Double.compare(that.maxX, maxX) != 0) return false;
         if (Double.compare(that.maxY, maxY) != 0) return false;
         if (Double.compare(that.minX, minX) != 0) return false;
