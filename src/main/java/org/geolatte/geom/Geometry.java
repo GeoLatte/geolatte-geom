@@ -346,14 +346,7 @@ public abstract class Geometry implements Serializable {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder("SRID=")
-                .append(getSRID())
-                .append(";")
-                .append(getGeometryType());
-        if (isMeasured()) builder.append("M");
-        builder.append(getPoints());
-        return builder.toString();
-
+       return asText();
     }
 
     public abstract int getDimension();
