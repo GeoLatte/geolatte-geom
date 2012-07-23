@@ -35,6 +35,9 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.XY);
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point) {
         if (geometry == null || point == null) throw new IllegalArgumentException("Parameters must not be NULL");
@@ -50,6 +53,9 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         };
     }
 
+     /**
+     * @inheritDoc
+     */
     @Override
     public GeometryOperation<Geometry> createMeasureOnLengthOp(final Geometry geometry, final boolean keepBeginMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
@@ -114,8 +120,6 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         final Point searchPoint;
         final double tolerance;
         double mValue = Double.NaN;
-
-
 
         InterpolatingVisitor(Point pnt, double tolerance){
             if (pnt == null) throw new IllegalArgumentException("Null point is not allowed.");

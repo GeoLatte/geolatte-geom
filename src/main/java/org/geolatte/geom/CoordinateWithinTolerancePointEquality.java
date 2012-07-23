@@ -32,11 +32,19 @@ public class CoordinateWithinTolerancePointEquality extends AbstractPointEqualit
 
     private final double tolerance;
 
+    /**
+     * Constructs an instance
+     * @param dimensionalFlag specifies the dimensions that will be considered in the equality check
+     * @param tolerance the tolerance within which coordinates are considered equal
+     */
     public CoordinateWithinTolerancePointEquality(DimensionalFlag dimensionalFlag, double tolerance) {
         super(dimensionalFlag);
         this.tolerance = tolerance;
     }
 
+     /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean equals(double co1, double co2) {
         return Math.abs(co1-co2) <= tolerance;

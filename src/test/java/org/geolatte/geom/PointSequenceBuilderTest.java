@@ -38,7 +38,7 @@ public class PointSequenceBuilderTest {
         try {
             builder.add(1.0, 1.0, 1.0);
             fail("Adding 3D point to 2D PointSequence should throw IllegalStateException");
-        }catch(IllegalStateException e){
+        }catch(IllegalArgumentException e){
         }
 
     }
@@ -51,14 +51,14 @@ public class PointSequenceBuilderTest {
         try {
             builder.add(1.0, 1.0);
             fail("Adding 2D point to 3D PointSequence should throw IllegalStateException");
-        }catch(IllegalStateException e){
+        }catch(IllegalArgumentException e){
         }
         builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYM);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);
             fail("Adding 2D point to 3D PointSequence should throw IllegalStateException");
-        }catch(IllegalStateException e){
+        }catch(IllegalArgumentException e){
         }
 
     }

@@ -31,11 +31,18 @@ package org.geolatte.geom;
  */
 public class ExactCoordinatePointEquality extends AbstractPointEquality {
 
-
+    /**
+     * Creates an instance that takes only the coordinates into account specified in the dimensionalFlag.
+     *
+     * @param dimensionalFlag specifies the dimensions that are considered in the equality test
+     */
     public ExactCoordinatePointEquality(DimensionalFlag dimensionalFlag) {
         super(dimensionalFlag);
     }
 
+    /**
+     * Creates an instance that takes all coordinate values into account.
+     */
     public ExactCoordinatePointEquality(){
         super(DimensionalFlag.XYZM);
     }

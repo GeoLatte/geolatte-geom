@@ -27,6 +27,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
+ * An <code>Iterator</code> over the <code>Point</code>s of a <code>PointSequence</code>.
+ *
+ * <p>This implementation does not support the remove operation.</p>
+ * <p>This implementation is not thread-safe.</p>
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PointSequenceIterator implements Iterator<Point> {
@@ -61,6 +66,11 @@ public class PointSequenceIterator implements Iterator<Point> {
         return new PackedPointSequence(coordinates, sequence.getDimensionalFlag());
     }
 
+    /**
+     * Not supported.
+     *
+     * @throws UnsupportedOperationException when invoked.
+     */
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Remove method not supported on " + getClass().getName());

@@ -60,8 +60,8 @@ class NestedPointSequence extends AbstractPointSequence {
     //TODO implement a custom getCoordinates(int, double[]) method
 
     @Override
-    public double getCoordinate(int index, CoordinateComponent component) {
-        int childOffset = index;
+    public double getCoordinate(int position, CoordinateComponent component) {
+        int childOffset = position;
         for (PointSequence child : children()) {
             if (childOffset < child.size()) {
                 return child.getCoordinate(childOffset, component);
@@ -69,7 +69,7 @@ class NestedPointSequence extends AbstractPointSequence {
                 childOffset -= child.size();
             }
         }
-        throw new ArrayIndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", index, size()));
+        throw new ArrayIndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", position, size()));
     }
 
     @Override

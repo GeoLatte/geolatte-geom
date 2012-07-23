@@ -22,7 +22,10 @@
 package org.geolatte.geom;
 
 /**
- * An operation that can be executed on <code>Geometry</code>.
+ * An operation that can be executed on a <code>Geometry</code>.
+ *
+ * <p>The <code>GeometryOperation</code> interface makes it easy to use the Strategy Pattern and implement different
+ * algorithms for certain geometric or topological operations. </p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11

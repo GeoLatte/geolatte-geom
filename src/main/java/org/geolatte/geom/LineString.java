@@ -24,35 +24,58 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CrsId;
 
 /**
+ * A LineString is a 1-dimensional <code>Geometry</code> consisting of the <code>LineSegment</code>s defined by
+ * consecutive pairs of <code>Point</code>s of a <code>PointSequence</code>.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class LineString extends Geometry {
 
-    public static final LineString EMPTY =  new LineString(null, CrsId.UNDEFINED, null);
+    static final LineString EMPTY = new LineString(null, CrsId.UNDEFINED, null);
 
     private final PointSequence points;
 
+    /**
+     * Constructs an empty <code>LineString</code>.
+     *
+     * @return
+     */
     public static LineString createEmpty() {
         return EMPTY;
     }
 
     /**
      * This constructor has been added to speed up object creation of LinearRings
+     *
      * @param base
      */
-    protected LineString(LineString base){
+    protected LineString(LineString base) {
         super(base.getCrsId(), base.getGeometryOperations());
         this.points = base.points;
     }
 
+    /**
+     * Constructs a <code>LineString</code> from the specified <code>PointSequence</code>, coordinate reference system
+     * and <code>GeometryOperations</code> implementation.
+     *
+     * @param points             the <code>PointSequence</code>
+     * @param crsId              the <code>CrsId</code> for the coordinate reference system
+     * @param geometryOperations the <code>GeometryOperations</code> implementation.
+     */
     public LineString(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
         super(crsId, geometryOperations);
-        if (points == null){
+        if (points == null) {
             points = EmptyPointSequence.INSTANCE;
         }
         this.points = points;
     }
 
+    /**
+     * Constructs a <code>LineString</code> from the specified <code>PointSequence</code> and coordinate reference system
+     *
+     * @param points the <code>PointSequence</code>
+     * @param crsId  the <code>CrsId</code> for the coordinate reference system
+     */
     public LineString(PointSequence points, CrsId crsId) {
         this(points, crsId, null);
     }
@@ -67,11 +90,16 @@ public class LineString extends Geometry {
         return points;
     }
 
+    /**
+     * Returns the length of this <code>LineString</code> in its coordinate reference system.
+     *
+     * @return the length of this <code>LineString</code> in its coordinate reference system.
+     */
     public double getLength() {
         double length = 0d;
         Point prev = null;
-        for(Point pnt : getPoints()){
-            if (prev == null){
+        for (Point pnt : getPoints()) {
+            if (prev == null) {
                 prev = pnt;
                 continue;
             }
@@ -81,24 +109,44 @@ public class LineString extends Geometry {
         return length;
     }
 
+
+    /**
+     * Returns the first <code>Point</code> of this <code>LineString</code>.
+     *
+     * @return the first <code>Point</code> of this <code>LineString</code>.
+     */
     public Point getStartPoint() {
-        return isEmpty()?
+        return isEmpty() ?
                 Points.createEmpty() :
                 getPointN(0);
     }
 
 
+    /**
+     * Returns the last <code>Point</code> of this <code>LineString</code>.
+     *
+     * @return the last <code>Point</code> of this <code>LineString</code>.
+     */
     public Point getEndPoint() {
-        return isEmpty()?
+        return isEmpty() ?
                 Points.createEmpty() :
                 getPointN(getNumPoints() - 1);
     }
 
+    /**
+     * Checks whether this <code>LineString</code> is closed, i.e. the first <code>Point</code> equals the last.
+     *
+     * @return true if this <code>LineString</code> is closed.
+     */
     public boolean isClosed() {
         return !isEmpty() && getStartPoint().equals(getEndPoint());
     }
 
-
+    /**
+     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple.
+     *
+     * @return true if this <code>LineString</code> is a ring.
+     */
     public boolean isRing() {
         return isEmpty() ? false : isClosed() && isSimple();
     }
