@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.jts.JTS;
 
 /**
+ * A <code>GeometryCollection</code> that contains only <code>Polygon</code>s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/20/11
  */
@@ -31,11 +33,20 @@ public class MultiPolygon extends GeometryCollection {
 
     static final MultiPolygon EMPTY = new MultiPolygon(new Polygon[0]);
 
-
+    /**
+     * Constructs an empty <code>MultiPolygon</code>.
+     *
+     * @return an empty <code>MultiPolygon</code>.
+     */
     public static MultiPolygon createEmpty() {
         return EMPTY;
     }
 
+    /**
+     * Constructs a <code>MultiPolygon</code> from the specified array of <code>Polygon</code>s.
+     *
+     * @param polygons the element <code>Polygon</code>s for the constructed <code>MultiPolygon</code>
+     */
     public MultiPolygon(Polygon[] polygons) {
         super(polygons);
     }
@@ -45,6 +56,11 @@ public class MultiPolygon extends GeometryCollection {
         return (Polygon) super.getGeometryN(num);
     }
 
+    /**
+     * Returns the sum of the areas of all element <code>Polygon</code>s.
+     *
+     * @return the sum of the areas of all element <code>Polygon</code>s.
+     */
     public double area() {
         int totalArea = 0;
         for (int i = 0; i < getNumGeometries(); i++) {
@@ -53,11 +69,21 @@ public class MultiPolygon extends GeometryCollection {
         return totalArea;
     }
 
+    /**
+     * Returns the mathematical centroid for this <code>MultiPolygon</code>.
+     *
+     * @return the mathematical centroid for this <code>MultiPolygon</code>.
+     */
     public Point centroid() {
         if (this.isEmpty()) return Point.EMPTY;
         return (Point) JTS.from(JTS.to(this).getCentroid());
     }
 
+    /**
+     * Returns a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
+     *
+     * @return a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
+     */
     public Point pointOnSurface() {
         for (int i = 0; i < getNumGeometries(); i++) {
             if (!getGeometryN(i).isEmpty()) {

@@ -22,6 +22,8 @@
 package org.geolatte.geom;
 
 /**
+ * Enumerates the instantiable <code>Geometry</code> types.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public enum GeometryType {

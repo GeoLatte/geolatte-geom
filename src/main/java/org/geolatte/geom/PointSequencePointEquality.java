@@ -41,10 +41,7 @@ public class PointSequencePointEquality implements PointSequenceEquality {
     public PointSequencePointEquality() {
         this.pointEquality = new ExactCoordinatePointEquality();
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public boolean equals(PointSequence first, PointSequence second) {
      

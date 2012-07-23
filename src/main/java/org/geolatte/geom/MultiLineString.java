@@ -28,19 +28,29 @@ package org.geolatte.geom;
 public class MultiLineString extends GeometryCollection {
 
 
-    public static final MultiLineString EMPTY = new MultiLineString(new LineString[0]);
+    static final MultiLineString EMPTY = new MultiLineString(new LineString[0]);
 
+    /**
+     * Constructs an empty <code>MultiLineString</code>.
+     *
+     * @return an empty <code>MultiLineString</code>.
+     */
     public static MultiLineString createEmpty() {
         return EMPTY;
     }
 
-    public MultiLineString(LineString[] geometries) {
-        super(geometries);
+    /**
+     * Constructs a <code>MultiLineString</code> from the specified <code>LineString</code>s
+     *
+     * @param lineStrings the element <code>LineString</code>s for the constructed <code>MultiLineString</code>
+     */
+    public MultiLineString(LineString[] lineStrings) {
+        super(lineStrings);
     }
 
     @Override
-    public LineString getGeometryN(int i){
-        return (LineString)super.getGeometryN(i);
+    public LineString getGeometryN(int i) {
+        return (LineString) super.getGeometryN(i);
     }
 
     public double getLength() {
@@ -52,7 +62,7 @@ public class MultiLineString extends GeometryCollection {
     }
 
     public boolean isClosed() {
-        for(int i = 0; i < this.getNumGeometries(); i++) {
+        for (int i = 0; i < this.getNumGeometries(); i++) {
             if (!getGeometryN(i).isClosed()) return false;
         }
         return true;
