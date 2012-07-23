@@ -87,12 +87,12 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
     }
 
     @Override
-    public double getX(int i) {
+    public double getX(int position) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 
     @Override
-    public double getY(int i) {
+    public double getY(int position) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 
@@ -102,17 +102,17 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
     }
 
     @Override
-    public double getCoordinate(int index, CoordinateComponent component) {
+    public double getCoordinate(int position, CoordinateComponent component) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 
     @Override
-    public double getZ(int i) {
+    public double getZ(int position) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 
     @Override
-    public double getM(int i) {
+    public double getM(int position) {
         throw new IndexOutOfBoundsException("Empty PointSequence");
     }
 

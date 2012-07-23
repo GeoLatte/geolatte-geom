@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CrsId;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
+
 public abstract class PolyHedralSurface extends Geometry implements Iterable<Polygon>{
 
     protected PolyHedralSurface(CrsId crsId, GeometryOperations geometryOperations) {

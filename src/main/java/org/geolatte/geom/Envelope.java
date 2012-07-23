@@ -174,7 +174,6 @@ public class Envelope {
         return Points.create(maxX, minY, crsId);
     }
 
-
     public String toString() {
         StringBuilder builder = new StringBuilder(this.crsId.toString());
         builder.append("LL: ")

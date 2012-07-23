@@ -24,6 +24,11 @@ package org.geolatte.geom;
 import java.util.Iterator;
 
 /**
+ * A <code>Geometry</code> that is an ordered collection of some number of <code>Geometry</code>s.
+ *
+ * <p>All elements in a <code>GeometryCollection</code> must be in the same <code>CoordinateReferenceSystem</code>,
+ * which is also the <code>CoordinateReferenceSystem</code> for the <code>GeometryCollection</code>.</p>
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class GeometryCollection extends Geometry implements Iterable<Geometry>{
@@ -33,10 +38,20 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
 
     final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0]);
 
+    /**
+     * Constructs an empty <code>GeometryCollection</code>.
+     *
+     * @return an <code>GeometryCollection</code> that is empty.
+     */
     public static GeometryCollection createEmpty() {
         return EMPTY;
     }
 
+    /**
+     * Constructs a <code>GeometryCollection</code> from the specified <code>Geometry</code>s.
+     *
+     * @param geometries the <code>Geometry</code>s that are the elements of the constructed <code>GeometryCollection</code>.
+     */
     public GeometryCollection(Geometry[] geometries) {
         super(getCrsId(geometries), getGeometryOperations(geometries));
         points = createAndCheckPointSequence(geometries);
@@ -48,10 +63,21 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
     }
 
 
+    /**
+     * Returns the number of elements in this <code>GeometryCollection</code>.
+     *
+     * @return the number of elements of this instance.
+     */
     public int getNumGeometries() {
         return geometries.length;
     }
 
+    /**
+     * Returns the <code>Geometry</code> element at the specified (zero-based) position in this <code>GeometryCollection</code>.
+     *
+     * @param num the position in the collection of the requested <code>Geometry</code>
+     * @return the element <code>Geometry</code> at the position specified by the num parameter.
+     */
     public Geometry getGeometryN(int num) {
         return geometries[num];
     }
@@ -75,6 +101,11 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
         return points;
     }
 
+    /**
+     * Creates an <code>Iterator</code> over the elements of this <code>GeometryCollection</code>.
+     *
+     * @return an <code>Iterator</code> over the elements of this <code>GeometryCollection</code>.
+     */
     public Iterator<Geometry> iterator() {
         return new Iterator<Geometry>(){
             private int index = 0;

@@ -22,6 +22,8 @@
 package org.geolatte.geom;
 
 /**
+ * A PointSequenceBuilder for <code>PointSequence</code>s with known size.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {

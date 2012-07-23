@@ -31,26 +31,72 @@ package org.geolatte.geom;
 public interface PointSequenceBuilder {
 
     /**
-     * Adds the specified coordinates to the <code>PointSequence</code> being built.
+     * Adds a <code>Point</code> to the <code>PointSequence</code> being built.
      *
-     * @param coordinates the coordinates the
-     * @return the
+     * @param coordinates the coordinates of the <code>Point</code> that is added
+     * @return this instance
      */
     PointSequenceBuilder add(double[] coordinates);
 
     /**
-     * @param x
-     * @param y
-     * @return
+     * Adds a 2-dimensional point to the <code>PointSequence</code> being built.
+     * @param x the X-coordinate of the of the <code>Point</code> that is added
+     * @param y the Y-coordinate of the of the <code>Point</code> that is added
+     * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
+     * is not equal to {@link DimensionalFlag#XY}
+     * @return this instance
      */
     PointSequenceBuilder add(double x, double y);
 
+    /**
+     * Adds a 3-dimensional point to the <code>PointSequence</code> being built. The <code>DimensionalFlag</code> determines
+     * whether the third dimension is a Z- or M-coordinate.
+     *
+     * @param x the X-coordinate of the of the <code>Point</code> that is added
+     * @param y the Y-coordinate of the of the <code>Point</code> that is added
+     * @param zOrm the Z- or M-coordinate of the of the <code>Point</code> that is added
+     * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
+     * is not equal to {@link DimensionalFlag#XYZ} or {@link DimensionalFlag#XYM}
+     * @return this instance
+     */
     PointSequenceBuilder add(double x, double y, double zOrm);
 
+    /**
+     * Adds a 4-dimensional point to the <code>PointSequence</code> being built.
+     *
+     * @param x the X-coordinate of the of the <code>Point</code> that is added
+     * @param y the Y-coordinate of the of the <code>Point</code> that is added
+     * @param z the Z-coordinate of the of the <code>Point</code> that is added
+     * @param m the M-coordinate of the of the <code>Point</code> that is added
+     * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
+     * is not equal to {@link DimensionalFlag#XYZM}
+     * @return this instance
+     */
     PointSequenceBuilder add(double x, double y, double z, double m);
 
+    /**
+     * Adds the specified <code>Point</code> to the <code>PointSequence</code> being built.
+     *
+     * @param pnt the <code>Point</code> that is added.
+     * @return this instance
+     * @throws IllegalArgumentException when the <code>DimensionalFlag</code> of the specified <code>Point</code> is not
+     * equal to the flag returned by {@link #getDimensionalFlag()}
+     */
     PointSequenceBuilder add(Point pnt);
 
+    /**
+     * Returns the <code>DimensionalFlag</code> of the <code>PointSequence</code> being built.
+     *
+     * @return the <code>DimensionalFlag</code> of the <code>PointSequence</code> being built.
+     */
+    DimensionalFlag getDimensionalFlag();
+
+    /**
+     * Returns the result of this builder.
+     *
+     * @return the <code>PointSequence</code> that has been built by this builder instance.
+     * @throws IllegalStateException when the construction of the <code>PointSequence</code> has not yet been completed.
+     */
     PointSequence toPointSequence();
 
 }

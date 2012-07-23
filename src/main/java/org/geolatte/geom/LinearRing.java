@@ -24,12 +24,15 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CrsId;
 
 /**
+ * A <code>LineString</code> that is both closed and simple.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
 public class LinearRing extends LineString {
 
-    public final static LinearRing EMPTY = new LinearRing(null, CrsId.UNDEFINED, null);
+
+    final static LinearRing EMPTY = new LinearRing(null, CrsId.UNDEFINED, null);
 
     public static LinearRing create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
         return new LinearRing(points, crsId, geometryOperations);

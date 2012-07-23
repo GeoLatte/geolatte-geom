@@ -27,12 +27,22 @@ package org.geolatte.geom;
 public class MultiPoint extends GeometryCollection {
 
 
-    protected static final MultiPoint EMPTY = new MultiPoint(new Point[0]);
+    static final MultiPoint EMPTY = new MultiPoint(new Point[0]);
 
+    /**
+     * Constructs an empty <code>MultiPoint</code>.
+     *
+     * @return an empty <code>MultiPoint</code>.
+     */
     public static MultiPoint createEmpty() {
         return EMPTY;
     }
 
+    /**
+     * Constructs a <code>MultiPoint</code> from the specified <code>Point</code>s
+     *
+     * @param points the element <code>Point</code>s for the constructed <code>MultiPoint</code>
+     */
     public MultiPoint(Point[] points) {
         super(points);
     }
