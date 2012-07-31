@@ -57,19 +57,19 @@ public class PackedPointSequenceTest {
     @Test
     public void testConstructorThrowsIllegalArgumentOnWrongNumberOfCoordinates() {
         try {
-            PointSequence pseq = new PackedPointSequence(new double[]{0, 0, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 1, 1}, DimensionalFlag.XYZ);
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            PointSequence pseq = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1}, DimensionalFlag.XYZ);
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            PointSequence pseq = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1, 1}, DimensionalFlag.XYZ);
             fail();
         } catch (IllegalArgumentException e) {
         }

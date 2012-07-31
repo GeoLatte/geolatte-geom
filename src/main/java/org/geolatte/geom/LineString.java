@@ -148,7 +148,7 @@ public class LineString extends Geometry {
      * @return true if this <code>LineString</code> is a ring.
      */
     public boolean isRing() {
-        return isEmpty() ? false : isClosed() && isSimple();
+        return !isEmpty() && isClosed() && isSimple();
     }
 
     @Override

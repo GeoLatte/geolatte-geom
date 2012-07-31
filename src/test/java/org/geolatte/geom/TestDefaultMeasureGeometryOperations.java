@@ -38,7 +38,7 @@ public class TestDefaultMeasureGeometryOperations {
     @Test
     public void testCreateMeasureOnLengthOpThrowsExceptionOnNullParameter() {
         try {
-            GeometryOperation<Geometry> onLengthOp = measureOps.createMeasureOnLengthOp(null, false);
+            measureOps.createMeasureOnLengthOp(null, false);
             fail("createMeasureOnLengthOp created on null parameter. Should throw exception");
         } catch (IllegalArgumentException e) {
             //OK

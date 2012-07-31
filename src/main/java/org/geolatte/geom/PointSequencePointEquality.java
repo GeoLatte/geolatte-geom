@@ -50,7 +50,6 @@ public class PointSequencePointEquality implements PointSequenceEquality {
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
         if (first.isEmpty() || second.isEmpty()) return false;
-        if (second == null || first == null) return false;
         if (first.size() != second.size()) return false;
 
         double[] c1 = new double[first.getCoordinateDimension()];
