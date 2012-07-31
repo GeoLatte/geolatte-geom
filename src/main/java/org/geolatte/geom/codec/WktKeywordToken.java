@@ -51,7 +51,7 @@ class WktKeywordToken implements WktToken {
      * @param wkt        the input text
      * @param currentPos the start position for the match
      * @param endPos     the end position for the match
-     * @throws WktParseException if nothing matches at the specified substring.
+     * @throws WktDecodeException if nothing matches at the specified substring.
      */
     public boolean matches(CharSequence wkt, int currentPos, int endPos) {
         Matcher m = getPattern().matcher(wkt);

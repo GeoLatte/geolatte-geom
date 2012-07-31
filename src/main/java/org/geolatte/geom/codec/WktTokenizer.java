@@ -90,9 +90,9 @@ class WktTokenizer {
             }
         } else if (wkt.charAt(currentPos) == variant.getElemSepChar()) {
             currentPos++;
-            return variant.getElemSep();
+            return variant.getElementSeparator();
         } else {
-            throw new WktParseException(String.format("Illegal Character at pos %d in Wkt text: %s", currentPos, wkt));
+            throw new WktDecodeException(String.format("Illegal Character at pos %d in Wkt text: %s", currentPos, wkt));
         }
 
     }
@@ -227,14 +227,14 @@ class WktTokenizer {
                 num++;
                 inNumber = true;
             }
-            if (pos == wkt.length() - 1) throw new WktParseException("");
+            if (pos == wkt.length() - 1) throw new WktDecodeException("");
             c = wkt.charAt(++pos);
         }
         if (num == 4) return DimensionalFlag.XYZM;
         if (num == 3 && isMeasured) return DimensionalFlag.XYM;
         if (num == 3 && !isMeasured) return DimensionalFlag.XYZ;
         if (num == 2) return DimensionalFlag.XY;
-        throw new WktParseException("Point with less than 2 coordinates at position " + currentPos);
+        throw new WktDecodeException("Point with less than 2 coordinates at position " + currentPos);
     }
 
     private void skipWhitespace() {
@@ -270,7 +270,7 @@ class WktTokenizer {
      * @param currentPos the start of the subsequence to match
      * @param endPos the end of the subsequence to match
      * @return the taken that matches the specified subsequence
-     * @throws WktParseException if the specified subsequence does not match a token.
+     * @throws WktDecodeException if the specified subsequence does not match a token.
      */
     private WktToken matchKeyword(int currentPos, int endPos) {
         WktToken token = variant.matchKeyword(wkt, currentPos, endPos);

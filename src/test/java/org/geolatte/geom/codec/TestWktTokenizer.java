@@ -152,7 +152,7 @@ public class TestWktTokenizer {
         assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.nextToken() instanceof WktPointSequenceToken);
         assertEquals(tokens.nextToken(), words.getCloseList());
-        assertEquals(tokens.nextToken(), words.getElemSep());
+        assertEquals(tokens.nextToken(), words.getElementSeparator());
         assertEquals(tokens.nextToken(), words.getOpenList());
         assertTrue(tokens.nextToken() instanceof WktPointSequenceToken);
         assertEquals(tokens.nextToken(), words.getCloseList());

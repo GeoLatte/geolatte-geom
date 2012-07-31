@@ -37,6 +37,11 @@ abstract class AbstractWktDecoder<T> {
     private WktTokenizer tokenizer;
     private final WktVariant wktVariant;
 
+    /**
+     * The constructor of this AbstractWktDecoder. It sets the variant.
+     *
+     * @param wktVariant The <code>WktVariant</code> to be used by this decoder.
+     */
     public AbstractWktDecoder(WktVariant wktVariant) {
         this.wktVariant = wktVariant;
     }
@@ -61,15 +66,15 @@ abstract class AbstractWktDecoder<T> {
      * Returns the text and moves to the next token if the current token matches text, otherwise throws an exception.
      *
      * @return the matched text
-     * @throws WktParseException when the current token does not match text.
+     * @throws WktDecodeException when the current token does not match text.
      */
-    protected String matchesText() {
+    protected String decodeText() {
         if (currentToken instanceof WktTextToken) {
             String text = ((WktTextToken) currentToken).getText();
             nextToken();
             return text;
         }
-        throw new WktParseException("Expected text token, received " + currentToken.toString());
+        throw new WktDecodeException("Expected text token, received " + currentToken.toString());
     }
 
     /**
@@ -82,7 +87,7 @@ abstract class AbstractWktDecoder<T> {
     /**
      * Returns true and moves to the next token if the current token matches the open list token.
      *
-     * @return
+     * @return True if the current token matches the open list token, false otherwise.
      */
     protected boolean matchesOpenList() {
         if (currentToken == getWktVariant().getOpenList()) {
@@ -95,7 +100,7 @@ abstract class AbstractWktDecoder<T> {
     /**
      * Returns true and moves to the next token if the current token matches the close list token.
      *
-     * @return
+     * @return True if the current token matches the close list token, false otherwise.
      */
     protected boolean matchesCloseList() {
         if (currentToken == getWktVariant().getCloseList()) {
@@ -108,10 +113,10 @@ abstract class AbstractWktDecoder<T> {
     /**
      * Returns true and moves to the next token if the current token matches the element separator token.
      *
-     * @return
+     * @return True if the current token matches the element separator token, false otherwise.
      */
-    protected boolean matchesElemSeparator() {
-        if (currentToken == getWktVariant().getElemSep()) {
+    protected boolean matchesElementSeparator() {
+        if (currentToken == getWktVariant().getElementSeparator()) {
             nextToken();
             return true;
         }
@@ -121,21 +126,22 @@ abstract class AbstractWktDecoder<T> {
     /**
      * Returns the value of the current token and moves to the next token if the current token matches a number.
      *
-     * @return
-     * @throws WktParseException if the current token does not match a number.
+     * @return The value of the current token if the current token matches a number.
+     * @throws WktDecodeException if the current token does not match a number.
      */
-    protected double matchesNumber(){
+    protected double decodeNumber(){
         if (currentToken instanceof WktNumberToken) {
             double value = ((WktNumberToken)currentToken).getNumber();
             nextToken();
             return value;
         }
-        throw new WktParseException("Expected a number ; received " + currentToken.toString());
+        throw new WktDecodeException("Expected a number ; received " + currentToken.toString());
     }
 
     /**
      * Returns the <code>WktVariant</code> for this decoder.
-     * @return
+     * 
+     * @return the <code>WktVariant</code> for this decoder.
      */
     protected WktVariant getWktVariant(){
         return this.wktVariant;
@@ -144,7 +150,7 @@ abstract class AbstractWktDecoder<T> {
     /**
      * Reports the current position of the tokenizer.
      *
-     * @return
+     * @return the current position of the tokenizer.
      */
     protected int getTokenizerPosition(){
         return this.tokenizer.position();
