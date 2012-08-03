@@ -29,7 +29,7 @@ import java.util.Arrays;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PointSequenceFactory {
+public class PointCollectionFactory {
 
     /**
      * Creates an empty <code>PointSequence</code>.
@@ -50,6 +50,22 @@ public class PointSequenceFactory {
      */
     public static PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
         return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
+    }
+
+    /**
+     * Creates a <code>PointCollection</code> from the specified array of <code>PointCollection</code>s.
+     *
+     * <p>If the specified <code>PointCollection</code> array is null or empty, an empty <code>PointSequence</code>
+     * will be created; otherwise a <code>ComplexPointCollection</code>.</p>
+     *
+     * @param pointCollections the <code>PointCollection</code> to create the <code>PointCollection</code> from
+     * @return the constructed <code>PointCollection</code>
+     */
+    public static PointCollection create(PointCollection[] pointCollections) {
+        if (pointCollections == null || pointCollections.length == 0 ) {
+            return EmptyPointSequence.INSTANCE;
+        }
+        return new NestedPointCollection(pointCollections);
     }
 
 

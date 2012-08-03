@@ -136,7 +136,7 @@ class PostgisWktEncoder {
         addPointList(ring.getPoints());
     }
 
-    private void addPointList(PointSequence points) {
+    private void addPointList(PointCollection points) {
         addStartList();
         double[] coords = new double[points.getCoordinateDimension()];
         for (int i = 0; i < points.size(); i++) {
