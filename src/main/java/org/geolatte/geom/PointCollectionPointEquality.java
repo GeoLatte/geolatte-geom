@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A {@link  PointSetEquality} implementation that considers two <code>PointSequence</code>s
+ * A {@link  PointCollectionEquality} implementation that considers two <code>PointSequence</code>s
  * equal if and only if both contain the same points in the same order. Whether two <code>Point</code>s
  * are the same is determined by the {@link PointEquality} instance which is passed in the constructor. In case of the
  * no-argument default constructor, the {@link ExactCoordinatePointEquality} is used.
@@ -30,15 +30,15 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12
  */
-public class PointSetPointEquality implements PointSetEquality {
+public class PointCollectionPointEquality implements PointCollectionEquality {
 
     private final PointEquality pointEquality;
 
-    public PointSetPointEquality(PointEquality pointEquality) {
+    public PointCollectionPointEquality(PointEquality pointEquality) {
         this.pointEquality = pointEquality;
     }
 
-    public PointSetPointEquality() {
+    public PointCollectionPointEquality() {
         this.pointEquality = new ExactCoordinatePointEquality();
     }
 

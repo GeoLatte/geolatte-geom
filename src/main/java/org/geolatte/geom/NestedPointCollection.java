@@ -97,7 +97,7 @@ class NestedPointCollection extends AbstractPointCollection implements ComplexPo
 
         if (is3D() != that.is3D()) return false;
         if (isMeasured() != that.isMeasured()) return false;
-        return new PointSetPointEquality().equals(this, that);
+        return new PointCollectionPointEquality().equals(this, that);
     }
 
 

@@ -29,7 +29,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12
  */
-public interface PointSetEquality {
+public interface PointCollectionEquality {
 
     /**
      * Tests whether two <code>PointSequence</code>s are equal.
