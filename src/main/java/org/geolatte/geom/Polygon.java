@@ -53,7 +53,7 @@ import java.util.Iterator;
 public class Polygon extends Geometry implements Iterable<LinearRing> {
 
 
-    private final PointSequence points;
+    private final PointCollection points;
     private final LinearRing[] rings;
     static final Polygon EMPTY = new Polygon(new LinearRing[0]);
 
@@ -102,24 +102,26 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
     public Polygon(LinearRing[] rings) {
         super(getCrsId(rings), getGeometryOperations(rings));
         checkRings(rings);
-        points = createAndCheckPointSequence(rings);
+        points = collectPointSets(rings);
         this.rings = rings;
     }
 
 
     private void checkRings(LinearRing[] rings) {
+        CrsId crsId = getCrsId(rings);
         for (LinearRing ring : rings) {
-            checkLinearRing(ring);
+            checkLinearRing(ring, crsId);
         }
     }
 
-    private void checkLinearRing(LinearRing ring) {
+    private void checkLinearRing(LinearRing ring, CrsId crsId) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
         if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
+        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS then exterior boundary.");
     }
 
     @Override
-    public PointSequence getPoints() {
+    public PointCollection getPoints() {
         return this.points;
     }
 
