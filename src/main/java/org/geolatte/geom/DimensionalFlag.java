@@ -74,18 +74,10 @@ public enum DimensionalFlag {
      * @return the appropriate DimensionalFlag depending on whether coordinates have a Z- and/or M-coordinate component
      */
     public static DimensionalFlag valueOf(boolean is3D, boolean isMeasured) {
-        if (is3D) {
-            if (isMeasured) {
-                return XYZM;
-            } else {
-                return XYZ;
-            }
+        if (isMeasured) {
+            return is3D ? XYZM : XYM;
         } else {
-            if (isMeasured) {
-                return XYM;
-            } else {
-                return XY;
-            }
+            return is3D ? XYZ : XY;
         }
     }
 
