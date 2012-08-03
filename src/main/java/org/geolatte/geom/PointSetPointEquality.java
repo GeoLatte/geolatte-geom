@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A {@link  PointSequenceEquality} implementation that considers two <code>PointSequence</code>s
+ * A {@link  PointSetEquality} implementation that considers two <code>PointSequence</code>s
  * equal if and only if both contain the same points in the same order. Whether two <code>Point</code>s
  * are the same is determined by the {@link PointEquality} instance which is passed in the constructor. In case of the
  * no-argument default constructor, the {@link ExactCoordinatePointEquality} is used.
@@ -30,33 +30,39 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12
  */
-public class PointSequencePointEquality implements PointSequenceEquality {
+public class PointSetPointEquality implements PointSetEquality {
 
     private final PointEquality pointEquality;
 
-    public PointSequencePointEquality(PointEquality pointEquality) {
+    public PointSetPointEquality(PointEquality pointEquality) {
         this.pointEquality = pointEquality;
     }
 
-    public PointSequencePointEquality() {
+    public PointSetPointEquality() {
         this.pointEquality = new ExactCoordinatePointEquality();
     }
 
     @Override
-    public boolean equals(PointSequence first, PointSequence second) {
+    public boolean equals(PointCollection first, PointCollection second) {
      
         if (first == second) return true;
-        if (first == null & second == null) return true;
+        if (first == null && second == null) return true;
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
         if (first.isEmpty() || second.isEmpty()) return false;
-        if (second == null || first == null) return false;
         if (first.size() != second.size()) return false;
 
+        if (first instanceof ComplexPointCollection && second instanceof ComplexPointCollection) {
+            return testComplexPointSetEquality((ComplexPointCollection) first, (ComplexPointCollection) second);
+        } else if (first instanceof PointSequence && second instanceof PointSequence){
+            return testPointSequenceEquality(first, second);
+        }
+        return false;
+    }
+
+    private boolean testPointSequenceEquality(PointCollection first, PointCollection second) {
         double[] c1 = new double[first.getCoordinateDimension()];
         double[] c2 = new double[second.getCoordinateDimension()];
-
-
         for (int idx = 0; idx < first.size(); idx++) {
             first.getCoordinates(c1, idx);
             second.getCoordinates(c2, idx);
@@ -65,6 +71,16 @@ public class PointSequencePointEquality implements PointSequenceEquality {
             }
         }
         return true;
-    } 
+    }
+
+    private boolean testComplexPointSetEquality(ComplexPointCollection first, ComplexPointCollection second) {
+        PointCollection[] firstCollection = first.getPointSets();
+        PointCollection[] secondCollection = second.getPointSets();
+        if (firstCollection.length != secondCollection.length) return false;
+        for (int i = 0; i < firstCollection.length; i++){
+            if (! equals(firstCollection[i], secondCollection[i]) ) return false;
+        }
+        return true;
+    }
 
 }

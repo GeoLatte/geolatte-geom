@@ -38,7 +38,7 @@ package org.geolatte.geom;
 public class GeometryPointEquality implements GeometryEquality {
 
 
-    private final PointSequenceEquality pointSeqEq;
+    private final PointSetEquality pointSeqEq;
 
     /**
      * Constructs an instance that uses the specified <code>PointEquality</code> to determine
@@ -47,7 +47,7 @@ public class GeometryPointEquality implements GeometryEquality {
      * @param pointEq
      */
     public GeometryPointEquality(PointEquality pointEq) {
-        this.pointSeqEq = new PointSequencePointEquality(pointEq);
+        this.pointSeqEq = new PointSetPointEquality(pointEq);
     }
 
 /**
@@ -56,7 +56,7 @@ public class GeometryPointEquality implements GeometryEquality {
      */
     public GeometryPointEquality() {
         ExactCoordinatePointEquality pointEquality = new ExactCoordinatePointEquality();
-        this.pointSeqEq = new PointSequencePointEquality(pointEquality);
+        this.pointSeqEq = new PointSetPointEquality(pointEquality);
     }
 
 

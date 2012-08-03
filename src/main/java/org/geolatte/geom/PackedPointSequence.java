@@ -22,11 +22,12 @@
 package org.geolatte.geom;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PackedPointSequence extends AbstractPointSequence {
+class PackedPointSequence extends AbstractPointCollection implements PointSequence {
 
     private final double[] coordinates;
 
@@ -63,6 +64,12 @@ class PackedPointSequence extends AbstractPointSequence {
         return this.coordinates.length / getCoordinateDimension();
     }
 
+
+    @Override
+    public Iterator<Point> iterator() {
+        return new PointSequenceIterator(this);
+    }
+
     @Override
     public PointSequence clone() {
         return this; //this is valid since a PackedPointSequence is immutable.
@@ -77,7 +84,7 @@ class PackedPointSequence extends AbstractPointSequence {
 
         if (is3D() != that.is3D()) return false;
         if (isMeasured() != that.isMeasured()) return false;
-        return new PointSequencePointEquality().equals(this, that);
+        return new PointSetPointEquality().equals(this, that);
     }
 
 

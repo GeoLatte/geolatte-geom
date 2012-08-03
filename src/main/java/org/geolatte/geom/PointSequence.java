@@ -21,120 +21,18 @@
 
 package org.geolatte.geom;
 
-import java.io.Serializable;
-
 /**
- * A Strategy for holding a list of points.
+ * A <code>PointCollection</code> that consists of a sequence of <code>Point</code>s.
+ *
+ * <p>A <code>PointSequence</code> is typically used to store the <code>Point</code>s (vertices) that define a
+ * curve (a 1-dimensional geometric primitive), with the subtype of the curve specifying the form of interpolation between
+ * consecutive <code>Point</code>s. (E.g.a <code>LineString</code> uses linear interpolation between <code>Point</code>s.)</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public interface PointSequence extends Iterable<Point>, Cloneable, Serializable {
-
-    /**
-     * Returns true iff the <code>Point</code>s in this instance have a Z-coordinate.
-     *
-     * @return true iff the <code>Point</code>s in this instance have a Z-coordinate.
-     */
-    boolean is3D();
-
-    /**
-     * Returns true iff the <code>Point</code>s in this instance have an M-coordinate.
-     *
-     * @return true iff the <code>Point</code>s in this instance have an M-coordinate.
-     */
-    boolean isMeasured();
-
-    /**
-     * Returns the <code>DimensionalFlag</code> of this <code>PointSequence</code>.
-     *
-     * @return the <code>DimensionalFlag</code> of this <code>PointSequence</code>
-     */
-    DimensionalFlag getDimensionalFlag();
-
-    /**
-     * Returns true iff this <code>PointSequence</code> contains no <code>Point</code>s
-     *
-     * @return true iff this <code>PointSequence</code> contains no <code>Point</code>s
-     */
-    boolean isEmpty();
-
-    /**
-     * Returns the coordinate dimension of this <code>PointSequence</code>.
-     * <p/>
-     * <p>The coordinate dimension is number of measurements or axes needed to describe a position of a <code>Point</code>
-     * in a coordinate system.</p>
-     *
-     * @return the coordinate dimension of this <code>PointSequence</code>
-     */
-    int getCoordinateDimension();
-
-    /**
-     * Copies the coordinates of the <code>Point</code> at the specified (zero-based) position in this <code>PointSequence</code>
-     * into the specified coordinate array.
-     *
-     * @param coordinates an array for the coordinates of the <code>Point</code> at the specified position
-     * @param position the position of the <code>Point</code> in this <code>PointSequence</code> whose coordinates
-     * are copied into the coordinates array
-     */
-
-    void getCoordinates(double[] coordinates, int position);
-
-    /**
-     * Returns the X-coordinate for the <code>Point</code> at the specified position in this <code>PointSequence</code>.
-     *
-     * @param position position of the <code>Point</code> in this <code>PointSequence</code>
-     * @return the X-coordinate of the specified <code>Point</code>
-     */
-    double getX(int position);
-
-    /**
-     * Returns the Y-coordinate for the <code>Point</code> at the specified position in this <code>PointSequence</code>.
-     *
-     * @param position position of the <code>Point</code> in this <code>PointSequence</code>
-     * @return the Y-coordinate of the specified <code>Point</code>
-     */
-    double getY(int position);
-
-    /**
-     * Returns the Z-coordinate for the <code>Point</code> at the specified position in this <code>PointSequence</code>.
-     *
-     * @param position position of the <code>Point</code> in this <code>PointSequence</code>
-     * @return the Z-coordinate of the specified <code>Point</code>
-     */
-    double getZ(int position);
-
-    /**
-     * Returns the M-coordinate for the <code>Point</code> at the specified position in this <code>PointSequence</code>.
-     *
-     * @param position position of the <code>Point</code> in this <code>PointSequence</code>
-     * @return the M-coordinate of the specified <code>Point</code>
-     */
-    double getM(int position);
-
-    /**
-     * Returns the specified coordinate for the <code>Point</code> at the specified position in this <code>PointSequence</code>.
-     *
-     * @param position position of the <code>Point</code> in this <code>PointSequence</code>
-     * @param component the coordinate component for which to return the coordinate
-     * @return the coordinate, specified by the component parameter, of the specified <code>Point</code>
-     */
-    public double getCoordinate(int position, CoordinateComponent component);
-
-    /**
-     * Returns the number of <code>Point</code>s contained in this <code>PointSequence</code>.
-     * @return the number of <code>Point</code>s contained in this <code>PointSequence</code>.
-     */
-    int size();
+public interface PointSequence extends PointCollection, Iterable<Point> {
 
     PointSequence clone();
-
-    /**
-     * Accepts a <code>PointVisitor</code>.
-     *
-     * <p>This instance will pass the visitor to all of its <code>Point</code>s.</p>
-     * @param visitor the visitor for this instance's <code>Point</code>s
-     */
-    void accept(PointVisitor visitor);
 
 
 }

@@ -26,24 +26,24 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import org.geolatte.geom.jts.DimensionalCoordinate;
 
-import java.util.Iterator;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-abstract class AbstractPointSequence implements PointSequence, CoordinateSequence {
+abstract class AbstractPointCollection implements PointCollection, CoordinateSequence {
 
     private final DimensionalFlag dimensionalFlag;
 
-    AbstractPointSequence(DimensionalFlag dimensionalFlag) {
+
+    public AbstractPointCollection(DimensionalFlag dimensionalFlag) {
         this.dimensionalFlag = dimensionalFlag;
     }
 
-    public static DimensionalCoordinate[] toCoordinateArray(AbstractPointSequence sequence) {
-        DimensionalCoordinate[] coordinates = new DimensionalCoordinate[sequence.size()];
-        for (int i = 0; i < sequence.size(); i++){
-            coordinates[i] = new DimensionalCoordinate(sequence.getDimensionalFlag());
-            sequence.getCoordinate(i, coordinates[i]);
+
+    private static DimensionalCoordinate[] toCoordinateArray(AbstractPointCollection set) {
+        DimensionalCoordinate[] coordinates = new DimensionalCoordinate[set.size()];
+        for (int i = 0; i < set.size(); i++){
+            coordinates[i] = new DimensionalCoordinate(set.getDimensionalFlag());
+            set.getCoordinate(i, coordinates[i]);
         }
         return coordinates;
     }
@@ -72,13 +72,13 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
     }
 
     /**
-     * Clones a  PointSequence.
+     * Clones a  PointCollection
      *
      * <p>This method is defined in the JTS CoordinateSequence interface.
      * @return
      */
     @Override
-    public abstract PointSequence clone() ;
+    public abstract PointCollection clone() ;
 
     @Override
     public void getCoordinates(double[] coordinates, int i) {
@@ -170,10 +170,6 @@ abstract class AbstractPointSequence implements PointSequence, CoordinateSequenc
         return expander.result();
     }
 
-    @Override
-    public Iterator<Point> iterator() {
-        return new PointSequenceIterator(this);
-    }
 
     @Override
     public void accept(PointVisitor visitor) {

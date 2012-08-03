@@ -22,32 +22,38 @@
 package org.geolatte.geom;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class NestedPointSequence extends AbstractPointSequence {
+class NestedPointCollection extends AbstractPointCollection implements ComplexPointCollection {
 
-    private final PointSequence[] children;
     private final int size;
+    protected final PointCollection[] children;
 
-    NestedPointSequence(PointSequence[] children, DimensionalFlag dimensionalFlag) {
-        super(dimensionalFlag);
-        if (children == null) throw new IllegalArgumentException("Require non-null argumnet");
+
+    NestedPointCollection(PointCollection[] children) {
+        super(extractDimensionalFlag(children));
         this.children = children;
         this.size = calculateSize();
     }
 
+    private static DimensionalFlag extractDimensionalFlag(PointCollection[] children) {
+        return (children == null || children.length == 0) ? DimensionalFlag.XY : children[0].getDimensionalFlag();
+    }
+
     private int calculateSize() {
         int size = 0;
-        for (PointSequence child : children()) {
+        for (PointCollection child : getPointSets()) {
             size += child.size();
         }
         return size;
 
     }
 
-    private PointSequence[] children() {
+    @Override
+    public PointCollection[] getPointSets() {
         return this.children;
     }
 
@@ -62,7 +68,7 @@ class NestedPointSequence extends AbstractPointSequence {
     @Override
     public double getCoordinate(int position, CoordinateComponent component) {
         int childOffset = position;
-        for (PointSequence child : children()) {
+        for (PointCollection child : getPointSets()) {
             if (childOffset < child.size()) {
                 return child.getCoordinate(childOffset, component);
             } else {
@@ -78,12 +84,8 @@ class NestedPointSequence extends AbstractPointSequence {
     }
 
     @Override
-    public PointSequence clone() {
-        PointSequence[] clonedChildren = new PointSequence[this.children.length];
-        for (int i = 0; i < clonedChildren.length; i++) {
-            clonedChildren[i] = children[i].clone();
-        }
-        return new NestedPointSequence(clonedChildren, getDimensionalFlag());
+    public PointCollection clone() {
+        return this; //this is correct since PointSets are immutable.
     }
 
     @Override
@@ -95,7 +97,7 @@ class NestedPointSequence extends AbstractPointSequence {
 
         if (is3D() != that.is3D()) return false;
         if (isMeasured() != that.isMeasured()) return false;
-        return new PointSequencePointEquality().equals(this, that);
+        return new PointSetPointEquality().equals(this, that);
     }
 
 
@@ -111,10 +113,30 @@ class NestedPointSequence extends AbstractPointSequence {
         builder.append("[");
         for (int i = 0; i < children.length; i++) {
             if (i > 0) builder.append(",");
-            builder.append(children()[i].toString());
+            builder.append(getPointSets()[i].toString());
         }
         builder.append("]");
         return builder.toString();
     }
 
+    @Override
+    public Iterator<PointCollection> iterator() {
+        return new Iterator<PointCollection>(){
+            private int index = 0;
+            @Override
+            public boolean hasNext() {
+                return index < children.length;
+            }
+
+            @Override
+            public PointCollection next() {
+                return children[index++];
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Remove not supported on PointSets.");
+            }
+        };
+    }
 }

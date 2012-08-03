@@ -91,7 +91,7 @@ class JTSGeometryOperations implements GeometryOperations {
 
             @Override
             public Envelope execute() {
-                PointSequence ps = geometry.getPoints();
+                PointCollection ps = geometry.getPoints();
                 EnvelopeVisitor visitor = new EnvelopeVisitor(geometry.getCrsId());
                 ps.accept(visitor);
                 return visitor.result();

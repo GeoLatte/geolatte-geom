@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Iterator;
 
 /**
@@ -34,7 +36,7 @@ import java.util.Iterator;
 public class GeometryCollection extends Geometry implements Iterable<Geometry>{
 
     protected final Geometry[] geometries;
-    protected final PointSequence points;
+    protected final PointCollection points;
 
     final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0]);
 
@@ -54,7 +56,8 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      */
     public GeometryCollection(Geometry[] geometries) {
         super(getCrsId(geometries), getGeometryOperations(geometries));
-        points = createAndCheckPointSequence(geometries);
+        check(geometries);
+        points = collectPointSets(geometries);
         if (points.isEmpty()) {
             this.geometries = new Geometry[0];
         } else {
@@ -97,7 +100,7 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
     }
 
     @Override
-    public PointSequence getPoints() {
+    public PointCollection getPoints() {
         return points;
     }
 
@@ -140,4 +143,27 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
             part.accept(visitor);
         }
     }
+
+    /**
+     * Verifies that the <code>Geometry</code> array can be used to construct a Geometry collection.
+     *
+     * <p>Conditions:</p>
+     * <il>
+     *     <li>Array contains no NULL values</li>
+     *     <li>All elements have the same coordinate reference system</li>
+     * </il>
+     * @param geometries
+     */
+    private void check(Geometry[] geometries){
+        if (geometries == null || geometries.length == 0) return;
+        String msg = "NULL element not allowd in Geometry array";
+        if (geometries[0] == null) throw new IllegalStateException(msg);
+        CrsId crsId = geometries[0].getCrsId();
+        for (int i = 1; i < geometries.length; i++) {
+            if (geometries[i] == null) throw new IllegalStateException(msg);
+            if ( ! crsId.equals(geometries[i].getCrsId()) )
+                throw new IllegalStateException("Geometries in the array do no share the same coordinate reference systems.");
+        }
+    }
+
 }

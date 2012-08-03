@@ -30,7 +30,7 @@ import static org.junit.Assert.assertTrue;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12
  */
-public class PointSequencePointEqualityTest {
+public class PointSetPointEqualityTest {
 
     PointSequence ps1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XYZM)
             .add(1, 2, 3, 4)
@@ -58,8 +58,8 @@ public class PointSequencePointEqualityTest {
             .add(2, 4, 3, 2)
             .add(3, 4, 5, 2).toPointSequence();
 
-    PointSequencePointEquality eq = new PointSequencePointEquality();
-    PointSequencePointEquality eq2D = new PointSequencePointEquality(new ExactCoordinatePointEquality(
+    PointSetPointEquality eq = new PointSetPointEquality();
+    PointSetPointEquality eq2D = new PointSetPointEquality(new ExactCoordinatePointEquality(
             DimensionalFlag.XY
     ));
 
