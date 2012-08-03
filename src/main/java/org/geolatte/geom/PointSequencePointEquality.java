@@ -44,17 +44,14 @@ public class PointSequencePointEquality implements PointSequenceEquality {
 
     @Override
     public boolean equals(PointSequence first, PointSequence second) {
-     
+
         if (first == second) return true;
-        if (first == null & second == null) return true;
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
-        if (first.isEmpty() || second.isEmpty()) return false;
         if (first.size() != second.size()) return false;
 
         double[] c1 = new double[first.getCoordinateDimension()];
         double[] c2 = new double[second.getCoordinateDimension()];
-
 
         for (int idx = 0; idx < first.size(); idx++) {
             first.getCoordinates(c1, idx);
