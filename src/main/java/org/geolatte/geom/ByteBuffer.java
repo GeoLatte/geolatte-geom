@@ -66,16 +66,16 @@ public class ByteBuffer {
      *
      * <p>Every two chars in the string are interpreted as the hexadecimal representation of a byte.
      * If the string length is odd, the last character will be ignored.</p>
-     * @param text the bytes represented in hexadecimal
-     * @return
+     *
+     * @param hexString the bytes represented in hexadecimal form
+     * @return A ByteBuffer based on the hexadecimal string
      */
-    public static ByteBuffer from(String text) {
-        if (text == null) throw new IllegalArgumentException("Null not allowed.");
-        int size = text.length() / 2; // this will drop the last char, if text is not even.
-        byte[] byteArray = new byte[size];
-        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(byteArray);
-        for (int i = 0; i < text.length() - 1; i += 2) {
-            byte b = (byte) Integer.parseInt(text.substring(i, i + 2), 16);
+    public static ByteBuffer from(String hexString) {
+        if (hexString == null) throw new IllegalArgumentException("Cannot create ByteBuffer from null input String.");
+        int size = hexString.length() / 2; // this will drop the last char, if hexString is not even.
+        java.nio.ByteBuffer buffer = java.nio.ByteBuffer.allocate(size);
+        for (int i = 0; i < size * 2; i += 2) {
+            byte b = (byte) Integer.parseInt(hexString.substring(i, i + 2), 16);
             buffer.put(b);
         }
         buffer.rewind();
@@ -85,15 +85,17 @@ public class ByteBuffer {
     /**
      * Returns this instance as a hexadecimal string.
      *
-     * @return
+     * @return A string representation of this ByteBuffer in hexadecimal form
      */
     public String toString() {
         StringBuilder builder = new StringBuilder();
+        int savedPosition = buffer.position();
         rewind();
         for (int i = 0; i < limit(); i++) {
             int hexValue = readByte();
             appendHexByteRepresentation(builder, hexValue);
         }
+        buffer.position(savedPosition);
         return builder.toString();
     }
 
@@ -113,10 +115,13 @@ public class ByteBuffer {
     }
 
     /**
-     * Creates a <code>ByteBuffer</code> instance from byte array.
+     * Wraps a byte array into a <code>ByteBuffer</code>.
      *
-     * @param bytes
-     * @return
+     * The new buffer will be backed by the given byte array; that is, modifications to the buffer will cause the array
+     * to be modified and vice versa. The new buffer's capacity and limit will be bytes.length.
+     *
+     * @param bytes The array that will back this buffer
+     * @return The new byte buffer.
      */
     public static ByteBuffer from(byte[] bytes) {
         java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(bytes);
@@ -124,8 +129,12 @@ public class ByteBuffer {
     }
 
     /**
-     * Creates an empty <code>ByteBuffer</code> instance of the specified capacity
-     * @param capacity capacity of the returned instance
+     * Allocates a new <code>ByteBuffer</code> of the specified capacity.
+     *
+     * The new buffer's position will be zero, its limit will be its capacity and each of its elements will be
+     * initialized to zero.
+     *
+     * @param capacity The new buffer's capacity, in bytes
      * @return a new <code>ByteBuffer</code> instance of the specified capacity
      */
     public static ByteBuffer allocate(int capacity) {
@@ -133,62 +142,64 @@ public class ByteBuffer {
     }
 
     /**
-     * Returns the next byte.
+     * Relative get method. Reads the byte at this buffer's current position, and then increments the position.
      *
-     * @return
+     * @return The byte at the buffer's current position
+     * @throws RuntimeException If the buffer's current position is not smaller than its limit
      */
     public byte get() {
         try {
-            return this.buffer.get();
+            return buffer.get();
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Puts the specified byte in this <code>ByteBuffer</code>
+     * Writes the given byte into this buffer at the current position, and then increments the position.
      *
-     * @param value
+     * @param value The byte to be written
+     * @throws RuntimeException If this buffer's current position is not smaller than its limit
      */
     public void put(byte value) {
         try {
-            this.buffer.put(value);
+            buffer.put(value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Returns the capacity.
+     * Returns this buffer's capacity.
      *
-     * @return
+     * @return The capacity of this buffer
      */
     public int capacity() {
-        return this.buffer.capacity();
+        return buffer.capacity();
     }
 
     /**
-     * Returns the limit of the <code>ByteBuffer</code>.
+     * Returns this buffer's limit.
      *
-     * @return
+     * @return The limit of this buffer
      */
     public int limit() {
-        return this.buffer.limit();
+        return buffer.limit();
     }
 
     /**
-     * Rewinds the buffer
+     * Rewinds the buffer.
      *
      * <p>After rewind, the next get() or put() will take place on the first element of this instance. </p>
      */
     public void rewind() {
-        this.buffer.rewind();
+        buffer.rewind();
     }
 
     /**
      * Reports if this buffer is empty (holds no bytes).
      *
-     * @return
+     * @return True if limit is 0, otherwise false
      */
     public boolean isEmpty() {
         return buffer.limit() == 0;
@@ -197,140 +208,160 @@ public class ByteBuffer {
     /**
      * Sets the byte order for this instance.
      *
-     * @param wbo
+     * @param wbo The new byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
      */
     public void setWKBByteOrder(ByteOrder wbo) {
-        this.buffer.order(wbo.getByteOrder());
+        buffer.order(wbo.getByteOrder());
     }
 
     /**
-     * Returns the next 4 bytes as an int from this instance, taking into account the byte-order..
+     * Reads the next 4 bytes as an int from this instance at the current position, taking into account the byte-order,
+     * and then increments the position by four.
      *
-     * @return
+     * @return The int value at the buffer's current position
+     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
      */
     public int getInt() {
         try {
-            return this.buffer.getInt();
+            return buffer.getInt();
         } catch (BufferUnderflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Appends the specified int-value as 4 bytes to this instance, respecting the byte-order.
+     * Writes the specified int-value as 4 bytes to this instance at the current position, respecting the byte-order,
+     * and then increments the position by four.
      *
-     * @param value
+     * @param value The int value to be written
+     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
      */
     public void putInt(int value) {
         try {
-            this.buffer.putInt(value);
+            buffer.putInt(value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Returns the next 8 bytes as a long from this instance, taking into account the byte-order.
+     * Reads the next 8 bytes as a long from this instance at the current position, taking into account the byte-order,
+     * and then increments the position by eight.
      *
-     * @return
+     * @return The long value at the buffer's current position
+     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
      */
     public long getLong() {
         try {
-            return this.buffer.getLong();
+            return buffer.getLong();
         } catch (BufferUnderflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Appends the specified long value as 8 bytes to this instance, respecting the byte-order.
+     * Writes the specified long value as 8 bytes to this instance at the current position, respecting the byte-order,
+     * and then increments the position by eight.
      *
-     * @param value
+     * @param value The long value to be written
+     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
      */
     public void putLong(long value) {
         try {
-            this.buffer.putLong(value);
+            buffer.putLong(value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Returns the next 4 bytes as a float, taking into account the byte-order.
+     * Reads the next 4 bytes as a float from this instance at the current position, taking into account the byte-order,
+     * and then increments the position by four.
      *
-     * @return
+     * @return The float value at the buffer's current position
+     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
      */
     public float getFloat() {
         try {
-            return this.buffer.getFloat();
+            return buffer.getFloat();
         } catch (BufferUnderflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Appends the specified float-value as 4 bytes to this instance, respecting the byte-order.
+     * Writes the specified float-value as 4 bytes to this instance at the current position, respecting the byte-order,
+     * and then increments the position by four.
      *
-     * @param value
+     * @param value The float value to be written
+     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
      */
     public void putFloat(float value) {
         try {
-            this.buffer.putFloat(value);
+            buffer.putFloat(value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
-     /**
-     * Returns the next 8 bytes as a double, taking into account the byte-order.
-      *
-     * @return
+    /**
+     * Reads the next 8 bytes as a double from this instance at the current position, taking into account the byte-order,
+     * and then increments the position by eight.
+     *
+     * @return The double value at the buffer's current position
+     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
      */
     public double getDouble() {
         try {
-            return this.buffer.getDouble();
+            return buffer.getDouble();
         } catch (BufferUnderflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Appends the specified double-value as 8 bytes to this instance, respecting the byte-order.
+     * Writes the specified double-value as 8 bytes to this instance at the current position, respecting the byte-order,
+     * and then increments the position by eight.
      *
-     * @param value
+     * @param value The double value to be written
+     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
      */
     public void putDouble(Double value) {
         try {
-            this.buffer.putDouble(value);
+            buffer.putDouble(value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     * Interprets the next 4 bytes as an unsigned integer, taking into account the byte-order, and returns it as a long.
-     * @return the value of the 4-byte unsigned integer at the current location as a long
+     * Reads the next 4 bytes as an unsigned integer from this instance at the current position,
+     * taking into account the byte-order, and then increments the position by four.
+     *
+     * @return The value of the 4-byte unsigned integer at the current position as a long
+     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
      */
     public long getUInt() {
         try {
-            long value = this.buffer.getInt();   // read integer in a long
-            return (value << 32) >>> 32; //shift 32-bytes left (dropping all             
+            int signedInt = buffer.getInt();
+            return signedInt & 0xffffffffL; //cast the signed int to an unsigned value in the bottom 32 bits of a long
         } catch (BufferUnderflowException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
-     *  Interprets the specified long-value as and unsigned integer, and appends it as 4 bytes to this instance,
-     *  respecting the byte-order.
+     *  Interprets the specified long-value as and unsigned integer, and appends it as 4 bytes
+     *  to this instance at the current position, respecting the byte-order.
      *
-     * @param value
-     * @throws RuntimeException if the specified value is larger than the largest unsigned integer (4294967295L).
+     * @param value The unsigned integer value to be written
+     * @throws RuntimeException If the specified value is larger than the largest unsigned integer (4294967295L) or
+     *                          if there are fewer than eight bytes remaining in this buffer
      */
     public void putUInt(long value) {
         if (value > UINT_MAX_VALUE) throw new RuntimeException("Value received doesn't fit in unsigned integer");
         try {
-            this.buffer.putInt((int) value);
+            buffer.putInt((int) value);
         } catch (BufferOverflowException e) {
             throw new RuntimeException(e);
         }
@@ -339,20 +370,20 @@ public class ByteBuffer {
     /**
      * Gets the byte order of this instance.
      *
-     * @return
+     * @return This buffer's byte order
      */
     public ByteOrder getWKBByteOrder() {
-        java.nio.ByteOrder order = this.buffer.order();
+        java.nio.ByteOrder order = buffer.order();
         return ByteOrder.valueOf(order);
     }
 
     /**
-     * Returns this instance as a byte array.
+     * Returns the byte array that backs this buffer.
      *
-     * @return
+     * @return The array that backs this buffer
      */
     public byte[] toByteArray(){
-        return this.buffer.array();
+        return buffer.array();
     }
 
     /**
@@ -363,15 +394,16 @@ public class ByteBuffer {
      */
     public boolean hasSameContent(ByteBuffer other) {
         if (other == null) return false;
-        if (other.isEmpty() != this.isEmpty()) return false;
         if (this.limit() != other.limit()) return false;
+        int thisSavedPosition = this.buffer.position();
+        int otherSavedPosition = other.buffer.position();
         this.rewind();
         other.rewind();
         for (int i = 0; i < this.limit(); i++) {
             if (this.get() != other.get()) return false;
         }
-        this.rewind();
-        other.rewind();
+        this.buffer.position(thisSavedPosition);
+        other.buffer.position(otherSavedPosition);
         return true;
     }
 
