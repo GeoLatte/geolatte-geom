@@ -168,7 +168,7 @@ class WktTokenizer {
             c = wkt.charAt(++currentPos);
             readDigits(stb, c);
         }
-        return Double.valueOf(stb.toString());
+        return Double.parseDouble(stb.toString());
     }
 
     private char readDigits(StringBuilder stb, char c) {

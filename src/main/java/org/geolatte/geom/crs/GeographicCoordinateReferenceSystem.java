@@ -26,8 +26,9 @@ package org.geolatte.geom.crs;
  * <p/>
  * <p>A <code>GeographicCoordinateReferenceSystem</code> is defined as a coordinate system based on
  * latitude and longitude. Some geographic coordinate systems are Lat/Lon, and some are Lon/Lat.
- * You can find out which this is by examining the <code>CoordinateSystemAxis</code>es. You should also check the angular units,
- * since not all geographic coordinate systems use degrees (see [CTS-1.00], p. 63).</p>
+ * You can find out which this is by examining the {@link CoordinateSystemAxis CoordinateSystemAxes}.
+ * You should also check the angular units, since not all geographic coordinate systems use degrees
+ * (see [CTS-1.00], p. 63).</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
@@ -42,8 +43,8 @@ public class GeographicCoordinateReferenceSystem extends CoordinateReferenceSyst
      *
      * @param crsId the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
      * @param name  the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes  the <code>CoordinateSystemAxis</code>es for this <code>CoordinateReferenceSystem</code>
-     * @throws IllegalArgumentException if less than two <code>CoordinateSystemAxis</code>es are passed.
+     * @param axes  the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
     public GeographicCoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
         super(crsId, name, axes);

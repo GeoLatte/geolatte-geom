@@ -34,10 +34,10 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.
      *
-     * @param crsId the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
+     * @param crsId the {@link CrsId} that identifies this <code>CoordinateReferenceSystem</code> uniquely
      * @param name the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes the <code>CoordinateSystemAxis</code>es for this <code>CoordinateReferenceSystem</code>
-     * @throws IllegalArgumentException if less than two <code>CoordinateSystemAxis</code>es are passed.
+     * @param axes the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
     public CoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
         super(crsId, name);
@@ -55,9 +55,9 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
     }
 
     /**
-     * Return the <code>CoordinateSystemAxis</code>es associated with this <code>CoordinateRefereeceSystem</code>.
+     * Return the {@link CoordinateSystemAxis CoordinateSystemAxes} associated with this <code>CoordinateRefereeceSystem</code>.
      *
-     * @return an array of <code>CoordinateSystemAxis</code>es.
+     * @return an array of {@link CoordinateSystemAxis CoordinateSystemAxes}.
      *
      */
     public CoordinateSystemAxis[] getAxes(){

@@ -40,8 +40,8 @@ public class GeocentricCoordinateReferenceSystem extends CoordinateReferenceSyst
      *
      * @param crsId the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
      * @param name  the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes  the <code>CoordinateSystemAxis</code>es for this <code>CoordinateReferenceSystem</code>
-     * @throws IllegalArgumentException if less than two <code>CoordinateSystemAxis</code>es are passed.
+     * @param axes  the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
     public GeocentricCoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
         super(crsId, name, axes);

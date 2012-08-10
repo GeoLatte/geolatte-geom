@@ -51,7 +51,7 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
      * @param geoCRS     the <code>GeographicCoordinateReferenceSystem</code> for this projection
      * @param projection the map projection method
      * @param parameters the projection parameters for the projection method
-     * @param axes       the <code>CoordinateSystemAxis</code>es of the cartesian coordinate system for
+     * @param axes       the {@link CoordinateSystemAxis CoordinateSystemAxes} of the cartesian coordinate system for
      *                   this <code>ProjectedCoordinateReferenceSystem</code>,
      */
     public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
