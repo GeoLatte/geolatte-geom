@@ -40,7 +40,13 @@ public class TestPostgisWktEncoderDecoder {
         String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
 
         PostgisWktDecoder postgisWktDecoder = new PostgisWktDecoder();
-        assertEquals(postgisWktDecoder.decode(wkt), postgisWktDecoder.decode(wkt));
+        Geometry decodedBefore = postgisWktDecoder.decode(wkt);
+
+        //Use decoder to decode point with srid
+        postgisWktDecoder.decode(testcases.getWKT(CodecTestCases.POINT_WITH_SRID));
+
+        Geometry decodedAfter = postgisWktDecoder.decode(wkt);
+        assertEquals(decodedBefore, decodedAfter);
     }
 
     @Test
@@ -49,7 +55,12 @@ public class TestPostgisWktEncoderDecoder {
         Geometry geom = new PostgisWktDecoder().decode(wkt);
 
         PostgisWktEncoder postgisWktEncoder = new PostgisWktEncoder();
-        assertEquals(postgisWktEncoder.encode(geom), postgisWktEncoder.encode(geom));
+        String encodedBefore = postgisWktEncoder.encode(geom);
+
+        postgisWktEncoder.encode(new PostgisWktDecoder().decode(testcases.getWKT(CodecTestCases.POINT_WITH_SRID)));
+
+        String encodedAfter = postgisWktEncoder.encode(geom);
+        assertEquals(encodedBefore, encodedAfter);
     }
 
     @Test

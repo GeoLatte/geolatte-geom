@@ -36,15 +36,16 @@ import org.geolatte.geom.crs.CrsId;
  */
 class PostgisWkbDecoder {
 
-    private CrsId crsId = CrsId.UNDEFINED;
+    private CrsId crsId;
 
     /**
-     * Decodes a Postgis WKB representation of a <code>Geometry</code>.
+     * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
      *
      * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     public Geometry decode(ByteBuffer byteBuffer) {
+        crsId = CrsId.UNDEFINED;
         byteBuffer.rewind();
         return decodeGeometry(byteBuffer);
     }

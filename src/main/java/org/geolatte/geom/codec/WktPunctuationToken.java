@@ -37,7 +37,7 @@ class WktPunctuationToken implements WktToken {
     }
 
     public char getChar(){
-        return this.punctuationChar;
+        return punctuationChar;
     }
 
     @Override

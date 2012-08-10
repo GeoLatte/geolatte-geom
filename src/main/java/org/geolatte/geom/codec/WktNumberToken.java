@@ -37,10 +37,10 @@ class WktNumberToken implements WktToken {
     }
 
     public double getNumber() {
-        return this.number;
+        return number;
     }
 
     public String toString(){
-        return String.valueOf(this.number);
+        return String.valueOf(number);
     }
 }

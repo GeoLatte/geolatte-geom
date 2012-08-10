@@ -34,7 +34,7 @@ import org.geolatte.geom.*;
 class PostgisWkbEncoder {
 
     /**
-     * Encodes a Geometry into Postgis WKB.
+     * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
      *
      * @param geom The <code>Geometry</code> to be encoded as WKB.
      * @param wbo The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}

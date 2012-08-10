@@ -33,7 +33,7 @@ class WktPointSequenceToken implements WktToken {
 
     private final PointSequence points;
 
-    public WktPointSequenceToken(org.geolatte.geom.PointSequence points) {
+    public WktPointSequenceToken(PointSequence points) {
         this.points = points;
     }
 
@@ -42,7 +42,7 @@ class WktPointSequenceToken implements WktToken {
     }
 
     public String toString(){
-        return this.points.toString();
+        return points.toString();
     }
 
 }
