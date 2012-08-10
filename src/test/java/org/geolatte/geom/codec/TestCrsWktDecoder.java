@@ -137,7 +137,7 @@ public class TestCrsWktDecoder {
         expectedParameters.add ( new CrsParameter("central_meridian",4.367486666666666));
         expectedParameters.add ( new CrsParameter("false_easting",150000.013));
         expectedParameters.add ( new CrsParameter("false_northing",5400088.438));
-        assertArrayEquals(expectedParameters.toArray(new CrsParameter[]{}), parameters.toArray(new CrsParameter[]{}));
+        assertArrayEquals(expectedParameters.toArray(), parameters.toArray());
 
         //check the authority
         assertEquals(31370, projCRS.getCrsId().getCode());

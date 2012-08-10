@@ -26,8 +26,8 @@ package org.geolatte.geom.codec;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class WktParseException extends RuntimeException {
-    WktParseException(String msg) {
+public class WktDecodeException extends RuntimeException {
+    WktDecodeException(String msg) {
         super(msg);
     }
 }

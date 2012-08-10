@@ -324,7 +324,7 @@ class JTSGeometryOperations implements GeometryOperations {
         double yMin = Double.POSITIVE_INFINITY;
         double xMax = Double.NEGATIVE_INFINITY;
         double yMax = Double.NEGATIVE_INFINITY;
-        CrsId crsId;
+        final CrsId crsId;
 
         EnvelopeVisitor(CrsId crsId) {
             this.crsId = crsId;

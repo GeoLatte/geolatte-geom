@@ -79,8 +79,8 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
              throw new IllegalArgumentException("Attempting to add Point to pointsequence with inconsistent DimensionalFlag");
         }
         double[] coords = getPointCoordinates(point);
-        for (int i = 0; i < coords.length; i++) {
-            add(coords[i]);
+        for (double coord : coords) {
+            add(coord);
         }
         return this;
     }

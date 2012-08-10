@@ -26,7 +26,7 @@ import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 
 /**
- * A Utility class for encoding/decoding WKB geometry representations.
+ * A Utility class for encoding/decoding WKB geometry representations for the PostGIS EWKB dialect (versions 1.0 to 1.5).
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
@@ -34,21 +34,21 @@ import org.geolatte.geom.Geometry;
 public class Wkb {
 
     /**
-     * Encodes a <code>Geometry</code> to a WKB representation using the NDR (little-endian)  byte-order.
+     * Encodes a <code>Geometry</code> into a WKB representation using the NDR (little-endian)  byte-order.
      *
-     * @param geometry
-     * @return
+     * @param geometry The <code>Geometry</code> to be encoded as WKB.
+     * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     public static ByteBuffer toWkb(Geometry geometry) {
         return toWkb(geometry, ByteOrder.NDR);
     }
 
     /**
-     * Encodes a <code>Geometry</code> to a WKB representation using the specified byte-order.
+     * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
      *
-     * @param geometry
-     * @param byteOrder
-     * @return
+     * @param geometry The <code>Geometry</code> to be encoded as WKB.
+     * @param byteOrder The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
+     * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     public static ByteBuffer toWkb(Geometry geometry, ByteOrder byteOrder) {
         PostgisWkbEncoder encoder = new PostgisWkbEncoder();
@@ -56,10 +56,10 @@ public class Wkb {
     }
 
     /**
-     * Decodes a <code>ByteBuffer</code> buffer to a Geometry.
+     * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
      *
-     * @param byteBuffer
-     * @return
+     * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
+     * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     public static Geometry fromWkb(ByteBuffer byteBuffer) {
         PostgisWkbDecoder decoder = new PostgisWkbDecoder();

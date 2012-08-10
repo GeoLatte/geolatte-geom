@@ -65,7 +65,7 @@ public class TestCrsWktWordMatcher {
         try {
             matcher.matchKeyword(test, 0, test.length());
             fail();
-        }catch(WktParseException e){
+        }catch(WktDecodeException e){
             //OK
         }
     }

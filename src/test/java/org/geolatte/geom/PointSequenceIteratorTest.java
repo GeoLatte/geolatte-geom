@@ -73,7 +73,7 @@ public class PointSequenceIteratorTest {
     public void test_iteration_over_empty_sequence() throws Exception {
         int i = 0;
         while (itEmpty.hasNext()){
-            Point received = itEmpty.next();
+            itEmpty.next();
             i++;
         }
         assertEquals(0, i);

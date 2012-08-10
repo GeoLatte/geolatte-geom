@@ -37,7 +37,7 @@ abstract class WktVariant {
 
     private final WktPunctuationToken openList;
     private final WktPunctuationToken closeList;
-    private final WktPunctuationToken elemSep;
+    private final WktPunctuationToken elementSeparator;
     private final WktPunctuationToken end = new WktPunctuationToken(' ');
 
     /**
@@ -45,12 +45,12 @@ abstract class WktVariant {
      *
      * @param openList the character that indicates the start of a list, e.g. '(' or '['
      * @param closeList the character that indicates the end of a list, e.g. ')' or ']'
-     * @param elemSep the character that separates individual elements in a structure (usually ',')
+     * @param elementSeparator the character that separates individual elements in a structure (usually ',')
      */
-    protected WktVariant(char openList, char closeList, char elemSep) {
+    protected WktVariant(char openList, char closeList, char elementSeparator) {
         this.openList = new WktPunctuationToken(openList);
         this.closeList = new WktPunctuationToken(closeList);
-        this.elemSep = new WktPunctuationToken(elemSep);
+        this.elementSeparator = new WktPunctuationToken(elementSeparator);
     }
 
 
@@ -62,7 +62,7 @@ abstract class WktVariant {
      * @param currentPos the start position for the match
      * @param endPos the end position for the match
      * @return a matching <code>WktKeywordToken</code>
-     * @throws WktParseException if nothing matches at the specified substring.
+     * @throws WktDecodeException if nothing matches at the specified substring.
      */
     public WktKeywordToken matchKeyword(CharSequence wkt, int currentPos, int endPos) {
         for (WktKeywordToken token : getWktKeywords()){
@@ -70,7 +70,7 @@ abstract class WktVariant {
                  return token;
              }
         }
-        throw new WktParseException(String.format("Can't interpret word %s in Wkt.", wkt.subSequence(currentPos, endPos)));
+        throw new WktDecodeException(String.format("Can't interpret word %s in Wkt.", wkt.subSequence(currentPos, endPos)));
     }
 
     /**
@@ -88,8 +88,8 @@ abstract class WktVariant {
         return closeList;
     }
 
-    public WktPunctuationToken getElemSep() {
-        return elemSep;
+    public WktPunctuationToken getElementSeparator() {
+        return elementSeparator;
     }
 
     public WktPunctuationToken end() {
@@ -105,6 +105,6 @@ abstract class WktVariant {
     }
 
     public char getElemSepChar() {
-        return getElemSep().getChar();
+        return getElementSeparator().getChar();
     }
 }

@@ -78,7 +78,7 @@ public class TestByteBuffer {
     @Test
     public void test_throw_IllegalArgumentException_on_null_string() {
         try {
-            ByteBuffer byteBuffer = ByteBuffer.from((String) null);
+            ByteBuffer.from((String) null);
             fail();
         } catch (IllegalArgumentException e) {
             //OK
@@ -134,7 +134,7 @@ public class TestByteBuffer {
         String hxStr = "C7B47F03";
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
         try {
-            Long lng = byteBuffer.getLong();
+            byteBuffer.getLong();
         } catch (RuntimeException e) {
             //OK
         }

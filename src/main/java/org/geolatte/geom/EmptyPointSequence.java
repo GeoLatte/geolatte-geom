@@ -32,7 +32,7 @@ import java.util.Iterator;
  */
 class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
-    public static EmptyPointSequence INSTANCE = new EmptyPointSequence();
+    public static final EmptyPointSequence INSTANCE = new EmptyPointSequence();
 
     private EmptyPointSequence(){}
 

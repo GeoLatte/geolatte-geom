@@ -36,7 +36,7 @@ class WktDimensionMarkerToken extends WktKeywordToken {
     private final DimensionalFlag dimensionalFlag;
 
     public WktDimensionMarkerToken(String pattern, DimensionalFlag flag) {
-        super("pattern");
+        super(pattern);
         this.dimensionalFlag = flag;
     }
 

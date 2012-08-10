@@ -24,17 +24,17 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.Geometry;
 
 /**
- *  A Utility class for encoding/decoding WKB geometry representations.
+ *  A utility class for encoding/decoding WKT geometry representations.
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class Wkt {
 
     /**
-     * Decodes the specified String to a <code>Geometry</code>.
+     * Decodes the specified WKT String to a <code>Geometry</code>.
      *
-     * @param wkt
-     * @return
+     * @param wkt the WKT string to decode
+     * @return The decoded Geometry
      */
     public static Geometry fromWkt(String wkt) {
         PostgisWktDecoder decoder = new PostgisWktDecoder();
@@ -44,8 +44,8 @@ public class Wkt {
     /**
      * Encodes a <code>Geometry</code> to a WKT representation.
      *
-     * @param geometry
-     * @return
+     * @param geometry the <code>Geometry</code> to encode
+     * @return the WKT representation of the given geometry
      */
     public static String toWkt(Geometry geometry) {
         PostgisWktEncoder encoder = new PostgisWktEncoder();

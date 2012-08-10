@@ -171,7 +171,7 @@ public class TestJTSGeometryOperations {
         psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
         psBuilder.add(3, 1).add(3, 4);
         LineString lineString2 = new LineString(psBuilder.toPointSequence(), null);
-        assertEquals(2, ops.createDistanceOp(lineString, lineString2).execute(), 0.00001d);
+        assertEquals(2., ops.createDistanceOp(lineString, lineString2).execute(), 0.00001d);
     }
 
     @Test
@@ -289,7 +289,7 @@ public class TestJTSGeometryOperations {
     @Test
     public void testLocateAlongOpOnNullThrowsIllegalArgument() {
         try {
-            Geometry result = ops.createLocateAlongOp(null, 10d).execute();
+            ops.createLocateAlongOp(null, 10d).execute();
             fail("No IllegalArgumentException thrown on NULL argument");
         } catch (IllegalArgumentException e) {
             //OK
@@ -299,7 +299,7 @@ public class TestJTSGeometryOperations {
     @Test
     public void testLocateBetweenOpOnNullThrowsIllegalArgument() {
         try {
-            Geometry result = ops.createLocateBetweenOp(null, 10d, 12d).execute();
+            ops.createLocateBetweenOp(null, 10d, 12d).execute();
             fail("No IllegalArgumentException thrown on NULL argument");
         } catch (IllegalArgumentException e) {
             //OK

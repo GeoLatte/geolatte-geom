@@ -36,15 +36,16 @@ import org.geolatte.geom.crs.CrsId;
  */
 class PostgisWkbDecoder {
 
-    private CrsId crsId = CrsId.UNDEFINED;
+    private CrsId crsId;
 
     /**
-     * Decodes a Postgis WKB representation of a <code>Geometry</code>.
+     * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
      *
-     * @param byteBuffer
-     * @return
+     * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
+     * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     public Geometry decode(ByteBuffer byteBuffer) {
+        crsId = CrsId.UNDEFINED;
         byteBuffer.rewind();
         return decodeGeometry(byteBuffer);
     }
@@ -53,7 +54,7 @@ class PostgisWkbDecoder {
         alignByteOrder(byteBuffer);
         int typeCode = readTypeCode(byteBuffer);
         WkbGeometryType wkbType = WkbGeometryType.parse((byte) typeCode);
-        readSRIDIfPresent(byteBuffer, typeCode);
+        readSridIfPresent(byteBuffer, typeCode);
         DimensionalFlag flag = getCoordinateDimension(typeCode);
         switch (wkbType) {
             case POINT:
@@ -70,7 +71,6 @@ class PostgisWkbDecoder {
                 return decodeMultiPolygon(byteBuffer);
             case MULTI_LINE_STRING:
                 return decodeMultiLineString(byteBuffer);
-
         }
         throw new IllegalStateException(String.format("WKBType %s is not supported.", wkbType));
     }
@@ -166,7 +166,7 @@ class PostgisWkbDecoder {
         return DimensionalFlag.valueOf(hasZ, hasM);
     }
 
-    private void readSRIDIfPresent(ByteBuffer byteBuffer, int typeCode) {
+    private void readSridIfPresent(ByteBuffer byteBuffer, int typeCode) {
         if (hasSrid(typeCode)) {
             crsId = CrsId.valueOf(byteBuffer.getInt());
         }

@@ -22,7 +22,7 @@
 package org.geolatte.geom.crs;
 
 import org.geolatte.geom.codec.CrsWktDecoder;
-import org.geolatte.geom.codec.WktParseException;
+import org.geolatte.geom.codec.WktDecodeException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class CrsRegistry {
         try {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
             crsMap.put(srid, crs);
-        } catch (WktParseException e) {
+        } catch (WktDecodeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid,tokens[2], e.getMessage()));
         }
 

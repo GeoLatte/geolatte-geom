@@ -26,7 +26,7 @@ import java.util.Arrays;
 /**
  * A coordinate system.
  *
- * <p>A coordinate system is characterized by its <code>CoordinateSystemAxis</code>es (in order).</p>
+ * <p>A coordinate system is characterized by its {@link CoordinateSystemAxis CoordinateSystemAxes} (in order).</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
@@ -36,22 +36,22 @@ public class CoordinateSystem {
     private final CoordinateSystemAxis[] axes;
 
     /**
-     * Constructs an <code>CoordinateSystem</code>.
+     * Constructs a <code>CoordinateSystem</code>.
      *
-     * <p><code>CoordinateSystem</code>s are characterized by their <code>CoordinateSystemAxis</code>es. </p>
+     * <p><code>CoordinateSystem</code>s are characterized by their {@link CoordinateSystemAxis CoordinateSystemAxes}. </p>
      *
-     * @param axes the sequence (at least two) of its <code>CoordinateSystem</code>es.
+     * @param axes the sequence (at least two) of its <code>CoordinateSystem</code>s.
      * @throws IllegalArgumentException when less than two axes are specified.
      */
     public CoordinateSystem(CoordinateSystemAxis... axes) {
         if (axes == null || axes.length < 2) {
-            throw new IllegalArgumentException("Require at least 2 axes");
+            throw new IllegalArgumentException("Requires at least 2 axes");
         }
         this.axes = axes;
     }
 
     /**
-     * Returns the <code>CoordinateSystemAxis</code>es of this <code>CoordinateSystem</code> (in order).
+     * Returns the {@link CoordinateSystemAxis CoordinateSystemAxes} of this <code>CoordinateSystem</code> (in order).
      * @return
      */
     public CoordinateSystemAxis[] getAxes() {
@@ -67,7 +67,7 @@ public class CoordinateSystem {
     }
 
     /**
-     * Returns the position of the specified <code>CoordinateSystemAxis</code> in this <code>CoordinateSystem</code>.
+     * Returns the position of the specified {@link CoordinateSystemAxis} in this <code>CoordinateSystem</code>.
      * @param axis
      * @return
      */
@@ -81,7 +81,7 @@ public class CoordinateSystem {
     }
 
     /**
-     * Returns the <code>CoordinateSystemAxis</code> at the specified position.
+     * Returns the {@link CoordinateSystemAxis} at the specified position.
      *
      * @param index
      * @return

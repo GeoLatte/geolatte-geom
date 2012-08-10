@@ -39,8 +39,9 @@ class PostgisWktEncoder {
     private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
 
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
+    private StringBuffer builder;
+
     private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
-    private final StringBuffer builder = new StringBuffer();
     private final NumberFormat formatter;
 
     private static final int MAX_FRACTIONAL_DIGITS = 24;
@@ -59,9 +60,10 @@ class PostgisWktEncoder {
      * Encodes the specified <code>Geometry</code>.
      *
      * @param geometry the <code>Geometry</code> to encode
-     * @return the WKT representation of the geometry parameter value.
+     * @return the WKT representation of the given geometry
      */
     public String encode(Geometry geometry) {
+        builder = new StringBuffer();
         addSridIfValid(geometry);
         addGeometry(geometry);
         return result();
@@ -69,9 +71,9 @@ class PostgisWktEncoder {
 
     private void addSridIfValid(Geometry geometry) {
         if (geometry.getSRID() < 1) return;
-        this.builder.append("SRID=")
-                .append(geometry.getSRID())
-                .append(";");
+        builder.append("SRID=")
+               .append(geometry.getSRID())
+               .append(";");
     }
 
     private void addGeometry(Geometry geometry) {
@@ -164,15 +166,15 @@ class PostgisWktEncoder {
     }
 
     private void addWhitespace() {
-        this.builder.append(" ");
+        builder.append(" ");
     }
 
     private void addDelimiter() {
-        this.builder.append(",");
+        builder.append(",");
     }
 
     private void addStartList() {
-        this.builder.append("(");
+        builder.append("(");
     }
 
     private void addEmptyKeyword() {
@@ -180,7 +182,7 @@ class PostgisWktEncoder {
     }
 
     private void addGeometryTag(Geometry geometry) {
-        this.builder.append(WKT_WORDS.wordFor(geometry));
+        builder.append(WKT_WORDS.wordFor(geometry));
     }
 
     private String result() {

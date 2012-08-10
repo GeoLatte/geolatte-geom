@@ -54,7 +54,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingShouldHaveAtLeast4Points() {
         try {
-            LinearRing invalid = new LinearRing(tooFewPoints, CrsId.UNDEFINED);
+            new LinearRing(tooFewPoints, CrsId.UNDEFINED);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -73,7 +73,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingMustBeClosed() {
         try {
-            LinearRing invalid = new LinearRing(notClosedPoints, CrsId.UNDEFINED);
+            new LinearRing(notClosedPoints, CrsId.UNDEFINED);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }

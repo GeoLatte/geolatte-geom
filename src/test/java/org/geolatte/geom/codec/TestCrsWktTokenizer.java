@@ -56,7 +56,7 @@ public class TestCrsWktTokenizer {
         //read seperator
         assertTrue(tokenizer.moreTokens());
         token = tokenizer.nextToken();
-        assertEquals(token, symbols.getElemSep());
+        assertEquals(token, symbols.getElementSeparator());
 
         //read Datum
         assertTrue(tokenizer.moreTokens());

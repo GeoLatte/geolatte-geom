@@ -44,12 +44,10 @@ public class PointCollectionPointEquality implements PointCollectionEquality {
 
     @Override
     public boolean equals(PointCollection first, PointCollection second) {
-     
+
         if (first == second) return true;
-        if (first == null && second == null) return true;
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
-        if (first.isEmpty() || second.isEmpty()) return false;
         if (first.size() != second.size()) return false;
 
         if (first instanceof ComplexPointCollection && second instanceof ComplexPointCollection) {

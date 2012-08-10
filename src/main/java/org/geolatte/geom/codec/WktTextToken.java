@@ -42,7 +42,7 @@ class WktTextToken implements WktToken {
      * @return the text
      */
     public String getText() {
-        return this.text;
+        return text;
     }
 }
 
