@@ -40,33 +40,33 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
 
     private String wktString;
-    private PointSequence currentPointSequence = null;
-    private CrsId crsId = CrsId.UNDEFINED;
+    private CrsId crsId;
 
     public PostgisWktDecoder() {
         super(WKT_GEOM_TOKENS);
     }
 
     public Geometry decode(String wkt) {
-        if (wkt == null || wkt.isEmpty()) throw new WktDecodeException("Null or empty string passed");
-        splitSRIDAndWKT(wkt);
+        if (wkt == null || wkt.isEmpty()) throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
+        splitSridAndWkt(wkt);
         initializeTokenizer();
         return decodeGeometry();
     }
 
-    private void initializeTokenizer() {
-        setTokenizer(new WktTokenizer(this.wktString, getWktVariant()));
-        nextToken();
-    }
-
-    private void splitSRIDAndWKT(String wkt) {
+    private void splitSridAndWkt(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
             crsId = CrsId.valueOf(Integer.parseInt(matcher.group(1)));
-            this.wktString = wkt.substring(matcher.end());
+            wktString = wkt.substring(matcher.end());
         } else {
-            this.wktString = wkt;
+            crsId = CrsId.UNDEFINED;
+            wktString = wkt;
         }
+    }
+
+    private void initializeTokenizer() {
+        setTokenizer(new WktTokenizer(wktString, getWktVariant()));
+        nextToken();
     }
 
     private Geometry decodeGeometry() {
@@ -158,9 +158,8 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
         if (matchesOpenList()) {
             List<LinearRing> rings = new ArrayList<LinearRing>();
             while (!matchesCloseList()) {
-                matchesPoints();
+                rings.add(new LinearRing(decodePointSequence(), crsId));
                 matchesElementSeparator();
-                rings.add(new LinearRing(currentPointSequence, crsId));
             }
             return new Polygon(rings.toArray(new LinearRing[rings.size()]));
         }
@@ -171,8 +170,9 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     }
 
     private LineString decodeLineStringText() {
-        if (matchesPoints()) {
-            return new LineString(currentPointSequence, crsId);
+        PointSequence pointSequence = decodePointSequence();
+        if (pointSequence != null) {
+            return new LineString(pointSequence, crsId);
         }
         if (matchesEmptyToken()) {
             return LineString.createEmpty();
@@ -181,24 +181,14 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     }
 
     private Point decodePointText() {
-        if (matchesPoints()) {
-            return new Point(currentPointSequence, crsId);
+        PointSequence pointSequence = decodePointSequence();
+        if (pointSequence != null) {
+            return new Point(pointSequence, crsId);
         }
         if (matchesEmptyToken()) {
             return Points.createEmpty();
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
-
-    }
-
-    private boolean matchesPoints() {
-        if (matchesOpenList()) {
-            this.currentPointSequence = decodePointSequence();
-            if (!matchesCloseList()) throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
-            return true;
-        }
-        this.currentPointSequence = null;
-        return false;
     }
 
     private boolean matchesEmptyToken() {
@@ -210,12 +200,17 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     }
 
     private PointSequence decodePointSequence() {
-        if (currentToken instanceof WktPointSequenceToken) {
-            PointSequence points = ((WktPointSequenceToken) currentToken).getPoints();
-            nextToken();
-            return points;
+        PointSequence pointSequence = null;
+        if (matchesOpenList()) {
+            if (currentToken instanceof WktPointSequenceToken) {
+                pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
+                nextToken();
+            } else {
+                throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+            }
+            if (!matchesCloseList()) throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
         }
-        throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+        return pointSequence;
     }
 
     private String buildWrongSymbolAtPositionMsg() {

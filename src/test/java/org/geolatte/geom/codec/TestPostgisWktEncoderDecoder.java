@@ -22,7 +22,6 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
@@ -37,17 +36,33 @@ public class TestPostgisWktEncoderDecoder {
     CodecTestCases testcases = new CodecTestCases();
 
     @Test
+    public void testDecodeTwice() throws Exception {
+        String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
+
+        PostgisWktDecoder postgisWktDecoder = new PostgisWktDecoder();
+        assertEquals(postgisWktDecoder.decode(wkt), postgisWktDecoder.decode(wkt));
+    }
+
+    @Test
+    public void testEncodeTwice() throws Exception {
+        String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
+        Geometry geom = new PostgisWktDecoder().decode(wkt);
+
+        PostgisWktEncoder postgisWktEncoder = new PostgisWktEncoder();
+        assertEquals(postgisWktEncoder.encode(geom), postgisWktEncoder.encode(geom));
+    }
+
+    @Test
     public void test_point_2d() {
         String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(CodecTestCases.POINT_2D), geom);
         testEncoding(wkt, geom);
-
     }
 
     private void testEncoding(String wkt, Geometry geom) {
-        Assert.assertEquals(wkt, Wkt.toWkt(geom));
+        assertEquals(wkt, Wkt.toWkt(geom));
     }
 
     @Test
@@ -57,7 +72,6 @@ public class TestPostgisWktEncoderDecoder {
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(CodecTestCases.POINT_3D), geom);
         testEncoding(wkt, geom);
-
     }
 
     @Test
@@ -187,7 +201,7 @@ public class TestPostgisWktEncoderDecoder {
 
 
     private Geometry decode(String wkt) {
-        return Wkt.fromWkt(wkt);  //To change body of created methods use File | Settings | File Templates.
+        return Wkt.fromWkt(wkt);
     }
 
 

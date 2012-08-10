@@ -40,14 +40,14 @@ class WktGeometryToken extends WktKeywordToken {
     }
 
     GeometryType getType() {
-        return this.geometryType;
+        return geometryType;
     }
 
     boolean isMeasured() {
-        return this.isMeasured;
+        return isMeasured;
     }
 
     public String toString(){
-        return this.getType().toString() + (isMeasured() ? " M" : "");
+        return getType() + (isMeasured() ? " M" : "");
     }
 }
