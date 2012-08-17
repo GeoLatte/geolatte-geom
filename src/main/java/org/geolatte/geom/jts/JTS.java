@@ -46,11 +46,16 @@ public class JTS {
 
     /**
      * Primary Factory method that converts a JTS geometry into an equivalent geolatte geometry
+     *
      * @param jtsGeometry the jts geometry to convert
      * @return an equivalent geolatte geometry
+     * @throws IllegalArgumentException when a null object is passed
      */
     public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
-        return from(jtsGeometry,  CrsId.valueOf(jtsGeometry.getSRID()));
+        if (jtsGeometry == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
+        return from(jtsGeometry, CrsId.valueOf(jtsGeometry.getSRID()));
     }
 
     /**
@@ -60,8 +65,12 @@ public class JTS {
      * @param jtsGeometry the jtsGeometry
      * @param crsId
      * @return A geolatte geometry that corresponds with the given JTS geometry
+     * @throws IllegalArgumentException when a null object is passed
      */
     public static org.geolatte.geom.Geometry from(Geometry jtsGeometry, CrsId crsId) {
+        if (jtsGeometry == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
         if (jtsGeometry instanceof Point) {
             return from((Point) jtsGeometry, crsId);
         } else if (jtsGeometry instanceof LineString) {
@@ -83,10 +92,15 @@ public class JTS {
 
     /**
      * Primary factory method that converts a geolatte geometry into an equivalent jts geometry
+     *
      * @param geometry the geolatte geometry to start from
      * @return the equivalent JTS geometry
+     * @throws IllegalArgumentException when a null object is passed
      */
     public static com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry geometry) {
+        if (geometry == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
         if (geometry instanceof org.geolatte.geom.Point) {
             return to((org.geolatte.geom.Point) geometry);
         } else if (geometry instanceof org.geolatte.geom.LineString) {
@@ -108,11 +122,16 @@ public class JTS {
 
     /**
      * Converts a JTS <code>Envelope</code> to a geolatte <code>Envelope</code>.
+     *
      * @param jtsEnvelope the JTS Envelope to convert
      * @return the corresponding geolatte Envelope.
+     * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope){
-        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
+        if (jtsEnvelope == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
                 jtsEnvelope.getMaxY());
     }
 
@@ -121,20 +140,29 @@ public class JTS {
      * specified CRS.
      *
      * @param jtsEnvelope the JTS Envelope to convert.
-     * @param crsId the <code>CrsId</code> to use for the return value.
+     * @param crsId       the <code>CrsId</code> to use for the return value.
      * @return the corresponding geolatte Envelope, having the CRS specified in the crsId parameter.
+     * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope, CrsId crsId){
-        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(),jtsEnvelope.getMinY(),jtsEnvelope.getMaxX(),
+    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope, CrsId crsId) {
+        if (jtsEnvelope == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
+        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
                 jtsEnvelope.getMaxY(), crsId);
     }
 
     /**
      * Converts a Geolatte <code>Envelope</code> to a JTS <code>Envelope</code>.
+     *
      * @param env the geolatte Envelope.
      * @return the corresponding JTS Envelope.
+     * @throws IllegalArgumentException when a null object is passed
      */
     public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope env) {
+        if (env == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
         return new com.vividsolutions.jts.geom.Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
     }
 
@@ -148,7 +176,7 @@ public class JTS {
      */
     private static org.geolatte.geom.MultiPolygon from(MultiPolygon jtsGeometry, CrsId crsId) {
         org.geolatte.geom.Polygon[] polygons = new org.geolatte.geom.Polygon[jtsGeometry.getNumGeometries()];
-        for (int i =0; i< jtsGeometry.getNumGeometries(); i++) {
+        for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
             polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crsId);
         }
         return new org.geolatte.geom.MultiPolygon(polygons);
@@ -184,7 +212,7 @@ public class JTS {
      */
     private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, CrsId crsId) {
         org.geolatte.geom.Geometry[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
-        for (int i=0; i < jtsGeometry.getNumGeometries(); i++) {
+        for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
             geoms[i] = from(jtsGeometry.getGeometryN(i), crsId);
         }
         return new org.geolatte.geom.GeometryCollection(geoms);
@@ -256,7 +284,7 @@ public class JTS {
     private static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
         MultiPoint mp = geometryFactory().createMultiPoint(sequenceOf(multiPoint));
         mp.setSRID(multiPoint.getSRID());
-        for (int i =0;i <mp.getNumGeometries(); i++) {
+        for (int i = 0; i < mp.getNumGeometries(); i++) {
             mp.getGeometryN(i).setSRID(multiPoint.getSRID());
         }
         return mp;
@@ -264,7 +292,7 @@ public class JTS {
 
     private static MultiLineString to(org.geolatte.geom.MultiLineString multiLineString) {
         LineString[] lineStrings = new LineString[multiLineString.getNumGeometries()];
-        for (int i=0; i < multiLineString.getNumGeometries(); i++) {
+        for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
             lineStrings[i] = to(multiLineString.getGeometryN(i));
         }
         MultiLineString mls = geometryFactory().createMultiLineString(lineStrings);
@@ -274,7 +302,7 @@ public class JTS {
 
     private static MultiPolygon to(org.geolatte.geom.MultiPolygon multiPolygon) {
         Polygon[] polygons = new Polygon[multiPolygon.getNumGeometries()];
-        for (int i=0; i < multiPolygon.getNumGeometries(); i++) {
+        for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
             polygons[i] = to(multiPolygon.getGeometryN(i));
         }
         MultiPolygon mp = geometryFactory().createMultiPolygon(polygons);
@@ -284,7 +312,7 @@ public class JTS {
 
     private static GeometryCollection to(org.geolatte.geom.GeometryCollection collection) {
         Geometry[] geoms = new Geometry[collection.getNumGeometries()];
-        for (int i=0; i < collection.getNumGeometries(); i++) {
+        for (int i = 0; i < collection.getNumGeometries(); i++) {
             geoms[i] = to(collection.getGeometryN(i));
         }
         GeometryCollection gc = geometryFactory().createGeometryCollection(geoms);
