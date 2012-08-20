@@ -80,7 +80,6 @@ public class MultiLineStringTest {
     public void testGetGeometryN() throws Exception {
         assertEquals(ls1, ml1.getGeometryN(0));
         assertEquals(ls2, ml1.getGeometryN(1));
-        System.out.println("ml1 = " + ml1);
     }
 
     @Test
