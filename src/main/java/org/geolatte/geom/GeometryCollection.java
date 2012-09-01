@@ -150,7 +150,7 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      * <p>Conditions:</p>
      * <il>
      *     <li>Array contains no NULL values</li>
-     *     <li>All elements have the same coordinate reference system</li>
+     *     <li>All non-empty elements have the same coordinate reference system/li>
      * </il>
      * @param geometries
      */
@@ -161,8 +161,9 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
         CrsId crsId = geometries[0].getCrsId();
         for (int i = 1; i < geometries.length; i++) {
             if (geometries[i] == null) throw new IllegalStateException(msg);
-            if ( ! crsId.equals(geometries[i].getCrsId()) )
+            if (!(geometries[i].isEmpty() || crsId.equals(geometries[i].getCrsId()))){
                 throw new IllegalStateException("Geometries in the array do no share the same coordinate reference systems.");
+            }
         }
     }
 
