@@ -66,6 +66,9 @@ public class CrsId {
      * @return a <code>CrsId</code> for the specified authority and code.
      */
     public static CrsId valueOf(String authority, int code) {
+        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code == 0 || code == 1 )) {
+            return CrsId.UNDEFINED;
+        }
         return new CrsId(authority, code);
     }
 
@@ -77,19 +80,24 @@ public class CrsId {
      * @return a <code>CrsId</code> for the specified code,and EPSG as authority.
      */
     public static CrsId valueOf(int code) {
-        return new CrsId(CrsId.DEFAULT_AUTHORITY, code);
+        return valueOf(CrsId.DEFAULT_AUTHORITY, code);
     }
 
     /**
      * Creates an instance having the specified authority and code.
+     *
+     * <p>If authority EPSG and 0 or -1 is passed for the code parameter, a value equal to <code>CrsId.UNDEFINED</code> is returned.
      *
      * @param authority the authority that assigned the code
      * @param code the code for the <code>CoordinateReferenceSystem</code>
      * @return a <code>CrsId</code> for the specified authority and code.
      */
     public CrsId(String authority, int code) {
-        this.authority = authority;
-        this.code = code;
+        if (authority == null || authority.isEmpty()) {
+            throw new IllegalArgumentException("Null or empty authority parameter.");
+        }
+        this.authority = authority.toUpperCase();
+        this.code = (code < 1 && DEFAULT_AUTHORITY.equals(this.authority)) ? -1 : code;
     }
 
     /**
