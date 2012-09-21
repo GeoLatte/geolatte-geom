@@ -57,6 +57,17 @@ public class TestCrsId {
     }
 
     @Test
+    public void testValueOf(){
+        assertEquals(CrsId.parse("epsg:4326"), CrsId.valueOf("EPSG", 4326));
+        assertEquals(CrsId.parse("4326"), CrsId.valueOf(4326));
+        assertEquals(CrsId.UNDEFINED, CrsId.valueOf(0));
+        assertEquals(CrsId.UNDEFINED, CrsId.valueOf(-1));
+        assertEquals(CrsId.parse("1"), CrsId.valueOf(1));
+
+    }
+    
+
+    @Test
     public void testToString() {
         assertEquals("EPSG:31370", CrsId.valueOf("epsg", 31370).toString());
         assertEquals("EPSG:31370", CrsId.valueOf(31370).toString());

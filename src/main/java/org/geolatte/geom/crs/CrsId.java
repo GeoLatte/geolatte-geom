@@ -66,7 +66,7 @@ public class CrsId {
      * @return a <code>CrsId</code> for the specified authority and code.
      */
     public static CrsId valueOf(String authority, int code) {
-        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code == 0 || code == 1 )) {
+        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0 )) {
             return CrsId.UNDEFINED;
         }
         return new CrsId(authority, code);
