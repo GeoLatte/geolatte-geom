@@ -40,7 +40,7 @@ abstract class AbstractPointCollection implements PointCollection, CoordinateSeq
 
 
     private static Coordinate[] toCoordinateArray(AbstractPointCollection set) {
-        Coordinate[] coordinates = new DimensionalCoordinate[set.size()];
+        Coordinate[] coordinates = new Coordinate[set.size()];
         for (int i = 0; i < set.size(); i++){
             coordinates[i] = new DimensionalCoordinate(set.getDimensionalFlag());
             set.getCoordinate(i, coordinates[i]);
