@@ -22,9 +22,15 @@
 package org.geolatte.geom;
 
 /**
- * An exception for Buffer overflow.
+ * An exception for Buffer over- or underflow.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/29/12
  */
-public class BufferAccessException extends RuntimeException {}
+public class BufferAccessException extends RuntimeException {
+
+    public BufferAccessException(String msg) {
+        super(msg);
+    }
+
+}

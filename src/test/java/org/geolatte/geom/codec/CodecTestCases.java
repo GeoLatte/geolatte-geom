@@ -175,16 +175,16 @@ public class CodecTestCases {
         this.expected.put(key, geom);
     }
 
-    public String getWKT(Integer name) {
-        return this.wktcases.get(name);
+    public String getWKT(Integer testCase) {
+        return this.wktcases.get(testCase);
     }
 
-    public Geometry getExpected(Integer name) {
-        return this.expected.get(name);
+    public Geometry getExpected(Integer testCase) {
+        return this.expected.get(testCase);
     }
 
-    public ByteBuffer getWKB(Integer name) {
-        return this.wkbcases.get(name);
+    public ByteBuffer getWKB(Integer testCase) {
+        return this.wkbcases.get(testCase);
     }
 
 }

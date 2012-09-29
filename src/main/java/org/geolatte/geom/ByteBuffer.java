@@ -151,7 +151,7 @@ public class ByteBuffer {
         try {
             return buffer.get();
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -165,7 +165,7 @@ public class ByteBuffer {
         try {
             buffer.put(value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -225,7 +225,7 @@ public class ByteBuffer {
         try {
             return buffer.getInt();
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -240,7 +240,7 @@ public class ByteBuffer {
         try {
             buffer.putInt(value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -255,7 +255,7 @@ public class ByteBuffer {
         try {
             return buffer.getLong();
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -270,7 +270,7 @@ public class ByteBuffer {
         try {
             buffer.putLong(value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -285,7 +285,7 @@ public class ByteBuffer {
         try {
             return buffer.getFloat();
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -300,7 +300,7 @@ public class ByteBuffer {
         try {
             buffer.putFloat(value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -315,7 +315,7 @@ public class ByteBuffer {
         try {
             return buffer.getDouble();
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -330,7 +330,7 @@ public class ByteBuffer {
         try {
             buffer.putDouble(value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -346,7 +346,7 @@ public class ByteBuffer {
             int signedInt = buffer.getInt();
             return signedInt & 0xffffffffL; //cast the signed int to an unsigned value in the bottom 32 bits of a long
         } catch (BufferUnderflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
@@ -363,7 +363,7 @@ public class ByteBuffer {
         try {
             buffer.putInt((int) value);
         } catch (BufferOverflowException e) {
-            throw new RuntimeException(e);
+            throw new BufferAccessException(e.getMessage());
         }
     }
 
