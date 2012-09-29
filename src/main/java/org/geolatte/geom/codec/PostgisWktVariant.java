@@ -70,9 +70,9 @@ class PostgisWktVariant extends WktVariant {
         GEOMETRIES.add(new WktGeometryToken(word, type, isMeasured));
     }
 
-    public String wordFor(Geometry geometry) {
+    public String wordFor(Geometry geometry, boolean ignoreMeasureMarker) {
         for (WktGeometryToken candidate : GEOMETRIES) {
-            if (sameGeometryType(candidate, geometry) && hasSameMeasuredSuffixInWkt(candidate, geometry)) {
+            if (sameGeometryType(candidate, geometry) && hasSameMeasuredSuffixInWkt(candidate, geometry, ignoreMeasureMarker)) {
                 return candidate.getPattern().toString();
             }
         }
@@ -106,11 +106,16 @@ class PostgisWktVariant extends WktVariant {
      * POINTM(x y m): 2D measured point (with 'M' suffix),
      * POINT(x y z m): 3D measured point (without 'M' suffix)
      *
+     *
      * @param candidate The candidate wkt geometry token
      * @param geometry  The geometry to check the candidate wkt geometry token for
+     * @param ignoreMeasureMarker
      * @return The candidate is measured if and only if the geometry is measured and not 3D
      */
-    private boolean hasSameMeasuredSuffixInWkt(WktGeometryToken candidate, Geometry geometry) {
+    private boolean hasSameMeasuredSuffixInWkt(WktGeometryToken candidate, Geometry geometry, boolean ignoreMeasureMarker) {
+        if (ignoreMeasureMarker) {
+            return !candidate.isMeasured();
+        }
         if (geometry.isMeasured() && !geometry.is3D()) {
             return candidate.isMeasured();
         } else {

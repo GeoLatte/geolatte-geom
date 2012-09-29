@@ -290,10 +290,10 @@ class WktTokenizer {
     private WktToken matchKeyword(int currentPos, int endPos) {
         WktToken token = variant.matchKeyword(wkt, currentPos, endPos);
         if (token instanceof WktGeometryToken) {
-            this.isMeasured = ((WktGeometryToken) token).isMeasured();
+            this.isMeasured = isMeasured || ((WktGeometryToken) token).isMeasured();
         }
         if (token instanceof WktDimensionMarkerToken) {
-            this.isMeasured = ((WktDimensionMarkerToken) token).isMeasured();
+            this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
         }
         return token;
     }

@@ -48,7 +48,9 @@ class PostgisWkbDecoder implements WkbDecoder {
     public Geometry decode(ByteBuffer byteBuffer) {
         crsId = CrsId.UNDEFINED;
         byteBuffer.rewind();
-        return decodeGeometry(byteBuffer);
+        Geometry geom =  decodeGeometry(byteBuffer);
+        byteBuffer.rewind();
+        return geom;
     }
 
     private Geometry decodeGeometry(ByteBuffer byteBuffer) {

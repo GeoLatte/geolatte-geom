@@ -129,6 +129,15 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
     private Geometry decodeMultiPoint() {
         if (matchesOpenList()) {
             List<Point> points = new ArrayList<Point>();
+            //this handles the case of the non-compliant MultiPoints in Postgis (e.g.
+            // MULTIPOINT(10 10, 12 13) rather than MULTIPOINT((10 20), (30 40))
+            if (currentToken instanceof WktPointSequenceToken) {
+                PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
+                for (Point pnt : pointSequence) {
+                    points.add(pnt);
+                }
+                nextToken();
+            }
             while (!matchesCloseList()) {
                 points.add(decodePointText());
                 matchesElementSeparator();

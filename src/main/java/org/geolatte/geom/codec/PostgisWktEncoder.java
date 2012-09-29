@@ -37,15 +37,16 @@ import java.util.Locale;
 class PostgisWktEncoder implements WktEncoder<Geometry> {
 
     private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
+    private static final int MAX_FRACTIONAL_DIGITS = 24;
+    private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
-    //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
-    private StringBuffer builder;
 
     private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
     private final NumberFormat formatter;
 
-    private static final int MAX_FRACTIONAL_DIGITS = 24;
-    private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
+    //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
+    private StringBuffer builder;
+    private boolean inGeometryCollection = false;
 
     /**
      * Constructs an instance.
@@ -63,10 +64,15 @@ class PostgisWktEncoder implements WktEncoder<Geometry> {
      */
     @Override
     public String encode(Geometry geometry) {
-        builder = new StringBuffer();
+        prepare();
         addSridIfValid(geometry);
         addGeometry(geometry);
         return result();
+    }
+
+    private void prepare() {
+        builder = new StringBuffer();
+        inGeometryCollection = false;
     }
 
     private void addSridIfValid(Geometry geometry) {
@@ -117,6 +123,7 @@ class PostgisWktEncoder implements WktEncoder<Geometry> {
     }
 
     private void addGeometries(GeometryCollection collection, boolean withTag) {
+        inGeometryCollection = true;
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             if (i > 0) {
                 addDelimiter();
@@ -190,7 +197,11 @@ class PostgisWktEncoder implements WktEncoder<Geometry> {
     }
 
     private void addGeometryTag(Geometry geometry) {
-        builder.append(WKT_WORDS.wordFor(geometry));
+        if (inGeometryCollection) {
+            builder.append(WKT_WORDS.wordFor(geometry, true));
+        } else {
+            builder.append(WKT_WORDS.wordFor(geometry, false));
+        }
     }
 
     private String result() {

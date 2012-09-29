@@ -386,6 +386,23 @@ public class ByteBuffer {
         return buffer.array();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ByteBuffer that = (ByteBuffer) o;
+
+        if (buffer != null ? !buffer.equals(that.buffer) : that.buffer != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return buffer != null ? buffer.hashCode() : 0;
+    }
+
     /**
      * Used for testing purposes.
      *

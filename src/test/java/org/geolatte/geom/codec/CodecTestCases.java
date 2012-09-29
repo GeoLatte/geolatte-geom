@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CrsId;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -52,12 +53,15 @@ public class CodecTestCases {
     public static final Integer POINT_SCIENTIFIC_NOTATION = 16;
 
 
-    public final Map<Integer, String> wktcases = new HashMap<Integer, String>();
-    public final Map<Integer, ByteBuffer> wkbcases = new HashMap<Integer, ByteBuffer>();
-    public final Map<Integer, Geometry> expected = new HashMap<Integer, Geometry>();
+    public final Map<Integer, CodecTestCase> testCases = new HashMap<Integer, CodecTestCase>();
 
 
-    public CodecTestCases() {
+    public CodecTestCases(){
+        this(true);
+    }
+
+    public CodecTestCases(boolean loadTestCases) {
+        if (!loadTestCases) return;
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
                 Points.create(1, 1, CrsId.UNDEFINED));
@@ -183,23 +187,38 @@ public class CodecTestCases {
 
     }
 
-
     public void addCase(Integer key, String wkt, String wkb, Geometry geom) {
-        this.wktcases.put(key, wkt);
-        this.wkbcases.put(key, ByteBuffer.from(wkb));
-        this.expected.put(key, geom);
+        addCase(key, wkt, wkb, geom, true);
+    }
+
+    public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
+        CodecTestCase testCase = new CodecTestCase();
+        testCase.wkt = wkt;
+        testCase.wkb = ByteBuffer.from(wkb);
+        testCase.expected = geom;
+        testCase.testEncoding = testEncoding;
+        this.testCases.put(key, testCase);
+
     }
 
     public String getWKT(Integer testCase) {
-        return this.wktcases.get(testCase);
+        return this.testCases.get(testCase).wkt;
     }
 
     public Geometry getExpected(Integer testCase) {
-        return this.expected.get(testCase);
+        return this.testCases.get(testCase).expected;
     }
 
     public ByteBuffer getWKB(Integer testCase) {
-        return this.wkbcases.get(testCase);
+        return this.testCases.get(testCase).wkb;
+    }
+
+    public boolean getTestEncoding(Integer testCase) {
+        return this.testCases.get(testCase).testEncoding;
+    }
+
+    public Set<Integer> getCases(){
+        return this.testCases.keySet();
     }
 
 }
