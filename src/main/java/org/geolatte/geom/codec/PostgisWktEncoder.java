@@ -34,7 +34,7 @@ import java.util.Locale;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktEncoder {
+class PostgisWktEncoder implements WktEncoder<Geometry> {
 
     private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
 
@@ -49,7 +49,6 @@ class PostgisWktEncoder {
 
     /**
      * Constructs an instance.
-     *
      */
     public PostgisWktEncoder() {
         formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
@@ -62,6 +61,7 @@ class PostgisWktEncoder {
      * @param geometry the <code>Geometry</code> to encode
      * @return the WKT representation of the given geometry
      */
+    @Override
     public String encode(Geometry geometry) {
         builder = new StringBuffer();
         addSridIfValid(geometry);
@@ -70,10 +70,12 @@ class PostgisWktEncoder {
     }
 
     private void addSridIfValid(Geometry geometry) {
-        if (geometry.getSRID() < 1) return;
+        if (geometry.getSRID() < 1) {
+            return;
+        }
         builder.append("SRID=")
-               .append(geometry.getSRID())
-               .append(";");
+                .append(geometry.getSRID())
+                .append(";");
     }
 
     private void addGeometry(Geometry geometry) {
@@ -116,7 +118,9 @@ class PostgisWktEncoder {
 
     private void addGeometries(GeometryCollection collection, boolean withTag) {
         for (int i = 0; i < collection.getNumGeometries(); i++) {
-            if (i > 0) addDelimiter();
+            if (i > 0) {
+                addDelimiter();
+            }
             Geometry geom = collection.getGeometryN(i);
             if (withTag) {
                 addGeometry(geom);
@@ -142,7 +146,9 @@ class PostgisWktEncoder {
         addStartList();
         double[] coords = new double[points.getCoordinateDimension()];
         for (int i = 0; i < points.size(); i++) {
-            if (i > 0) addDelimiter();
+            if (i > 0) {
+                addDelimiter();
+            }
             points.getCoordinates(coords, i);
             addPoint(coords);
         }
@@ -156,7 +162,9 @@ class PostgisWktEncoder {
 
     private void addPoint(double[] coords) {
         for (int i = 0; i < coords.length; i++) {
-            if (i > 0) addWhitespace();
+            if (i > 0) {
+                addWhitespace();
+            }
             addNumber(coords[i]);
         }
     }

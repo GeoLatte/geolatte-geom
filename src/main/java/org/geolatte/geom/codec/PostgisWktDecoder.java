@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
@@ -47,13 +47,15 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     }
 
     public Geometry decode(String wkt) {
-        if (wkt == null || wkt.isEmpty()) throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
-        splitSridAndWkt(wkt);
+        if (wkt == null || wkt.isEmpty()) {
+            throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
+        }
+        prepare(wkt);
         initializeTokenizer();
         return decodeGeometry();
     }
 
-    private void splitSridAndWkt(String wkt) {
+    private void prepare(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
             crsId = CrsId.valueOf(Integer.parseInt(matcher.group(1)));
@@ -208,7 +210,9 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
             } else {
                 throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
             }
-            if (!matchesCloseList()) throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+            if (!matchesCloseList()) {
+                throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+            }
         }
         return pointSequence;
     }

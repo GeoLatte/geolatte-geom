@@ -25,16 +25,37 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * A Utility class for encoding/decoding WKB geometry representations for the PostGIS EWKB dialect (versions 1.0 to 1.5).
+ * A Utility class for encoding/decoding WKB geometry representations
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010
  */
 public class Wkb {
 
+    public enum Dialect {
+        //the PostGIS EWKB dialect (versions 1.0 to 1.5).
+        POSTGIS_EWKB_1
+    }
+
+    private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_1;
+
+    private static final Map<Dialect, Class<? extends WkbDecoder>> DECODERS = new HashMap<Dialect, Class<? extends WkbDecoder>>();
+    private static final Map<Dialect, Class<? extends WkbEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WkbEncoder>>();
+
+    static {
+        DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbDecoder.class);
+        ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
+    }
+
+
     /**
      * Encodes a <code>Geometry</code> into a WKB representation using the NDR (little-endian)  byte-order.
+     *
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
      *
      * @param geometry The <code>Geometry</code> to be encoded as WKB.
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
@@ -45,25 +66,64 @@ public class Wkb {
 
     /**
      * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
      *
-     * @param geometry The <code>Geometry</code> to be encoded as WKB.
+     * @param geometry  The <code>Geometry</code> to be encoded as WKB.
      * @param byteOrder The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     public static ByteBuffer toWkb(Geometry geometry, ByteOrder byteOrder) {
-        PostgisWkbEncoder encoder = new PostgisWkbEncoder();
+        WkbEncoder encoder = newWkbEncoder(DEFAULT_DIALECT);
         return encoder.encode(geometry, byteOrder);
     }
 
     /**
-     * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
+     * Decodes a WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
      *
      * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     public static Geometry fromWkb(ByteBuffer byteBuffer) {
-        PostgisWkbDecoder decoder = new PostgisWkbDecoder();
+        WkbDecoder decoder = newWkbDecoder(DEFAULT_DIALECT);
         return decoder.decode(byteBuffer);
+    }
+
+    /**
+     * Creates a <code>WkbDecoder</code> for the specified WKB <code>Dialect</code>.
+     *
+     * @param dialect the WKB dialect
+     * @return an <code>WkbDecoder</code> that supports the specified dialect
+     */
+    public static WkbDecoder newWkbDecoder(Dialect dialect) {
+        Class<? extends WkbDecoder> decoderClass = DECODERS.get(dialect);
+        assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
+        return createInstance(decoderClass);
+    }
+
+    /**
+     * Creates a <code>WkbEncoder</code> for the specified WKB <code>Dialect</code>.
+     *
+     * @param dialect the WKB dialect
+     * @return an <code>WkbEncoder</code> that supports the specified dialect
+     */
+    public static WkbEncoder newWkbEncoder(Dialect dialect) {
+        Class<? extends WkbEncoder> decoderClass = ENCODERS.get(dialect);
+        assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
+        return createInstance(decoderClass);
+    }
+
+    private static <T> T createInstance(Class<? extends T> codecClass) {
+        if (codecClass == null) {
+            return null;
+        }
+        try {
+            return codecClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
