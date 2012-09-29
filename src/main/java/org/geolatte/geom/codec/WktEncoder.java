@@ -25,6 +25,7 @@ package org.geolatte.geom.codec;
  * An Encoder for WKT (Well-Known Text) representations.
  * <p>Encoders are generic because both <code>Geometry</code>s and <code>CoordinateReferenceSystem</code>s can be
  * encoded.</p>
+ * <p>In general <code>WktEncoder</code> implementations are not be thread-safe.</p>
  *
  * @param <T> the type to encode (can be <code>Geometry</code> or <code>CoordinateReferenceSystem</code>).
  *

@@ -27,7 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A utility class for encoding/decoding WKT geometry representations.
+ * Creates encoders/decoders for WKT geometry representations.
+ *
+ * <p>Note that the <coder>WktEncoder</coder>/<code>WktDecoder</code> instances returned by the factory
+ * methods are not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */

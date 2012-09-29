@@ -27,6 +27,8 @@ import org.geolatte.geom.Geometry;
 /**
  * A decoder for WKB (Well-Known Binary) encoded <code>Geometries</code>.
  *
+ * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/29/12
  */

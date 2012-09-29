@@ -29,7 +29,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A Utility class for encoding/decoding WKB geometry representations
+ * Creates encoders/decoders for WKB geometry representations.
+ *
+ * <p>Note that the <coder>WkbEncoder</coder>/<code>WkbDecoder</code> instances returned by the factory
+ * methods are not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Oct 29, 2010

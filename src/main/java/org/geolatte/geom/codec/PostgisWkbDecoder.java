@@ -26,10 +26,9 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
 /**
- * A Wkb Decoder for PostGIS EWKB (as implemented in Postgis 1.5).
- * <p/>
- * <p/>
- * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.
+ * A Wkb Decoder for PostGIS EWKB
+ * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.</p>
+ * <p>This implementation is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010

@@ -27,6 +27,8 @@ import org.geolatte.geom.*;
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
  *
+ * <p>This class is not thread-safe.</p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */

@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 /**
  * A decoder for WKT (Well-Known Text) representations.
+ * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
  * @param <T> the type as which the WKT representation is decoded.
  *

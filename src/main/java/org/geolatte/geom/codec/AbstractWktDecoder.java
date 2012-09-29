@@ -32,9 +32,10 @@ package org.geolatte.geom.codec;
  */
 abstract class AbstractWktDecoder<T> implements WktDecoder<T> {
 
+    private final WktVariant wktVariant;
+
     protected WktToken currentToken;
     private WktTokenizer tokenizer;
-    private final WktVariant wktVariant;
 
     /**
      * The constructor of this AbstractWktDecoder. It sets the variant.
@@ -48,6 +49,7 @@ abstract class AbstractWktDecoder<T> implements WktDecoder<T> {
 
     protected void setTokenizer(WktTokenizer tokenizer) {
         this.tokenizer = tokenizer;
+        this.currentToken = null;
     }
 
     /**
