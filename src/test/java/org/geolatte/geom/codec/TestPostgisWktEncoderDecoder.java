@@ -210,6 +210,25 @@ public class TestPostgisWktEncoderDecoder {
         testEncoding(wkt, geom);
     }
 
+    @Test
+    public void test_irregular_white_space(){
+        String wkt = testcases.getWKT(CodecTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1) ;
+        LineString geom = (LineString)decode(wkt);
+        assertNotNull(geom);
+        String normalizedWkt = "LINESTRING(-29.261 66,-71.1074 -20.255)";
+        assertEquals(testcases.getExpected(CodecTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1), geom);
+        testEncoding(normalizedWkt, geom);
+    }
+
+    @Test
+    public void test_scientific_notation() {
+        String wkt = testcases.getWKT(CodecTestCases.POINT_SCIENTIFIC_NOTATION);
+        Point pnt = (Point) decode(wkt);
+        assertNotNull(pnt);
+        GeometryPointEquality eq = new GeometryPointEquality(
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, 0.00000001));
+        assertTrue(eq.equals(testcases.getExpected(CodecTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
+    }
 
     private Geometry decode(String wkt) {
         return Wkt.fromWkt(wkt);
