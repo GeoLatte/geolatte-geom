@@ -26,15 +26,14 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
 /**
- * A Wkb Decoder for PostGIS EWKB (as implemented in Postgis 1.5).
- *
- * <p/>
- * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.
+ * A Wkb Decoder for PostGIS EWKB
+ * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.</p>
+ * <p>This implementation is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-class PostgisWkbDecoder {
+class PostgisWkbDecoder implements WkbDecoder {
 
     private CrsId crsId;
 
@@ -44,10 +43,13 @@ class PostgisWkbDecoder {
      * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
+    @Override
     public Geometry decode(ByteBuffer byteBuffer) {
         crsId = CrsId.UNDEFINED;
         byteBuffer.rewind();
-        return decodeGeometry(byteBuffer);
+        Geometry geom =  decodeGeometry(byteBuffer);
+        byteBuffer.rewind();
+        return geom;
     }
 
     private Geometry decodeGeometry(ByteBuffer byteBuffer) {
@@ -155,7 +157,7 @@ class PostgisWkbDecoder {
 
     private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
         int numPoints = byteBuffer.getInt();
-        PointSequence ps = readPoints(numPoints,byteBuffer, dimensionalFlag);
+        PointSequence ps = readPoints(numPoints, byteBuffer, dimensionalFlag);
         return new LinearRing(ps, crsId);
     }
 

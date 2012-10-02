@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CrsId;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
@@ -48,14 +49,19 @@ public class CodecTestCases {
     public static final Integer MULTILINESTRING_2D = 12;
     public static final Integer MULTILINESTRING_2D_WITH_SRID = 13;
     public static final Integer MULTIPOLYGON_2D = 14;
+    public static final Integer LINESTRING_IRREGULAR_WHITE_SPACE_1 = 15;
+    public static final Integer POINT_SCIENTIFIC_NOTATION = 16;
 
 
-    public final Map<Integer, String> wktcases = new HashMap<Integer, String>();
-    public final Map<Integer, ByteBuffer> wkbcases = new HashMap<Integer, ByteBuffer>();
-    public final Map<Integer, Geometry> expected = new HashMap<Integer, Geometry>();
+    public final Map<Integer, CodecTestCase> testCases = new HashMap<Integer, CodecTestCase>();
 
 
-    public CodecTestCases() {
+    public CodecTestCases(){
+        this(true);
+    }
+
+    public CodecTestCases(boolean loadTestCases) {
+        if (!loadTestCases) return;
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
                 Points.create(1, 1, CrsId.UNDEFINED));
@@ -166,25 +172,53 @@ public class CodecTestCases {
                 "0106000000020000000103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F000000000000000000000000000000000103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
                 new MultiPolygon(polygons));
 
-    }
+        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
+        psb.add(-29.261, 66.000).add(-71.1074, -20.255);
+        expected = new LineString(psb.toPointSequence(),CrsId.UNDEFINED);
+        addCase(LINESTRING_IRREGULAR_WHITE_SPACE_1,
+                "LINESTRING ( -29.261 66 ,  -71.1074    -20.255     )",
+                "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
+                expected);
 
+        addCase(POINT_SCIENTIFIC_NOTATION,
+                "POINT(1e100 1.2345e-100 -2e-5)",
+                "01010000807DC39425AD49B25402EBD79DF147312BF168E388B5F8F4BE",
+                Points.create3D(1e100, 1.23454e-100, -2e-5, CrsId.UNDEFINED));
+
+    }
 
     public void addCase(Integer key, String wkt, String wkb, Geometry geom) {
-        this.wktcases.put(key, wkt);
-        this.wkbcases.put(key, ByteBuffer.from(wkb));
-        this.expected.put(key, geom);
+        addCase(key, wkt, wkb, geom, true);
     }
 
-    public String getWKT(Integer name) {
-        return this.wktcases.get(name);
+    public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
+        CodecTestCase testCase = new CodecTestCase();
+        testCase.wkt = wkt;
+        testCase.wkb = ByteBuffer.from(wkb);
+        testCase.expected = geom;
+        testCase.testEncoding = testEncoding;
+        this.testCases.put(key, testCase);
+
     }
 
-    public Geometry getExpected(Integer name) {
-        return this.expected.get(name);
+    public String getWKT(Integer testCase) {
+        return this.testCases.get(testCase).wkt;
     }
 
-    public ByteBuffer getWKB(Integer name) {
-        return this.wkbcases.get(name);
+    public Geometry getExpected(Integer testCase) {
+        return this.testCases.get(testCase).expected;
+    }
+
+    public ByteBuffer getWKB(Integer testCase) {
+        return this.testCases.get(testCase).wkb;
+    }
+
+    public boolean getTestEncoding(Integer testCase) {
+        return this.testCases.get(testCase).testEncoding;
+    }
+
+    public Set<Integer> getCases(){
+        return this.testCases.keySet();
     }
 
 }

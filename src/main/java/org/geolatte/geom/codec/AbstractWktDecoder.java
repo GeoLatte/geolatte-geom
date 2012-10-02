@@ -23,19 +23,19 @@ package org.geolatte.geom.codec;
 
 /**
  * An abstract WKT decoder.
- *
+ * <p/>
  * <p><code>AbstractWktDecoder</code>s are not thread-safe.</p>
  *
+ * @param <T> the type of the decoded WKT.
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
- *
- * @param <T> the type of the decoded WKT.
  */
-abstract class AbstractWktDecoder<T> {
+abstract class AbstractWktDecoder<T> implements WktDecoder<T> {
+
+    private final WktVariant wktVariant;
 
     protected WktToken currentToken;
     private WktTokenizer tokenizer;
-    private final WktVariant wktVariant;
 
     /**
      * The constructor of this AbstractWktDecoder. It sets the variant.
@@ -46,20 +46,10 @@ abstract class AbstractWktDecoder<T> {
         this.wktVariant = wktVariant;
     }
 
-    /**
-     * Decodes a WKT representation.
-     *
-     * @param wkt the WKT string to decode
-     * @return the decoded object
-     */
-    abstract public T decode(String wkt);
 
-
-    //TODO -- make the decode method concrete, and remove the need for setTokenizer(), e.g. by introducing a WktTokenizerFactory
-    //TODO -- most of the logic of PostgisWktDecoder should be moved to this method.
-
-    protected void setTokenizer(WktTokenizer tokenizer){
+    protected void setTokenizer(WktTokenizer tokenizer) {
         this.tokenizer = tokenizer;
+        this.currentToken = null;
     }
 
     /**
@@ -129,9 +119,9 @@ abstract class AbstractWktDecoder<T> {
      * @return The value of the current token if the current token matches a number.
      * @throws WktDecodeException if the current token does not match a number.
      */
-    protected double decodeNumber(){
+    protected double decodeNumber() {
         if (currentToken instanceof WktNumberToken) {
-            double value = ((WktNumberToken)currentToken).getNumber();
+            double value = ((WktNumberToken) currentToken).getNumber();
             nextToken();
             return value;
         }
@@ -140,10 +130,10 @@ abstract class AbstractWktDecoder<T> {
 
     /**
      * Returns the <code>WktVariant</code> for this decoder.
-     * 
+     *
      * @return the <code>WktVariant</code> for this decoder.
      */
-    protected WktVariant getWktVariant(){
+    protected WktVariant getWktVariant() {
         return this.wktVariant;
     }
 
@@ -152,7 +142,7 @@ abstract class AbstractWktDecoder<T> {
      *
      * @return the current position of the tokenizer.
      */
-    protected int getTokenizerPosition(){
+    protected int getTokenizerPosition() {
         return this.tokenizer.position();
     }
 }

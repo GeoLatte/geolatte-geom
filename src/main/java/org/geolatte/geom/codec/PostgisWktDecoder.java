@@ -32,9 +32,11 @@ import java.util.regex.Pattern;
 /**
  * A decoder for the Postgis WKT/EWKT representations as used in Postgis (at least 1.0 to 1.5+).
  *
+ * <p>This class is not thread-safe</p>
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
@@ -47,13 +49,15 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     }
 
     public Geometry decode(String wkt) {
-        if (wkt == null || wkt.isEmpty()) throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
-        splitSridAndWkt(wkt);
+        if (wkt == null || wkt.isEmpty()) {
+            throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
+        }
+        prepare(wkt);
         initializeTokenizer();
         return decodeGeometry();
     }
 
-    private void splitSridAndWkt(String wkt) {
+    private void prepare(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
             crsId = CrsId.valueOf(Integer.parseInt(matcher.group(1)));
@@ -127,6 +131,15 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
     private Geometry decodeMultiPoint() {
         if (matchesOpenList()) {
             List<Point> points = new ArrayList<Point>();
+            //this handles the case of the non-compliant MultiPoints in Postgis (e.g.
+            // MULTIPOINT(10 10, 12 13) rather than MULTIPOINT((10 20), (30 40))
+            if (currentToken instanceof WktPointSequenceToken) {
+                PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
+                for (Point pnt : pointSequence) {
+                    points.add(pnt);
+                }
+                nextToken();
+            }
             while (!matchesCloseList()) {
                 points.add(decodePointText());
                 matchesElementSeparator();
@@ -208,7 +221,9 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry>{
             } else {
                 throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
             }
-            if (!matchesCloseList()) throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+            if (!matchesCloseList()) {
+                throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+            }
         }
         return pointSequence;
     }
