@@ -53,7 +53,7 @@ public class CodecTestCases {
     public static final Integer POINT_SCIENTIFIC_NOTATION = 16;
 
 
-    public final Map<Integer, CodecTestCase> testCases = new HashMap<Integer, CodecTestCase>();
+    public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
 
 
     public CodecTestCases(){
@@ -192,12 +192,12 @@ public class CodecTestCases {
     }
 
     public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
-        CodecTestCase testCase = new CodecTestCase();
-        testCase.wkt = wkt;
-        testCase.wkb = ByteBuffer.from(wkb);
-        testCase.expected = geom;
-        testCase.testEncoding = testEncoding;
-        this.testCases.put(key, testCase);
+        CodecTestInput testInput = new CodecTestInput();
+        testInput.wkt = wkt;
+        testInput.wkb = ByteBuffer.from(wkb);
+        testInput.expected = geom;
+        testInput.testEncoding = testEncoding;
+        this.testCases.put(key, testInput);
 
     }
 

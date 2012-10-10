@@ -153,6 +153,8 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      *     <li>All non-empty elements have the same coordinate reference system/li>
      * </il>
      * @param geometries
+     * @throws IllegalStateException When geometries contains a null value or when the given geometries do not share the
+     *                               same {@link CrsId}
      */
     private void check(Geometry[] geometries){
         if (geometries == null || geometries.length == 0) return;

@@ -55,7 +55,7 @@ public class ByteBuffer {
      */
     public static final long UINT_MAX_VALUE = 4294967295L;
 
-    final private java.nio.ByteBuffer buffer;
+    private final java.nio.ByteBuffer buffer;
 
     private ByteBuffer(java.nio.ByteBuffer buffer) {
         this.buffer = buffer;
@@ -145,7 +145,7 @@ public class ByteBuffer {
      * Relative get method. Reads the byte at this buffer's current position, and then increments the position.
      *
      * @return The byte at the buffer's current position
-     * @throws RuntimeException If the buffer's current position is not smaller than its limit
+     * @throws BufferAccessException If the buffer's current position is not smaller than its limit.
      */
     public byte get() {
         try {
@@ -159,7 +159,7 @@ public class ByteBuffer {
      * Writes the given byte into this buffer at the current position, and then increments the position.
      *
      * @param value The byte to be written
-     * @throws RuntimeException If this buffer's current position is not smaller than its limit
+     * @throws BufferAccessException If this buffer's current position is not smaller than its limit.
      */
     public void put(byte value) {
         try {
@@ -219,7 +219,7 @@ public class ByteBuffer {
      * and then increments the position by four.
      *
      * @return The int value at the buffer's current position
-     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than four bytes remaining in this buffer.
      */
     public int getInt() {
         try {
@@ -234,7 +234,7 @@ public class ByteBuffer {
      * and then increments the position by four.
      *
      * @param value The int value to be written
-     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than four bytes remaining in this buffer.
      */
     public void putInt(int value) {
         try {
@@ -249,7 +249,7 @@ public class ByteBuffer {
      * and then increments the position by eight.
      *
      * @return The long value at the buffer's current position
-     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than eight bytes remaining in this buffer.
      */
     public long getLong() {
         try {
@@ -264,7 +264,7 @@ public class ByteBuffer {
      * and then increments the position by eight.
      *
      * @param value The long value to be written
-     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than eight bytes remaining in this buffer.
      */
     public void putLong(long value) {
         try {
@@ -279,7 +279,7 @@ public class ByteBuffer {
      * and then increments the position by four.
      *
      * @return The float value at the buffer's current position
-     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than four bytes remaining in this buffer.
      */
     public float getFloat() {
         try {
@@ -294,7 +294,7 @@ public class ByteBuffer {
      * and then increments the position by four.
      *
      * @param value The float value to be written
-     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than four bytes remaining in this buffer.
      */
     public void putFloat(float value) {
         try {
@@ -309,7 +309,7 @@ public class ByteBuffer {
      * and then increments the position by eight.
      *
      * @return The double value at the buffer's current position
-     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than eight bytes remaining in this buffer.
      */
     public double getDouble() {
         try {
@@ -324,7 +324,7 @@ public class ByteBuffer {
      * and then increments the position by eight.
      *
      * @param value The double value to be written
-     * @throws RuntimeException If there are fewer than eight bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than eight bytes remaining in this buffer.
      */
     public void putDouble(Double value) {
         try {
@@ -339,7 +339,7 @@ public class ByteBuffer {
      * taking into account the byte-order, and then increments the position by four.
      *
      * @return The value of the 4-byte unsigned integer at the current position as a long
-     * @throws RuntimeException If there are fewer than four bytes remaining in this buffer
+     * @throws BufferAccessException If there are fewer than four bytes remaining in this buffer
      */
     public long getUInt() {
         try {
@@ -355,8 +355,8 @@ public class ByteBuffer {
      *  to this instance at the current position, respecting the byte-order.
      *
      * @param value The unsigned integer value to be written
-     * @throws RuntimeException If the specified value is larger than the largest unsigned integer (4294967295L) or
-     *                          if there are fewer than eight bytes remaining in this buffer
+     * @throws RuntimeException      If the specified value is larger than the largest unsigned integer (4294967295L)
+     * @throws BufferAccessException If there are fewer than eight bytes remaining in this buffer.
      */
     public void putUInt(long value) {
         if (value > UINT_MAX_VALUE) throw new RuntimeException("Value received doesn't fit in unsigned integer");

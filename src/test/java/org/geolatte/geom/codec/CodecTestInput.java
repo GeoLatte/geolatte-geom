@@ -28,7 +28,7 @@ import org.geolatte.geom.Geometry;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/29/12
  */
-public class CodecTestCase {
+public class CodecTestInput {
 
     public String wkt;
     public ByteBuffer wkb;
