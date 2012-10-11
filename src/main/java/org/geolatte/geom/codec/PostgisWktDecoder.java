@@ -177,7 +177,8 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
         if (matchesOpenList()) {
             List<LinearRing> rings = new ArrayList<LinearRing>();
             while (!matchesCloseList()) {
-                rings.add(new LinearRing(decodePointSequence(), crsId));
+                LinearRing ring = decodeLinearRingText();
+                rings.add(ring);
                 matchesElementSeparator();
             }
             return new Polygon(rings.toArray(new LinearRing[rings.size()]));
@@ -186,6 +187,14 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
             return Polygon.createEmpty();
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
+    }
+
+    private LinearRing decodeLinearRingText() {
+        try {
+            return new LinearRing(decodePointSequence(), crsId);
+        } catch (IllegalArgumentException ex) {
+            throw new WktDecodeException(ex.getMessage());
+        }
     }
 
     private LineString decodeLineStringText() {

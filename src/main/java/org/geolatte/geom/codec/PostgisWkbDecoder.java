@@ -47,9 +47,13 @@ class PostgisWkbDecoder implements WkbDecoder {
     public Geometry decode(ByteBuffer byteBuffer) {
         crsId = CrsId.UNDEFINED;
         byteBuffer.rewind();
-        Geometry geom =  decodeGeometry(byteBuffer);
-        byteBuffer.rewind();
-        return geom;
+        try {
+            Geometry geom =  decodeGeometry(byteBuffer);
+            byteBuffer.rewind();
+            return geom;
+        } catch(BufferAccessException e){
+            throw new WkbDecodeException(e);
+        }
     }
 
     private Geometry decodeGeometry(ByteBuffer byteBuffer) {
@@ -74,7 +78,7 @@ class PostgisWkbDecoder implements WkbDecoder {
             case MULTI_LINE_STRING:
                 return decodeMultiLineString(byteBuffer);
         }
-        throw new IllegalStateException(String.format("WKBType %s is not supported.", wkbType));
+        throw new WkbDecodeException(String.format("WKBType %s is not supported.", wkbType));
     }
 
     private MultiLineString decodeMultiLineString(ByteBuffer byteBuffer) {
@@ -158,7 +162,11 @@ class PostgisWkbDecoder implements WkbDecoder {
     private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
         int numPoints = byteBuffer.getInt();
         PointSequence ps = readPoints(numPoints, byteBuffer, dimensionalFlag);
-        return new LinearRing(ps, crsId);
+        try {
+            return new LinearRing(ps, crsId);
+        } catch (IllegalArgumentException e) {
+            throw new WkbDecodeException(e);
+        }
     }
 
 

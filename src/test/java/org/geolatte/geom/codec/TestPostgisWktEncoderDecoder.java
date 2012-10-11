@@ -230,6 +230,18 @@ public class TestPostgisWktEncoderDecoder {
         assertTrue(eq.equals(testcases.getExpected(CodecTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
     }
 
+    @Test(expected= WktDecodeException.class)
+    public void test_invalid_point() {
+        String wkt = testcases.getWKT(CodecTestCases.INVALID_POINT);
+        decode(wkt);
+    }
+
+    @Test(expected= WktDecodeException.class)
+    public void test_invalid_polygon() {
+        String wkt = testcases.getWKT(CodecTestCases.INVALID_POLYGON);
+        decode(wkt);
+    }
+
     private Geometry decode(String wkt) {
         return Wkt.fromWkt(wkt);
     }

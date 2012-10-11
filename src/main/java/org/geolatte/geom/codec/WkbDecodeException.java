@@ -21,24 +21,19 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
-
 /**
- * A decoder for WKB (Well-Known Binary) encoded <code>Geometries</code>.
- *
- * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
+ * Thrown when the WKB cannot be parsed.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/29/12
+ *
  */
-public interface WkbDecoder {
+public class WkbDecodeException extends RuntimeException {
 
-    /**
-     * Decodes a WKB encoded representation of a <code>Geometry</code>
-     * @param byteBuffer the WKB encoded binary representation
-     * @return the represented <code>Geometry</code>
-     * @throws WkbDecodeException if the specified ByteBuffer is an illegal or unsupported WKB representation
-     */
-    Geometry decode(ByteBuffer byteBuffer);
+    WkbDecodeException(String msg) {
+        super(msg);
+    }
+
+    WkbDecodeException(Throwable ex) {
+        super(ex);
+    }
 }

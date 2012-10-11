@@ -51,12 +51,14 @@ public class CodecTestCases {
     public static final Integer MULTIPOLYGON_2D = 14;
     public static final Integer LINESTRING_IRREGULAR_WHITE_SPACE_1 = 15;
     public static final Integer POINT_SCIENTIFIC_NOTATION = 16;
+    public static final Integer INVALID_POINT = 17;
+    public static final Integer INVALID_POLYGON = 18;
 
 
     public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
 
 
-    public CodecTestCases(){
+    public CodecTestCases() {
         this(true);
     }
 
@@ -84,7 +86,7 @@ public class CodecTestCases {
 
         PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
-        Geometry expected = new LineString(psb.toPointSequence(),CrsId.UNDEFINED);
+        Geometry expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
         addCase(LINESTRING_2D,
                 "LINESTRING(-29.261 66,-71.1074 -20.255)",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
@@ -174,7 +176,7 @@ public class CodecTestCases {
 
         psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
-        expected = new LineString(psb.toPointSequence(),CrsId.UNDEFINED);
+        expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
         addCase(LINESTRING_IRREGULAR_WHITE_SPACE_1,
                 "LINESTRING ( -29.261 66 ,  -71.1074    -20.255     )",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
@@ -184,6 +186,17 @@ public class CodecTestCases {
                 "POINT(1e100 1.2345e-100 -2e-5)",
                 "01010000807DC39425AD49B25402EBD79DF147312BF168E388B5F8F4BE",
                 Points.create3D(1e100, 1.23454e-100, -2e-5, CrsId.UNDEFINED));
+
+        addCase(INVALID_POINT,
+                "POINT(10,12)",
+                "01010000807DC39425AD4",
+                Points.createEmpty());
+
+        addCase(INVALID_POLYGON,
+                "POLYGON((0 0,1 0,1 1,0 1))",
+                "0103000000010000000400000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0",
+                Polygon.createEmpty());
+
 
     }
 
@@ -217,7 +230,7 @@ public class CodecTestCases {
         return this.testCases.get(testCase).testEncoding;
     }
 
-    public Set<Integer> getCases(){
+    public Set<Integer> getCases() {
         return this.testCases.keySet();
     }
 

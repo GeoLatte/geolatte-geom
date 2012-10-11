@@ -204,6 +204,20 @@ public class TestPostgisWkbDecoder {
         assertEquals(decodedBefore, decodedAfter);
     }
 
+    @Test(expected = WkbDecodeException.class)
+    public void test_invalid_point() {
+        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.INVALID_POINT);
+        Geometry geom = decode(byteBuffer);
+        System.out.println(geom.toString());
+    }
+
+    @Test(expected = WkbDecodeException.class)
+    public void test_invalid_polygon() {
+        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.INVALID_POLYGON);
+        Geometry geom = decode(byteBuffer);
+        System.out.println(geom.toString());
+    }
+
     private void testEncoding(ByteBuffer byteBuffer, Geometry geom) {
         ByteBuffer out = Wkb.toWkb(geom);
         assertTrue(String.format("Expected: %s, Received: %s", byteBuffer.toString(), out.toString()),
