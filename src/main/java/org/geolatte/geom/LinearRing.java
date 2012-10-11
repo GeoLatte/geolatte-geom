@@ -34,10 +34,6 @@ public class LinearRing extends LineString {
 
     final static LinearRing EMPTY = new LinearRing(null, CrsId.UNDEFINED, null);
 
-    public static LinearRing create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
-        return new LinearRing(points, crsId, geometryOperations);
-    }
-
     public static LinearRing createEmpty(){
         return EMPTY;
     }

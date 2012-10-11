@@ -97,7 +97,7 @@ public class GeometryFactory {
      * @throws IllegalArgumentException if the input <code>PointSequence</code> does not form a closed ring.
      */
     public LinearRing createLinearRing(PointSequence points) {
-        return LinearRing.create(points, crsId, geometryOperations);
+        return new LinearRing(points, crsId, geometryOperations);
     }
 
     /**
