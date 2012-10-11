@@ -57,6 +57,12 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
         return decodeGeometry();
     }
 
+    /**
+     * The instance fields wktString and crsId are initialized prior to decoding. For postgis EWKT that entails
+     * extracting the SRID prefix (if any) from the WKT string.
+     *
+     * @param wkt the WKT representation
+     */
     private void prepare(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
