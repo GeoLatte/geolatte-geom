@@ -28,7 +28,7 @@ import java.util.Map;
 
 /**
  * Creates encoders/decoders for WKT geometry representations.
- *
+ * <p/>
  * <p>Note that the <coder>WktEncoder</coder>/<code>WktDecoder</code> instances returned by the factory
  * methods are not thread-safe.</p>
  *
@@ -60,7 +60,7 @@ public class Wkt {
      * @return The decoded Geometry
      */
     public static Geometry fromWkt(String wkt) {
-        WktDecoder<Geometry> decoder = newWktDecoder(DEFAULT_DIALECT);
+        WktDecoder<Geometry> decoder = newWktDecoder();
         return decoder.decode(wkt);
     }
 
@@ -72,7 +72,7 @@ public class Wkt {
      * @return the WKT representation of the given geometry
      */
     public static String toWkt(Geometry geometry) {
-        WktEncoder encoder = newWktEncoder(DEFAULT_DIALECT);
+        WktEncoder encoder = newWktEncoder();
         return encoder.encode(geometry);
     }
 
@@ -89,6 +89,15 @@ public class Wkt {
     }
 
     /**
+    * Creates a <code>WktDecoder</code> for the default dialect (Postgis 1.x EWKT).
+     * @return an <code>WktDecoder</code> that supports the default dialect
+     * @return
+     */
+    public static WktDecoder<Geometry> newWktDecoder() {
+        return newWktDecoder(DEFAULT_DIALECT);
+    }
+
+    /**
      * Creates a <code>WktEncoder</code> for the specified WKT <code>Dialect</code>.
      *
      * @param dialect the WKT dialect
@@ -98,6 +107,14 @@ public class Wkt {
         Class<? extends WktEncoder> decoderClass = ENCODERS.get(dialect);
         assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
         return createInstance(decoderClass);
+    }
+
+    /**
+     * Creates a <code>WktEncoder</code> for the default dialect (Postgis 1.x EWKT).
+     * @return an <code>WktEncoder</code> that supports the default dialect
+     */
+    public static WktEncoder<Geometry> newWktEncoder() {
+        return newWktEncoder(DEFAULT_DIALECT);
     }
 
     private static <T> T createInstance(Class<? extends T> codecClass) {
