@@ -28,9 +28,11 @@ import com.vividsolutions.jts.geom.Envelope;
 import java.util.Iterator;
 
 /**
+ * Represents an empty <code>PointSequence</code>.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class EmptyPointSequence implements PointSequence, CoordinateSequence {
+public class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     public static final EmptyPointSequence INSTANCE = new EmptyPointSequence();
 

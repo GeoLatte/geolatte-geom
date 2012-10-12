@@ -22,10 +22,17 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.PointSequence;
-import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilders;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
 /**
@@ -326,6 +333,9 @@ public class JTS {
     private static PointSequence toPointSequence(CoordinateSequence cs) {
         if (cs instanceof PointSequence) {
             return (PointSequence) cs;
+        }
+        if (cs.size() == 0) {
+            return EmptyPointSequence.INSTANCE;
         }
         double[] coord;
         DimensionalFlag df;
