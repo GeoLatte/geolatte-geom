@@ -35,6 +35,10 @@ import com.vividsolutions.jts.geom.Polygon;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
 /**
  * @author Karel Maesen, Geovise BVBA, 2011 (original code)
  * @author Yves Vandewoude, Qmino bvba, 2011 (bugfixes)
@@ -43,13 +47,66 @@ public class JTS {
 
     private static final GeometryFactory jtsGeometryFactory;
 
+    private static final Map<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> JTS2GLClassMap =
+            new HashMap<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>>();
+
     static {
         jtsGeometryFactory = new GeometryFactory(new PointSequenceCoordinateSequenceFactory());
+
+        //define the class mapping JTS -> Geolatte
+        JTS2GLClassMap.put(Point.class, org.geolatte.geom.Point.class);
+        JTS2GLClassMap.put(LineString.class, org.geolatte.geom.LineString.class);
+        JTS2GLClassMap.put(LinearRing.class, org.geolatte.geom.LinearRing.class);
+        JTS2GLClassMap.put(Polygon.class, org.geolatte.geom.Polygon.class);
+        JTS2GLClassMap.put(GeometryCollection.class, org.geolatte.geom.GeometryCollection.class);
+        JTS2GLClassMap.put(MultiPoint.class, org.geolatte.geom.MultiPoint.class);
+        JTS2GLClassMap.put(MultiLineString.class, org.geolatte.geom.MultiLineString.class);
+        JTS2GLClassMap.put(MultiPolygon.class, org.geolatte.geom.MultiPolygon.class);
+
     }
 
     public static GeometryFactory geometryFactory() {
         return jtsGeometryFactory;
     }
+
+    /**
+     * Returns the JTS Geometry class that corresponds to the specified Geolatte Geometry class.
+     * <p>Geometry classes correspond iff they are of the same Geometry type in the SFS or SFA geometry model.</p>
+     *
+     * @param geometryClass the JTS Geometry class
+     * @return the corresponding o.g.geom class
+     * @throws IllegalArgumentException when the geometryClass parameter is null.
+     * @throws NoSuchElementException when no corresponding class can be found.
+     */
+    public static Class<? extends Geometry> getCorrespondingJTSClass(Class<? extends org.geolatte.geom.Geometry> geometryClass) {
+        if (geometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
+        for ( Map.Entry<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> entry : JTS2GLClassMap.entrySet()) {
+            if (entry.getValue() == geometryClass) {
+                   return entry.getKey();
+            }
+        }
+        throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.", geometryClass.getCanonicalName()) );
+    }
+
+    /**
+     * Returns the Geolatte Geometry class that corresponds to the specified JTS class.
+     * <p>Geometry classes correspond iff they are of the same Geometry type in the SFS or SFA geometry model.</p>
+     *
+     * @param jtsGeometryClass the Geolatte Geometry class
+     * @return the corresponding o.g.geom class
+     * @throws IllegalArgumentException when the jtsGeometryClass parameter is null.
+     * @throws NoSuchElementException when no corresponding class can be found.
+     */
+    public static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry> jtsGeometryClass) {
+        if (jtsGeometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
+        Class<? extends org.geolatte.geom.Geometry> corresponding = JTS2GLClassMap.get(jtsGeometryClass);
+        if (corresponding == null) {
+            throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.", jtsGeometryClass.getCanonicalName()) );
+        }
+        return corresponding;
+    }
+
+
 
     /**
      * Primary Factory method that converts a JTS geometry into an equivalent geolatte geometry
@@ -193,6 +250,9 @@ public class JTS {
      * Converts a jts polygon into a geolatte polygon
      */
     private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, CrsId crsId) {
+        if (jtsGeometry.isEmpty()) {
+            return org.geolatte.geom.Polygon.createEmpty();
+        }
         org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
         org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), crsId);
         rings[0] = new org.geolatte.geom.LinearRing(extRing.getPoints(), extRing.getCrsId());
@@ -266,33 +326,33 @@ public class JTS {
             holes[i] = to(polygon.getInteriorRingN(i));
         }
         Polygon pg = geometryFactory().createPolygon(shell, holes);
-        pg.setSRID(polygon.getSRID());
+        copySRID(polygon, pg);
         return pg;
     }
 
     private static Point to(org.geolatte.geom.Point point) {
         Point pnt = geometryFactory().createPoint(sequenceOf(point));
-        pnt.setSRID(point.getSRID());
+        copySRID(point, pnt);
         return pnt;
     }
 
     private static LineString to(org.geolatte.geom.LineString lineString) {
         LineString ls = geometryFactory().createLineString(sequenceOf(lineString));
-        ls.setSRID(lineString.getSRID());
+        copySRID(lineString, ls);
         return ls;
     }
 
     private static LinearRing to(org.geolatte.geom.LinearRing linearRing) {
         LinearRing lr = geometryFactory().createLinearRing(sequenceOf(linearRing));
-        lr.setSRID(linearRing.getSRID());
+        copySRID(linearRing, lr);
         return lr;
     }
 
     private static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
         MultiPoint mp = geometryFactory().createMultiPoint(sequenceOf(multiPoint));
-        mp.setSRID(multiPoint.getSRID());
+        copySRID(multiPoint, mp);
         for (int i = 0; i < mp.getNumGeometries(); i++) {
-            mp.getGeometryN(i).setSRID(multiPoint.getSRID());
+            copySRID(multiPoint, mp.getGeometryN(i));
         }
         return mp;
     }
@@ -303,7 +363,7 @@ public class JTS {
             lineStrings[i] = to(multiLineString.getGeometryN(i));
         }
         MultiLineString mls = geometryFactory().createMultiLineString(lineStrings);
-        mls.setSRID(multiLineString.getSRID());
+        copySRID(multiLineString, mls);
         return mls;
     }
 
@@ -313,7 +373,7 @@ public class JTS {
             polygons[i] = to(multiPolygon.getGeometryN(i));
         }
         MultiPolygon mp = geometryFactory().createMultiPolygon(polygons);
-        mp.setSRID(multiPolygon.getSRID());
+        copySRID(multiPolygon, mp);
         return mp;
     }
 
@@ -323,8 +383,13 @@ public class JTS {
             geoms[i] = to(collection.getGeometryN(i));
         }
         GeometryCollection gc = geometryFactory().createGeometryCollection(geoms);
-        gc.setSRID(collection.getSRID());
+        copySRID(collection, gc);
         return gc;
+    }
+
+    private static void copySRID(org.geolatte.geom.Geometry source, Geometry target) {
+        int srid = source.getCrsId() == CrsId.UNDEFINED ? 0 : source.getCrsId().getCode();
+        target.setSRID(srid);
     }
 
     /*

@@ -19,7 +19,7 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
@@ -53,6 +53,7 @@ public class CodecTestInputs {
     public static final Integer POINT_SCIENTIFIC_NOTATION = 16;
     public static final Integer INVALID_POINT = 17;
     public static final Integer INVALID_POLYGON = 18;
+    public static final Integer LINESTRING_3DM = 19;
 
 
     public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
@@ -196,6 +197,14 @@ public class CodecTestInputs {
                 "POLYGON((0 0,1 0,1 1,0 1))",
                 "0103000000010000000400000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0",
                 Polygon.createEmpty());
+
+        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYZM);
+        psb.add(-29.261, 66.000, 1, 2).add(-71.1074, -20.255, 3, 5);
+        expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
+        addCase(LINESTRING_3DM,
+                "LINESTRING(-29.261 66 1 2, -71.1074 -20.255 3 5)",
+                "01020000C002000000894160E5D0423DC00000000000805040000000000000F03F0000000000000040C9E53FA4DFC651C0E17A14AE474134C000000000000008400000000000001440",
+                expected);
 
 
     }

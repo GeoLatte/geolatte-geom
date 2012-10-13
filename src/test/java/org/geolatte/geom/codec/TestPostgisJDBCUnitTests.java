@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.support.CodecTestInputs;
 import org.junit.Test;
 
 import java.util.Collection;

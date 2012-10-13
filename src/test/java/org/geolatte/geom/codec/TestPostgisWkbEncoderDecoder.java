@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.support.CodecTestInputs;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
