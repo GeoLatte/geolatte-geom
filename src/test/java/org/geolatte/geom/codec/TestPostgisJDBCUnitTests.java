@@ -35,9 +35,9 @@ import static junit.framework.Assert.assertEquals;
  */
 public class TestPostgisJDBCUnitTests {
 
-    class PostgisJDBCUnitTestCases extends CodecTestCases {
+    class PostgisJDBCUnitTestInputs extends CodecTestInputs {
 
-        public PostgisJDBCUnitTestCases() {
+        public PostgisJDBCUnitTestInputs() {
             super(false);
             GeometryFactory factory = new GeometryFactory(CrsId.UNDEFINED);
             addCase(1,
@@ -347,7 +347,7 @@ public class TestPostgisJDBCUnitTests {
     }
 
 
-    PostgisJDBCUnitTestCases testCases = new PostgisJDBCUnitTestCases();
+    PostgisJDBCUnitTestInputs testCases = new PostgisJDBCUnitTestInputs();
     WktDecoder<Geometry> wktDecoder = Wkt.newWktDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
     WktEncoder<Geometry> wktEncoder = Wkt.newWktEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
     WkbDecoder wkbDecoder = Wkb.newWkbDecoder(Wkb.Dialect.POSTGIS_EWKB_1);

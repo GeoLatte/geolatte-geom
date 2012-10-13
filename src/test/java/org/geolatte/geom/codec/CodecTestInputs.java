@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class CodecTestCases {
+public class CodecTestInputs {
 
 
     public static final Integer POINT_2D = 0;
@@ -58,11 +58,11 @@ public class CodecTestCases {
     public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
 
 
-    public CodecTestCases() {
+    public CodecTestInputs() {
         this(true);
     }
 
-    public CodecTestCases(boolean loadTestCases) {
+    public CodecTestInputs(boolean loadTestCases) {
         if (!loadTestCases) return;
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
