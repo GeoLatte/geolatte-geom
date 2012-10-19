@@ -34,6 +34,7 @@ public class CodecTestInput {
     public ByteBuffer wkb;
     public Geometry expected;
     public boolean testEncoding = true;
+    public String wkbHex;
 
 
 }

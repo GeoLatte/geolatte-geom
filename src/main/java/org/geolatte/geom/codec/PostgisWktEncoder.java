@@ -100,6 +100,7 @@ class PostgisWktEncoder implements WktEncoder<Geometry> {
         switch (type) {
             case POINT:
             case LINE_STRING:
+            case LINEAR_RING:
                 addPointList(geometry.getPoints());
                 break;
             case POLYGON:

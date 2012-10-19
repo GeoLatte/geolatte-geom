@@ -216,6 +216,7 @@ public class CodecTestInputs {
     public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
         CodecTestInput testInput = new CodecTestInput();
         testInput.wkt = wkt;
+        testInput.wkbHex = wkb;
         testInput.wkb = ByteBuffer.from(wkb);
         testInput.expected = geom;
         testInput.testEncoding = testEncoding;
@@ -234,6 +235,11 @@ public class CodecTestInputs {
     public ByteBuffer getWKB(Integer testCase) {
         return this.testCases.get(testCase).wkb;
     }
+
+    public String getWKBHexString(Integer testCase) {
+        return this.testCases.get(testCase).wkbHex;
+    }
+
 
     public boolean getTestEncoding(Integer testCase) {
         return this.testCases.get(testCase).testEncoding;

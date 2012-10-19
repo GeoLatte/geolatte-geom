@@ -45,6 +45,10 @@ public class Point extends Geometry {
         this(sequence, crsId, null);
     }
 
+    public Point(Point point, CrsId crsId) {
+        this(point.getPoints(), crsId);
+    }
+
     @Override
     public PointSequence getPoints() {
         return points;

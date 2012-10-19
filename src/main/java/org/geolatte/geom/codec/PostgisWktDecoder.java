@@ -142,7 +142,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
             if (currentToken instanceof WktPointSequenceToken) {
                 PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
                 for (Point pnt : pointSequence) {
-                    points.add(pnt);
+                    points.add(new Point(pnt, crsId));
                 }
                 nextToken();
             }
