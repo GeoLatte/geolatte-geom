@@ -243,6 +243,14 @@ public class TestPostgisWktEncoderDecoder {
         decode(wkt);
     }
 
+    @Test
+    public void test_empty_point() {
+        String wkt = testcases.getWKT(CodecTestInputs.EMPTY_POINT);
+        Geometry geom = decode(wkt);
+        assertTrue(geom.isEmpty());
+        assertTrue(geom.getGeometryType() == GeometryType.POINT);
+    }
+
     private Geometry decode(String wkt) {
         return Wkt.fromWkt(wkt);
     }

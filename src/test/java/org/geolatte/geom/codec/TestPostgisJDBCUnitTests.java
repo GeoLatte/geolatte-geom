@@ -73,7 +73,8 @@ public class TestPostgisJDBCUnitTests {
             ByteBuffer wkb = testCases.getWKB(testCase);
             Geometry geom = wkbDecoder.decode(wkb);
             assertEquals("WKB decoder gives incorrect result for case: " + testCase, testCases.getExpected(testCase), geom);
-            assertEquals(wkb, wkbEncoder.encode(geom, ByteOrder.NDR));
+            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, wkbEncoder.encode(geom, ByteOrder.NDR));
+            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, wkbEncoder.encode(testCases.getExpected(testCase), ByteOrder.NDR));
         }
     }
 }

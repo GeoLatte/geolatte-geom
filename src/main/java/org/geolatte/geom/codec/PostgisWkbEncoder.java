@@ -61,6 +61,8 @@ class PostgisWkbEncoder implements WkbEncoder {
         if (geom.getSRID() > 0 && includeSrid) {
             size += 4;
         }
+        //empty geoms have same representation as an empty GeometryCollection
+        if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
         if (geom instanceof GeometryCollection) {
             size += sizeOfGeometryCollection((GeometryCollection) geom);
         } else if (geom instanceof Polygon) {
@@ -119,7 +121,11 @@ class PostgisWkbEncoder implements WkbEncoder {
             writeByteOrder(output);
             DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
             writeTypeCodeAndSrid(geom, dimension, output);
-            writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            if (geom.isEmpty()) {
+                output.putUInt(0);
+            } else {
+                writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            }
         }
 
         @Override
@@ -127,8 +133,12 @@ class PostgisWkbEncoder implements WkbEncoder {
             writeByteOrder(output);
             DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
             writeTypeCodeAndSrid(geom, dimension, output);
-            output.putUInt(geom.getNumPoints());
-            writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            if (geom.isEmpty()) {
+                output.putUInt(0);
+            } else {
+                output.putUInt(geom.getNumPoints());
+                writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            }
         }
 
         @Override
@@ -136,9 +146,13 @@ class PostgisWkbEncoder implements WkbEncoder {
             writeByteOrder(output);
             DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
             writeTypeCodeAndSrid(geom, dimension, output);
-            writeNumRings(geom, output);
-            for (LinearRing ring : geom) {
-                writeRing(ring);
+            if (geom.isEmpty()) {
+                output.putUInt(0);
+            } else {
+                writeNumRings(geom, output);
+                for (LinearRing ring : geom) {
+                    writeRing(ring);
+                }
             }
         }
 
@@ -147,9 +161,13 @@ class PostgisWkbEncoder implements WkbEncoder {
             writeByteOrder(output);
             DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
             writeTypeCodeAndSrid(geom, dimension, output);
-            output.putUInt(geom.getNumPatches());
-            for (Polygon pg : geom) {
-                pg.accept(this);
+            if (geom.isEmpty()) {
+                output.putUInt(0);
+            } else {
+                output.putUInt(geom.getNumPatches());
+                for (Polygon pg : geom) {
+                    pg.accept(this);
+                }
             }
         }
 
@@ -166,7 +184,11 @@ class PostgisWkbEncoder implements WkbEncoder {
             writeByteOrder(output);
             DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
             writeTypeCodeAndSrid(geom, dimension, output);
-            writeRing(geom);
+            if (geom.isEmpty()) {
+                output.putUInt(0);
+            } else {
+                writeRing(geom);
+            }
         }
 
         private void writeRing(LinearRing geom) {
@@ -216,6 +238,10 @@ class PostgisWkbEncoder implements WkbEncoder {
         }
 
         protected int getGeometryType(Geometry geometry) {
+            //empty geometries have the same representation as an empty geometry collection
+            if (geometry.isEmpty()) {
+                return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
+            }
             WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
             if (type == null) {
                 throw new UnsupportedConversionException(

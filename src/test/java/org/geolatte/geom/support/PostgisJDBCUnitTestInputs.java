@@ -337,5 +337,13 @@ public class PostgisJDBCUnitTestInputs extends CodecTestInputs {
         addCase(45, "POLYGON EMPTY", "010700000000000000", LineString.createEmpty());
         addCase(45, "MULTIPOINT EMPTY", "010700000000000000", LineString.createEmpty());
 
+
+        LineString ls = new LineString(PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY).add(4, 2).add(5, 3).toPointSequence(), CrsId.UNDEFINED);
+        addCase(46, "GEOMETRYCOLLECTION(POINT(4 0),POINT EMPTY,LINESTRING(4 2,5 3))",
+                "0107000000030000000101000000000000000000104000000000000000000107000000000000000102000000020000000000000000001040000000000000004000000000000014400000000000000840",
+                new GeometryCollection(new Geometry[]{
+                        Points.create(4, 0), Points.createEmpty(), ls
+                }));
+
     }
 }
