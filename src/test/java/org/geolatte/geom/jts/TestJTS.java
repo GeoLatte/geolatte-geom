@@ -44,7 +44,7 @@ import static org.junit.Assert.assertTrue;
 public class TestJTS {
 
 
-    WktDecoder<Geometry> wktDecoder = Wkt.newWktDecoder();
+    WktDecoder wktDecoder = Wkt.newDecoder();
     WKTReader jtsWktDecoder = new WKTReader();
 
 

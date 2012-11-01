@@ -21,7 +21,6 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
 import org.geolatte.geom.support.CodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
 
@@ -33,10 +32,10 @@ public class TestPostgisJDBCUnitTests extends CodecUnitTestBase {
 
     PostgisJDBCUnitTestInputs testCases = new PostgisJDBCUnitTestInputs();
 
-    WktDecoder<Geometry> wktDecoder = Wkt.newWktDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
-    WktEncoder<Geometry> wktEncoder = Wkt.newWktEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
-    WkbDecoder wkbDecoder = Wkb.newWkbDecoder(Wkb.Dialect.POSTGIS_EWKB_1);
-    WkbEncoder wkbEncoder = Wkb.newWkbEncoder(Wkb.Dialect.POSTGIS_EWKB_1);
+    WktDecoder wktDecoder = Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
+    WktEncoder wktEncoder = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
+    WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.POSTGIS_EWKB_1);
+    WkbEncoder wkbEncoder = Wkb.newEncoder(Wkb.Dialect.POSTGIS_EWKB_1);
 
 
     @Override
@@ -45,7 +44,7 @@ public class TestPostgisJDBCUnitTests extends CodecUnitTestBase {
     }
 
     @Override
-    protected WktDecoder<Geometry> getWktDecoder() {
+    protected WktDecoder getWktDecoder() {
         return wktDecoder;
     }
 

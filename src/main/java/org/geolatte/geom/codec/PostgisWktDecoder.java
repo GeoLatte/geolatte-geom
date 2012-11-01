@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecoder {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);

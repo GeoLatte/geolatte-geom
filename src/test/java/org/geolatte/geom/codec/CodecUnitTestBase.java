@@ -62,7 +62,7 @@ abstract public class CodecUnitTestBase {
 
     abstract protected CodecTestBase getTestCases();
 
-    abstract protected WktDecoder<Geometry> getWktDecoder();
+    abstract protected WktDecoder getWktDecoder();
     abstract protected WktEncoder getWktEncoder();
 
     abstract protected WkbDecoder getWkbDecoder();

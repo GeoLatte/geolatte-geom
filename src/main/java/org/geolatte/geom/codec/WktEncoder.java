@@ -21,21 +21,20 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
+
 /**
  * An Encoder for WKT (Well-Known Text) representations.
- * <p>Encoders are generic because both <code>Geometry</code>s and <code>CoordinateReferenceSystem</code>s can be
- * encoded.</p>
  * <p>In general <code>WktEncoder</code> implementations are not be thread-safe.</p>
  *
- * @param <T> the type to encode (can be <code>Geometry</code> or <code>CoordinateReferenceSystem</code>).
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public interface WktEncoder<T> {
+public interface WktEncoder {
     /**
      * Encodes an object to its WKT representation.
-     * @param object the object to encode
+     * @param geometry the <code>Geometry</code> instance to encode
      * @return a WKT representation of the specified object.
      */
-    String encode(T object);
+    String encode(Geometry geometry);
 }

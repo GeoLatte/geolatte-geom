@@ -41,10 +41,10 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
     static final private Logger LOGGER = LoggerFactory.getLogger(MySqlCodecUnitTests.class);
 
     MySqlUnitTestInputs testCases = new MySqlUnitTestInputs();
-    WktDecoder<Geometry> wktDecoder = Wkt.newWktDecoder(Wkt.Dialect.MYSQL_WKT);
-    WktEncoder wktEncoder = Wkt.newWktEncoder(Wkt.Dialect.MYSQL_WKT);
-    WkbDecoder wkbDecoder = Wkb.newWkbDecoder(Wkb.Dialect.MYSQL_WKB);
-    WkbEncoder wkbEncoder = Wkb.newWkbEncoder(Wkb.Dialect.MYSQL_WKB);
+    WktDecoder wktDecoder = Wkt.newDecoder(Wkt.Dialect.MYSQL_WKT);
+    WktEncoder wktEncoder = Wkt.newEncoder(Wkt.Dialect.MYSQL_WKT);
+    WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.MYSQL_WKB);
+    WkbEncoder wkbEncoder = Wkb.newEncoder(Wkb.Dialect.MYSQL_WKB);
 
 
     @Test
@@ -92,7 +92,7 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
     }
 
     @Override
-    protected WktDecoder<Geometry> getWktDecoder() {
+    protected WktDecoder getWktDecoder() {
         return wktDecoder;
     }
 
