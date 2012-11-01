@@ -24,6 +24,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryCollection;
 import org.geolatte.geom.crs.CrsId;
 
 /**
@@ -34,7 +35,7 @@ public class MySqlWkbEncoder extends AbstractWkbEncoder {
 
     @Override
     public ByteBuffer encode(Geometry geometry, ByteOrder byteOrder) {
-        if (geometry == null || geometry.isEmpty()) return null;
+        if (geometry == null || hasEmpty(geometry)) return null;
         //size is size for WKB + 4 bytes for the SRID
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, false) + 4);
         if (byteOrder != null) {
@@ -49,5 +50,17 @@ public class MySqlWkbEncoder extends AbstractWkbEncoder {
     @Override
     protected int sizeEmptyGeometry(Geometry geometry) {
         return 0;
+    }
+
+    private boolean hasEmpty(Geometry geometry) {
+        if (geometry.isEmpty()) {
+            return true;
+        }
+        if (geometry instanceof GeometryCollection) {
+            for (Geometry part : (GeometryCollection) geometry) {
+                if (hasEmpty(part)) return true;
+            }
+        }
+        return false;
     }
 }
