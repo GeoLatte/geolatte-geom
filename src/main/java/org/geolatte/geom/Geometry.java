@@ -506,7 +506,7 @@ public abstract class Geometry implements Serializable {
      *
      * @return
      */
-    protected GeometryOperations getGeometryOperations() {
+    public GeometryOperations getGeometryOperations() {
         return this.geometryOperations;
     }
 }

@@ -22,200 +22,37 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.DimensionalFlag;
+import org.geolatte.geom.Geometry;
 
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
- *
+ * <p/>
  * <p>This class is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-class PostgisWkbEncoder implements WkbEncoder {
+class PostgisWkbEncoder extends AbstractWkbEncoder {
 
-    /**
-     * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
-     *
-     * @param geometry The <code>Geometry</code> to be encoded as WKB.
-     * @param byteOrder  The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
-     * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
-     */
+    //size of an empty geometry is the size of an emp
     @Override
-    public ByteBuffer encode(Geometry geometry, ByteOrder byteOrder) {
-        ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, true));
-        if (byteOrder != null) {
-            output.setWKBByteOrder(byteOrder);
-        }
-        writeGeometry(geometry, output);
-        output.rewind();
-        return output;
+    protected int sizeEmptyGeometry(Geometry geometry) {
+        return ByteBuffer.UINT_SIZE;
     }
 
-    private void writeGeometry(Geometry geom, ByteBuffer output) {
-        geom.accept(new WkbVisitor(output));
+
+    protected WkbVisitor newWkbVisitor(ByteBuffer output) {
+        return new PostgisWkbVisitor(output);
     }
 
-    private int calculateSize(Geometry geom, boolean includeSrid) {
-        int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
-        if (geom.getSRID() > 0 && includeSrid) {
-            size += 4;
-        }
-        //empty geoms have same representation as an empty GeometryCollection
-        if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
-        if (geom instanceof GeometryCollection) {
-            size += sizeOfGeometryCollection((GeometryCollection) geom);
-        } else if (geom instanceof Polygon) {
-            size += getPolygonSize((Polygon) geom);
-        } else if (geom instanceof Point) {
-            size += getPointByteSize(geom);
-        } else if (geom instanceof PolyHedralSurface) {
-            size += getPolyHedralSurfaceSize((PolyHedralSurface) geom);
-        } else {
-            size += ByteBuffer.UINT_SIZE; //to hold number of points
-            size += getPointByteSize(geom) * geom.getNumPoints();
-        }
-        return size;
-    }
+    static private class PostgisWkbVisitor extends WkbVisitor {
 
-    private int getPointByteSize(Geometry geom) {
-        return geom.getCoordinateDimension() * ByteBuffer.DOUBLE_SIZE;
-    }
-
-    private int getPolyHedralSurfaceSize(PolyHedralSurface geom) {
-        int size = ByteBuffer.UINT_SIZE;
-        for (int i = 0; i < geom.getNumPatches(); i++) {
-            size += getPolygonSize(geom.getPatchN(i));
-        }
-        return size;
-    }
-
-    private int getPolygonSize(Polygon geom) {
-        //to hold the number of linear rings
-        int size = ByteBuffer.UINT_SIZE;
-        //for each linear ring, a UINT holds the number of points
-        size += geom.isEmpty() ? 0 : ByteBuffer.UINT_SIZE * (geom.getNumInteriorRing() + 1);
-        size += getPointByteSize(geom) * geom.getNumPoints();
-        return size;
-    }
-
-    private int sizeOfGeometryCollection(GeometryCollection collection) {
-        int size = ByteBuffer.UINT_SIZE;
-        for (Geometry g : collection) {
-            size += calculateSize(g, false);
-        }
-        return size;
-    }
-
-    private static class WkbVisitor implements GeometryVisitor {
-
-        private final ByteBuffer output;
         private boolean hasWrittenSrid = false;
 
-        WkbVisitor(ByteBuffer byteBuffer) {
-            this.output = byteBuffer;
-        }
-
-        @Override
-        public void visit(Point geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            if (geom.isEmpty()) {
-                output.putUInt(0);
-            } else {
-                writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
-            }
-        }
-
-        @Override
-        public void visit(LineString geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            if (geom.isEmpty()) {
-                output.putUInt(0);
-            } else {
-                output.putUInt(geom.getNumPoints());
-                writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
-            }
-        }
-
-        @Override
-        public void visit(Polygon geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            if (geom.isEmpty()) {
-                output.putUInt(0);
-            } else {
-                writeNumRings(geom, output);
-                for (LinearRing ring : geom) {
-                    writeRing(ring);
-                }
-            }
-        }
-
-        @Override
-        public void visit(PolyHedralSurface geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            if (geom.isEmpty()) {
-                output.putUInt(0);
-            } else {
-                output.putUInt(geom.getNumPatches());
-                for (Polygon pg : geom) {
-                    pg.accept(this);
-                }
-            }
-        }
-
-        @Override
-        public void visit(GeometryCollection geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            output.putUInt(geom.getNumGeometries());
-        }
-
-        @Override
-        public void visit(LinearRing geom) {
-            writeByteOrder(output);
-            DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-            writeTypeCodeAndSrid(geom, dimension, output);
-            if (geom.isEmpty()) {
-                output.putUInt(0);
-            } else {
-                writeRing(geom);
-            }
-        }
-
-        private void writeRing(LinearRing geom) {
-            output.putUInt(geom.getNumPoints());
-            writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
-        }
-
-        private void writeNumRings(Polygon geom, ByteBuffer byteBuffer) {
-            byteBuffer.putUInt(geom.isEmpty() ? 0 : geom.getNumInteriorRing() + 1);
-        }
-
-        protected void writePoint(double[] coordinates, ByteBuffer output) {
-            for (double coordinate : coordinates) {
-                output.putDouble(coordinate);
-            }
-        }
-
-        protected void writePoints(PointSequence points, int coordinateDimension, ByteBuffer output) {
-            double[] coordinates = new double[coordinateDimension];
-            for (int i = 0; i < points.size(); i++) {
-                points.getCoordinates(coordinates, i);
-                writePoint(coordinates, output);
-            }
-        }
-
-        protected void writeByteOrder(ByteBuffer output) {
-            output.put(output.getWKBByteOrder().byteValue());
+        PostgisWkbVisitor(ByteBuffer byteBuffer) {
+            super(byteBuffer);
         }
 
         protected void writeTypeCodeAndSrid(Geometry geometry, DimensionalFlag dimension, ByteBuffer output) {
@@ -237,24 +74,9 @@ class PostgisWkbEncoder implements WkbEncoder {
             }
         }
 
-        protected int getGeometryType(Geometry geometry) {
-            //empty geometries have the same representation as an empty geometry collection
-            if (geometry.isEmpty()) {
-                return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
-            }
-            WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
-            if (type == null) {
-                throw new UnsupportedConversionException(
-                        String.format(
-                                "Can't convert geometries of type %s",
-                                geometry.getClass().getCanonicalName()
-                        )
-                );
-            }
-            return type.getTypeCode();
-        }
-
     }
+
+
 }
 
 

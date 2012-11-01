@@ -14,49 +14,48 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2012 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
 package org.geolatte.geom.codec;
 
-
-import org.geolatte.geom.*;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.ByteOrder;
+import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.crs.CrsId;
 
 /**
- * A Wkb Decoder for PostGIS EWKB
- * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.</p>
- * <p>This implementation is not thread-safe.</p>
- *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 11, 2010
+ *         creation-date: 11/1/12
  */
-class PostgisWkbDecoder extends AbstractWkbDecoder {
+public class MySqlWkbDecoder extends AbstractWkbDecoder {
 
+    /**
+     * Read the first four bytes: this contains the SRID
+     * @param byteBuffer
+     */
     @Override
     protected void prepare(ByteBuffer byteBuffer) {
-        //do nothing
+        byteBuffer.setByteOrder(ByteOrder.NDR);
+        int srid = byteBuffer.getInt();
+        setCrsId(CrsId.valueOf(srid));
     }
 
     @Override
     protected DimensionalFlag determineDimensionalFlag(int typeCode) {
-        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
-        return DimensionalFlag.valueOf(hasZ, hasM);
+        return DimensionalFlag.XY; // MYSQL only supports 2D geometries
     }
 
     @Override
     protected void readSridIfPresent(ByteBuffer byteBuffer, int typeCode) {
-        if (hasSrid(typeCode)) {
-            setCrsId(CrsId.valueOf(byteBuffer.getInt()));
-        }
+        //is already done in prepare() method
     }
 
     @Override
     protected boolean hasSrid(int typeCode) {
-        return (typeCode & PostgisWkbTypeMasks.SRID_FLAG) == PostgisWkbTypeMasks.SRID_FLAG;
+        return true;
     }
 
 }

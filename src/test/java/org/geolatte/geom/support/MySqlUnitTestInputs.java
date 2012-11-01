@@ -28,11 +28,16 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-public class MySQLUnitTests extends CodecTestBase {
+public class MySqlUnitTestInputs extends CodecTestBase {
 
-    public MySQLUnitTests() {
+    public MySqlUnitTestInputs() {
         GeometryFactory factory = new GeometryFactory(CrsId.UNDEFINED);
         addCase(1,
+                "POINT(10 10)",
+                "00000000010100000000000000000024400000000000002440",
+                Points.create(10, 10));
+
+        addCase(2,
                 "POINT(10 10)",
                 "00000000010100000000000000000024400000000000002440",
                 Points.create(10, 10));
@@ -42,12 +47,6 @@ public class MySQLUnitTests extends CodecTestBase {
                 "00000000010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
                 new MultiPoint(new Point[]{Points.create(11, 12), Points.create(20, 20)}),
                 false);
-
-        //Seems to be unsupported - weird
-//          addCase(9,
-//                  "MULTIPOINT((11 12),(20 20))",
-//                  "010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-//                  new MultiPoint(new Point[]{Points.create(11, 12), Points.create(20, 20)}));
 
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",
