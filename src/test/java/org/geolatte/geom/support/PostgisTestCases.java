@@ -24,14 +24,10 @@ package org.geolatte.geom.support;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class CodecTestInputs {
+public class PostgisTestCases extends CodecTestBase {
 
 
     public static final Integer POINT_2D = 0;
@@ -56,16 +52,7 @@ public class CodecTestInputs {
     public static final Integer LINESTRING_3DM = 19;
     public static final Integer EMPTY_POINT = 20;
 
-
-    public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
-
-
-    public CodecTestInputs() {
-        this(true);
-    }
-
-    public CodecTestInputs(boolean loadTestCases) {
-        if (!loadTestCases) return;
+    public PostgisTestCases() {
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
                 Points.create(1, 1, CrsId.UNDEFINED));
@@ -215,44 +202,5 @@ public class CodecTestInputs {
 
     }
 
-    public void addCase(Integer key, String wkt, String wkb, Geometry geom) {
-        addCase(key, wkt, wkb, geom, true);
-    }
-
-    public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
-        CodecTestInput testInput = new CodecTestInput();
-        testInput.wkt = wkt;
-        testInput.wkbHex = wkb;
-        testInput.wkb = ByteBuffer.from(wkb);
-        testInput.expected = geom;
-        testInput.testEncoding = testEncoding;
-        this.testCases.put(key, testInput);
-
-    }
-
-    public String getWKT(Integer testCase) {
-        return this.testCases.get(testCase).wkt;
-    }
-
-    public Geometry getExpected(Integer testCase) {
-        return this.testCases.get(testCase).expected;
-    }
-
-    public ByteBuffer getWKB(Integer testCase) {
-        return this.testCases.get(testCase).wkb;
-    }
-
-    public String getWKBHexString(Integer testCase) {
-        return this.testCases.get(testCase).wkbHex;
-    }
-
-
-    public boolean getTestEncoding(Integer testCase) {
-        return this.testCases.get(testCase).testEncoding;
-    }
-
-    public Set<Integer> getCases() {
-        return this.testCases.keySet();
-    }
 
 }

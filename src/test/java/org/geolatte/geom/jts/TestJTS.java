@@ -27,8 +27,9 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.support.CodecTestInputs;
+import org.geolatte.geom.support.CodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
+import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +56,7 @@ public class TestJTS {
     @Test
     public void test_codec_cases() {
         try {
-            testInputs(new CodecTestInputs());
+            testInputs(new PostgisTestCases());
         } catch (WktDecodeException e) {
             // ignore. The CodecTestInputs contain invalid WKT's to test exception handling. We only need the valid examples.
         }
@@ -63,8 +64,8 @@ public class TestJTS {
 
     @Test
     public void test_measured_2d() {
-        CodecTestInputs testInputs = new CodecTestInputs();
-        Geometry geometry = testInputs.getExpected(testInputs.LINESTRING_3DM);
+        PostgisTestCases testCases = new PostgisTestCases();
+        Geometry geometry = testCases.getExpected(testCases.LINESTRING_3DM);
         com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
         assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
@@ -132,10 +133,10 @@ public class TestJTS {
 
 
     // Note that the XYM and XYZM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
-    private void testInputs(CodecTestInputs testInputs) {
-        for (Integer testCase : testInputs.getCases()) {
+    private void testInputs(CodecTestBase testCases) {
+        for (Integer testCase : testCases.getCases()) {
             String failureMsg = "Failure in testcase " + testCase;
-            String wkt = testInputs.getWKT(testCase);
+            String wkt = testCases.getWKT(testCase);
             Geometry geolatteGeom = wktDecoder.decode(wkt);
             com.vividsolutions.jts.geom.Geometry jtsGeom = null;
             jtsGeom = parseWKTtoJTS(wkt, jtsGeom);

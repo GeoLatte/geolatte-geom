@@ -21,60 +21,46 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.support.CodecTestInputs;
+import org.geolatte.geom.support.CodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
-import org.junit.Test;
-
-import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 9/29/12
  */
-public class TestPostgisJDBCUnitTests {
+public class TestPostgisJDBCUnitTests extends CodecUnitTestBase {
 
     PostgisJDBCUnitTestInputs testCases = new PostgisJDBCUnitTestInputs();
-    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
+
     WktDecoder<Geometry> wktDecoder = Wkt.newWktDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
     WktEncoder<Geometry> wktEncoder = Wkt.newWktEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
     WkbDecoder wkbDecoder = Wkb.newWkbDecoder(Wkb.Dialect.POSTGIS_EWKB_1);
     WkbEncoder wkbEncoder = Wkb.newWkbEncoder(Wkb.Dialect.POSTGIS_EWKB_1);
 
-    @Test
-    public void test_wkt_codec() {
-        testWktCase(testCases);
+
+    @Override
+    protected CodecTestBase getTestCases() {
+        return testCases;
     }
 
-    @Test
-    public void test_wkt_with_srid_codec(){
-        testWktCase(testCasesWithSRID);
+    @Override
+    protected WktDecoder<Geometry> getWktDecoder() {
+        return wktDecoder;
     }
 
-    private void testWktCase(CodecTestInputs inputs) {
-
-        for (Integer testCase : inputs.getCases()) {
-            String wkt = inputs.getWKT(testCase);
-            Geometry geom = wktDecoder.decode(wkt);
-            assertEquals("Wkt decoder gives incorrect result for case: " + wkt, inputs.getExpected(testCase), geom);
-            if (inputs.getTestEncoding(testCase)) {
-                assertEquals("Wkt encoder gives incorrect result for case:" + wkt, wkt, wktEncoder.encode(geom));
-            }
-        }
+    @Override
+    protected WktEncoder getWktEncoder() {
+        return wktEncoder;
     }
 
+    @Override
+    protected WkbDecoder getWkbDecoder() {
+        return wkbDecoder;
+    }
 
-    @Test
-    public void test_wkb_codec() {
-        for (Integer testCase : testCases.getCases()) {
-            ByteBuffer wkb = testCases.getWKB(testCase);
-            Geometry geom = wkbDecoder.decode(wkb);
-            assertEquals("WKB decoder gives incorrect result for case: " + testCase, testCases.getExpected(testCase), geom);
-            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, wkbEncoder.encode(geom, ByteOrder.NDR));
-            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, wkbEncoder.encode(testCases.getExpected(testCase), ByteOrder.NDR));
-        }
+    @Override
+    protected WkbEncoder getWkbEncoder() {
+        return wkbEncoder;
     }
 }

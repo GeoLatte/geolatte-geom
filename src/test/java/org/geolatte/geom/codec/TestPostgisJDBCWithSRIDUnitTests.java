@@ -19,22 +19,28 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.support;
+package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
+import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+import org.junit.Test;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/29/12
+ *         creation-date: 11/1/12
  */
-public class CodecTestInput {
+public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
 
-    public String wkt;
-    public ByteBuffer wkb;
-    public Geometry expected;
-    public boolean testEncoding = true;
-    public String wkbHex;
+    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
 
+    @Override
+    protected CodecTestBase getTestCases() {
+        return testCasesWithSRID;
+    }
 
+    @Override
+    @Test
+    public void test_wkb_codec() {
+        //Don't test WKB with SRID at this point - we don't have the WKB's yet
+    }
 }

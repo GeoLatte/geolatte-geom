@@ -29,10 +29,9 @@ import org.geolatte.geom.crs.CrsId;
  *         creation-date: 10/13/12
  */
 
-public class PostgisJDBCUnitTestInputs extends CodecTestInputs {
+public class PostgisJDBCUnitTestInputs extends CodecTestBase {
 
     public PostgisJDBCUnitTestInputs() {
-        super(false);
         GeometryFactory factory = new GeometryFactory(CrsId.UNDEFINED);
         addCase(1,
                 "POINT(10 10)",
