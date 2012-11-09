@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  */
 public class PointSequenceIteratorTest {
 
-    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, DimensionalFlag.XY);
+    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, DimensionalFlag.d2D);
     PointSequence emptySequence = EmptyPointSequence.INSTANCE;
 
     PointSequenceIterator itSeq;

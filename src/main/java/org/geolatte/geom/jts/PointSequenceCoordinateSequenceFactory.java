@@ -52,10 +52,10 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
+        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.d2D;
         if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
-        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.XY;
-        return DimensionalFlag.XYZ;
+        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.d2D;
+        return DimensionalFlag.d3D;
     }
 
     private CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim) {

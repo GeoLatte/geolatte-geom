@@ -227,7 +227,7 @@ public class TestPostgisWktEncoderDecoder {
         Point pnt = (Point) decode(wkt);
         assertNotNull(pnt);
         GeometryPointEquality eq = new GeometryPointEquality(
-                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, 0.00000001));
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.d2D, 0.00000001));
         assertTrue(eq.equals(testcases.getExpected(PostgisTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
     }
 

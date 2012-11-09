@@ -58,10 +58,10 @@ public class LineStringTest {
         linestr2dm = create(coordinates, false, true);
         linestr3dm = create(coordinates, true, true);
         emptyLine = new LineString(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED);
-        PointSequence closedSeq = new PackedPointSequence(new double[]{0,0,0,1,1,0,1,0,0,0,0,0}, DimensionalFlag.XYZ);
+        PointSequence closedSeq = new PackedPointSequence(new double[]{0,0,0,1,1,0,1,0,0,0,0,0}, DimensionalFlag.d3D);
         simpleClosed = new LineString(closedSeq, CrsId.UNDEFINED);
         nonSimpleClosed = new LineString(createNonSimpleClosedPointSequence(),CrsId.UNDEFINED);
-        PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.XY);
+        PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.d2D);
         line2d = new LineString(lineSeq, CrsId.UNDEFINED);
 
     }
@@ -189,7 +189,7 @@ public class LineStringTest {
 
     PointSequence createNonSimpleClosedPointSequence() {
 
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(5, DimensionalFlag.XY);
+        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(5, DimensionalFlag.d2D);
         double[] points = new double[2];
         points[0] = 1d;
         points[1] = 1d;

@@ -406,10 +406,10 @@ public class JTS {
         DimensionalFlag df;
         // TODO: A problem remains when the first point has a z value and the others don't
         if (Double.isNaN(cs.getCoordinate(0).z)) {
-            df = DimensionalFlag.XY;
+            df = DimensionalFlag.d2D;
             coord = new double[2];
         } else {
-            df = DimensionalFlag.XYZ;
+            df = DimensionalFlag.d3D;
             coord = new double[3];
         }
         PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df);

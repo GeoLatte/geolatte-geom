@@ -45,7 +45,7 @@ public class MySqlWkbDecoder extends AbstractWkbDecoder {
 
     @Override
     protected DimensionalFlag determineDimensionalFlag(int typeCode) {
-        return DimensionalFlag.XY; // MYSQL only supports 2D geometries
+        return DimensionalFlag.d2D; // MYSQL only supports 2D geometries
     }
 
     @Override

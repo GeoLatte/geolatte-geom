@@ -100,9 +100,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",
                 "01020000000400000000000000000024400000000000002440000000000000344000000000000034400000000000004940000000000000494000000000000041400000000000004140",
-                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPointSequence()));
+                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPointSequence()));
 
-        LineString line3D = factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.XYZ)
+        LineString line3D = factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.d3D)
                 .add(10, 10, 20).add(20, 20, 20).add(50, 50, 50).add(34, 34, 34).toPointSequence());
         addCase(14,
                 "LINESTRING(10 10 20,20 20 20,50 50 50,34 34 34)",
@@ -112,20 +112,20 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(15,
                 "LINESTRINGM(10 10 20,20 20 20,50 50 50,34 34 34)",
                 "010200004004000000000000000000244000000000000024400000000000003440000000000000344000000000000034400000000000003440000000000000494000000000000049400000000000004940000000000000414000000000000041400000000000004140",
-                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.XYM)
+                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2DM)
                         .add(10, 10, 20).add(20, 20, 20).add(50, 50, 50).add(34, 34, 34).toPointSequence()));
 
         addCase(16,
                 "LINESTRING(10 10 20 20,20 20 20 20,50 50 50 50,34 34 34 50)",
                 "01020000C0040000000000000000002440000000000000244000000000000034400000000000003440000000000000344000000000000034400000000000003440000000000000344000000000000049400000000000004940000000000000494000000000000049400000000000004140000000000000414000000000000041400000000000004940",
-                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.XYZM)
+                factory.createLineString(PointSequenceBuilders.fixedSized(4, DimensionalFlag.d3DM)
                         .add(10, 10, 20, 20).add(20, 20, 20, 20).add(50, 50, 50, 50).add(34, 34, 34, 50).toPointSequence()));
 
         Polygon polygon2D = factory.createPolygon(new LinearRing[]{
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XY)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d2D)
                         .add(10, 10).add(20, 10).add(20, 20).add(20, 10).add(10, 10)
                         .toPointSequence()),
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XY)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d2D)
                         .add(5, 5).add(5, 6).add(6, 6).add(6, 5).add(5, 5).toPointSequence())
         });
         addCase(17,
@@ -135,10 +135,10 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         );
 
         Polygon polygon3D = factory.createPolygon(new LinearRing[]{
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                         .add(10, 10, 0).add(20, 10, 0).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0)
                         .toPointSequence()),
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                         .add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
         });
 
@@ -148,10 +148,10 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 polygon3D);
 
         Polygon polygon2DM = factory.createPolygon(new LinearRing[]{
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYM)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d2DM)
                         .add(10, 10, 0).add(20, 10, 0).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0)
                         .toPointSequence()),
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYM)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d2DM)
                         .add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
         });
 
@@ -161,10 +161,10 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 polygon2DM);
 
         Polygon polygon3DM = factory.createPolygon(new LinearRing[]{
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYZM)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d3DM)
                         .add(10, 10, 0, 7).add(20, 10, 0, 7).add(20, 20, 0, 7).add(20, 10, 0, 7).add(10, 10, 0, 7)
                         .toPointSequence()),
-                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.XYZM)
+                factory.createLinearRing(PointSequenceBuilders.variableSized(DimensionalFlag.d3DM)
                         .add(5, 5, 0, 7).add(5, 6, 0, 7).add(6, 6, 0, 7).add(6, 5, 0, 7).add(5, 5, 0, 7).toPointSequence())
         });
         addCase(20,
@@ -199,9 +199,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "MULTILINESTRING((10 10,20 10,20 20,20 10,10 10),(5 5,5 6,6 6,6 5,5 5))",
                 "01050000000200000001020000000500000000000000000024400000000000002440000000000000344000000000000024400000000000003440000000000000344000000000000034400000000000002440000000000000244000000000000024400102000000050000000000000000001440000000000000144000000000000014400000000000001840000000000000184000000000000018400000000000001840000000000000144000000000000014400000000000001440",
                 factory.createMultiLineString(new LineString[]{
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XY)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d2D)
                                 .add(10, 10).add(20, 10).add(20, 20).add(20, 10).add(10, 10).toPointSequence()),
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XY)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d2D)
                                 .add(5, 5).add(5, 6).add(6, 6).add(6, 5).add(5, 5).toPointSequence())
 
                 }));
@@ -210,9 +210,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "MULTILINESTRING((10 10 5,20 10 5,20 20 0,20 10 0,10 10 0),(5 5 0,5 6 0,6 6 0,6 5 0,5 5 0))",
                 "010500008002000000010200008005000000000000000000244000000000000024400000000000001440000000000000344000000000000024400000000000001440000000000000344000000000000034400000000000000000000000000000344000000000000024400000000000000000000000000000244000000000000024400000000000000000010200008005000000000000000000144000000000000014400000000000000000000000000000144000000000000018400000000000000000000000000000184000000000000018400000000000000000000000000000184000000000000014400000000000000000000000000000144000000000000014400000000000000000",
                 factory.createMultiLineString(new LineString[]{
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                                 .add(10, 10, 5).add(20, 10, 5).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0).toPointSequence()),
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                                 .add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
                 }));
 
@@ -220,9 +220,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "MULTILINESTRINGM((10 10 7,20 10 7,20 20 0,20 10 0,10 10 0),(5 5 0,5 6 0,6 6 0,6 5 0,5 5 0))",
                 "010500004002000000010200004005000000000000000000244000000000000024400000000000001C40000000000000344000000000000024400000000000001C40000000000000344000000000000034400000000000000000000000000000344000000000000024400000000000000000000000000000244000000000000024400000000000000000010200004005000000000000000000144000000000000014400000000000000000000000000000144000000000000018400000000000000000000000000000184000000000000018400000000000000000000000000000184000000000000014400000000000000000000000000000144000000000000014400000000000000000",
                 factory.createMultiLineString(new LineString[]{
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYM)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d2DM)
                                 .add(10, 10, 7).add(20, 10, 7).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0).toPointSequence()),
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYM)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d2DM)
                                 .add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
                 }));
 
@@ -230,9 +230,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "MULTILINESTRING((10 10 0 7,20 10 0 7,20 20 0 7,20 10 0 7,10 10 0 7),(5 5 0 7,5 6 0 7,6 6 0 7,6 5 0 7,5 5 0 7))",
                 "01050000C00200000001020000C0050000000000000000002440000000000000244000000000000000000000000000001C400000000000003440000000000000244000000000000000000000000000001C400000000000003440000000000000344000000000000000000000000000001C400000000000003440000000000000244000000000000000000000000000001C400000000000002440000000000000244000000000000000000000000000001C4001020000C0050000000000000000001440000000000000144000000000000000000000000000001C400000000000001440000000000000184000000000000000000000000000001C400000000000001840000000000000184000000000000000000000000000001C400000000000001840000000000000144000000000000000000000000000001C400000000000001440000000000000144000000000000000000000000000001C40",
                 factory.createMultiLineString(new LineString[]{
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZM)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3DM)
                                 .add(10, 10, 0, 7).add(20, 10, 0, 7).add(20, 20, 0, 7).add(20, 10, 0, 7).add(10, 10, 0, 7).toPointSequence()),
-                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZM)
+                        factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3DM)
                                 .add(5, 5, 0, 7).add(5, 6, 0, 7).add(6, 6, 0, 7).add(6, 5, 0, 7).add(5, 5, 0, 7).toPointSequence())
                 }));
 
@@ -291,9 +291,9 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "010700008001000000010500008002000000010200008005000000000000000000244000000000000024400000000000000000000000000000344000000000000024400000000000000000000000000000344000000000000034400000000000000000000000000000344000000000000024400000000000000000000000000000244000000000000024400000000000000000010200008005000000000000000000144000000000000014400000000000000000000000000000144000000000000018400000000000000000000000000000184000000000000018400000000000000000000000000000184000000000000014400000000000000000000000000000144000000000000014400000000000000000",
                 new GeometryCollection(new Geometry[]{
                         factory.createMultiLineString(new LineString[]{
-                                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                                         .add(10, 10, 0).add(20, 10, 0).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0).toPointSequence()),
-                                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ)
+                                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D)
                                         .add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
                         })
                 }));
@@ -311,8 +311,8 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 }));
 
         MultiLineString mls = factory.createMultiLineString(new LineString[]{
-                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ).add(10, 10, 0).add(20, 10, 0).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0).toPointSequence()),
-                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.XYZ).add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
+                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D).add(10, 10, 0).add(20, 10, 0).add(20, 20, 0).add(20, 10, 0).add(10, 10, 0).toPointSequence()),
+                factory.createLineString(PointSequenceBuilders.variableSized(DimensionalFlag.d3D).add(5, 5, 0).add(5, 6, 0).add(6, 6, 0).add(6, 5, 0).add(5, 5, 0).toPointSequence())
         });
 
         addCase(40,
@@ -337,7 +337,7 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(45, "MULTIPOINT EMPTY", "010700000000000000", LineString.createEmpty());
 
 
-        LineString ls = new LineString(PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY).add(4, 2).add(5, 3).toPointSequence(), CrsId.UNDEFINED);
+        LineString ls = new LineString(PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D).add(4, 2).add(5, 3).toPointSequence(), CrsId.UNDEFINED);
         addCase(46, "GEOMETRYCOLLECTION(POINT(4 0),POINT EMPTY,LINESTRING(4 2,5 3))",
                 "0107000000030000000101000000000000000000104000000000000000000107000000000000000102000000020000000000000000001040000000000000004000000000000014400000000000000840",
                 new GeometryCollection(new Geometry[]{

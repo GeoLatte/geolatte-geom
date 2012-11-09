@@ -35,13 +35,13 @@ import static org.junit.Assert.fail;
 public class PolygonTest {
 
 
-    PointSequence shellPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.XY);
-    PointSequence innerPoints = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.XY);
+    PointSequence shellPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
+    PointSequence innerPoints = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D);
 
-    PointSequence shellPoints2 = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.XY);
-    PointSequence innerPoints2 = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.XY);
+    PointSequence shellPoints2 = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
+    PointSequence innerPoints2 = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D);
 
-    PointSequence shellPoints3 = PointCollectionFactory.create(new double[]{1, 1, 10, 0, 10, 10, 0, 10, 1, 1}, DimensionalFlag.XY);
+    PointSequence shellPoints3 = PointCollectionFactory.create(new double[]{1, 1, 10, 0, 10, 10, 0, 10, 1, 1}, DimensionalFlag.d2D);
 
 
     @Test

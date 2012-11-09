@@ -245,10 +245,10 @@ class WktTokenizer {
             if (pos == wkt.length() - 1) throw new WktDecodeException("");
             c = wkt.charAt(++pos);
         }
-        if (num == 4) return DimensionalFlag.XYZM;
-        if (num == 3 && isMeasured) return DimensionalFlag.XYM;
-        if (num == 3 && !isMeasured) return DimensionalFlag.XYZ;
-        if (num == 2) return DimensionalFlag.XY;
+        if (num == 4) return DimensionalFlag.d3DM;
+        if (num == 3 && isMeasured) return DimensionalFlag.d2DM;
+        if (num == 3 && !isMeasured) return DimensionalFlag.d3D;
+        if (num == 2) return DimensionalFlag.d2D;
         throw new WktDecodeException("Point with less than 2 coordinates at position " + currentPos);
     }
 

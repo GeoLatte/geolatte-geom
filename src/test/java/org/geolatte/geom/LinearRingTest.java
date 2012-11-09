@@ -35,11 +35,11 @@ import static org.junit.Assert.fail;
  */
 public class LinearRingTest {
 
-    PointSequence validPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.XY);
+    PointSequence validPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
 
-    PointSequence tooFewPoints = PointCollectionFactory.create(new double[]{0, 0, 0, 0}, DimensionalFlag.XY);
+    PointSequence tooFewPoints = PointCollectionFactory.create(new double[]{0, 0, 0, 0}, DimensionalFlag.d2D);
 
-    PointSequence notClosedPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0.1, 0}, DimensionalFlag.XY);
+    PointSequence notClosedPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0.1, 0}, DimensionalFlag.d2D);
 
 
     @Test

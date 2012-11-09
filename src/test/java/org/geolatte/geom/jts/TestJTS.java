@@ -69,7 +69,7 @@ public class TestJTS {
         com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
         assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
-        assertEquals(DimensionalFlag.XYZM, dc.getDimensionalFlag());
+        assertEquals(DimensionalFlag.d3DM, dc.getDimensionalFlag());
         assertEquals(dc.getM(), 2, Math.ulp(2));
     }
 
@@ -132,7 +132,7 @@ public class TestJTS {
     }
 
 
-    // Note that the XYM and XYZM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
+    // Note that the d2DM and d3DM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
     private void testInputs(CodecTestBase testCases) {
         for (Integer testCase : testCases.getCases()) {
             String failureMsg = "Failure in testcase " + testCase;

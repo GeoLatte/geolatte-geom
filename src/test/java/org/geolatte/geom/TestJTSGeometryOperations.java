@@ -41,7 +41,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testCreateEnvelopeOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D);
         psBuilder.add(-1, 3).add(2, 5).add(10, -8).add(9, -1);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         assertEquals(new Envelope(-1, -8, 10, 5), ops.createEnvelopeOp(lineString).execute());
@@ -49,7 +49,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testCreateEnvelopeOpOnlyNegative() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D);
         psBuilder.add(-101, -97).add(-98, -95).add(-90, -108).add(-91, -101);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         assertEquals(new Envelope(-101, -108, -90, -95), ops.createEnvelopeOp(lineString).execute());
@@ -57,7 +57,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testCreateEnvelopeOpOnlyPositive() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D);
         psBuilder.add(99, 103).add(102, 105).add(110, 92).add(109, 99);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         assertEquals(new Envelope(99, 92, 110, 105), ops.createEnvelopeOp(lineString).execute());
@@ -72,14 +72,14 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testIntersectsOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(1, 1).add(2, 2);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 3).add(4, 4);
         LineString lineString2 = new LineString(psBuilder.toPointSequence(), null);
         assertFalse(ops.createIntersectsOp(lineString, lineString2).execute());
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(2, 2).add(4, 4);
         LineString lineString3 = new LineString(psBuilder.toPointSequence(), null);
         assertTrue(ops.createIntersectsOp(lineString, lineString3).execute());
@@ -87,14 +87,14 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testTouchesOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(1, 1).add(2, 2);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 3).add(4, 4);
         LineString lineString2 = new LineString(psBuilder.toPointSequence(), null);
         assertFalse(ops.createTouchesOp(lineString, lineString2).execute());
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(2, 2).add(4, 4);
         LineString lineString3 = new LineString(psBuilder.toPointSequence(), null);
         assertTrue(ops.createTouchesOp(lineString, lineString3).execute());
@@ -102,14 +102,14 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testCrossesOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(1, 1).add(1, 3);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 3).add(4, 4);
         LineString lineString2 = new LineString(psBuilder.toPointSequence(), null);
         assertFalse(ops.createCrossesOp(lineString, lineString2).execute());
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 2).add(3, 2);
         LineString lineString3 = new LineString(psBuilder.toPointSequence(), null);
         assertTrue(ops.createCrossesOp(lineString, lineString3).execute());
@@ -118,10 +118,10 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testContainsOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(1, 1).add(1, 2);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(0, 4).add(4, 4).add(4, 0).add(0, 0);
         Polygon polygon = new Polygon(psBuilder.toPointSequence(), null);
         assertFalse(ops.createContainsOp(lineString, polygon).execute());
@@ -131,15 +131,15 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testOverlapsOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(-1, -1).add(-1, 2).add(2, 2).add(2, -1).add(-1, -1);
         Polygon polygon = new Polygon(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(0, 4).add(4, 4).add(4, 0).add(0, 0);
         Polygon polygon2 = new Polygon(psBuilder.toPointSequence(), null);
         assertTrue(ops.createOverlapsOp(polygon, polygon2).execute());
         assertTrue(ops.createOverlapsOp(polygon2, polygon).execute());
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(10, 10).add(10, 14).add(14, 14).add(14, 10).add(10, 10);
         Polygon polygon3 = new Polygon(psBuilder.toPointSequence(), null);
         assertFalse(ops.createOverlapsOp(polygon3, polygon2).execute());
@@ -148,15 +148,15 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testRelateOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(-1, -1).add(-1, 2).add(2, 2).add(2, -1).add(-1, -1);
         Polygon polygon = new Polygon(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(0, 4).add(4, 4).add(4, 0).add(0, 0);
         Polygon polygon2 = new Polygon(psBuilder.toPointSequence(), null);
         assertTrue(ops.createRelateOp(polygon, polygon2, "T*T***T**").execute());
         assertTrue(ops.createRelateOp(polygon2, polygon, "T*T***T**").execute());
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(10, 10).add(10, 14).add(14, 14).add(14, 10).add(10, 10);
         Polygon polygon3 = new Polygon(psBuilder.toPointSequence(), null);
         assertFalse(ops.createRelateOp(polygon3, polygon2, "T*T***T**").execute());
@@ -165,10 +165,10 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testDistanceOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(1, 1).add(1, 3);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 1).add(3, 4);
         LineString lineString2 = new LineString(psBuilder.toPointSequence(), null);
         assertEquals(2., ops.createDistanceOp(lineString, lineString2).execute(), 0.00001d);
@@ -176,7 +176,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testBufferOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(1, 1);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         Geometry buffer = ops.createBufferOp(lineString, 10d).execute();
@@ -187,7 +187,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testConvexHullOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(1, 1);
         LineString lineString = new LineString(psBuilder.toPointSequence(), null);
         Geometry hull = ops.createConvexHullOp(lineString).execute();
@@ -197,14 +197,14 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testIntersectionOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(5, 0).add(5, 5).add(0, 5).add(0, 0);
         Polygon polygon1 = new Polygon(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 3).add(7, 3).add(7, 7).add(3, 7).add(3, 3);
         Polygon polygon2 = new Polygon(psBuilder.toPointSequence(), null);
         Polygon polygon3 = new Polygon(psBuilder.toPointSequence(), CrsId.valueOf(4326));
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 5).add(5, 5).add(5, 3).add(3, 3).add(3, 5);
         Polygon expected = new Polygon(psBuilder.toPointSequence(), null);
         assertEquals("Intersection returned incorrect result", expected, ops.createIntersectionOp(polygon1, polygon2).execute());
@@ -221,15 +221,15 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testUnionOp() {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(0, 0).add(5, 0).add(5, 5).add(0, 5).add(0, 0);
         Polygon polygon1 = new Polygon(psBuilder.toPointSequence(), null);
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(3, 3).add(7, 3).add(7, 7).add(3, 7).add(3, 3);
         Polygon polygon2 = new Polygon(psBuilder.toPointSequence(), null);
 
 
-        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         psBuilder.add(5, 3).add(5, 0).add(0, 0).add(0, 5).add(3, 5).add(3, 7).add(7, 7).add(7, 3).add(5, 3);
         Polygon expected = new Polygon(psBuilder.toPointSequence(), null);
         assertEquals(expected, ops.createUnionOp(polygon1, polygon2).execute());
@@ -237,13 +237,13 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testDifferenceOp() {
-        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(0, 0).add(5, 0).add(5, 5).add(0, 5).add(0, 0);
         Polygon pg1 = new Polygon(builder.toPointSequence(), null);
-        builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(0, 3).add(0, 6).add(5, 6).add(5, 3).add(0, 3);
         Polygon pg2 = new Polygon(builder.toPointSequence(), null);
-        builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(5, 3).add(5, 0).add(0, 0).add(0, 3).add(5, 3);
         Polygon expected = new Polygon(builder.toPointSequence(), null);
         assertEquals(expected, ops.createDifferenceOp(pg1, pg2).execute());
@@ -253,16 +253,16 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testSymDifferenceOp() {
-        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(0, 0).add(6, 0).add(6, 6).add(0, 6).add(0, 0);
         Polygon pg1 = new Polygon(builder.toPointSequence(), null);
-        builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(0, 3).add(6, 3).add(6, 8).add(0, 8).add(0, 3);
         Polygon pg2 = new Polygon(builder.toPointSequence(), null);
-        builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(6, 3).add(6, 0).add(0, 0).add(0, 3).add(6, 3);
         Polygon expected1 = new Polygon(builder.toPointSequence(), null);
-        builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(6, 6).add(0, 6).add(0, 8).add(6, 8).add(6, 6);
         Polygon expected2 = new Polygon(builder.toPointSequence(), null);
         MultiPolygon expected = new MultiPolygon(new Polygon[]{expected1, expected2});
@@ -273,7 +273,7 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testWktOp() {
-        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.XY);
+        PointSequenceBuilder builder = PointSequenceBuilders.variableSized(DimensionalFlag.d2D);
         builder.add(0, 0).add(6, 0).add(6, 6).add(0, 6).add(0, 0);
         Polygon pg1 = new Polygon(builder.toPointSequence(), null);
         String expected = "POLYGON((0 0,6 0,6 6,0 6,0 0))";
@@ -404,7 +404,7 @@ public class TestJTSGeometryOperations {
     public void testLocateBetweenisNumericallyStable() {
         Geometry result = ops.createLocateBetweenOp(tc.caseD1D, 1d, 2d - 10 * Math.ulp(1.d)).execute();
         GeometryPointEquality geomEq = new GeometryPointEquality(
-                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, Math.ulp(10d)));
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.d2D, Math.ulp(10d)));
         assertTrue("Error in case d) for 1-Dim. geometry",
                 geomEq.equals(
                         Wkt.fromWkt("MULTILINESTRINGM((0.0 0.0 1.0 ,0.9999999999999978 0.9999999999999978 1.9999999999999978))"),

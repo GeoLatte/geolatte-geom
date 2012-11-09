@@ -40,7 +40,7 @@ class NestedPointCollection extends AbstractPointCollection implements ComplexPo
     }
 
     private static DimensionalFlag extractDimensionalFlag(PointCollection[] children) {
-        return (children == null || children.length == 0) ? DimensionalFlag.XY : children[0].getDimensionalFlag();
+        return (children == null || children.length == 0) ? DimensionalFlag.d2D : children[0].getDimensionalFlag();
     }
 
     private int calculateSize() {

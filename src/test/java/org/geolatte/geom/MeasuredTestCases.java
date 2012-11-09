@@ -103,20 +103,20 @@ public class MeasuredTestCases {
 
 
     MeasuredTestCases(){
-         PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+         PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D);
         psBuilder.add(0, 0)
                 .add(1, 0)
                 .add(1, 1)
                 .add(2, 1);
         lineString2d = new LineString(psBuilder.toPointSequence(), CrsId.parse("EPSG:4326"));
 
-        psBuilder = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D);
         psBuilder.add(3, 1).add(4, 1).add(5, 1);
         LineString test2DLine2 = new LineString(psBuilder.toPointSequence(), CrsId.parse("EPSG:4326"));
         multiLineString2D = new MultiLineString(new LineString[]{lineString2d, test2DLine2});
 
 
-        psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XYZM);
+        psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d3DM);
         psBuilder.add(0, 0, 2, 5)
                 .add(1, 0, 3, 10)
                 .add(1, 1, 4, 20)
@@ -129,7 +129,7 @@ public class MeasuredTestCases {
                 });
 
 
-        psBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XYM);
+        psBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2DM);
         psBuilder.add(0, 0, 0)
                 .add(1, 0, 0)
                 .add(1, 1, 0)

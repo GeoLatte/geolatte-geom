@@ -32,35 +32,35 @@ import static org.junit.Assert.assertTrue;
  */
 public class PointCollectionPointEqualityTest {
 
-    PointSequence ps1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XYZM)
+    PointSequence ps1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPointSequence();
 
-    PointSequence ps1_2D = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XY)
+    PointSequence ps1_2D = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D)
             .add(1, 2)
             .add(2, 3)
             .add(3, 4).toPointSequence();
 
 
-    PointSequence ps2 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XYZM)
+    PointSequence ps2 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPointSequence();
 
-    PointSequence ps3 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XYZM)
+    PointSequence ps3 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
             .add(1, 2, 4, 5)
             .add(2, 3, 3, 2)
             .add(3, 4, 5, 2).toPointSequence();
 
-    PointSequence ps4 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XYZM)
+    PointSequence ps4 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
             .add(2, 2, 4, 5)
             .add(2, 4, 3, 2)
             .add(3, 4, 5, 2).toPointSequence();
 
     PointCollectionPointEquality eq = new PointCollectionPointEquality();
     PointCollectionPointEquality eq2D = new PointCollectionPointEquality(new ExactCoordinatePointEquality(
-            DimensionalFlag.XY
+            DimensionalFlag.d2D
     ));
 
     @Test
@@ -73,11 +73,11 @@ public class PointCollectionPointEqualityTest {
     @Test
     public void testEmptyPointSequencesAreEqual(){
         assertTrue(eq.equals(
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.XY).toPointSequence(),
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.XYZM).toPointSequence()));
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D).toPointSequence(),
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d3DM).toPointSequence()));
 
         assertFalse(eq.equals(
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.XY).toPointSequence(),
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D).toPointSequence(),
                 ps1));
     }
 

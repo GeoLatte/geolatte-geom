@@ -50,7 +50,7 @@ public class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     @Override
     public DimensionalFlag getDimensionalFlag() {
-        return DimensionalFlag.XY;
+        return DimensionalFlag.d2D;
     }
 
     @Override

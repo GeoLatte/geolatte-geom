@@ -33,7 +33,7 @@ package org.geolatte.geom;
  */
 public class DefaultMeasureGeometryOperations implements MeasureGeometryOperations {
 
-    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.XY);
+    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.d2D);
 
     /**
      * @inheritDoc
