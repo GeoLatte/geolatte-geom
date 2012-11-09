@@ -34,25 +34,10 @@ import org.geolatte.geom.crs.CrsId;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class WktTokenizer {
+class WktTokenizer extends AbstractWktTokenizer {
 
-    private final CharSequence wkt;
-    private final WktVariant variant;
-    private int currentPos = 0;
     private boolean isMeasured = false;
-    private final boolean pointListAsSingleToken;
     private final CrsId crsId;
-
-    /**
-     * Constructs a tokenizer
-     *
-     * @param wkt     the String to tokenizer
-     * @param variant the variant that can be recognized
-     * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
-     */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId) {
-        this(wkt, variant, crsId, true);
-    }
 
     /**
      * A Tokenizer for the specified WKT string
@@ -60,9 +45,9 @@ class WktTokenizer {
      * @param wkt                     the string to tokenize
      * @param variant                 the list of words to recognize as separate variant
      * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
-     * @param pointListAsSingleNumber this treats any substring consisting of list delimiters and numeric characters as a single pointlist
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId, boolean pointListAsSingleNumber) {
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId) {
+        super(wkt, variant);
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
         if (crsId == null) {
@@ -70,46 +55,10 @@ class WktTokenizer {
         } else {
             this.crsId = crsId;
         }
-        this.wkt = wkt;
-        this.variant = variant;
-        this.pointListAsSingleToken = pointListAsSingleNumber;
     }
 
-    public boolean moreTokens() {
-        skipWhitespace();
-        return this.currentPos < wkt.length();
-    }
-
-    public WktToken nextToken() {
-        if (!moreTokens()) {
-            return variant.end();
-        }
-        if (wkt.charAt(currentPos) == variant.getOpenListChar()) {
-            currentPos++;
-            return variant.getOpenList();
-        } else if (wkt.charAt(currentPos) == variant.getCloseListChar()) {
-            currentPos++;
-            return variant.getCloseList();
-        } else if (wkt.charAt(currentPos) == '"') {
-            return readText();
-        } else if (Character.isLetter(wkt.charAt(currentPos))) {
-            return readToken();
-        } else if (Character.isDigit(wkt.charAt(currentPos)) || wkt.charAt(currentPos) == '.' || wkt.charAt(currentPos) == '-') {
-            if (pointListAsSingleToken) {
-                return readPointList();
-            } else {
-                return readNumberToken();
-            }
-        } else if (wkt.charAt(currentPos) == variant.getElemSepChar()) {
-            currentPos++;
-            return variant.getElementSeparator();
-        } else {
-            throw new WktDecodeException(String.format("Illegal Character at pos %d in Wkt text: %s", currentPos, wkt));
-        }
-
-    }
-
-    private WktToken readPointList() {
+    @Override
+    WktToken numericToken() {
         DimensionalFlag dimensionalFlag = countDimension();
         int numPoints = countPoints();
         double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
@@ -178,48 +127,6 @@ class WktTokenizer {
     }
 
 
-    protected double readNumber() {
-        skipWhitespace();
-        StringBuilder stb = new StringBuilder();
-        char c = wkt.charAt(currentPos);
-        if (c == '-') {
-            stb.append(c);
-            c = wkt.charAt(++currentPos);
-        }
-        c = readDigits(stb, c);
-        if (c == '.') {
-            stb.append(c);
-            c = wkt.charAt(++currentPos);
-            readDigits(stb, c);
-        }
-        return Double.parseDouble(stb.toString());
-    }
-
-    private char readDigits(StringBuilder stb, char c) {
-        while (Character.isDigit(c)) {
-            stb.append(c);
-            c = wkt.charAt(++currentPos);
-        }
-        return c;
-    }
-
-
-    protected WktToken readNumberToken() {
-        double d = readNumber();
-        return new WktNumberToken(d);
-    }
-
-    protected WktToken readText() {
-        StringBuilder builder = new StringBuilder();
-        char c = wkt.charAt(++currentPos);
-        while (c != '"') {
-            builder.append(c);
-            c = wkt.charAt(++currentPos);
-        }
-        currentPos++;
-        return new WktTextToken(builder.toString());
-    }
-
     private int countPoints() {
         int pos = currentPos + 1;
         char c = wkt.charAt(pos);
@@ -261,42 +168,12 @@ class WktTokenizer {
         throw new WktDecodeException("Point with less than 2 coordinates at position " + currentPos);
     }
 
-    private void skipWhitespace() {
-        while (currentPos < wkt.length() && Character.isWhitespace(wkt.charAt(currentPos))) {
-            currentPos++;
-        }
-    }
-
     private void skipPointDelimiter() {
         skipWhitespace();
         if (wkt.charAt(currentPos) == ',') currentPos++;
     }
 
-    private WktToken readToken() {
-        int endPos = this.currentPos;
-        while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
-            endPos++;
-        }
-        WktToken nextToken = matchKeyword(currentPos, endPos);
-        currentPos = endPos;
-        return nextToken;
-    }
-
-    protected boolean isWordChar(char c) {
-        return (Character.isLetter(c) || Character.isDigit(c) || c == '_');
-    }
-
-    /**
-     * Matches the specifed subsequence of the WKT to a <code>WktToken</code>.
-     * <p/>
-     * <p>As a side-effect it informs this WktTokenizer whether to expect coordinates with an M-coordinate.</p>
-     *
-     * @param currentPos the start of the subsequence to match
-     * @param endPos     the end of the subsequence to match
-     * @return the taken that matches the specified subsequence
-     * @throws WktDecodeException if the specified subsequence does not match a token.
-     */
-    private WktToken matchKeyword(int currentPos, int endPos) {
+    protected WktToken matchKeyword(int currentPos, int endPos) {
         WktToken token = variant.matchKeyword(wkt, currentPos, endPos);
         if (token instanceof WktGeometryToken) {
             this.isMeasured = isMeasured || ((WktGeometryToken) token).isMeasured();
@@ -305,10 +182,6 @@ class WktTokenizer {
             this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
         }
         return token;
-    }
-
-    public int position() {
-        return this.currentPos;
     }
 
 }

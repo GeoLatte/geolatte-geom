@@ -38,7 +38,7 @@ abstract class AbstractWktDecoder<T> {
     private final WktVariant wktVariant;
 
     protected WktToken currentToken;
-    private WktTokenizer tokenizer;
+    private AbstractWktTokenizer tokenizer;
 
     /**
      * The constructor of this AbstractWktDecoder. It sets the variant.
@@ -50,7 +50,7 @@ abstract class AbstractWktDecoder<T> {
     }
 
 
-    protected void setTokenizer(WktTokenizer tokenizer) {
+    protected void setTokenizer(AbstractWktTokenizer tokenizer) {
         this.tokenizer = tokenizer;
         this.currentToken = null;
     }
