@@ -255,10 +255,10 @@ public class JTS {
         }
         org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
         org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), crsId);
-        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPoints(), extRing.getCrsId());
+        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPoints());
         for (int i = 1; i < rings.length; i++) {
             org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crsId);
-            rings[i] = new org.geolatte.geom.LinearRing(intRing.getPoints(), extRing.getCrsId());
+            rings[i] = new org.geolatte.geom.LinearRing(intRing.getPoints());
         }
         return new org.geolatte.geom.Polygon(rings);
     }
@@ -290,7 +290,7 @@ public class JTS {
      */
     private static org.geolatte.geom.LineString from(LineString jtsLineString, CrsId crsId) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return new org.geolatte.geom.LineString(toPointSequence(cs), crsId);
+        return new org.geolatte.geom.LineString(toPointSequence(cs, CrsId.valueOf(jtsLineString.getSRID())));
 
     }
 
@@ -312,7 +312,7 @@ public class JTS {
      */
     private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return new org.geolatte.geom.Point(toPointSequence(cs), crsId);
+        return new org.geolatte.geom.Point(toPointSequence(cs, CrsId.valueOf(jtsPoint.getSRID())));
     }
 
     ///
@@ -395,7 +395,7 @@ public class JTS {
     /*
      * Helpermethod that transforms a coordinatesequence into a pointsequence.
      */
-    private static PointSequence toPointSequence(CoordinateSequence cs) {
+    private static PointSequence toPointSequence(CoordinateSequence cs, CrsId crsId) {
         if (cs instanceof PointSequence) {
             return (PointSequence) cs;
         }
@@ -412,7 +412,7 @@ public class JTS {
             df = DimensionalFlag.d3D;
             coord = new double[3];
         }
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df, crsId);
         for (int i = 0; i < cs.size(); i++) {
             for (int ci = 0; ci < coord.length; ci++) {
                 coord[ci] = cs.getOrdinate(i, ci);

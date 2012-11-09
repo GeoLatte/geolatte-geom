@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * A LineString is a 1-dimensional <code>Geometry</code> consisting of the <code>LineSegment</code>s defined by
  * consecutive pairs of <code>Point</code>s of a <code>PointSequence</code>.
@@ -31,7 +29,7 @@ import org.geolatte.geom.crs.CrsId;
  */
 public class LineString extends Geometry {
 
-    static final LineString EMPTY = new LineString(null, CrsId.UNDEFINED, null);
+    static final LineString EMPTY = new LineString(EmptyPointSequence.INSTANCE, null);
 
     private final PointSequence points;
 
@@ -50,7 +48,7 @@ public class LineString extends Geometry {
      * @param base
      */
     protected LineString(LineString base) {
-        super(base.getCrsId(), base.getGeometryOperations());
+        super(base.getGeometryOperations());
         this.points = base.points;
     }
 
@@ -59,11 +57,10 @@ public class LineString extends Geometry {
      * and <code>GeometryOperations</code> implementation.
      *
      * @param points             the <code>PointSequence</code>
-     * @param crsId              the <code>CrsId</code> for the coordinate reference system
      * @param geometryOperations the <code>GeometryOperations</code> implementation.
      */
-    public LineString(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
-        super(crsId, geometryOperations);
+    public LineString(PointSequence points, GeometryOperations geometryOperations) {
+        super(geometryOperations);
         if (points == null) {
             points = EmptyPointSequence.INSTANCE;
         }
@@ -74,10 +71,9 @@ public class LineString extends Geometry {
      * Constructs a <code>LineString</code> from the specified <code>PointSequence</code> and coordinate reference system
      *
      * @param points the <code>PointSequence</code>
-     * @param crsId  the <code>CrsId</code> for the coordinate reference system
      */
-    public LineString(PointSequence points, CrsId crsId) {
-        this(points, crsId, null);
+    public LineString(PointSequence points) {
+        this(points, null);
     }
 
 

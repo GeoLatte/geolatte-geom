@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -32,8 +34,8 @@ class PackedPointSequence extends AbstractPointCollection implements PointSequen
     private final double[] coordinates;
 
 
-    PackedPointSequence(double[] coordinates, DimensionalFlag dimensionalFlag) {
-        super(dimensionalFlag);
+    PackedPointSequence(double[] coordinates, DimensionalFlag dimensionalFlag, CrsId crsId) {
+        super(dimensionalFlag, crsId);
         if (coordinates == null) {
             this.coordinates = new double[0];
         } else {
@@ -84,9 +86,9 @@ class PackedPointSequence extends AbstractPointCollection implements PointSequen
 
         if (is3D() != that.is3D()) return false;
         if (isMeasured() != that.isMeasured()) return false;
+        if (!getCrsId().equals(that.getCrsId())) return false;
         return new PointCollectionPointEquality().equals(this, that);
     }
-
 
 
     @Override
@@ -94,6 +96,7 @@ class PackedPointSequence extends AbstractPointCollection implements PointSequen
         int result = Arrays.hashCode(coordinates);
         result = 31 * result + (isMeasured() ? 1 : 0);
         result = 31 * result + (is3D() ? 1 : 0);
+        result = 31 * result + getCrsId().hashCode();
         return result;
     }
 

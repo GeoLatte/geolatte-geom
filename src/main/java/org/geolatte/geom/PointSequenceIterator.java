@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -55,7 +53,7 @@ public class PointSequenceIterator implements Iterator<Point> {
     @Override
     public Point next() {
         if (hasNext()){
-            return new Point(createSingleElementPointSequenceFrom(sequence, index++), CrsId.UNDEFINED);
+            return new Point(createSingleElementPointSequenceFrom(sequence, index++));
         }
         throw new NoSuchElementException();
     }
@@ -63,7 +61,7 @@ public class PointSequenceIterator implements Iterator<Point> {
     private PointSequence createSingleElementPointSequenceFrom(PointSequence sequence, int i) {
         double[] coordinates = new double[sequence.getCoordinateDimension()];
         sequence.getCoordinates(coordinates, i);
-        return new PackedPointSequence(coordinates, sequence.getDimensionalFlag());
+        return new PackedPointSequence(coordinates, sequence.getDimensionalFlag(), sequence.getCrsId());
     }
 
     /**

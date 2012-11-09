@@ -55,7 +55,7 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      * @param geometries the <code>Geometry</code>s that are the elements of the constructed <code>GeometryCollection</code>.
      */
     public GeometryCollection(Geometry[] geometries) {
-        super(getCrsId(geometries), getGeometryOperations(geometries));
+        super(getGeometryOperations(geometries));
         check(geometries);
         points = collectPointSets(geometries);
         if (points.isEmpty()) {

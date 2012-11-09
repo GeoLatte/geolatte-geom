@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
@@ -28,9 +30,11 @@ package org.geolatte.geom;
 abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     protected final DimensionalFlag dimensionalFlag;
+    protected final CrsId crsId;
 
-    public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag) {
+    public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag, CrsId crsId) {
         this.dimensionalFlag = dimensionalFlag;
+        this.crsId = crsId;
     }
 
     @Override
@@ -88,6 +92,11 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
     @Override
     public DimensionalFlag getDimensionalFlag(){
         return this.dimensionalFlag;
+    }
+
+    @Override
+    public CrsId getCrsId() {
+        return this.crsId;
     }
 
     private double[] getPointCoordinates(Point point) {

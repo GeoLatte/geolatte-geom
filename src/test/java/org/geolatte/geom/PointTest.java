@@ -32,16 +32,16 @@ import static org.junit.Assert.*;
  */
 public class PointTest {
 
-    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.d2D);
-    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.d3D);
-    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM);
-    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM);
-
     CrsId wgs84 = CrsId.valueOf(4326);
-    Point point2D =  new Point(seq2D, wgs84);
-    Point point3D =  new Point(seq3D, wgs84);
-    Point point2DM = new Point(seq2DM, wgs84);
-    Point point3DM = new Point(seq3DM, wgs84);
+    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
+    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.d3D, wgs84);
+    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
+
+    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
+    Point point2D =  new Point(seq2D);
+    Point point3D =  new Point(seq3D);
+    Point point2DM = new Point(seq2DM);
+    Point point3DM = new Point(seq3DM);
     Point emptyPoint = Points.createEmpty();
 
     @Test
@@ -188,7 +188,7 @@ public class PointTest {
         Point empty1 = Points.createEmpty();
         Point empty2 = Points.createEmpty();
         assertEquals(empty1, empty2);
-        Point empty3 = new Point(EmptyPointSequence.INSTANCE,CrsId.UNDEFINED, null);
+        Point empty3 = new Point(EmptyPointSequence.INSTANCE,null);
         assertEquals(empty1, empty3);
     }
 }

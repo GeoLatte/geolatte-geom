@@ -69,7 +69,8 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
             Constructor cons = gClass.getConstructor(PointSequence.class, CrsId.class, GeometryOperations.class);
             geom =  (Geometry) cons.newInstance(expected.getPoints(), CrsId.valueOf(4326), expected.getGeometryOperations());
         }catch (Exception e){
-            LOGGER.warn("failure to create geom", e);
+            //Ignore exceptions. Exceptions only thrown for geometries that do not accept PSeqs in their constructor.
+            //LOGGER.warn("failure to create geom", e);
         }
         return geom;
     }

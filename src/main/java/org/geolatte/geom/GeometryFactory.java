@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * A Factory for <code>Geometry</code>s.
  * <p/>
@@ -32,41 +30,30 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/27/11
  */
+
+//TODO -- remove this class!
 public class GeometryFactory {
 
-    final private CrsId crsId;
     final private GeometryOperations geometryOperations;
 
     /**
      * Creates a <code>GeometryFactory</code> that creates <code>Geometry</code>s
-     * with the specified <code>CrsId</code> and <code>GeometryOperations</code>.
+     * with the specified <code>GeometryOperations</code>.
      *
-     * @param crsId              the spatial reference identifier
      * @param geometryOperations the <code>GeometryOperations</code> implementation
      */
-    public GeometryFactory(CrsId crsId, GeometryOperations geometryOperations) {
-        this.crsId = (crsId == null ? CrsId.UNDEFINED : crsId);
+    public GeometryFactory(GeometryOperations geometryOperations) {
         this.geometryOperations = (geometryOperations == null ? new JTSGeometryOperations() : geometryOperations);
     }
 
     /**
      * Creates a <code>GeometryFactory</code> that creates <code>Geometry</code>s
-     * with the specified <code>CrsId</code> and the default <code>GeometryOperations</code>
+     * with the default <code>GeometryOperations</code>
      * implementation.
      *
-     * @param crsId the spatial reference identifier
-     */
-    public GeometryFactory(CrsId crsId) {
-        this(crsId, null);
-    }
-
-    /**
-     * Creates a <code>GeometryFactory</code> that creates <code>Geometry</code>s
-     * with the default <code>CrsId</code> (i.e. UNDEFINED) and the default <code>GeometryOperations</code>
-     * implementation.
      */
     public GeometryFactory() {
-        this(null, null);
+        this((GeometryOperations) null);
     }
 
     /**
@@ -76,7 +63,7 @@ public class GeometryFactory {
      * @return the <code>Point</code> with the specified coordinates
      */
     public Point createPoint(PointSequence points) {
-        return new Point(points, this.crsId, this.geometryOperations);
+        return new Point(points, this.geometryOperations);
     }
 
     /**
@@ -86,7 +73,7 @@ public class GeometryFactory {
      * @return
      */
     public LineString createLineString(PointSequence points) {
-        return new LineString(points, crsId, geometryOperations);
+        return new LineString(points, geometryOperations);
     }
 
     /**
@@ -97,7 +84,7 @@ public class GeometryFactory {
      * @throws IllegalArgumentException if the input <code>PointSequence</code> does not form a closed ring.
      */
     public LinearRing createLinearRing(PointSequence points) {
-        return new LinearRing(points, crsId, geometryOperations);
+        return new LinearRing(points, geometryOperations);
     }
 
     /**
@@ -107,7 +94,7 @@ public class GeometryFactory {
      * @return
      */
     public Polygon createPolygon(PointSequence points) {
-        return new Polygon(new LinearRing[]{new LinearRing(points,this.crsId, this.geometryOperations)});
+        return new Polygon(new LinearRing[]{new LinearRing(points, this.geometryOperations)});
     }
 
     /**

@@ -35,11 +35,10 @@ import static org.junit.Assert.*;
 public class LineStringTest {
 
 
-
     double[] coordinates = new double[]{
-            0,0,0,0,
-            1,-1,1,2,
-            2,-2,3,4
+            0, 0, 0, 0,
+            1, -1, 1, 2,
+            2, -2, 3, 4
     };
 
     LineString linestr2d;
@@ -52,22 +51,22 @@ public class LineStringTest {
     LineString line2d;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         linestr2d = create(coordinates, false, false);
         linestr3d = create(coordinates, true, false);
         linestr2dm = create(coordinates, false, true);
         linestr3dm = create(coordinates, true, true);
-        emptyLine = new LineString(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED);
-        PointSequence closedSeq = new PackedPointSequence(new double[]{0,0,0,1,1,0,1,0,0,0,0,0}, DimensionalFlag.d3D);
-        simpleClosed = new LineString(closedSeq, CrsId.UNDEFINED);
-        nonSimpleClosed = new LineString(createNonSimpleClosedPointSequence(),CrsId.UNDEFINED);
-        PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.d2D);
-        line2d = new LineString(lineSeq, CrsId.UNDEFINED);
+        emptyLine = new LineString(EmptyPointSequence.INSTANCE);
+        PointSequence closedSeq = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0}, DimensionalFlag.d3D, CrsId.UNDEFINED);
+        simpleClosed = new LineString(closedSeq);
+        nonSimpleClosed = new LineString(createNonSimpleClosedPointSequence());
+        PointSequence lineSeq = new PackedPointSequence(new double[]{0.0, 0.0, 1.0, 1.0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+        line2d = new LineString(lineSeq);
 
     }
 
     @Test
-    public void testNumPoints(){
+    public void testNumPoints() {
         assertEquals(3, linestr2d.getNumPoints());
         assertEquals(3, linestr3d.getNumPoints());
         assertEquals(3, linestr2dm.getNumPoints());
@@ -76,7 +75,7 @@ public class LineStringTest {
     }
 
     @Test
-    public void testPointN(){
+    public void testPointN() {
         Assert.assertEquals(Points.create(0, 0, CrsId.UNDEFINED), linestr2d.getPointN(0));
         assertEquals(Points.create3D(0, 0, 0, CrsId.UNDEFINED), linestr3d.getPointN(0));
         assertEquals(Points.create(0, 0, 0, 0, CrsId.UNDEFINED), linestr3dm.getPointN(0));
@@ -85,29 +84,30 @@ public class LineStringTest {
         assertEquals(Points.create3D(2, -2, 3, CrsId.UNDEFINED), linestr3d.getPointN(2));
         assertEquals(Points.create(2, -2, 3, 4, CrsId.UNDEFINED), linestr3dm.getPointN(2));
 
-        try{
+        try {
             linestr3dm.getPointN(3);
             fail();
-        }catch(IndexOutOfBoundsException e){}
+        } catch (IndexOutOfBoundsException e) {
+        }
 
     }
 
 
     @Test
-    public void testLength(){
+    public void testLength() {
         //empty line is of getLength 0
         assertEquals(0, emptyLine.getLength(), 10E-6);
 
-        assertEquals(2*Math.sqrt(2), linestr2d.getLength(), 10E-6);
+        assertEquals(2 * Math.sqrt(2), linestr2d.getLength(), 10E-6);
         //getLength calculation only takes into account X/Y coordinates
         //i.e. getLength calculated in 2D-plane
-        assertEquals(2*Math.sqrt(2), linestr3d.getLength(), 10E-6);
-        assertEquals(2*Math.sqrt(2), linestr2dm.getLength(), 10E-6);
+        assertEquals(2 * Math.sqrt(2), linestr3d.getLength(), 10E-6);
+        assertEquals(2 * Math.sqrt(2), linestr2dm.getLength(), 10E-6);
 
     }
 
     @Test
-    public void testStartPoint(){
+    public void testStartPoint() {
         assertEquals(Points.createEmpty(), emptyLine.getStartPoint());
 
         assertEquals(Points.create(0, 0, CrsId.UNDEFINED), linestr2d.getStartPoint());
@@ -116,7 +116,7 @@ public class LineStringTest {
     }
 
     @Test
-    public void testEndPoint(){
+    public void testEndPoint() {
         assertEquals(Points.createEmpty(), emptyLine.getEndPoint());
 
         assertEquals(Points.create(2, -2, CrsId.UNDEFINED), linestr2d.getEndPoint());
@@ -125,7 +125,7 @@ public class LineStringTest {
     }
 
     @Test
-    public void testIsClosed(){
+    public void testIsClosed() {
         assertFalse(emptyLine.isClosed());
         assertFalse(linestr2d.isClosed());
         assertFalse(linestr3d.isClosed());
@@ -134,8 +134,8 @@ public class LineStringTest {
     }
 
     @Test
-    public void testIsSimple(){
-        assertTrue(emptyLine.isSimple()) ;
+    public void testIsSimple() {
+        assertTrue(emptyLine.isSimple());
         assertTrue(linestr2d.isSimple());
         assertTrue(linestr3d.isSimple());
         assertTrue(simpleClosed.isSimple());
@@ -143,7 +143,7 @@ public class LineStringTest {
     }
 
     @Test
-    public void testIsRing(){
+    public void testIsRing() {
         assertFalse(emptyLine.isRing());
         assertFalse(linestr2d.isRing());
         assertFalse(nonSimpleClosed.isRing());
@@ -151,7 +151,7 @@ public class LineStringTest {
     }
 
     @Test
-    public void testGetDimension(){
+    public void testGetDimension() {
         assertEquals(1, linestr2d.getDimension());
     }
 
@@ -189,7 +189,7 @@ public class LineStringTest {
 
     PointSequence createNonSimpleClosedPointSequence() {
 
-        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(5, DimensionalFlag.d2D);
+        FixedSizePointSequenceBuilder builder = new FixedSizePointSequenceBuilder(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         double[] points = new double[2];
         points[0] = 1d;
         points[1] = 1d;
@@ -205,21 +205,20 @@ public class LineStringTest {
 
     LineString create(double[] coordinates, boolean is3D, boolean isMeasured) {
         DimensionalFlag dimensionalFlag = DimensionalFlag.valueOf(is3D, isMeasured);
-        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.valueOf(is3D, isMeasured));
+        FixedSizePointSequenceBuilder sequenceBuilder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.valueOf(is3D, isMeasured), CrsId.UNDEFINED);
         int dim = dimensionalFlag.getCoordinateDimension();
         double[] point = new double[dim];
-        for (int i = 0; i < coordinates.length/4; i++){
-            point[CoordinateSequence.X] = coordinates[i*4];
-            point[CoordinateSequence.Y] = coordinates[i*4+1];
+        for (int i = 0; i < coordinates.length / 4; i++) {
+            point[CoordinateSequence.X] = coordinates[i * 4];
+            point[CoordinateSequence.Y] = coordinates[i * 4 + 1];
             if (is3D)
-                point[CoordinateSequence.Z] = coordinates[i*4+2];
+                point[CoordinateSequence.Z] = coordinates[i * 4 + 2];
             if (isMeasured)
-                point[is3D ? CoordinateSequence.M : CoordinateSequence.M -1] = coordinates[i*4+3];
+                point[is3D ? CoordinateSequence.M : CoordinateSequence.M - 1] = coordinates[i * 4 + 3];
             sequenceBuilder.add(point);
         }
-        return new LineString(sequenceBuilder.toPointSequence(),CrsId.UNDEFINED);
+        return new LineString(sequenceBuilder.toPointSequence());
     }
-
 
 
 }

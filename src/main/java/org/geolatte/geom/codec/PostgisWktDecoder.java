@@ -75,7 +75,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
     }
 
     private void initializeTokenizer() {
-        setTokenizer(new WktTokenizer(wktString, getWktVariant()));
+        setTokenizer(new WktTokenizer(wktString, getWktVariant(), crsId));
         nextToken();
     }
 
@@ -142,7 +142,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
             if (currentToken instanceof WktPointSequenceToken) {
                 PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
                 for (Point pnt : pointSequence) {
-                    points.add(new Point(pnt, crsId));
+                    points.add(new Point(pnt));
                 }
                 nextToken();
             }
@@ -191,7 +191,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
 
     private LinearRing decodeLinearRingText() {
         try {
-            return new LinearRing(decodePointSequence(), crsId);
+            return new LinearRing(decodePointSequence());
         } catch (IllegalArgumentException ex) {
             throw new WktDecodeException(ex.getMessage());
         }
@@ -200,7 +200,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
     private LineString decodeLineStringText() {
         PointSequence pointSequence = decodePointSequence();
         if (pointSequence != null) {
-            return new LineString(pointSequence, crsId);
+            return new LineString(pointSequence);
         }
         if (matchesEmptyToken()) {
             return LineString.createEmpty();
@@ -211,7 +211,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
     private Point decodePointText() {
         PointSequence pointSequence = decodePointSequence();
         if (pointSequence != null) {
-            return new Point(pointSequence, crsId);
+            return new Point(pointSequence);
         }
         if (matchesEmptyToken()) {
             return Points.createEmpty();

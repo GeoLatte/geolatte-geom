@@ -37,8 +37,6 @@ public abstract class Geometry implements Serializable {
 
     private final static GeometryEquality geomEq = new GeometryPointEquality();
 
-    private final CrsId crsId;
-
     private final GeometryOperations geometryOperations;
 
 
@@ -61,8 +59,7 @@ public abstract class Geometry implements Serializable {
         return new NestedPointCollection(collections);
     }
 
-    protected Geometry(CrsId crsId, GeometryOperations geometryOperations) {
-        this.crsId = (crsId == null ? CrsId.UNDEFINED : crsId);
+    protected Geometry(GeometryOperations geometryOperations) {
         this.geometryOperations = (geometryOperations == null ? new JTSGeometryOperations() : geometryOperations);
     }
 
@@ -84,7 +81,7 @@ public abstract class Geometry implements Serializable {
      * @return
      */
     public CrsId getCrsId() {
-        return crsId;
+        return getPoints().getCrsId();
     }
 
     /**
@@ -96,7 +93,7 @@ public abstract class Geometry implements Serializable {
      * @return
      */
     public int getSRID() {
-        return crsId.getCode();
+        return getPoints().getCrsId().getCode();
     }
 
     /**
@@ -200,7 +197,7 @@ public abstract class Geometry implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = crsId != null ? crsId.hashCode() : 0;
+        int result = getGeometryType().hashCode();
         result = 31 * result + this.getPoints().hashCode();
         return result;
     }

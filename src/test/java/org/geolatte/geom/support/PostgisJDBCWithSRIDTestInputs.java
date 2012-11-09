@@ -30,17 +30,17 @@ import org.geolatte.geom.crs.CrsId;
  */
 public class PostgisJDBCWithSRIDTestInputs extends CodecTestBase {
 
-    GeometryFactory factory = new GeometryFactory(CrsId.valueOf(4326));
+    final CrsId crsId = CrsId.valueOf(4326);
 
     public PostgisJDBCWithSRIDTestInputs(){
         PostgisJDBCUnitTestInputs base = new PostgisJDBCUnitTestInputs();
         for (Integer testCase : base.getCases()) {
             addCase(testCase,
-                    "SRID=4326;"+base.getWKT(testCase),
+                    "SRID=4326;" + base.getWKT(testCase),
                     toSRIDPrefixedWKB(base, testCase),
                     addCrsId(base, testCase),
                     false
-                    );
+            );
         }
     }
 
@@ -53,40 +53,48 @@ public class PostgisJDBCWithSRIDTestInputs extends CodecTestBase {
     private Geometry addCrsId(Geometry geom) {
         if (geom instanceof Point) {
             Point pnt = (Point) geom;
-            return factory.createPoint(pnt.getPoints());
+            return new Point(forceCrsId(pnt.getPoints()));
         } else if (geom instanceof LinearRing) {
             LinearRing lr = (LinearRing)geom;
-            return factory.createLinearRing(lr.getPoints());
+            return new LinearRing(forceCrsId(lr.getPoints()));
         } else if (geom instanceof LineString) {
             LineString ls = (LineString)geom;
-            return factory.createLineString(ls.getPoints());
+            return new LineString(forceCrsId(ls.getPoints()));
         } else if (geom instanceof MultiPoint) {
             MultiPoint mp = (MultiPoint)geom;
             Point[] points = new Point[mp.getNumGeometries()];
             addCrsId(points, mp);
-            return factory.createMultiPoint(points);
+            return new MultiPoint(points);
         } else if (geom instanceof Polygon) {
             Polygon pg = (Polygon)geom;
             LinearRing[] rings = new LinearRing[pg.getNumInteriorRing() + 1];
             addCrsId(rings, pg);
-            return factory.createPolygon(rings);
+            return new Polygon(rings);
         } else if (geom instanceof MultiPolygon) {
             MultiPolygon mpg = (MultiPolygon)geom;
             Polygon[] polygons = new Polygon[mpg.getNumGeometries()];
             addCrsId(polygons, mpg);
-            return factory.createMultiPolygon(polygons);
+            return new MultiPolygon(polygons);
         } else if (geom instanceof MultiLineString) {
             MultiLineString mls = (MultiLineString)geom;
             LineString[] ls = new LineString[mls.getNumGeometries()];
             addCrsId(ls, mls);
-            return factory.createMultiLineString(ls);
+            return new MultiLineString(ls);
         }  else if (geom instanceof GeometryCollection) {
             GeometryCollection gc = (GeometryCollection)geom;
             Geometry[] parts = new Geometry[gc.getNumGeometries()];
             addCrsId(parts, gc);
-            return factory.createGeometryCollection(parts);
+            return new GeometryCollection(parts);
         }
         return geom;
+    }
+
+    private PointSequence forceCrsId(PointSequence pointSequence) {
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(pointSequence.size(), pointSequence.getDimensionalFlag(), crsId);
+        for (Point pnt : pointSequence) {
+            builder.add(pnt);
+        }
+        return builder.toPointSequence();
     }
 
     private void addCrsId(Geometry[] result, GeometryCollection source) {

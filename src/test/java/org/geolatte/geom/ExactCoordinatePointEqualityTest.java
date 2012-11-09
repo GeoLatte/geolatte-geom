@@ -65,7 +65,7 @@ public class ExactCoordinatePointEqualityTest {
     @Test
     public void testEmptyPointsAlwaysEqual() {
         Point emptyPnt1 = Point.createEmpty();
-        Point emptyPnt2 = new Point(PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D).toPointSequence(), CrsId.UNDEFINED);
+        Point emptyPnt2 = new Point(PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D, CrsId.UNDEFINED).toPointSequence());
         assertTrue(eq.equals(emptyPnt1, emptyPnt2));
         assertFalse(eq.equals(emptyPnt1, pnt2));
     }

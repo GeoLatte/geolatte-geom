@@ -35,13 +35,13 @@ import static org.junit.Assert.fail;
 public class PolygonTest {
 
 
-    PointSequence shellPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
-    PointSequence innerPoints = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D);
+    PointSequence shellPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PointSequence innerPoints = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
-    PointSequence shellPoints2 = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
-    PointSequence innerPoints2 = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D);
+    PointSequence shellPoints2 = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PointSequence innerPoints2 = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
-    PointSequence shellPoints3 = PointCollectionFactory.create(new double[]{1, 1, 10, 0, 10, 10, 0, 10, 1, 1}, DimensionalFlag.d2D);
+    PointSequence shellPoints3 = PointCollectionFactory.create(new double[]{1, 1, 10, 0, 10, 10, 0, 10, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
 
     @Test
@@ -53,7 +53,7 @@ public class PolygonTest {
         } catch(IllegalArgumentException e){}
 
         try {
-            LinearRing shell = new LinearRing(shellPoints, CrsId.UNDEFINED);
+            LinearRing shell = new LinearRing(shellPoints);
             LinearRing emptyInner = LinearRing.createEmpty();
             new Polygon(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
@@ -62,15 +62,15 @@ public class PolygonTest {
 
     @Test
     public void testPolygonEquality() {
-        LinearRing shell = new LinearRing(shellPoints, CrsId.UNDEFINED);
-        LinearRing inner = new LinearRing(innerPoints, CrsId.UNDEFINED);
+        LinearRing shell = new LinearRing(shellPoints);
+        LinearRing inner = new LinearRing(innerPoints);
         Polygon polygon1 = new Polygon(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing(shellPoints2, CrsId.UNDEFINED);
-        inner = new LinearRing(innerPoints2, CrsId.UNDEFINED);
+        shell = new LinearRing(shellPoints2);
+        inner = new LinearRing(innerPoints2);
         Polygon polygon2 = new Polygon(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing(shellPoints3, CrsId.UNDEFINED);
+        shell = new LinearRing(shellPoints3);
         Polygon polygon3 = new Polygon(new LinearRing[]{shell, inner});
 
 

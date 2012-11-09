@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * A PointSequenceBuilder for <code>PointSequence</code>s with known size.
  *
@@ -31,8 +33,8 @@ class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
     private int index = 0;
     private final double[] coordinates;
 
-    FixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag) {
-        super(flag);
+    FixedSizePointSequenceBuilder(int capacity, DimensionalFlag flag, CrsId crsId) {
+        super(flag, crsId);
         this.coordinates = new double[capacity * flag.getCoordinateDimension()];
     }
 
@@ -44,7 +46,7 @@ class FixedSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
     @Override
     public PointSequence toPointSequence() {
         //TODO -- check that index == coordinates.length (i.e. build is complete)
-        return new PackedPointSequence(this.coordinates, this.dimensionalFlag);
+        return new PackedPointSequence(this.coordinates, this.dimensionalFlag, this.crsId);
     }
 
 }

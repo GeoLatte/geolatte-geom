@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -32,28 +33,28 @@ import static org.junit.Assert.assertTrue;
  */
 public class PointCollectionPointEqualityTest {
 
-    PointSequence ps1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
+    PointSequence ps1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM, CrsId.UNDEFINED)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPointSequence();
 
-    PointSequence ps1_2D = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D)
+    PointSequence ps1_2D = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D, CrsId.UNDEFINED)
             .add(1, 2)
             .add(2, 3)
             .add(3, 4).toPointSequence();
 
 
-    PointSequence ps2 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
+    PointSequence ps2 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM, CrsId.UNDEFINED)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPointSequence();
 
-    PointSequence ps3 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
+    PointSequence ps3 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM, CrsId.UNDEFINED)
             .add(1, 2, 4, 5)
             .add(2, 3, 3, 2)
             .add(3, 4, 5, 2).toPointSequence();
 
-    PointSequence ps4 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM)
+    PointSequence ps4 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d3DM, CrsId.UNDEFINED)
             .add(2, 2, 4, 5)
             .add(2, 4, 3, 2)
             .add(3, 4, 5, 2).toPointSequence();
@@ -73,11 +74,11 @@ public class PointCollectionPointEqualityTest {
     @Test
     public void testEmptyPointSequencesAreEqual(){
         assertTrue(eq.equals(
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D).toPointSequence(),
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d3DM).toPointSequence()));
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D, CrsId.UNDEFINED).toPointSequence(),
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d3DM, CrsId.UNDEFINED).toPointSequence()));
 
         assertFalse(eq.equals(
-                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D).toPointSequence(),
+                PointSequenceBuilders.fixedSized(0, DimensionalFlag.d2D, CrsId.UNDEFINED).toPointSequence(),
                 ps1));
     }
 

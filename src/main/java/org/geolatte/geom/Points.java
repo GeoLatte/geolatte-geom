@@ -40,7 +40,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X- and Y-coordinates and coordinate reference system
      */
     public static Point create(double x, double y, CrsId crsId) {
-        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D), crsId);
+        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D, crsId));
     }
 
     /**
@@ -53,7 +53,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y- and Z-coordinates and coordinate reference system
      */
     public static Point create3D(double x, double y, double z, CrsId crsId) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.d3D), crsId);
+        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.d3D, crsId));
     }
 
     /**
@@ -66,7 +66,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y- and M-coordinates and coordinate reference system
      */
     public static Point createMeasured(double x, double y, double m, CrsId crsId) {
-        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM), crsId);
+        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM, crsId));
     }
 
     /**
@@ -80,7 +80,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y-, Z- and M-coordinates and coordinate reference system
      */
     public static Point create(double x, double y, double z, double m, CrsId crsId) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM), crsId);
+        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM, crsId));
     }
 
     /**
@@ -91,7 +91,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X- and Y-coordinates and undefined coordinate reference system
      */
     public static Point create(double x, double y) {
-        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D), CrsId.UNDEFINED);
+        return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D, CrsId.UNDEFINED));
     }
 
     /**
@@ -103,7 +103,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y- and Z-coordinates and undefined coordinate reference system
      */
     public static Point create3D(double x, double y, double z) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.d3D), CrsId.UNDEFINED);
+        return new Point(new PackedPointSequence(new double[]{x, y, z}, DimensionalFlag.d3D, CrsId.UNDEFINED));
     }
 
     /**
@@ -115,7 +115,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y- and M-coordinates and undefined coordinate reference system
      */
     public static Point createMeasured(double x, double y, double m) {
-        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM), CrsId.UNDEFINED);
+        return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM, CrsId.UNDEFINED));
     }
 
     /**
@@ -128,7 +128,7 @@ public class Points implements Serializable {
      * @return a <code>Point</code> with the specified X-, Y- Z- and M-coordinates and undefined coordinate reference system
      */
     public static Point create(double x, double y, double z, double m) {
-        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM), CrsId.UNDEFINED);
+        return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM, CrsId.UNDEFINED));
     }
 
     /**
@@ -143,7 +143,7 @@ public class Points implements Serializable {
         if (coordinates == null || coordinates.length == 0) {
             return Point.createEmpty();
         }
-        return new Point(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag), crsId);
+        return new Point(new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag, crsId));
     }
 
     /**

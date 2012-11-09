@@ -124,16 +124,16 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     private LineString decodeLineString(ByteBuffer byteBuffer, DimensionalFlag flag) {
         int numPoints = byteBuffer.getInt();
         PointSequence points = readPoints(numPoints, byteBuffer, flag);
-        return new LineString(points, crsId);
+        return new LineString(points);
     }
 
     private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
         PointSequence points = readPoints(1, byteBuffer, flag);
-        return new Point(points, crsId);
+        return new Point(points);
     }
 
     private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag, crsId);
         double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
         for (int i = 0; i < numPoints; i++) {
             readPoint(byteBuffer, dimensionalFlag, coordinates);
@@ -160,7 +160,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         int numPoints = byteBuffer.getInt();
         PointSequence ps = readPoints(numPoints, byteBuffer, dimensionalFlag);
         try {
-            return new LinearRing(ps, crsId);
+            return new LinearRing(ps);
         } catch (IllegalArgumentException e) {
             throw new WkbDecodeException(e);
         }

@@ -21,6 +21,7 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -36,7 +37,7 @@ public class TestCrsWktTokenizer {
 
     @Test
     public void testGEOGCSWords() {
-        WktTokenizer tokenizer = new WktTokenizer(wkt, symbols, false);
+        WktTokenizer tokenizer = new WktTokenizer(wkt, symbols, CrsId.UNDEFINED, false);
         //read type coordinate system
         assertTrue(tokenizer.moreTokens());
         assertEquals(CrsWktVariant.GEOGCS, tokenizer.nextToken());

@@ -24,6 +24,7 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.jts.DimensionalCoordinate;
 
 /**
@@ -32,10 +33,12 @@ import org.geolatte.geom.jts.DimensionalCoordinate;
 abstract class AbstractPointCollection implements PointCollection, CoordinateSequence {
 
     private final DimensionalFlag dimensionalFlag;
+    private final CrsId crsId;
 
 
-    public AbstractPointCollection(DimensionalFlag dimensionalFlag) {
+    public AbstractPointCollection(DimensionalFlag dimensionalFlag, CrsId crsId) {
         this.dimensionalFlag = dimensionalFlag;
+        this.crsId = crsId;
     }
 
 
@@ -50,6 +53,10 @@ abstract class AbstractPointCollection implements PointCollection, CoordinateSeq
 
     public DimensionalFlag getDimensionalFlag() {
         return this.dimensionalFlag;
+    }
+
+    public CrsId getCrsId() {
+        return this.crsId;
     }
 
     public boolean is3D(){

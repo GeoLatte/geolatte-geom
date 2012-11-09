@@ -35,16 +35,16 @@ import static org.junit.Assert.fail;
  */
 public class LinearRingTest {
 
-    PointSequence validPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D);
+    PointSequence validPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
-    PointSequence tooFewPoints = PointCollectionFactory.create(new double[]{0, 0, 0, 0}, DimensionalFlag.d2D);
+    PointSequence tooFewPoints = PointCollectionFactory.create(new double[]{0, 0, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
-    PointSequence notClosedPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0.1, 0}, DimensionalFlag.d2D);
+    PointSequence notClosedPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0.1, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
 
     @Test
     public void testValidLinearRing() {
-        LinearRing valid = new LinearRing(validPoints, CrsId.UNDEFINED);
+        LinearRing valid = new LinearRing(validPoints);
         assertNotNull(valid);
         assertFalse(valid.isEmpty());
         assertEquals(CrsId.UNDEFINED, valid.getCrsId());
@@ -54,7 +54,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingShouldHaveAtLeast4Points() {
         try {
-            new LinearRing(tooFewPoints, CrsId.UNDEFINED);
+            new LinearRing(tooFewPoints);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -63,7 +63,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringShouldHaveAtLeast4Points() {
         try {
-            LineString l = new LineString(tooFewPoints, CrsId.UNDEFINED);
+            LineString l = new LineString(tooFewPoints);
             new LinearRing(l);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
@@ -73,7 +73,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingMustBeClosed() {
         try {
-            new LinearRing(notClosedPoints, CrsId.UNDEFINED);
+            new LinearRing(notClosedPoints);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }
@@ -82,7 +82,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringMustBeClosed() {
         try {
-            LineString l = new LineString(notClosedPoints, CrsId.UNDEFINED);
+            LineString l = new LineString(notClosedPoints);
             new LinearRing(l);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {

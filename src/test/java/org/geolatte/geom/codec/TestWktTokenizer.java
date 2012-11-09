@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -36,7 +37,7 @@ public class TestWktTokenizer {
     @Test
     public void test_only_whitespace() {
         String wkt = "    ";
-        WktTokenizer tokenizer = new WktTokenizer(wkt, words);
+        WktTokenizer tokenizer = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertFalse(tokenizer.moreTokens());
     }
 
@@ -44,7 +45,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_empty_point() {
         String wkt = "POINT EMPTY";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
@@ -57,7 +58,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_point() {
         String wkt = "POINT (20 33.3)";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
@@ -77,7 +78,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_point_3D() {
         String wkt = "POINT (20 33.3 .24)";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
@@ -98,7 +99,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_point_M() {
         String wkt = "POINTM (20 33.3 .24)";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POINT, token.getType());
@@ -119,7 +120,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_linestring() {
         String wkt = "LINESTRING(20 33.3 .24 , .1 2 3)";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.LINE_STRING, token.getType());
@@ -143,7 +144,7 @@ public class TestWktTokenizer {
     @Test
     public void test_tokenize_polygon() {
         String wkt = "POLYGON((5 5, 1 0, 1 1 ,0 1, 3 3),(0.25 0.25, 0.25 0.5, 0.5 0.5, 0.5 0.25, 0.25 0.25))";
-        WktTokenizer tokens = new WktTokenizer(wkt, words);
+        WktTokenizer tokens = new WktTokenizer(wkt, words, CrsId.UNDEFINED);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
         assertEquals(GeometryType.POLYGON, token.getType());

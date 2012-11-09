@@ -73,27 +73,27 @@ public class PostgisTestCases extends CodecTestBase {
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
                 Points.create(1, 2, 3, 4, CrsId.valueOf(4326)));
 
-        PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D);
+        PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
-        Geometry expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
+        Geometry expected = new LineString(psb.toPointSequence());
         addCase(LINESTRING_2D,
                 "LINESTRING(-29.261 66,-71.1074 -20.255)",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
                 expected);
 
-        psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        expected = new Polygon(psb.toPointSequence(), CrsId.UNDEFINED);
+        expected = new Polygon(psb.toPointSequence());
         addCase(POLYGON_2D_NO_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0))",
                 "0103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F00000000000000000000000000000000",
                 expected);
 
-        PointSequenceBuilder psb1 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        PointSequenceBuilder psb1 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        PointSequenceBuilder psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        PointSequenceBuilder psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
-        LinearRing[] rings = new LinearRing[]{new LinearRing(psb1.toPointSequence(), CrsId.UNDEFINED), new LinearRing(psb2.toPointSequence(), CrsId.UNDEFINED)};
+        LinearRing[] rings = new LinearRing[]{new LinearRing(psb1.toPointSequence()), new LinearRing(psb2.toPointSequence())};
         expected = new Polygon(rings);
         addCase(POLYGON_2D_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0),(0.25 0.25,0.25 0.5,0.5 0.5,0.5 0.25,0.25 0.25))",
@@ -126,36 +126,40 @@ public class PostgisTestCases extends CodecTestBase {
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
                 new MultiPoint(new Point[]{pnt1, pnt2}));
 
-        PointSequenceBuilder psl1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D);
+        PointSequenceBuilder psl1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psl1.add(1, 2).add(2, 3).add(4, 5);
-        PointSequenceBuilder psl2 = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D);
+        PointSequenceBuilder psl2 = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psl2.add(6, 7).add(8, 9);
         LineString[] linestrings = new LineString[2];
-        linestrings[0] = new LineString(psl1.toPointSequence(), CrsId.UNDEFINED);
-        linestrings[1] = new LineString(psl2.toPointSequence(), CrsId.UNDEFINED);
+        linestrings[0] = new LineString(psl1.toPointSequence());
+        linestrings[1] = new LineString(psl2.toPointSequence());
         addCase(MULTILINESTRING_2D,
                 "MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "010500000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
                 , new MultiLineString(linestrings));
 
         linestrings = new LineString[2];
-        linestrings[0] = new LineString(psl1.toPointSequence(), CrsId.valueOf(4326));
-        linestrings[1] = new LineString(psl2.toPointSequence(), CrsId.valueOf(4326));
+        psl1 = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D, CrsId.valueOf(4326));
+        psl1.add(1, 2).add(2, 3).add(4, 5);
+        psl2 = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.valueOf(4326));
+        psl2.add(6, 7).add(8, 9);
+        linestrings[0] = new LineString(psl1.toPointSequence());
+        linestrings[1] = new LineString(psl2.toPointSequence());
         addCase(MULTILINESTRING_2D_WITH_SRID,
                 "SRID=4326;MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "0105000020E610000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
                 , new MultiLineString(linestrings));
 
 
-        psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        psb = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
         Polygon[] polygons = new Polygon[2];
-        polygons[0] = new Polygon(psb.toPointSequence(), CrsId.UNDEFINED);
-        psb1 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        polygons[0] = new Polygon(psb.toPointSequence());
+        psb1 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb1.add(0, 0).add(1, 0).add(1, 1).add(0, 1).add(0, 0);
-        psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D);
+        psb2 = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb2.add(0.25, 0.25).add(0.25, 0.5).add(0.5, 0.5).add(0.5, 0.25).add(0.25, 0.25);
-        rings = new LinearRing[]{new LinearRing(psb1.toPointSequence(), CrsId.UNDEFINED), new LinearRing(psb2.toPointSequence(), CrsId.UNDEFINED)};
+        rings = new LinearRing[]{new LinearRing(psb1.toPointSequence()), new LinearRing(psb2.toPointSequence())};
         polygons[1] = new Polygon(rings);
 
         addCase(MULTIPOLYGON_2D,
@@ -163,9 +167,9 @@ public class PostgisTestCases extends CodecTestBase {
                 "0106000000020000000103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F000000000000000000000000000000000103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
                 new MultiPolygon(polygons));
 
-        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D);
+        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
-        expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
+        expected = new LineString(psb.toPointSequence());
         addCase(LINESTRING_IRREGULAR_WHITE_SPACE_1,
                 "LINESTRING ( -29.261 66 ,  -71.1074    -20.255     )",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
@@ -186,9 +190,9 @@ public class PostgisTestCases extends CodecTestBase {
                 "0103000000010000000400000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0",
                 Polygon.createEmpty());
 
-        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d3DM);
+        psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d3DM, CrsId.UNDEFINED);
         psb.add(-29.261, 66.000, 1, 2).add(-71.1074, -20.255, 3, 5);
-        expected = new LineString(psb.toPointSequence(), CrsId.UNDEFINED);
+        expected = new LineString(psb.toPointSequence());
         addCase(LINESTRING_3DM,
                 "LINESTRING(-29.261 66 1 2, -71.1074 -20.255 3 5)",
                 "01020000C002000000894160E5D0423DC00000000000805040000000000000F03F0000000000000040C9E53FA4DFC651C0E17A14AE474134C000000000000008400000000000001440",

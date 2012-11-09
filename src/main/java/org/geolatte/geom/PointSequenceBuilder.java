@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * A builder for <code>PointSequence</code>s.
  *
@@ -90,6 +92,13 @@ public interface PointSequenceBuilder {
      * @return the <code>DimensionalFlag</code> of the <code>PointSequence</code> being built.
      */
     DimensionalFlag getDimensionalFlag();
+
+    /**
+     * Returns the {@link CrsId} of the <code>PointSequence</code> being built.
+     * @return the <code>CrsId</code> of the <code>PointSequence</code> being built.
+     */
+    CrsId getCrsId();
+
 
     /**
      * Returns the result of this builder.

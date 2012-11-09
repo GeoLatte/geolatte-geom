@@ -24,6 +24,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.PointSequenceBuilder;
 import org.geolatte.geom.PointSequenceBuilders;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * A tokenizer for WKT representations.
@@ -40,15 +41,17 @@ class WktTokenizer {
     private int currentPos = 0;
     private boolean isMeasured = false;
     private final boolean pointListAsSingleToken;
+    private final CrsId crsId;
 
     /**
      * Constructs a tokenizer
      *
      * @param wkt     the String to tokenizer
      * @param variant the variant that can be recognized
+     * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant) {
-        this(wkt, variant, true);
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId) {
+        this(wkt, variant, crsId, true);
     }
 
     /**
@@ -56,11 +59,17 @@ class WktTokenizer {
      *
      * @param wkt                     the string to tokenize
      * @param variant                 the list of words to recognize as separate variant
+     * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
      * @param pointListAsSingleNumber this treats any substring consisting of list delimiters and numeric characters as a single pointlist
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, boolean pointListAsSingleNumber) {
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId, boolean pointListAsSingleNumber) {
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
+        if (crsId == null) {
+            this.crsId = CrsId.UNDEFINED;
+        } else {
+            this.crsId = crsId;
+        }
         this.wkt = wkt;
         this.variant = variant;
         this.pointListAsSingleToken = pointListAsSingleNumber;
@@ -104,7 +113,7 @@ class WktTokenizer {
         DimensionalFlag dimensionalFlag = countDimension();
         int numPoints = countPoints();
         double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag);
+        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag, crsId);
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);

@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.io.Serializable;
 
 /**
@@ -54,6 +56,13 @@ public interface PointCollection extends Cloneable, Serializable {
      * @return the <code>DimensionalFlag</code> of this <code>PointCollection</code>
      */
     DimensionalFlag getDimensionalFlag();
+
+    /**
+     * Returns the {@link CrsId} of this <code>PointCollection</code>.
+     *
+     * @return the <code>CrsId</code> of this <code>PointCollection</code>.
+     */
+    CrsId getCrsId();
 
     /**
      * Returns true iff this <code>PointCollection</code> contains no <code>Point</code>s

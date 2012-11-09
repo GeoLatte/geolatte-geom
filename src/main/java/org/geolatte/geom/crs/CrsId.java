@@ -131,6 +131,7 @@ public class CrsId {
         CrsId crsId = (CrsId) o;
 
         if (code != crsId.code) return false;
+        //TODO - Should be able to simplify: authority can never be null.
         if (authority != null ? !authority.equals(crsId.authority) : crsId.authority != null) return false;
 
         return true;

@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +35,7 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void test() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D);
+        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
@@ -47,7 +48,7 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D);
+        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());
