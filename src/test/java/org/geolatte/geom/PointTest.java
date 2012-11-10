@@ -175,10 +175,10 @@ public class PointTest {
     @Test
     public void testPointEquality() {
         GeometryPointEquality eq2D = new GeometryPointEquality(new ExactCoordinatePointEquality(DimensionalFlag.d2D));
-        assertTrue(point3DM.equals(Points.create(1, 2, 3, 4, wgs84)));
-        assertTrue(eq2D.equals(point3DM, Points.create(1, 2, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create(2, 1, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create(1, 2, CrsId.UNDEFINED)));
+        assertTrue(point3DM.equals(Points.create3DM(1, 2, 3, 4, wgs84)));
+        assertTrue(eq2D.equals(point3DM, Points.create2D(1, 2, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create2D(2, 1, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create2D(1, 2, CrsId.UNDEFINED)));
         assertFalse(point2D.equals(Points.createEmpty()));
     }
 

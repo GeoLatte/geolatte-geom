@@ -34,7 +34,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag, CrsId crsId) {
         this.dimensionalFlag = dimensionalFlag;
-        this.crsId = crsId;
+        this.crsId = crsId == null ? CrsId.UNDEFINED : crsId;
     }
 
     @Override

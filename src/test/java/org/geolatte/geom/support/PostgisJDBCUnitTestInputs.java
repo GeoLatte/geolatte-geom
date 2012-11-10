@@ -36,7 +36,7 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(1,
                 "POINT(10 10)",
                 "010100000000000000000024400000000000002440",
-                Points.create(10, 10));
+                Points.create2D(10, 10));
 
         addCase(2,
                 "POINT(10 10 0)",
@@ -46,17 +46,17 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(3,
                 "POINTM(10 10 20)",
                 "0101000040000000000000244000000000000024400000000000003440",
-                Points.createMeasured(10, 10, 20));
+                Points.create2DM(10, 10, 20));
 
         addCase(4,
                 "POINT(10 10 20 30)",
                 "01010000C00000000000002440000000000000244000000000000034400000000000003E40",
-                Points.create(10, 10, 20, 30));
+                Points.create3DM(10, 10, 20, 30));
 
         addCase(5, //-- broken format
                 "MULTIPOINT(11 12, 20 20)",
                 "010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.create(11, 12), Points.create(20, 20)}),
+                new MultiPoint(new Point[]{Points.create2D(11, 12), Points.create2D(20, 20)}),
                 false);
 
         addCase(6,
@@ -68,19 +68,19 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(7,
                 "MULTIPOINTM(11 12 13, 20 20 20)",
                 "0104000040020000000101000040000000000000264000000000000028400000000000002A400101000040000000000000344000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.createMeasured(11, 12, 13), Points.createMeasured(20, 20, 20)}),
+                new MultiPoint(new Point[]{Points.create2DM(11, 12, 13), Points.create2DM(20, 20, 20)}),
                 false);
 
         addCase(8,
                 "MULTIPOINT(11 12 13 14,20 20 20 20)",
                 "01040000C00200000001010000C0000000000000264000000000000028400000000000002A400000000000002C4001010000C00000000000003440000000000000344000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.create(11, 12, 13, 14), Points.create(20, 20, 20, 20)}),
+                new MultiPoint(new Point[]{Points.create3DM(11, 12, 13, 14), Points.create3DM(20, 20, 20, 20)}),
                 false);
 
         addCase(9,
                 "MULTIPOINT((11 12),(20 20))",
                 "010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.create(11, 12), Points.create(20, 20)}));
+                new MultiPoint(new Point[]{Points.create2D(11, 12), Points.create2D(20, 20)}));
 
         addCase(10,
                 "MULTIPOINT((11 12 13),(20 20 20))",
@@ -90,12 +90,12 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(11,
                 "MULTIPOINTM((11 12 13),(20 20 20))",
                 "0104000040020000000101000040000000000000264000000000000028400000000000002A400101000040000000000000344000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.createMeasured(11, 12, 13), Points.createMeasured(20, 20, 20)}));
+                new MultiPoint(new Point[]{Points.create2DM(11, 12, 13), Points.create2DM(20, 20, 20)}));
 
         addCase(12,
                 "MULTIPOINT((11 12 13 14),(20 20 20 20))",
                 "01040000C00200000001010000C0000000000000264000000000000028400000000000002A400000000000002C4001010000C00000000000003440000000000000344000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.create(11, 12, 13, 14), Points.create(20, 20, 20, 20)}));
+                new MultiPoint(new Point[]{Points.create3DM(11, 12, 13, 14), Points.create3DM(20, 20, 20, 20)}));
 
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",
@@ -240,7 +240,7 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "GEOMETRYCOLLECTION(POINT(10 10),POINT(20 20))",
                 "010700000002000000010100000000000000000024400000000000002440010100000000000000000034400000000000003440",
                 new GeometryCollection(new Point[]{
-                        Points.create(10, 10), Points.create(20, 20)
+                        Points.create2D(10, 10), Points.create2D(20, 20)
                 }));
 
         addCase(30,
@@ -254,14 +254,14 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
                 "GEOMETRYCOLLECTIONM(POINT(10 10 20),POINT(20 20 20))",
                 "01070000400200000001010000400000000000002440000000000000244000000000000034400101000040000000000000344000000000000034400000000000003440",
                 new GeometryCollection(new Point[]{
-                        Points.createMeasured(10, 10, 20), Points.createMeasured(20, 20, 20)
+                        Points.create2DM(10, 10, 20), Points.create2DM(20, 20, 20)
                 }));
 
         addCase(32,
                 "GEOMETRYCOLLECTION(POINT(10 10 20 7),POINT(20 20 20 7))",
                 "01070000C00200000001010000C00000000000002440000000000000244000000000000034400000000000001C4001010000C00000000000003440000000000000344000000000000034400000000000001C40",
                 new GeometryCollection(new Point[]{
-                        Points.create(10, 10, 20, 7), Points.create(20, 20, 20, 7)
+                        Points.create3DM(10, 10, 20, 7), Points.create3DM(20, 20, 20, 7)
                 }));
 
         addCase(33,
@@ -341,7 +341,7 @@ public class PostgisJDBCUnitTestInputs extends CodecTestBase {
         addCase(46, "GEOMETRYCOLLECTION(POINT(4 0),POINT EMPTY,LINESTRING(4 2,5 3))",
                 "0107000000030000000101000000000000000000104000000000000000000107000000000000000102000000020000000000000000001040000000000000004000000000000014400000000000000840",
                 new GeometryCollection(new Geometry[]{
-                        Points.create(4, 0), Points.createEmpty(), ls
+                        Points.create2D(4, 0), Points.createEmpty(), ls
                 }));
 
     }

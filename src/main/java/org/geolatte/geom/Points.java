@@ -39,7 +39,7 @@ public class Points implements Serializable {
      * @param crsId the <code>CrsId</code> of the coordinate reference system of the <code>Point</code>
      * @return a <code>Point</code> with the specified X- and Y-coordinates and coordinate reference system
      */
-    public static Point create(double x, double y, CrsId crsId) {
+    public static Point create2D(double x, double y, CrsId crsId) {
         return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D, crsId));
     }
 
@@ -65,7 +65,7 @@ public class Points implements Serializable {
      * @param crsId the <code>CrsId</code> of the coordinate reference system of the <code>Point</code>
      * @return a <code>Point</code> with the specified X-, Y- and M-coordinates and coordinate reference system
      */
-    public static Point createMeasured(double x, double y, double m, CrsId crsId) {
+    public static Point create2DM(double x, double y, double m, CrsId crsId) {
         return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM, crsId));
     }
 
@@ -79,7 +79,7 @@ public class Points implements Serializable {
      * @param crsId the <code>CrsId</code> of the coordinate reference system of the <code>Point</code>
      * @return a <code>Point</code> with the specified X-, Y-, Z- and M-coordinates and coordinate reference system
      */
-    public static Point create(double x, double y, double z, double m, CrsId crsId) {
+    public static Point create3DM(double x, double y, double z, double m, CrsId crsId) {
         return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM, crsId));
     }
 
@@ -90,7 +90,7 @@ public class Points implements Serializable {
      * @param y the Y-coordinate of the <code>Point</code>
      * @return a <code>Point</code> with the specified X- and Y-coordinates and undefined coordinate reference system
      */
-    public static Point create(double x, double y) {
+    public static Point create2D(double x, double y) {
         return new Point(new PackedPointSequence(new double[]{x, y}, DimensionalFlag.d2D, CrsId.UNDEFINED));
     }
 
@@ -114,7 +114,7 @@ public class Points implements Serializable {
      * @param m the M-coordinate of the <code>Point</code>
      * @return a <code>Point</code> with the specified X-, Y- and M-coordinates and undefined coordinate reference system
      */
-    public static Point createMeasured(double x, double y, double m) {
+    public static Point create2DM(double x, double y, double m) {
         return new Point(new PackedPointSequence(new double[]{x, y, m}, DimensionalFlag.d2DM, CrsId.UNDEFINED));
     }
 
@@ -127,7 +127,7 @@ public class Points implements Serializable {
      * @param m the M-coordinate of the <code>Point</code>
      * @return a <code>Point</code> with the specified X-, Y- Z- and M-coordinates and undefined coordinate reference system
      */
-    public static Point create(double x, double y, double z, double m) {
+    public static Point create3DM(double x, double y, double z, double m) {
         return new Point(new PackedPointSequence(new double[]{x, y, z, m}, DimensionalFlag.d3DM, CrsId.UNDEFINED));
     }
 

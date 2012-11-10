@@ -84,7 +84,7 @@ public class PolygonTest {
         assertFalse(polygon1.equals(polygon3));
         assertFalse(polygon3.equals(polygon1));
 
-        assertFalse(polygon1.equals(Points.create(1, 2)));
+        assertFalse(polygon1.equals(Points.create2D(1, 2)));
 
     }
 

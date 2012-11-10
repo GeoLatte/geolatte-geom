@@ -37,13 +37,13 @@ public class ExactCoordinatePointEqualityTest {
     PointEquality eq2D = new ExactCoordinatePointEquality(DimensionalFlag.d2D);
     PointEquality eq3D = new ExactCoordinatePointEquality(DimensionalFlag.d3D);
 
-    Point pnt1 = Points.create(1, 2, 3, 4, CrsId.valueOf(4326));
-    Point pnt1_2D = Points.create(1, 2, CrsId.valueOf(4326));
-    Point pnt2 = Points.create(1, 2, 3, 4, CrsId.valueOf(4326));
-    Point pnt3 = Points.create(4, 3, 2, 1, CrsId.valueOf(4326));
-    Point pnt4 = Points.create(1, 2, 4, 3, CrsId.valueOf(4326));
-    Point pnt5 = Points.create(1, 2, 3, 5, CrsId.valueOf(4326));
-    Point pnt6 = Points.create(1, 2, 3, 5, CrsId.valueOf(4328));
+    Point pnt1 = Points.create3DM(1, 2, 3, 4, CrsId.valueOf(4326));
+    Point pnt1_2D = Points.create2D(1, 2, CrsId.valueOf(4326));
+    Point pnt2 = Points.create3DM(1, 2, 3, 4, CrsId.valueOf(4326));
+    Point pnt3 = Points.create3DM(4, 3, 2, 1, CrsId.valueOf(4326));
+    Point pnt4 = Points.create3DM(1, 2, 4, 3, CrsId.valueOf(4326));
+    Point pnt5 = Points.create3DM(1, 2, 3, 5, CrsId.valueOf(4326));
+    Point pnt6 = Points.create3DM(1, 2, 3, 5, CrsId.valueOf(4328));
 
 
     @Test

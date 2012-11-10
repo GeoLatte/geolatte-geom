@@ -165,9 +165,9 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
         double m = p0.getM() + r * (p1.getM() - p0.getM());
         if (p0.is3D()) {
             double z = p0.getZ() + r * (p1.getZ() - p0.getZ());
-            return Points.create(x, y, z, m);
+            return Points.create3DM(x, y, z, m);
         } else {
-            return Points.createMeasured(x, y, m);
+            return Points.create2DM(x, y, m);
         }
     }
 

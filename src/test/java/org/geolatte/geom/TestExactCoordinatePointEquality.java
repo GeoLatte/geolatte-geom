@@ -33,12 +33,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestExactCoordinatePointEquality {
 
-    Point pnt1 = Points.create(1, 2, 3, 4, CrsId.parse("EPSG:4326"));
-    Point pnt2 = Points.create(1, 2, 3, 4, CrsId.parse("EPSG:4326"));
-    Point pnt3 = Points.create(1, 2, 3, 4, CrsId.parse("EPSG:31370"));
-    Point pnt4 = Points.create(2, 3, 3, 4, CrsId.parse("EPSG:4326"));
-    Point pnt1XY = Points.create(1, 2, CrsId.parse("EPSG:4326"));
-    Point pnt2XY = Points.create(2, 3, CrsId.parse("EPSG:4326"));
+    Point pnt1 = Points.create3DM(1, 2, 3, 4, CrsId.parse("EPSG:4326"));
+    Point pnt2 = Points.create3DM(1, 2, 3, 4, CrsId.parse("EPSG:4326"));
+    Point pnt3 = Points.create3DM(1, 2, 3, 4, CrsId.parse("EPSG:31370"));
+    Point pnt4 = Points.create3DM(2, 3, 3, 4, CrsId.parse("EPSG:4326"));
+    Point pnt1XY = Points.create2D(1, 2, CrsId.parse("EPSG:4326"));
+    Point pnt2XY = Points.create2D(2, 3, CrsId.parse("EPSG:4326"));
 
 
     PointEquality eq = new ExactCoordinatePointEquality();

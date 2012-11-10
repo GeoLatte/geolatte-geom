@@ -103,7 +103,7 @@ public class Vector {
         if (p0.is3D() && p1.is3D()) {
             return Points.create3D(p0.getX() + p1.getX(), p0.getY() + p1.getY(), p0.getZ() + p1.getZ());
         } else {
-            return Points.create(p0.getX() + p1.getX(), p0.getY() + p1.getY());
+            return Points.create2D(p0.getX() + p1.getX(), p0.getY() + p1.getY());
         }
     }
 
@@ -120,7 +120,7 @@ public class Vector {
         if (p0.is3D() && p1.is3D()) {
             return Points.create3D(p0.getX() - p1.getX(), p0.getY() - p1.getY(), p0.getZ() - p1.getZ());
         } else {
-            return Points.create(p0.getX() - p1.getX(), p0.getY() - p1.getY());
+            return Points.create2D(p0.getX() - p1.getX(), p0.getY() - p1.getY());
         }
     }
 

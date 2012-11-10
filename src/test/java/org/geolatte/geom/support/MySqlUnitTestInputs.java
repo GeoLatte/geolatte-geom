@@ -34,17 +34,17 @@ public class MySqlUnitTestInputs extends CodecTestBase {
         addCase(1,
                 "POINT(10 10)",
                 "00000000010100000000000000000024400000000000002440",
-                Points.create(10, 10));
+                Points.create2D(10, 10));
 
         addCase(2,
                 "POINT(10 10)",
                 "00000000010100000000000000000024400000000000002440",
-                Points.create(10, 10));
+                Points.create2D(10, 10));
 
         addCase(5, //-- broken format
                 "MULTIPOINT(11 12, 20 20)",
                 "00000000010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint(new Point[]{Points.create(11, 12), Points.create(20, 20)}),
+                new MultiPoint(new Point[]{Points.create2D(11, 12), Points.create2D(20, 20)}),
                 false);
 
         addCase(13,
@@ -86,7 +86,7 @@ public class MySqlUnitTestInputs extends CodecTestBase {
                 "GEOMETRYCOLLECTION(POINT(10 10),POINT(20 20))",
                 "00000000010700000002000000010100000000000000000024400000000000002440010100000000000000000034400000000000003440",
                 new GeometryCollection(new Point[]{
-                        Points.create(10, 10), Points.create(20, 20)
+                        Points.create2D(10, 10), Points.create2D(20, 20)
                 }));
 
     }

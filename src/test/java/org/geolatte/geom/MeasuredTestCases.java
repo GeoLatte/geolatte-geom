@@ -124,8 +124,8 @@ public class MeasuredTestCases {
         lineString3DM = new LineString(psBuilder.toPointSequence());
 
         measuredMultiPoint = new MultiPoint(new Point[]{
-                Points.createMeasured(0,0,1, CrsId.UNDEFINED),
-                Points.createMeasured(1,2,2, CrsId.UNDEFINED)
+                Points.create2DM(0, 0, 1, CrsId.UNDEFINED),
+                Points.create2DM(1, 2, 2, CrsId.UNDEFINED)
                 });
 
 

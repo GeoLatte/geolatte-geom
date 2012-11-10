@@ -55,7 +55,7 @@ public class PostgisTestCases extends CodecTestBase {
     public PostgisTestCases() {
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
-                Points.create(1, 1, CrsId.UNDEFINED));
+                Points.create2D(1, 1, CrsId.UNDEFINED));
         addCase(POINT_3D,
                 "POINT(1 2 3)",
                 "0101000080000000000000F03F00000000000000400000000000000840",
@@ -63,15 +63,15 @@ public class PostgisTestCases extends CodecTestBase {
         addCase(POINT_3DM,
                 "POINT(1 2 3 4)",
                 "01010000C0000000000000F03F000000000000004000000000000008400000000000001040",
-                Points.create(1, 2, 3, 4, CrsId.UNDEFINED));
+                Points.create3DM(1, 2, 3, 4, CrsId.UNDEFINED));
         addCase(POINT_2DM,
                 "POINTM(1 2 4)",
                 "0101000040000000000000F03F00000000000000400000000000001040",
-                Points.createMeasured(1, 2, 4, CrsId.UNDEFINED));
+                Points.create2DM(1, 2, 4, CrsId.UNDEFINED));
         addCase(POINT_WITH_SRID,
                 "SRID=4326;POINT(1 2 3 4)",
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
-                Points.create(1, 2, 3, 4, CrsId.valueOf(4326)));
+                Points.create3DM(1, 2, 3, 4, CrsId.valueOf(4326)));
 
         PointSequenceBuilder psb = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         psb.add(-29.261, 66.000).add(-71.1074, -20.255);
@@ -101,8 +101,8 @@ public class PostgisTestCases extends CodecTestBase {
                 expected);
 
 
-        Point pnt1 = Points.create(1, 1, CrsId.UNDEFINED);
-        Point pnt2 = Points.create(2, 2, CrsId.UNDEFINED);
+        Point pnt1 = Points.create2D(1, 1, CrsId.UNDEFINED);
+        Point pnt2 = Points.create2D(2, 2, CrsId.UNDEFINED);
         expected = new GeometryCollection(new Geometry[]{pnt1, pnt2});
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
@@ -119,8 +119,8 @@ public class PostgisTestCases extends CodecTestBase {
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
                 new MultiPoint(new Point[]{pnt1, pnt2}));
 
-        pnt1 = Points.create(1, 2, CrsId.valueOf(4326));
-        pnt2 = Points.create(3, 4, CrsId.valueOf(4326));
+        pnt1 = Points.create2D(1, 2, CrsId.valueOf(4326));
+        pnt2 = Points.create2D(3, 4, CrsId.valueOf(4326));
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
