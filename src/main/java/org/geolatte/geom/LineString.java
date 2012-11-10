@@ -57,12 +57,18 @@ public class LineString extends Geometry {
      * and <code>GeometryOperations</code> implementation.
      *
      * @param points             the <code>PointSequence</code>
-     * @param geometryOperations the <code>GeometryOperations</code> implementation.
+     * @param geometryOperations the <code>GeometryOperations</code> implementation
+     * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size < 2
      */
     public LineString(PointSequence points, GeometryOperations geometryOperations) {
         super(geometryOperations);
         if (points == null) {
             points = EmptyPointSequence.INSTANCE;
+        }
+        if (!points.isEmpty() && points.size() < 2) {
+            throw new IllegalArgumentException(
+                    String.format("Constructor of class %s requires PointSequence of size at least 2.",
+                            this.getClass().getSimpleName()));
         }
         this.points = points;
     }
