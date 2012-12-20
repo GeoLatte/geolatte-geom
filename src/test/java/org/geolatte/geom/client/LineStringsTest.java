@@ -22,7 +22,7 @@
 package org.geolatte.geom.client;
 
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.LineStrings;
+import org.geolatte.geom.builder.LineStrings;
 import org.geolatte.geom.Points;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;

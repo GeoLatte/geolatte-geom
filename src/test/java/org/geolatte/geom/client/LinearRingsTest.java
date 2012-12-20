@@ -22,6 +22,8 @@
 package org.geolatte.geom.client;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.builder.LineStrings;
+import org.geolatte.geom.builder.LinearRings;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
