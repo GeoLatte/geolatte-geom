@@ -115,7 +115,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
     private void checkLinearRing(LinearRing ring, CrsId crsId) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
         if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
-        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS then exterior boundary.");
+        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS than exterior boundary.");
     }
 
     @Override
