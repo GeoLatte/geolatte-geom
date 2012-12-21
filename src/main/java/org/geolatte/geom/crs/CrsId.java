@@ -46,7 +46,7 @@ public class CrsId {
         if (tokens.length == 2) {
             authority = tokens[0];
         }
-        return new CrsId(authority, code);
+        return valueOf(authority, code);
     }
 
     private static int toNumericIdentifier(String codeStr) {
@@ -69,7 +69,11 @@ public class CrsId {
         if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0 )) {
             return CrsId.UNDEFINED;
         }
-        return new CrsId(authority, code);
+        CrsId result = null;
+        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority)) {
+            result = CrsRegistry.getCrsIdForEPSG(code);
+        }
+        return result == null ? new CrsId(authority, code) : result;
     }
 
     /**

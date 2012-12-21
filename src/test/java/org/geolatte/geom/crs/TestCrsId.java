@@ -63,7 +63,13 @@ public class TestCrsId {
         assertEquals(CrsId.UNDEFINED, CrsId.valueOf(0));
         assertEquals(CrsId.UNDEFINED, CrsId.valueOf(-1));
         assertEquals(CrsId.parse("1"), CrsId.valueOf(1));
+    }
 
+    @Test
+    public void testValueOfReturnsIdenticalObjectForIdentialEPSGCodes(){
+        CrsId id1 = CrsId.valueOf(4326);
+        CrsId id2 = CrsId.valueOf(4326);
+        assertTrue(id1 == id2);
     }
     
 
