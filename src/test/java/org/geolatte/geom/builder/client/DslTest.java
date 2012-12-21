@@ -37,24 +37,25 @@ public class DslTest {
 
     @Test
     public void testLineString2D() {
-        LineString ls = lineString(4326, c(0, 0), c(1, 0), c(2, 0));
+        LineString ls = linestring(4326, c(0, 0), c(1, 0), c(2, 0));
     }
 
     @Test
     public void testEmptyLineString2D() {
-        LineString ls = lineString(4326, empty());
+        LineString ls = linestring(4326, empty());
         assertTrue(ls.isEmpty());
         assertEquals(ls.getDimensionalFlag(), DimensionalFlag.d2D);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLineString() {
-        LineString ls = lineString(4326, c(0, 0));
+        LineString ls = linestring(4326, c(0, 0));
     }
 
     @Test
     public void testLinearRing3D(){
         LinearRing lr = ring(4326, cZ(0, 0, 0), cZ(1, 0, 0), cZ(1, 1, 0), cZ(0, 1, 0), cZ(0, 0, 0));
+        assertEquals(DimensionalFlag.d3D, lr.getDimensionalFlag());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -63,10 +64,18 @@ public class DslTest {
     }
 
     @Test
-    public void testvalidPolygon() {
+    public void testValidPolygon() {
         Polygon p = polygon(4326, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPoints(), 5);
+    }
+
+    @Test
+    public void testValidPolygon2DM(){
+        Polygon p = polygon(32100, ring(cM(0,0,2), cM(0,1,3), cM(1,1, 4), cM(1,0,3), cM(0, 0, 2)));
+        assertEquals(0, p.getNumInteriorRing());
+        assertEquals(DimensionalFlag.d2DM, p.getDimensionalFlag());
+        assertEquals(32100, p.getSRID());
     }
 
     @Test
@@ -103,12 +112,76 @@ public class DslTest {
 
     @Test
     public void testValidGeometryCollection(){
-        GeometryCollection gc = geometryCollection(4326,
-                point(c(1, 2)), lineString(c(0, 0), c(1, 1), c(2, 1))
-//                polygon(ring(c(0,0), c(1,0), c(1,1), c(0,1), c(0,0)))
+        GeometryCollection gc = geometrycollection(4326,
+                point(c(1, 2)),
+                linestring(c(0, 0), c(1, 1), c(2, 1)),
+                polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)))
         );
+        assertEquals(3, gc.getNumGeometries());
+        assertEquals(DimensionalFlag.d2D, gc.getDimensionalFlag());
+
+        GeometryCollection gc3D = geometrycollection(31370,
+                point(cZ(1, 2, 3)), linestring(cZ(1, 2, 3), cZ(2, 3, 4)));
+        assertEquals(DimensionalFlag.d3D, gc3D.getDimensionalFlag());
     }
 
+    @Test
+    public void testValidGeometryCollectionOfGeometryCollections(){
+        GeometryCollection gc = geometrycollection(4326,
+                point(c(1, 2)),
+                linestring(c(0, 0), c(1, 1), c(2, 1)),
+                polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
+                geometrycollection(point(c(1, 1)), linestring(c(1, 2), c(2, 3)))
+        );
+        assertEquals(4,gc.getNumGeometries());
+        assertEquals(GeometryType.GEOMETRY_COLLECTION, gc.getGeometryN(3).getGeometryType());
+    }
 
+    @Test
+    public void testValidMultiPoint() {
+        MultiPoint mp = multipoint(4326, point(c(2, 1, 3, 4)), point(c(3, 1, 5, 6)));
+        assertEquals(GeometryType.MULTI_POINT, mp.getGeometryType());
+        assertEquals(2,mp.getNumGeometries());
+        assertEquals(4326, mp.getSRID());
+        assertEquals(DimensionalFlag.d3DM, mp.getDimensionalFlag());
+    }
+
+    @Test
+    public void testMultiPointCanBeEmbeddedInGeometryCollection() {
+        GeometryCollection geometryCollection = geometrycollection(4326, multipoint(point(c(1, 2)), point(c(3, 4))));
+        assertEquals(GeometryType.MULTI_POINT, geometryCollection.getGeometryN(0).getGeometryType());
+    }
+
+    @Test
+    public void testValidMultiLineString() {
+        MultiLineString mls = multilinestring(4326, linestring(cZ(1, 2, 5), cZ(3, 4, 2)), linestring(cZ(4, 5, 1), cZ(6, 5, 0)));
+        assertEquals(GeometryType.MULTI_LINE_STRING, mls.getGeometryType());
+        assertEquals(2,mls.getNumGeometries());
+        assertEquals(4326, mls.getSRID());
+        assertEquals(DimensionalFlag.d3D, mls.getDimensionalFlag());
+    }
+
+    @Test
+    public void testMultiLineStringCanBeEmbeddedInGeometryCollection() {
+        GeometryCollection geometryCollection = geometrycollection(4326, multilinestring(linestring(cZ(1, 2, 5), cZ(3, 4, 2)), linestring(cZ(4, 5, 1), cZ(6, 5, 0))));
+        assertEquals(GeometryType.MULTI_LINE_STRING, geometryCollection.getGeometryN(0).getGeometryType());
+    }
+
+    @Test
+    public void testValidMultiPolygonString() {
+        MultiPolygon mp = multipolygon(4326, polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
+                polygon(ring(c(0, 0), c(10, 0), c(10, 10), c(0, 10), c(0, 0))));
+        assertEquals(GeometryType.MULTI_POLYGON, mp.getGeometryType());
+        assertEquals(2,mp.getNumGeometries());
+        assertEquals(4326, mp.getSRID());
+        assertEquals(DimensionalFlag.d2D, mp.getDimensionalFlag());
+    }
+
+    @Test
+    public void testMultiPolygonCanBeEmbeddedInGeometryCollection() {
+        GeometryCollection geometryCollection = geometrycollection(4326, multipolygon(polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
+                polygon(ring(c(0, 0), c(10, 0), c(10, 10), c(0, 10), c(0, 0)))));
+        assertEquals(GeometryType.MULTI_POLYGON, geometryCollection.getGeometryN(0).getGeometryType());
+    }
 
 }

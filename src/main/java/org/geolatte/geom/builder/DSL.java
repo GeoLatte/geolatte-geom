@@ -24,8 +24,6 @@ package org.geolatte.geom.builder;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
-import static org.geolatte.geom.DimensionalFlag.*;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/10/12
@@ -37,106 +35,198 @@ public class DSL {
     }
 
     public static <T extends VertexToken> Point point(int srid, T pointToken) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(1, pointToken.dFlag(), CrsId.valueOf(srid));
-        pointToken.addTo(psBuilder);
-        return new Point(psBuilder.toPointSequence());
+        return new PointToken(pointToken).toGeometry(srid);
     }
 
-    private static void addPoints(PointSequenceBuilder psBuilder, VertexToken[] points) {
-        for (VertexToken pnt : points) {
-            pnt.addTo(psBuilder);
-        }
+    private static <T extends VertexToken> LineString mkLineString(int srid, T... points) {
+        return new LineStringToken<T>(points).toGeometry(srid);
     }
 
-    //TODO -- can now eliminate redundancy because vertexToken reports its dimension.
-    public static LineString lineString(int srid, Vertex2DToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d2D, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LineString(psBuilder.toPointSequence());
+    public static LineString linestring(int srid, Vertex2DToken... points) {
+        return mkLineString(srid, points);
     }
 
-    public static LineString lineString(int srid, Vertex2DMToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d2DM, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LineString(psBuilder.toPointSequence());
+    public static LineString linestring(int srid, Vertex2DMToken... points) {
+        return mkLineString(srid, points);
     }
 
-    public static LineString lineString(int srid, Vertex3DToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d3D, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LineString(psBuilder.toPointSequence());
+    public static LineString linestring(int srid, Vertex3DToken... points) {
+        return mkLineString(srid, points);
     }
 
-    public static LineString lineString(int srid, Vertex3DMToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d3DM, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LineString(psBuilder.toPointSequence());
+    public static LineString linestring(int srid, Vertex3DMToken... points) {
+        return mkLineString(srid, points);
+    }
+
+    private static <T extends VertexToken> LinearRing mkLinearRing(int srid, T... points) {
+        return new LinearRingToken<T>(points).toGeometry(srid);
     }
 
     public static LinearRing ring(int srid, Vertex2DToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d2D, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LinearRing(psBuilder.toPointSequence());
+        return mkLinearRing(srid, points);
     }
 
     public static LinearRing ring(int srid, Vertex2DMToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d2DM, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LinearRing(psBuilder.toPointSequence());
+        return mkLinearRing(srid, points);
     }
 
     public static LinearRing ring(int srid, Vertex3DToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d3D, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LinearRing(psBuilder.toPointSequence());
+        return mkLinearRing(srid, points);
     }
 
     public static LinearRing ring(int srid, Vertex3DMToken... points) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(points.length, d3DM, CrsId.valueOf(srid));
-        addPoints(psBuilder, points);
-        return new LinearRing(psBuilder.toPointSequence());
+        return mkLinearRing(srid, points);
     }
 
-    public static <T extends VertexToken> GeometryCollection geometryCollection(int srid, GeometryToken<?, T>... geometryTokens) {
-        return null;
+    public static <T extends VertexToken> GeometryCollection geometrycollection(int srid, GeometryToken<?, T>... geometryTokens) {
+        return new GeometryCollectionToken<T>(geometryTokens).toGeometry(srid);
     }
 
 
     public static <T extends VertexToken> Polygon polygon(int srid, LinearRingToken<T>... rings) {
-        LinearRing[] linearRings = new LinearRing[rings.length];
-        int i = 0;
-        for (LinearRingToken<?> lrt : rings) {
-            linearRings[i++] = lrt.toGeometry(srid);
-        }
-        return new Polygon(linearRings);
+        return new PolygonToken<T>(rings).toGeometry(srid);
     }
 
-//    //Polygon tokens
-//    public static PolygonToken<T> polygon(LinearRingToken<T>... points) {
-//            return new LinearRingToken<Vertex2DToken>(d2D, points);
-//        }
-//
-//        public static LinearRingToken<Vertex2DMToken> ring(Vertex2DMToken... points) {
-//            return new LinearRingToken<Vertex2DMToken>(d2DM, points);
-//        }
-//
-//        public static LinearRingToken<Vertex3DToken> ring(Vertex3DToken... points) {
-//            return new LinearRingToken<Vertex3DToken>(d3D, points);
-//        }
-//
-//        public static LinearRingToken<Vertex3DMToken> ring(Vertex3DMToken... points) {
-//            return new LinearRingToken<Vertex3DMToken>(d3DM, points);
-//        }
-//
-//        public static class PolygonToken<T extends VertexToken> extends ComposedGeometryToken<Polygon, T> {
-//            PolygonToken(DimensionalFlag dimFlag, GeometryToken<?,T>... tokens) {
-//                super(dimFlag, tokens);
-//            }
-//
-//            Polygon toGeometry(int srid) {
-//                return new Polygon((LinearRing[])toGeometryArray(srid));
-//            }
-//        }
+    public static <T extends VertexToken> MultiPoint multipoint(int srid, PointToken<T>... pointTokens) {
+        return new MultiPointToken<T>(pointTokens).toGeometry(srid);
+    }
+
+    public static <T extends VertexToken> MultiLineString multilinestring(int srid, LineStringToken<T>... tokens) {
+            return new MultiLineStringToken<T>(tokens).toGeometry(srid);
+    }
+
+    public static <T extends VertexToken> MultiPolygon multipolygon(int srid, PolygonToken<T>... tokens) {
+            return new MultiPolygonToken<T>(tokens).toGeometry(srid);
+    }
+
+
+    //GeometryCollection Tokens
+    public static <T extends VertexToken> GeometryCollectionToken<T> geometrycollection(GeometryToken<?, T>... geometryTokens) {
+        return new GeometryCollectionToken<T>(geometryTokens);
+    }
+
+    public static class GeometryCollectionToken<T extends VertexToken> extends ComposedGeometryToken<GeometryCollection, T> {
+
+        GeometryCollectionToken(GeometryToken... tokens) {
+            super(tokens);
+        }
+
+        @Override
+        GeometryCollection toGeometry(int srid) {
+            Geometry[] geoms = mkGeometryArray();
+            loadGeometries(srid, geoms);
+            return toGeometryCollection(geoms);
+        }
+
+        protected void loadGeometries(int srid, Geometry[] geoms) {
+            int i = 0;
+            for (GeometryToken<?, T> token : geometryTokens) {
+                geoms[i++] = token.toGeometry(srid);
+            }
+        }
+
+        protected GeometryCollection toGeometryCollection(Geometry[] geoms) {
+            return new GeometryCollection(geoms);
+        }
+
+        protected Geometry[] mkGeometryArray() {
+            return new Geometry[geometryTokens.length];
+        }
+    }
+
+    public static <T extends VertexToken> MultiPointToken<T> multipoint(PointToken<T>... pointTokens) {
+        return new MultiPointToken<T>(pointTokens);
+    }
+
+    public static class MultiPointToken<T extends VertexToken> extends GeometryCollectionToken<T> {
+        MultiPointToken(PointToken... tokens){
+            super(tokens);
+        }
+
+        protected MultiPoint toGeometryCollection(Geometry[] geoms) {
+            return new MultiPoint((Point[])geoms);
+        }
+
+        protected Point[] mkGeometryArray() {
+            return new Point[geometryTokens.length];
+        }
+
+        MultiPoint toGeometry(int srid) {
+            return (MultiPoint)super.toGeometry(srid);
+        }
+
+    }
+
+    public static <T extends VertexToken> MultiLineStringToken<T> multilinestring(LineStringToken<T>... tokens) {
+        return new MultiLineStringToken<T>(tokens);
+    }
+
+    public static class MultiLineStringToken<T extends VertexToken> extends GeometryCollectionToken<T> {
+        MultiLineStringToken(LineStringToken... tokens){
+            super(tokens);
+        }
+
+        protected MultiLineString toGeometryCollection(Geometry[] geoms) {
+            return new MultiLineString((LineString[])geoms);
+        }
+
+        protected LineString[] mkGeometryArray() {
+            return new LineString[geometryTokens.length];
+        }
+
+        MultiLineString toGeometry(int srid) {
+            return (MultiLineString)super.toGeometry(srid);
+        }
+
+    }
+
+    public static <T extends VertexToken> MultiPolygonToken<T> multipolygon(PolygonToken<T>... tokens) {
+           return new MultiPolygonToken<T>(tokens);
+       }
+
+       public static class MultiPolygonToken<T extends VertexToken> extends GeometryCollectionToken<T> {
+           MultiPolygonToken(PolygonToken... tokens){
+               super(tokens);
+           }
+
+           protected MultiPolygon toGeometryCollection(Geometry[] geoms) {
+               return new MultiPolygon((Polygon[])geoms);
+           }
+
+           protected Polygon[] mkGeometryArray() {
+               return new Polygon[geometryTokens.length];
+           }
+
+           MultiPolygon toGeometry(int srid) {
+               return (MultiPolygon)super.toGeometry(srid);
+           }
+
+       }
+
+    //Polygon tokens
+    public static <T extends VertexToken> PolygonToken<T> polygon(LinearRingToken<T>... rings) {
+        return new PolygonToken<T>(rings);
+    }
+
+    public static class PolygonToken<T extends VertexToken> extends ComposedGeometryToken<Polygon, T> {
+
+        PolygonToken(GeometryToken<?, T>... tokens) {
+            super(tokens);
+        }
+
+        protected LinearRing[] toGeometryArray(int srid) {
+            LinearRing[] result = new LinearRing[geometryTokens.length];
+            int i = 0;
+            for (GeometryToken<?, T> token : geometryTokens) {
+                result[i++] = ((LinearRingToken<?>)token).toGeometry(srid);
+            }
+            return result;
+        }
+
+        Polygon toGeometry(int srid) {
+            return new Polygon((LinearRing[]) toGeometryArray(srid));
+        }
+    }
 
 
     // LinearRing tokens
@@ -174,7 +264,8 @@ public class DSL {
     private static <T extends VertexToken> LineStringToken<T> mkLineStringToken(T... points) {
         return new LineStringToken<T>(points);
     }
-    public static LineStringToken<Vertex2DToken> lineString(Vertex2DToken... points) {
+
+    public static LineStringToken<Vertex2DToken> linestring(Vertex2DToken... points) {
         return mkLineStringToken(points);
     }
 
@@ -182,7 +273,7 @@ public class DSL {
         return mkLineStringToken(points);
     }
 
-    public static LineStringToken<Vertex3DToken> lineString(Vertex3DToken... points) {
+    public static LineStringToken<Vertex3DToken> linestring(Vertex3DToken... points) {
         return mkLineStringToken(points);
     }
 
@@ -220,16 +311,25 @@ public class DSL {
     }
 
     public abstract static class GeometryToken<G extends Geometry, T extends VertexToken> {
+        DimensionalFlag dimFlag;
+
         abstract G toGeometry(int srid);
+
+        DimensionalFlag dimFlag() {
+            return this.dimFlag;
+        }
+
+        void extractDimensionalFlag(T[] tokens) {
+            this.dimFlag = (tokens == null || tokens.length == 0) ? DimensionalFlag.d2D : tokens[0].dFlag();
+        }
     }
 
     public abstract static class SimpleGeometryToken<G extends Geometry, T extends VertexToken> extends GeometryToken<G, T> {
         T[] pointTokens;
-        DimensionalFlag dimFlag;
 
         SimpleGeometryToken(T... tokens) {
             this.pointTokens = tokens;
-            this.dimFlag = (tokens == null || tokens.length == 0) ? DimensionalFlag.d2D : tokens[0].dFlag();
+            extractDimensionalFlag(tokens);
         }
 
         protected PointSequence mkPointSequence(int srid) {
@@ -239,22 +339,29 @@ public class DSL {
             }
             return psBuilder.toPointSequence();
         }
+
     }
 
-    public abstract static class ComposedGeometryToken<G extends Geometry, T extends VertexToken> extends GeometryToken<G,T>{
+    public abstract static class ComposedGeometryToken<G extends Geometry, T extends VertexToken> extends GeometryToken<G, T> {
         GeometryToken<?, T>[] geometryTokens;
         DimensionalFlag dimFlag;
-        ComposedGeometryToken(DimensionalFlag dimFlag, GeometryToken<?, T>... tokens){
+
+        ComposedGeometryToken(GeometryToken<?, T>... tokens) {
             this.geometryTokens = tokens;
-            this.dimFlag = dimFlag;
+            this.dimFlag = (tokens == null || tokens.length == 0) ? DimensionalFlag.d2D : tokens[0].dimFlag();
         }
-        protected Geometry[] toGeometryArray(int srid){
+
+        protected Geometry[] toGeometryArray(int srid) {
             Geometry[] result = new Geometry[geometryTokens.length];
             int i = 0;
             for (GeometryToken<?, T> token : geometryTokens) {
                 result[i++] = token.toGeometry(srid);
             }
             return result;
+        }
+
+        DimensionalFlag dimFlag() {
+            return this.dimFlag;
         }
     }
 
