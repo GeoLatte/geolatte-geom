@@ -31,17 +31,24 @@ import static org.junit.Assert.assertTrue;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class TestCRS {
+public class testCrsRegistry {
 
     @Test
-    public void testCreateCRSFromEPSGCode(){
-        CoordinateReferenceSystem crs = CrsRegistry.getEPSG(4326);
+    public void testCRSFromEPSGCode(){
+        CoordinateReferenceSystem crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326);
         assertNotNull(crs);
         assertEquals(4326,crs.getCrsId().getCode());
         assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
         assertEquals("WGS 84", crs.getName());
         crs.getCoordinateSystem();
         assertEquals("Lon",crs.getCoordinateSystem().getAxis(0).getAxisName());
+    }
+
+    @Test
+    public void testCrsIdFromEPSGCode(){
+        CrsId crs = CrsRegistry.getCrsIdForEPSG(4326);
+        assertNotNull(crs);
+        assertEquals(4326,crs.getCode());
     }
 
 }

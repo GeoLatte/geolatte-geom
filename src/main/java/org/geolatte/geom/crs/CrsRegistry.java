@@ -36,6 +36,8 @@ import java.util.Map;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
+ * <p/>
+ * <p>Currently, the registry is limited to EPSG-defined coordinate reference systems.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
@@ -44,6 +46,7 @@ public class CrsRegistry {
 
     final private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
     final private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
+    final private static Map<Integer, CrsId> crsIdMap = new HashMap<Integer, CrsId>(4000);
     final private static String DELIM = "\\|";
 
     static {
@@ -78,13 +81,17 @@ public class CrsRegistry {
 
     private static void addDefinition(String line, CrsWktDecoder decoder) {
         String[] tokens = line.split(DELIM);
-        if (!"EPSG".equals(tokens[0])) return;
+        if (!"EPSG".equals(tokens[0])) {
+            LOGGER.debug(String.format("Non-EPSG CRS ignored: %s", tokens[2]));
+            return;
+        }
         Integer srid = Integer.valueOf(tokens[1]);
         try {
             CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
             crsMap.put(srid, crs);
+            crsIdMap.put(srid, crs.getCrsId());
         } catch (WktDecodeException e) {
-            LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid,tokens[2], e.getMessage()));
+            LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid, tokens[2], e.getMessage()));
         }
 
     }
@@ -94,14 +101,21 @@ public class CrsRegistry {
      *
      * @param epsgCode the EPSG code
      * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
-     *  no such system is registered.
+     *         no such system is registered.
      */
-    public static CoordinateReferenceSystem getEPSG(int epsgCode) {
+    public static CoordinateReferenceSystem getCoordinateRefenceSystemForEPSG(int epsgCode) {
         return crsMap.get(epsgCode);
     }
 
-    //TODO implement method lower
-//    public static CoordinateReferenceSystem get(CrsId srcId){
-//
-//    }
+    /**
+     * Returns the {@code CrsId} for the specified EPSG Code.
+     *
+     * @param epsgCode the EPSG code
+     * @return the <code>CrsId</code> corresponding to the specified EPSG code, or null if
+     *         no such system is registered.
+     */
+    public static CrsId getCrsIdForEPSG(int epsgCode) {
+        return crsIdMap.get(epsgCode);
+    }
+
 }
