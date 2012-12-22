@@ -124,4 +124,47 @@ public class Vector {
         }
     }
 
+    /**
+     * Hill's "perp" operator.
+     * <p>The application of this operator on a vector <code>P</code> returns the vector perpendicular at 90 deg. counterclockwise
+     * from <code>P</code> in the 2D (X/Y) plane.</p>
+     *
+     * @param p a vector represented by a point.
+     * @return  the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
+     */
+    public static Point perp(Point p){
+        if (p == null || p.isEmpty()) return Points.createEmpty();
+        if (p.is3D() && p.isMeasured()) {
+            return Points.create3DM(-p.getY(), p.getX(), p.getZ(), p.getM(), p.getCrsId());
+        }
+        if (p.is3D()) {
+            return Points.create3D(-p.getY(), p.getX(), p.getZ(), p.getCrsId());
+        }
+        if (p.isMeasured()) {
+            return Points.create2DM(-p.getY(), p.getX(), p.getM(), p.getCrsId());
+        }
+        return Points.create2D(-p.getY(), p.getX(), p.getCrsId());
+    }
+
+
+    /**
+     * Applies the perp dot-operation on the specified <code>Point</code>s
+     *
+     * <p>The perp dot operation on vectors <code>P</code>, <code>Q</code> is defined as
+     * <code>dot(perp(P),Q)</code>.</p>
+     *
+     * <p>This operation will be performed in 2D only.</p>
+     *
+     * @param p0      first operand
+     * @param p1      second operand
+     * @return the Perp dot of p0 and p1.
+     */
+    public static double perpDot(Point p0, Point p1) {
+        if (p0 == null || p1 == null || p0.isEmpty() || p1.isEmpty()) {
+            throw new IllegalArgumentException("Null or empty Point passed.");
+        }
+            return -p0.getY() * p1.getX() + p0.getX() * p1.getY();
+
+    }
+
 }
