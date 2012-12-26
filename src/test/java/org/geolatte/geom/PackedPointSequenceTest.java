@@ -23,6 +23,7 @@ package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +47,10 @@ public class PackedPointSequenceTest {
 
     @Before
     public void setUp() {
-        testSeq2D = new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.XY);
-        testSeq3D = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYZ);
-        testSeq2DM = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYM);
-        testSeq3DM = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.XYZM);
+        testSeq2D = new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+        testSeq3D = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d3D, CrsId.UNDEFINED);
+        testSeq2DM = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d2DM, CrsId.UNDEFINED);
+        testSeq3DM = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.d3DM, CrsId.UNDEFINED);
         testEmpty = EmptyPointSequence.INSTANCE;
     }
 
@@ -57,19 +58,19 @@ public class PackedPointSequenceTest {
     @Test
     public void testConstructorThrowsIllegalArgumentOnWrongNumberOfCoordinates() {
         try {
-            new PackedPointSequence(new double[]{0, 0, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1, 1}, DimensionalFlag.XYZ);
+            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -392,12 +393,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testEquals() {
-        assertEquals(testSeq2D, new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.XY));
-        assertEquals(testSeq3D, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYZ));
-        assertEquals(testSeq2DM, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYM));
-        assertEquals(testSeq3DM, new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.XYZM));
+        assertEquals(testSeq2D, new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED));
+        assertEquals(testSeq3D, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d3D, CrsId.UNDEFINED));
+        assertEquals(testSeq2DM, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+        assertEquals(testSeq3DM, new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.d3DM, CrsId.UNDEFINED));
         assertFalse(testSeq2DM.equals(testSeq3D));
-        assertFalse(testSeq2D.equals(new PackedPointSequence(new double[]{0, 1, 1, -1, 2, -2}, DimensionalFlag.XY)));
+        assertFalse(testSeq2D.equals(new PackedPointSequence(new double[]{0, 1, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED)));
 
     }
 
@@ -405,10 +406,10 @@ public class PackedPointSequenceTest {
     //TODO -- correct unit tests
 //    @Test
 //    public void testEqualsDimensionallyLimited(){
-//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, -1,2, -2}, DimensionalFlag.XY), DimensionalFlag.XY));
-//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.XYZ), DimensionalFlag.XY));
-//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 1, -1, 2, 2, -2, 3}, DimensionalFlag.XYZ), DimensionalFlag.XY));
-//        assertFalse(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 2, -1, 2, 2, -2, 3}, DimensionalFlag.XYZ), DimensionalFlag.XY));
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, -1,2, -2}, DimensionalFlag.d2D), DimensionalFlag.d2D));
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d3D), DimensionalFlag.d2D));
+//        assertTrue(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 1, -1, 2, 2, -2, 3}, DimensionalFlag.d3D), DimensionalFlag.d2D));
+//        assertFalse(testSeq3D.equals(new PackedPointSequence(new double[]{0, 0, 1, 2, -1, 2, 2, -2, 3}, DimensionalFlag.d3D), DimensionalFlag.d2D));
 //    }
 
 

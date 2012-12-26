@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * A <code>LineString</code> that is both closed and simple.
  *
@@ -32,11 +30,7 @@ import org.geolatte.geom.crs.CrsId;
 public class LinearRing extends LineString {
 
 
-    final static LinearRing EMPTY = new LinearRing(null, CrsId.UNDEFINED, null);
-
-    public static LinearRing create(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
-        return new LinearRing(points, crsId, geometryOperations);
-    }
+    final static LinearRing EMPTY = new LinearRing(EmptyPointSequence.INSTANCE, null);
 
     public static LinearRing createEmpty(){
         return EMPTY;
@@ -47,13 +41,13 @@ public class LinearRing extends LineString {
         checkIsClosed();
     }
 
-    public LinearRing(PointSequence points, CrsId crsId, GeometryOperations geometryOperations) {
-        super(points, crsId, geometryOperations);
+    public LinearRing(PointSequence points, GeometryOperations geometryOperations) {
+        super(points, geometryOperations);
         checkIsClosed();
     }
 
-    public LinearRing(PointSequence points, CrsId crsId) {
-        this(points, crsId, null);
+    public LinearRing(PointSequence points) {
+        this(points, null);
     }
 
 

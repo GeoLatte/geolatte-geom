@@ -100,7 +100,7 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
+        byteBuffer.setByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBuffer.getInt());
     }
 
@@ -111,11 +111,11 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
+        byteBuffer.setByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBuffer.getInt());
 
         ByteBuffer byteBufferFromArray = ByteBuffer.from(byteArray);
-        byteBufferFromArray.setWKBByteOrder(ByteOrder.XDR);
+        byteBufferFromArray.setByteOrder(ByteOrder.XDR);
         assertEquals(expectedValue, byteBufferFromArray.getInt());
     }
 
@@ -125,7 +125,7 @@ public class TestByteBuffer {
         int expectedValue = 58700999;
 
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
+        byteBuffer.setByteOrder(ByteOrder.NDR);
         assertEquals(expectedValue, byteBuffer.getInt());
     }
 
@@ -163,10 +163,10 @@ public class TestByteBuffer {
     public void test_retrieve_byteorder() {
         String hxStr = "FFFFFFFF";
         ByteBuffer byteBuffer = ByteBuffer.from(hxStr);
-        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
-        assertEquals(ByteOrder.XDR, byteBuffer.getWKBByteOrder());
-        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
-        assertEquals(ByteOrder.NDR, byteBuffer.getWKBByteOrder());
+        byteBuffer.setByteOrder(ByteOrder.XDR);
+        assertEquals(ByteOrder.XDR, byteBuffer.getByteOrder());
+        byteBuffer.setByteOrder(ByteOrder.NDR);
+        assertEquals(ByteOrder.NDR, byteBuffer.getByteOrder());
     }
 
     @Test
@@ -179,7 +179,7 @@ public class TestByteBuffer {
     public void test_put_xdr_double() {
         double expected = 1234.56789;
         ByteBuffer byteBuffer = ByteBuffer.allocate(8);
-        byteBuffer.setWKBByteOrder(ByteOrder.XDR);
+        byteBuffer.setByteOrder(ByteOrder.XDR);
         byteBuffer.putDouble(expected);
         byteBuffer.rewind();
         double d = byteBuffer.getDouble();
@@ -190,7 +190,7 @@ public class TestByteBuffer {
     public void test_put_ndr_double() {
         double expected = 1234.56789;
         ByteBuffer byteBuffer = ByteBuffer.allocate(8);
-        byteBuffer.setWKBByteOrder(ByteOrder.NDR);
+        byteBuffer.setByteOrder(ByteOrder.NDR);
         byteBuffer.putDouble(expected);
         byteBuffer.rewind();
         double d = byteBuffer.getDouble();

@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
@@ -28,9 +30,11 @@ package org.geolatte.geom;
 abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     protected final DimensionalFlag dimensionalFlag;
+    protected final CrsId crsId;
 
-    public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag) {
+    public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag, CrsId crsId) {
         this.dimensionalFlag = dimensionalFlag;
+        this.crsId = crsId == null ? CrsId.UNDEFINED : crsId;
     }
 
     @Override
@@ -45,7 +49,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     @Override
     public PointSequenceBuilder add(double x, double y) {
-        if (dimensionalFlag != DimensionalFlag.XY)
+        if (dimensionalFlag != DimensionalFlag.d2D)
             throw new IllegalArgumentException("Attempting to add 2D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
@@ -54,7 +58,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     @Override
     public PointSequenceBuilder add(double x, double y, double zOrm) {
-        if (dimensionalFlag != DimensionalFlag.XYZ && dimensionalFlag != DimensionalFlag.XYM)
+        if (dimensionalFlag != DimensionalFlag.d3D && dimensionalFlag != DimensionalFlag.d2DM)
             throw new IllegalArgumentException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
@@ -64,7 +68,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     @Override
     public PointSequenceBuilder add(double x, double y, double z, double m) {
-        if (dimensionalFlag != DimensionalFlag.XYZM)
+        if (dimensionalFlag != DimensionalFlag.d3DM)
             throw new IllegalArgumentException("Attempting to add 3D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
@@ -88,6 +92,11 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
     @Override
     public DimensionalFlag getDimensionalFlag(){
         return this.dimensionalFlag;
+    }
+
+    @Override
+    public CrsId getCrsId() {
+        return this.crsId;
     }
 
     private double[] getPointCoordinates(Point point) {

@@ -21,23 +21,24 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
+
 /**
  * A decoder for WKT (Well-Known Text) representations.
  * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
- * @param <T> the type as which the WKT representation is decoded.
  *
  * @author Karel Maesen, Geovise BVBA
  *
  */
-public interface WktDecoder<T> {
+public interface WktDecoder {
 
     /**
      * Decodes a WKT representation.
      *
      * @param wkt the WKT string to decode
-     * @return the decoded object
+     * @return the decoded <code>Geometry</code>
      * @throws WktDecodeException when the String is an invalid or unsupported WKT representation
      */
-    T decode(String wkt);
+    Geometry decode(String wkt);
 }

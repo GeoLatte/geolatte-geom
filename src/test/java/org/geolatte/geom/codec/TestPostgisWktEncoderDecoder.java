@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
@@ -33,17 +34,17 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestPostgisWktEncoderDecoder {
 
-    CodecTestCases testcases = new CodecTestCases();
+    PostgisTestCases testcases = new PostgisTestCases();
 
     @Test
     public void testDecodeTwice() throws Exception {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_2D);
 
         PostgisWktDecoder postgisWktDecoder = new PostgisWktDecoder();
         Geometry decodedBefore = postgisWktDecoder.decode(wkt);
 
         //Use decoder to decode point with srid
-        postgisWktDecoder.decode(testcases.getWKT(CodecTestCases.POINT_WITH_SRID));
+        postgisWktDecoder.decode(testcases.getWKT(PostgisTestCases.POINT_WITH_SRID));
 
         Geometry decodedAfter = postgisWktDecoder.decode(wkt);
         assertEquals(decodedBefore, decodedAfter);
@@ -51,13 +52,13 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void testEncodeTwice() throws Exception {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_2D);
         Geometry geom = new PostgisWktDecoder().decode(wkt);
 
         PostgisWktEncoder postgisWktEncoder = new PostgisWktEncoder();
         String encodedBefore = postgisWktEncoder.encode(geom);
 
-        postgisWktEncoder.encode(new PostgisWktDecoder().decode(testcases.getWKT(CodecTestCases.POINT_WITH_SRID)));
+        postgisWktEncoder.encode(new PostgisWktDecoder().decode(testcases.getWKT(PostgisTestCases.POINT_WITH_SRID)));
 
         String encodedAfter = postgisWktEncoder.encode(geom);
         assertEquals(encodedBefore, encodedAfter);
@@ -65,10 +66,10 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void test_point_2d() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_2D);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_2D), geom);
         testEncoding(wkt, geom);
     }
 
@@ -78,85 +79,85 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void test_point_3d() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_3D);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_3D);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_3D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_3D), geom);
         testEncoding(wkt, geom);
     }
 
     @Test
     public void test_point_2dm() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_2DM);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_2DM);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_2DM), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_2DM), geom);
         testEncoding(wkt, geom);
 
     }
 
     @Test
     public void test_point_3dm() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_3DM);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_3DM);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_3DM), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_3DM), geom);
         testEncoding(wkt, geom);
 
     }
 
     @Test
     public void test_linestring_2d() {
-        String wkt = testcases.getWKT(CodecTestCases.LINESTRING_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.LINESTRING_2D);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.LINESTRING_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_2D), geom);
         testEncoding(wkt, geom);
 
     }
 
     @Test
     public void test_point_XYZM_WITH_SRID() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_WITH_SRID);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_WITH_SRID);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertTrue("Result of 4-dim point wkt is not measured.", geom.isMeasured());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_WITH_SRID), geom);
         testEncoding(wkt, geom);
     }
 
 
     @Test
     public void test_polygon_2d_no_inner_rings() {
-        String wkt = testcases.getWKT(CodecTestCases.POLYGON_2D_NO_INNER_RINGS);
+        String wkt = testcases.getWKT(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POLYGON_2D_NO_INNER_RINGS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS), geom);
         testEncoding(wkt, geom);
 
     }
 
     @Test
     public void test_polyogn_2d_inner_rings() {
-        String wkt = testcases.getWKT(CodecTestCases.POLYGON_2D_INNER_RINGS);
+        String wkt = testcases.getWKT(PostgisTestCases.POLYGON_2D_INNER_RINGS);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POLYGON_2D_INNER_RINGS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POLYGON_2D_INNER_RINGS), geom);
         testEncoding(wkt, geom);
     }
 
     @Test
     public void test_geometry_collection() {
-        String wkt = testcases.getWKT(CodecTestCases.GEOM_COLL_2D_POINTS);
+        String wkt = testcases.getWKT(PostgisTestCases.GEOM_COLL_2D_POINTS);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.GEOM_COLL_2D_POINTS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.GEOM_COLL_2D_POINTS), geom);
         testEncoding(wkt, geom);
     }
 
     @Test
     public void test_empty_geometry_collection() {
-        String wkt = testcases.getWKT(CodecTestCases.EMPTY_GEOM_COLL);
+        String wkt = testcases.getWKT(PostgisTestCases.EMPTY_GEOM_COLL);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
         assertTrue(geom.isEmpty());
@@ -165,11 +166,11 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void test_multipoint_with_srid() {
-        String wkt = testcases.getWKT(CodecTestCases.MULTIPOINT_2D_WITH_SRID);
+        String wkt = testcases.getWKT(PostgisTestCases.MULTIPOINT_2D_WITH_SRID);
         MultiPoint geom = (MultiPoint) decode(wkt);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTIPOINT_2D_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOINT_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         testEncoding(wkt, geom);
     }
@@ -177,22 +178,22 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void test_multilinestring() {
-        String wkt = testcases.getWKT(CodecTestCases.MULTILINESTRING_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.MULTILINESTRING_2D);
         MultiLineString geom = (MultiLineString) decode(wkt);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTILINESTRING_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D), geom);
         testEncoding(wkt, geom);
     }
 
 
     @Test
     public void test_multilinestring_with_srid() {
-        String wkt = testcases.getWKT(CodecTestCases.MULTILINESTRING_2D_WITH_SRID);
+        String wkt = testcases.getWKT(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID);
         MultiLineString geom = (MultiLineString) decode(wkt);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         for (Geometry part : geom) {
             assertEquals(4326, geom.getSRID());
@@ -202,32 +203,52 @@ public class TestPostgisWktEncoderDecoder {
 
     @Test
     public void test_multipolygon() {
-        String wkt = testcases.getWKT(CodecTestCases.MULTIPOLYGON_2D);
+        String wkt = testcases.getWKT(PostgisTestCases.MULTIPOLYGON_2D);
         MultiPolygon geom = (MultiPolygon) decode(wkt);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTIPOLYGON_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOLYGON_2D), geom);
         testEncoding(wkt, geom);
     }
 
     @Test
     public void test_irregular_white_space(){
-        String wkt = testcases.getWKT(CodecTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1) ;
+        String wkt = testcases.getWKT(PostgisTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1) ;
         LineString geom = (LineString)decode(wkt);
         assertNotNull(geom);
         String normalizedWkt = "LINESTRING(-29.261 66,-71.1074 -20.255)";
-        assertEquals(testcases.getExpected(CodecTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1), geom);
         testEncoding(normalizedWkt, geom);
     }
 
     @Test
     public void test_scientific_notation() {
-        String wkt = testcases.getWKT(CodecTestCases.POINT_SCIENTIFIC_NOTATION);
+        String wkt = testcases.getWKT(PostgisTestCases.POINT_SCIENTIFIC_NOTATION);
         Point pnt = (Point) decode(wkt);
         assertNotNull(pnt);
         GeometryPointEquality eq = new GeometryPointEquality(
-                new CoordinateWithinTolerancePointEquality(DimensionalFlag.XY, 0.00000001));
-        assertTrue(eq.equals(testcases.getExpected(CodecTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
+                new CoordinateWithinTolerancePointEquality(DimensionalFlag.d2D, 0.00000001));
+        assertTrue(eq.equals(testcases.getExpected(PostgisTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
+    }
+
+    @Test(expected= WktDecodeException.class)
+    public void test_invalid_point() {
+        String wkt = testcases.getWKT(PostgisTestCases.INVALID_POINT);
+        decode(wkt);
+    }
+
+    @Test(expected= WktDecodeException.class)
+    public void test_invalid_polygon() {
+        String wkt = testcases.getWKT(PostgisTestCases.INVALID_POLYGON);
+        decode(wkt);
+    }
+
+    @Test
+    public void test_empty_point() {
+        String wkt = testcases.getWKT(PostgisTestCases.EMPTY_POINT);
+        Geometry geom = decode(wkt);
+        assertTrue(geom.isEmpty());
+        assertTrue(geom.getGeometryType() == GeometryType.POINT);
     }
 
     private Geometry decode(String wkt) {

@@ -92,7 +92,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
 
     @Override
     public void visit(LineString lineString) {
-        currentBuilder = PointSequenceBuilders.variableSized(dimFlag);
+        currentBuilder = PointSequenceBuilders.variableSized(dimFlag, crsId);
         Point lastAddedPoint = null;
         LineSegments segments = new LineSegments(lineString.getPoints());
         for (LineSegment segment : segments) {
@@ -144,7 +144,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
     private void startNewPointSequenceIfNotEmpty() {
         if (!sequenceIsEmpty) {
             pointSequences.add(currentBuilder.toPointSequence());
-            currentBuilder = PointSequenceBuilders.variableSized(dimFlag);
+            currentBuilder = PointSequenceBuilders.variableSized(dimFlag, crsId);
             sequenceIsEmpty = true;
         }
     }
@@ -165,9 +165,9 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
         double m = p0.getM() + r * (p1.getM() - p0.getM());
         if (p0.is3D()) {
             double z = p0.getZ() + r * (p1.getZ() - p0.getZ());
-            return Points.create(x, y, z, m);
+            return Points.create3DM(x, y, z, m);
         } else {
-            return Points.createMeasured(x, y, m);
+            return Points.create2DM(x, y, m);
         }
     }
 
@@ -211,14 +211,14 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             Point[] pnts = new Point[number0Dimensional];
             int i = 0;
             for (PointSequence ps : pointSequences) {
-                pnts[i++] = new Point(ps, this.crsId, this.ops);
+                pnts[i++] = new Point(ps, this.ops);
             }
             return new MultiPoint(pnts);
         }
 
         if (number0Dimensional == 1 && number1Dimensional == 0) {
             return new MultiPoint(
-                    new Point[]{new Point(pointSequences.get(0), this.crsId, this.ops)}
+                    new Point[]{new Point(pointSequences.get(0), this.ops)}
             );
         }
 
@@ -226,7 +226,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             LineString[] lineStrings = new LineString[number1Dimensional];
             int i = 0;
             for (PointSequence ps : pointSequences) {
-                lineStrings[i++] = new LineString(ps, this.crsId, this.ops);
+                lineStrings[i++] = new LineString(ps,  this.ops);
             }
             return new MultiLineString(lineStrings);
         }
@@ -236,9 +236,9 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             int i = 0;
             for (PointSequence ps : pointSequences) {
                 if (ps.size() == 1) {
-                    geometries[i++] = new Point(ps, this.crsId, this.ops);
+                    geometries[i++] = new Point(ps, this.ops);
                 } else {
-                    geometries[i++] = new LineString(ps, this.crsId, this.ops);
+                    geometries[i++] = new LineString(ps, this.ops);
                 }
             }
             return new GeometryCollection(geometries);

@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * A builder for <code>PointSequence</code>s.
  *
@@ -43,7 +45,7 @@ public interface PointSequenceBuilder {
      * @param x the X-coordinate of the of the <code>Point</code> that is added
      * @param y the Y-coordinate of the of the <code>Point</code> that is added
      * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
-     * is not equal to {@link DimensionalFlag#XY}
+     * is not equal to {@link DimensionalFlag#d2D}
      * @return this instance
      */
     PointSequenceBuilder add(double x, double y);
@@ -56,7 +58,7 @@ public interface PointSequenceBuilder {
      * @param y the Y-coordinate of the of the <code>Point</code> that is added
      * @param zOrm the Z- or M-coordinate of the of the <code>Point</code> that is added
      * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
-     * is not equal to {@link DimensionalFlag#XYZ} or {@link DimensionalFlag#XYM}
+     * is not equal to {@link DimensionalFlag#d3D} or {@link DimensionalFlag#d2DM}
      * @return this instance
      */
     PointSequenceBuilder add(double x, double y, double zOrm);
@@ -69,7 +71,7 @@ public interface PointSequenceBuilder {
      * @param z the Z-coordinate of the of the <code>Point</code> that is added
      * @param m the M-coordinate of the of the <code>Point</code> that is added
      * @throws IllegalArgumentException when the <code>DimensionalFlag</code> returned by {@link #getDimensionalFlag()}
-     * is not equal to {@link DimensionalFlag#XYZM}
+     * is not equal to {@link DimensionalFlag#d3DM}
      * @return this instance
      */
     PointSequenceBuilder add(double x, double y, double z, double m);
@@ -90,6 +92,13 @@ public interface PointSequenceBuilder {
      * @return the <code>DimensionalFlag</code> of the <code>PointSequence</code> being built.
      */
     DimensionalFlag getDimensionalFlag();
+
+    /**
+     * Returns the {@link CrsId} of the <code>PointSequence</code> being built.
+     * @return the <code>CrsId</code> of the <code>PointSequence</code> being built.
+     */
+    CrsId getCrsId();
+
 
     /**
      * Returns the result of this builder.

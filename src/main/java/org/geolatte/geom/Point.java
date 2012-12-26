@@ -21,14 +21,12 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class Point extends Geometry {
 
-    static final Point EMPTY = new Point(EmptyPointSequence.INSTANCE, CrsId.UNDEFINED, null);
+    static final Point EMPTY = new Point(EmptyPointSequence.INSTANCE, null);
 
     private final PointSequence points;
 
@@ -36,13 +34,17 @@ public class Point extends Geometry {
         return EMPTY;
     }
 
-    public Point(PointSequence sequence, CrsId crsId, GeometryOperations geometryOperations) {
-        super(crsId, geometryOperations);
+    public Point(PointSequence sequence, GeometryOperations geometryOperations) {
+        super(geometryOperations);
         this.points = sequence;
     }
 
-    public Point(PointSequence sequence, CrsId crsId) {
-        this(sequence, crsId, null);
+    public Point(PointSequence sequence) {
+        this(sequence, null);
+    }
+
+    public Point(Point point) {
+        this(point.getPoints());
     }
 
     @Override

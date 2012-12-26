@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Arrays;
 
 /**
@@ -32,8 +34,8 @@ class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
     private double[] coordinates;
     private int index = 0;
 
-    VariableSizePointSequenceBuilder(DimensionalFlag flag) {
-        super(flag);
+    VariableSizePointSequenceBuilder(DimensionalFlag flag, CrsId crsId) {
+        super(flag, crsId);
         this.coordinates = new double[flag.getCoordinateDimension() * 10];
     }
 
@@ -51,6 +53,6 @@ class VariableSizePointSequenceBuilder extends AbstractPointSequenceBuilder {
 
     @Override
     public PointSequence toPointSequence() {
-        return new PackedPointSequence(Arrays.copyOf(coordinates, index), dimensionalFlag);
+        return new PackedPointSequence(Arrays.copyOf(coordinates, index), dimensionalFlag, crsId);
     }
 }

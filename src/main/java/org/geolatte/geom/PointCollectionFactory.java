@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Arrays;
 
 
@@ -30,6 +32,8 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PointCollectionFactory {
+
+    //TODO remove this class
 
     /**
      * Creates an empty <code>PointSequence</code>.
@@ -48,8 +52,8 @@ public class PointCollectionFactory {
      * @param dimensionalFlag the dimensions for the new <code>PointSequence</code>
      * @return a <code>PointSequence</code> with the specified coordinates and having the specified <code>DimensionalFlag</code>.
      */
-    public static PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag){
-        return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag);
+    public static PointSequence create(double[] coordinates, DimensionalFlag dimensionalFlag, CrsId crsId){
+        return  new PackedPointSequence(Arrays.copyOf(coordinates, coordinates.length), dimensionalFlag, crsId);
     }
 
     /**

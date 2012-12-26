@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.fail;
@@ -33,7 +34,7 @@ public class PointSequenceBuilderTest {
 
     @Test
     public void testMethodInvocationInconsistentWithDimensionalFlagThrowsIllegalStateException() {
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XY);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
         builder.add(1.0, 1.0);
         try {
             builder.add(1.0, 1.0, 1.0);
@@ -46,14 +47,14 @@ public class PointSequenceBuilderTest {
 
     @Test
     public void testAdding3DOr3DMCoordinates() {
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYZ);
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d3D, CrsId.UNDEFINED);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);
             fail("Adding 2D point to 3D PointSequence should throw IllegalStateException");
         }catch(IllegalArgumentException e){
         }
-        builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.XYM);
+        builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2DM, CrsId.UNDEFINED);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);

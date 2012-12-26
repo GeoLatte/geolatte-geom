@@ -33,7 +33,7 @@ package org.geolatte.geom;
  */
 public class DefaultMeasureGeometryOperations implements MeasureGeometryOperations {
 
-    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.XY);
+    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.d2D);
 
     /**
      * @inheritDoc
@@ -95,7 +95,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             private LineString measure(LineString geometry) {
                 PointSequence originalPoints = geometry.getPoints();
                 DimensionalFlag dimFlag = DimensionalFlag.valueOf(geometry.is3D(), true);
-                PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(originalPoints.size(), dimFlag);
+                PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(originalPoints.size(), dimFlag, originalPoints.getCrsId());
                 double[] coordinates = new double[geometry.getCoordinateDimension() + 1];
                 double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
                 for (int i = 0; i < originalPoints.size(); i++) {
@@ -107,7 +107,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                     builder.add(coordinates);
                     prevCoordinates[0] = coordinates[0]; prevCoordinates[1] = coordinates[1];
                 }
-                return new LineString(builder.toPointSequence(), geometry.getCrsId(), geometry.getGeometryOperations());
+                return new LineString(builder.toPointSequence(), geometry.getGeometryOperations());
             }
 
         };

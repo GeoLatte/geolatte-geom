@@ -144,7 +144,7 @@ public class Envelope {
      * @return the lower-left point
      */
     public Point lowerLeft() {
-        return Points.create(minX, minY, crsId);
+        return Points.create2D(minX, minY, crsId);
     }
 
     /**
@@ -153,7 +153,7 @@ public class Envelope {
      * @return the upper-right point
      */
     public Point upperRight() {
-        return Points.create(maxX, maxY, crsId);
+        return Points.create2D(maxX, maxY, crsId);
     }
 
     /**
@@ -162,7 +162,7 @@ public class Envelope {
      * @return the upper-left point
      */
     public Point upperLeft() {
-        return Points.create(minX, maxY, crsId);
+        return Points.create2D(minX, maxY, crsId);
     }
 
     /**
@@ -171,7 +171,7 @@ public class Envelope {
      * @return the lower-right point
      */
     public Point lowerRight() {
-        return Points.create(maxX, minY, crsId);
+        return Points.create2D(maxX, minY, crsId);
     }
 
     public String toString() {

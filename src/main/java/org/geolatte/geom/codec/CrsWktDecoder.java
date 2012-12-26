@@ -57,7 +57,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
      * @return The <code>CoordinateReferenceSystem</code> that is encoded in the input WKT.
      */
     public CoordinateReferenceSystem decode(String wkt) {
-        setTokenizer(new WktTokenizer(wkt, getWktVariant(), false));
+        setTokenizer(new CrsWktTokenizer(wkt, getWktVariant()));
         nextToken();
         return decode();
     }

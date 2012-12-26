@@ -45,11 +45,11 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = new LineString(new PackedPointSequence(c1, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString ls2 = new LineString(new PackedPointSequence(c2, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString ls3 = new LineString(new PackedPointSequence(c3, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString lcs = new LineString(new PackedPointSequence(cClosedSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
-    LineString lcns = new LineString(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.XYM), CrsId.UNDEFINED);
+    LineString ls1 = new LineString(new PackedPointSequence(c1, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString ls2 = new LineString(new PackedPointSequence(c2, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString ls3 = new LineString(new PackedPointSequence(c3, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString lcs = new LineString(new PackedPointSequence(cClosedSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString lcns = new LineString(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
 
 
     @Before

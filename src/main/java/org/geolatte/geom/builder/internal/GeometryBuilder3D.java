@@ -19,21 +19,16 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.builder.internal;
 
-import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/29/12
+ *         creation-date: 11/10/12
  */
-public class CodecTestInput {
+public interface GeometryBuilder3D<T extends Geometry> extends SimpleGeometryBuilder<T> {
 
-    public String wkt;
-    public ByteBuffer wkb;
-    public Geometry expected;
-    public boolean testEncoding = true;
-
+    public GeometryBuilder3D<T> add(double x, double y, double z);
 
 }

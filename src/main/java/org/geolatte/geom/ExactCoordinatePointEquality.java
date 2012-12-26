@@ -44,7 +44,7 @@ public class ExactCoordinatePointEquality extends AbstractPointEquality {
      * Creates an instance that takes all coordinate values into account.
      */
     public ExactCoordinatePointEquality(){
-        super(DimensionalFlag.XYZM);
+        super(DimensionalFlag.d3DM);
     }
 
     @Override

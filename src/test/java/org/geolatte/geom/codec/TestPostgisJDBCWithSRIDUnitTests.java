@@ -14,34 +14,33 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2012 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.crs;
+package org.geolatte.geom.codec;
 
+import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ *         creation-date: 11/1/12
  */
-public class TestCRS {
+public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
 
-    @Test
-    public void testCreateCRSFromEPSGCode(){
-        CoordinateReferenceSystem crs = CrsRegistry.getEPSG(4326);
-        assertNotNull(crs);
-        assertEquals(4326,crs.getCrsId().getCode());
-        assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
-        assertEquals("WGS 84", crs.getName());
-        crs.getCoordinateSystem();
-        assertEquals("Lon",crs.getCoordinateSystem().getAxis(0).getAxisName());
+    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
+
+    @Override
+    protected CodecTestBase getTestCases() {
+        return testCasesWithSRID;
     }
 
+    @Override
+    @Test
+    public void test_wkb_codec() {
+        //Don't test WKB with SRID at this point - we don't have the WKB's yet
+    }
 }

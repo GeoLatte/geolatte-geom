@@ -210,7 +210,7 @@ public class ByteBuffer {
      *
      * @param wbo The new byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
      */
-    public void setWKBByteOrder(ByteOrder wbo) {
+    public void setByteOrder(ByteOrder wbo) {
         buffer.order(wbo.getByteOrder());
     }
 
@@ -372,7 +372,7 @@ public class ByteBuffer {
      *
      * @return This buffer's byte order
      */
-    public ByteOrder getWKBByteOrder() {
+    public ByteOrder getByteOrder() {
         java.nio.ByteOrder order = buffer.order();
         return ByteOrder.valueOf(order);
     }

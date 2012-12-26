@@ -36,21 +36,21 @@ public enum DimensionalFlag {
     /**
      * Indicates 2 dimensions (X,Y)
      */
-    XY(2, -1, -1),
+    d2D(2, -1, -1),
 
     /**
      * Indicates 3 dimensions (X,Y,Z). The Z-coordinate is typically used to represent altitude.
      */
-    XYZ(3, 2, -1),
+    d3D(3, 2, -1),
     /**
      * Indicates 3 dimensions (X,Y,M). The M-coordinate represents a measurement.
      */
-    XYM(3, -1, 2),
+    d2DM(3, -1, 2),
 
     /**
      * Indicates 4 dimensions (X,Y,M,Z).
      */
-    XYZM(4, 2, 3);
+    d3DM(4, 2, 3);
 
     private final int dimension;
     public final int X = 0;
@@ -75,9 +75,9 @@ public enum DimensionalFlag {
      */
     public static DimensionalFlag valueOf(boolean is3D, boolean isMeasured) {
         if (isMeasured) {
-            return is3D ? XYZM : XYM;
+            return is3D ? d3DM : d2DM;
         } else {
-            return is3D ? XYZ : XY;
+            return is3D ? d3D : d2D;
         }
     }
 
@@ -85,7 +85,7 @@ public enum DimensionalFlag {
      * Returns the coordinate dimension of this <code>DimensionalFlag</code>.
      *
      * <p>The coordinate dimension is the number of components in a coordinate.</p>
-     * @return 2 for XY, 3 for XYZ or XYM, 4 for XYZM.
+     * @return 2 for d2D, 3 for d3D or d2DM, 4 for d3DM.
      */
     public int getCoordinateDimension() {
         return this.dimension;
@@ -93,19 +93,19 @@ public enum DimensionalFlag {
 
     /**
      * Returns true for <code>DimensionalFlag</code>s for coordinates with a Z-component.
-     * @return true for XYZ or XYZM
+     * @return true for d3D or d3DM
      */
     public boolean is3D() {
-        return (this == XYZ ||this == XYZM);
+        return (this == d3D ||this == d3DM);
     }
 
     /**
      * Returns true for <code>DimensionalFlag</code>s for coordinates with an M-component.
      *
-     * @return true for XYM or XYZM
+     * @return true for d2DM or d3DM
      */
     public boolean isMeasured() {
-        return (this == XYM ||this == XYZM);
+        return (this == d2DM ||this == d3DM);
     }
 
 

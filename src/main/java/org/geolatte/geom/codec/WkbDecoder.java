@@ -38,6 +38,7 @@ public interface WkbDecoder {
      * Decodes a WKB encoded representation of a <code>Geometry</code>
      * @param byteBuffer the WKB encoded binary representation
      * @return the represented <code>Geometry</code>
+     * @throws WkbDecodeException if the specified ByteBuffer is an illegal or unsupported WKB representation
      */
     Geometry decode(ByteBuffer byteBuffer);
 }

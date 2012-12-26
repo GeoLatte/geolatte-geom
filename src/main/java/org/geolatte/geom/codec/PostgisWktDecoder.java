@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecoder {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
@@ -57,6 +57,12 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
         return decodeGeometry();
     }
 
+    /**
+     * The instance fields wktString and crsId are initialized prior to decoding. For postgis EWKT that entails
+     * extracting the SRID prefix (if any) from the WKT string.
+     *
+     * @param wkt the WKT representation
+     */
     private void prepare(String wkt) {
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
@@ -69,7 +75,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
     }
 
     private void initializeTokenizer() {
-        setTokenizer(new WktTokenizer(wktString, getWktVariant()));
+        setTokenizer(new WktTokenizer(wktString, getWktVariant(), crsId));
         nextToken();
     }
 
@@ -136,7 +142,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
             if (currentToken instanceof WktPointSequenceToken) {
                 PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
                 for (Point pnt : pointSequence) {
-                    points.add(pnt);
+                    points.add(new Point(pnt));
                 }
                 nextToken();
             }
@@ -171,7 +177,8 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
         if (matchesOpenList()) {
             List<LinearRing> rings = new ArrayList<LinearRing>();
             while (!matchesCloseList()) {
-                rings.add(new LinearRing(decodePointSequence(), crsId));
+                LinearRing ring = decodeLinearRingText();
+                rings.add(ring);
                 matchesElementSeparator();
             }
             return new Polygon(rings.toArray(new LinearRing[rings.size()]));
@@ -182,10 +189,18 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
+    private LinearRing decodeLinearRingText() {
+        try {
+            return new LinearRing(decodePointSequence());
+        } catch (IllegalArgumentException ex) {
+            throw new WktDecodeException(ex.getMessage());
+        }
+    }
+
     private LineString decodeLineStringText() {
         PointSequence pointSequence = decodePointSequence();
         if (pointSequence != null) {
-            return new LineString(pointSequence, crsId);
+            return new LineString(pointSequence);
         }
         if (matchesEmptyToken()) {
             return LineString.createEmpty();
@@ -196,7 +211,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> {
     private Point decodePointText() {
         PointSequence pointSequence = decodePointSequence();
         if (pointSequence != null) {
-            return new Point(pointSequence, crsId);
+            return new Point(pointSequence);
         }
         if (matchesEmptyToken()) {
             return Points.createEmpty();

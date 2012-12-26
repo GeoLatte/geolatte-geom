@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
@@ -32,135 +33,135 @@ import static org.junit.Assert.assertTrue;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-public class TestPostgisWkbDecoder {
+public class TestPostgisWkbEncoderDecoder {
 
 
-    CodecTestCases testcases = new CodecTestCases();
+    PostgisTestCases testcases = new PostgisTestCases();
 
     @Test
     public void test_point_2d() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POINT_2D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_2D);
         Geometry geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_2D), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_point_XYZ() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POINT_3D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_3D);
         Geometry geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_3D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_3D), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_point_XYZM() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POINT_3DM);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_3DM);
         Geometry geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_3DM), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_3DM), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_point_XYM() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POINT_2DM);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_2DM);
         Geometry geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_2DM), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_2DM), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_point_XYZM_WITH_SRID() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POINT_WITH_SRID);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_WITH_SRID);
         Geometry geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POINT_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POINT_WITH_SRID), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_linestring_2d() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.LINESTRING_2D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.LINESTRING_2D);
         Geometry geom = decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.LINESTRING_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_2D), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_Polygon_2d_no_interior_rings() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POLYGON_2D_NO_INNER_RINGS);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS);
         Geometry geom = decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POLYGON_2D_NO_INNER_RINGS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_Polygon_2d_with_interior_ring() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.POLYGON_2D_INNER_RINGS);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POLYGON_2D_INNER_RINGS);
         Polygon geom = (Polygon) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.POLYGON_2D_INNER_RINGS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.POLYGON_2D_INNER_RINGS), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_geometrycollection() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.GEOM_COLL_2D_POINTS);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.GEOM_COLL_2D_POINTS);
         GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.GEOM_COLL_2D_POINTS), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.GEOM_COLL_2D_POINTS), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_empty_geometrycollection() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.EMPTY_GEOM_COLL);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_GEOM_COLL);
         GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
         assertTrue(geom.isEmpty());
-        assertEquals(testcases.getExpected(CodecTestCases.EMPTY_GEOM_COLL), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.EMPTY_GEOM_COLL), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_multipoint() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.MULTIPOINT_2D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOINT_2D);
         MultiPoint geom = (MultiPoint) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTIPOINT_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOINT_2D), geom);
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_multipoint_with_srid() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.MULTIPOINT_2D_WITH_SRID);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOINT_2D_WITH_SRID);
         MultiPoint geom = (MultiPoint) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_POINT, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTIPOINT_2D_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOINT_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         testEncoding(byteBuffer, geom);
     }
 
     @Test
     public void test_multilinestring() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.MULTILINESTRING_2D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTILINESTRING_2D);
         MultiLineString geom = (MultiLineString) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTILINESTRING_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D), geom);
 
         testEncoding(byteBuffer, geom);
     }
@@ -168,11 +169,11 @@ public class TestPostgisWkbDecoder {
 
     @Test
     public void test_multilinestring_with_srid() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.MULTILINESTRING_2D_WITH_SRID);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID);
         MultiLineString geom = (MultiLineString) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         for (Geometry part : geom) {
             assertEquals(4326, geom.getSRID());
@@ -182,11 +183,11 @@ public class TestPostgisWkbDecoder {
 
     @Test
     public void test_multipolygon() {
-        ByteBuffer byteBuffer = testcases.getWKB(CodecTestCases.MULTIPOLYGON_2D);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOLYGON_2D);
         MultiPolygon geom = (MultiPolygon) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_POLYGON, geom.getGeometryType());
-        assertEquals(testcases.getExpected(CodecTestCases.MULTIPOLYGON_2D), geom);
+        assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOLYGON_2D), geom);
         testEncoding(byteBuffer, geom);
     }
 
@@ -194,15 +195,38 @@ public class TestPostgisWkbDecoder {
     public void testReuseDecoder() throws Exception {
         PostgisWkbDecoder decoder = new PostgisWkbDecoder();
 
-        ByteBuffer pointWithNoSridBuffer = testcases.getWKB(CodecTestCases.POINT_2D);
+        ByteBuffer pointWithNoSridBuffer = testcases.getWKB(PostgisTestCases.POINT_2D);
         Geometry decodedBefore = decoder.decode(pointWithNoSridBuffer);
 
         //Use decoder to decode point with srid
-        decoder.decode(testcases.getWKB(CodecTestCases.POINT_WITH_SRID));
+        decoder.decode(testcases.getWKB(PostgisTestCases.POINT_WITH_SRID));
 
         Geometry decodedAfter = decoder.decode(pointWithNoSridBuffer);
         assertEquals(decodedBefore, decodedAfter);
     }
+
+    @Test(expected = WkbDecodeException.class)
+    public void test_invalid_point() {
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.INVALID_POINT);
+        Geometry geom = decode(byteBuffer);
+    }
+
+    @Test(expected = WkbDecodeException.class)
+    public void test_invalid_polygon() {
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.INVALID_POLYGON);
+        Geometry geom = decode(byteBuffer);
+    }
+
+    @Test
+    public void test_empty_point() {
+        Geometry g = Points.createEmpty();
+        ByteBuffer buf = Wkb.toWkb(g);
+        ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT);
+        Geometry geom = decode(byteBuffer);
+        assertTrue(geom.isEmpty());
+        testEncoding(byteBuffer, geom);
+    }
+
 
     private void testEncoding(ByteBuffer byteBuffer, Geometry geom) {
         ByteBuffer out = Wkb.toWkb(geom);

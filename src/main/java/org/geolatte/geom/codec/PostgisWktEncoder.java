@@ -36,7 +36,7 @@ import java.util.Locale;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktEncoder implements WktEncoder<Geometry> {
+class PostgisWktEncoder implements WktEncoder {
 
     private final static PostgisWktVariant WKT_WORDS = new PostgisWktVariant();
     private static final int MAX_FRACTIONAL_DIGITS = 24;
@@ -100,6 +100,7 @@ class PostgisWktEncoder implements WktEncoder<Geometry> {
         switch (type) {
             case POINT:
             case LINE_STRING:
+            case LINEAR_RING:
                 addPointList(geometry.getPoints());
                 break;
             case POLYGON:

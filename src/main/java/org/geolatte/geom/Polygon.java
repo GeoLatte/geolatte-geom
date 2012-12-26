@@ -70,25 +70,23 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      * Creates a <code>Polygon</code> with no holes, and having the specified <code>PointSequence</code> as exterior boundary
      *
      * @param pointSequence the <code>PointSequence</code> representing the exterior boundary
-     * @param crsId         the <code>CrsId</code> for the constructed <code>Polygon</code>
      * @param ops           the <code>GeometryOperatoins</code> implementation for the constructed <code>Polygon</code>
      * @throws IllegalArgumentException when the specified <code>PointSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    public Polygon(PointSequence pointSequence, CrsId crsId, GeometryOperations ops) {
-        this(new LinearRing[]{new LinearRing(pointSequence, crsId, ops)});
+    public Polygon(PointSequence pointSequence, GeometryOperations ops) {
+        this(new LinearRing[]{new LinearRing(pointSequence, ops)});
     }
 
     /**
      * Creates a <code>Polygon</code> with no holes, and having the specified <code>PointSequence</code> as exterior boundary
      *
      * @param pointSequence the <code>PointSequence</code> representing the exterior boundary
-     * @param crsId         the <code>CrsId</code> for the constructed <code>Polygon</code>
      * @throws IllegalArgumentException when the specified <code>PointSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    public Polygon(PointSequence pointSequence, CrsId crsId) {
-        this(new LinearRing[]{new LinearRing(pointSequence, crsId, null)});
+    public Polygon(PointSequence pointSequence) {
+        this(new LinearRing[]{new LinearRing(pointSequence, null)});
     }
 
     /**
@@ -100,7 +98,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
     public Polygon(LinearRing[] rings) {
-        super(getCrsId(rings), getGeometryOperations(rings));
+        super(getGeometryOperations(rings));
         checkRings(rings);
         points = collectPointSets(rings);
         this.rings = rings;
@@ -117,7 +115,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
     private void checkLinearRing(LinearRing ring, CrsId crsId) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
         if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
-        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS then exterior boundary.");
+        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS than exterior boundary.");
     }
 
     @Override

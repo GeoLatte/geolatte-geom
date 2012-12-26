@@ -41,7 +41,8 @@ public class Wkb {
 
     public enum Dialect {
         //the PostGIS EWKB dialect (versions 1.0 to 1.5).
-        POSTGIS_EWKB_1
+        POSTGIS_EWKB_1,
+        MYSQL_WKB
     }
 
     private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_1;
@@ -51,7 +52,9 @@ public class Wkb {
 
     static {
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbDecoder.class);
+        DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
+        ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);
     }
 
 
@@ -76,7 +79,7 @@ public class Wkb {
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     public static ByteBuffer toWkb(Geometry geometry, ByteOrder byteOrder) {
-        WkbEncoder encoder = newWkbEncoder(DEFAULT_DIALECT);
+        WkbEncoder encoder = newEncoder(DEFAULT_DIALECT);
         return encoder.encode(geometry, byteOrder);
     }
 
@@ -88,7 +91,7 @@ public class Wkb {
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     public static Geometry fromWkb(ByteBuffer byteBuffer) {
-        WkbDecoder decoder = newWkbDecoder(DEFAULT_DIALECT);
+        WkbDecoder decoder = newDecoder(DEFAULT_DIALECT);
         return decoder.decode(byteBuffer);
     }
 
@@ -98,11 +101,23 @@ public class Wkb {
      * @param dialect the WKB dialect
      * @return an <code>WkbDecoder</code> that supports the specified dialect
      */
-    public static WkbDecoder newWkbDecoder(Dialect dialect) {
+    public static WkbDecoder newDecoder(Dialect dialect) {
         Class<? extends WkbDecoder> decoderClass = DECODERS.get(dialect);
         assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
         return createInstance(decoderClass);
     }
+
+    /**
+     * Creates a <code>WkbDecoder</code> for the default WKB <code>Dialect</code>.
+     *
+     * @return an <code>WkbDecoder</code> that supports the specified dialect
+     */
+    public static WkbDecoder newDecoder() {
+        Class<? extends WkbDecoder> decoderClass = DECODERS.get(DEFAULT_DIALECT);
+        assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
+        return createInstance(decoderClass);
+    }
+
 
     /**
      * Creates a <code>WkbEncoder</code> for the specified WKB <code>Dialect</code>.
@@ -110,15 +125,26 @@ public class Wkb {
      * @param dialect the WKB dialect
      * @return an <code>WkbEncoder</code> that supports the specified dialect
      */
-    public static WkbEncoder newWkbEncoder(Dialect dialect) {
+    public static WkbEncoder newEncoder(Dialect dialect) {
         Class<? extends WkbEncoder> decoderClass = ENCODERS.get(dialect);
+        assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
+        return createInstance(decoderClass);
+    }
+
+    /**
+     * Creates a <code>WkbEncoder</code> for the default WKB <code>Dialect</code>.
+     *
+     * @return an <code>WkbEncoder</code> that supports the specified dialect
+     */
+    public static WkbEncoder newEncoder() {
+        Class<? extends WkbEncoder> decoderClass = ENCODERS.get(DEFAULT_DIALECT);
         assert (decoderClass != null) : "A variant declared, but no encoder/decoder registered.";
         return createInstance(decoderClass);
     }
 
     private static <T> T createInstance(Class<? extends T> codecClass) {
         if (codecClass == null) {
-            return null;
+            throw new IllegalArgumentException("Null WKB codec class argument not allowed.");
         }
         try {
             return codecClass.newInstance();

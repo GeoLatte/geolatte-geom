@@ -32,16 +32,16 @@ import static org.junit.Assert.*;
  */
 public class PointTest {
 
-    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.XY);
-    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.XYZ);
-    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.XYM);
-    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.XYZM);
-
     CrsId wgs84 = CrsId.valueOf(4326);
-    Point point2D =  new Point(seq2D, wgs84);
-    Point point3D =  new Point(seq3D, wgs84);
-    Point point2DM = new Point(seq2DM, wgs84);
-    Point point3DM = new Point(seq3DM, wgs84);
+    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
+    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.d3D, wgs84);
+    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
+
+    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
+    Point point2D =  new Point(seq2D);
+    Point point3D =  new Point(seq3D);
+    Point point2DM = new Point(seq2DM);
+    Point point3DM = new Point(seq3DM);
     Point emptyPoint = Points.createEmpty();
 
     @Test
@@ -155,30 +155,30 @@ public class PointTest {
 
     @Test
     public void testEqualsAndHashCode(){
-        Point test2D = Points.create(new double[]{1, 2}, DimensionalFlag.XY, wgs84);
+        Point test2D = Points.create(new double[]{1, 2}, DimensionalFlag.d2D, wgs84);
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point test3D = Points.create(new double[]{1, 2, -3}, DimensionalFlag.XYZ, wgs84);
+        Point test3D = Points.create(new double[]{1, 2, -3}, DimensionalFlag.d3D, wgs84);
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point test2DM = Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84);
+        Point test2DM = Points.create(new double[]{1, 2, 3}, DimensionalFlag.d2DM, wgs84);
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point test3DM = Points.create(new double[]{1, 2, 3, 4}, DimensionalFlag.XYZM, wgs84);
+        Point test3DM = Points.create(new double[]{1, 2, 3, 4}, DimensionalFlag.d3DM, wgs84);
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2}, DimensionalFlag.XY, CrsId.UNDEFINED)));
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYZ, wgs84)));
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.XYM, wgs84)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2}, DimensionalFlag.d2D, CrsId.UNDEFINED)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.d3D, wgs84)));
+        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.d2DM, wgs84)));
     }
 
     @Test
     public void testPointEquality() {
-        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactCoordinatePointEquality(DimensionalFlag.XY));
-        assertTrue(point3DM.equals(Points.create(1, 2, 3, 4, wgs84)));
-        assertTrue(eq2D.equals(point3DM, Points.create(1, 2, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create(2, 1, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create(1, 2, CrsId.UNDEFINED)));
+        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactCoordinatePointEquality(DimensionalFlag.d2D));
+        assertTrue(point3DM.equals(Points.create3DM(1, 2, 3, 4, wgs84)));
+        assertTrue(eq2D.equals(point3DM, Points.create2D(1, 2, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create2D(2, 1, wgs84)));
+        assertFalse(eq2D.equals(point3DM, Points.create2D(1, 2, CrsId.UNDEFINED)));
         assertFalse(point2D.equals(Points.createEmpty()));
     }
 
@@ -188,7 +188,7 @@ public class PointTest {
         Point empty1 = Points.createEmpty();
         Point empty2 = Points.createEmpty();
         assertEquals(empty1, empty2);
-        Point empty3 = new Point(EmptyPointSequence.INSTANCE,CrsId.UNDEFINED, null);
+        Point empty3 = new Point(EmptyPointSequence.INSTANCE,null);
         assertEquals(empty1, empty3);
     }
 }

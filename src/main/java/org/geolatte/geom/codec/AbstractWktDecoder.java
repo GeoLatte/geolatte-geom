@@ -23,19 +23,22 @@ package org.geolatte.geom.codec;
 
 /**
  * An abstract WKT decoder.
- * <p/>
+ *
+ * <p>This class does not implement interface WktDecoder because it contains shared code to be used
+ * both in CrsWktDecoder and the Geometry WktDecoders.</p>
+ *
  * <p><code>AbstractWktDecoder</code>s are not thread-safe.</p>
  *
  * @param <T> the type of the decoded WKT.
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-abstract class AbstractWktDecoder<T> implements WktDecoder<T> {
+abstract class AbstractWktDecoder<T> {
 
     private final WktVariant wktVariant;
 
     protected WktToken currentToken;
-    private WktTokenizer tokenizer;
+    private AbstractWktTokenizer tokenizer;
 
     /**
      * The constructor of this AbstractWktDecoder. It sets the variant.
@@ -47,7 +50,7 @@ abstract class AbstractWktDecoder<T> implements WktDecoder<T> {
     }
 
 
-    protected void setTokenizer(WktTokenizer tokenizer) {
+    protected void setTokenizer(AbstractWktTokenizer tokenizer) {
         this.tokenizer = tokenizer;
         this.currentToken = null;
     }

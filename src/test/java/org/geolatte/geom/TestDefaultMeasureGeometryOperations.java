@@ -99,7 +99,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testCreateMeasureOnLengthFailsForNonEmptyNonLinealGeometries() {
-        Point point = Points.create(3, 4);
+        Point point = Points.create2D(3, 4);
         try {
             measureOps.createMeasureOnLengthOp(point, false);
             fail("createMeasureOnLengthOp should not accept a Point argument.");
@@ -119,7 +119,7 @@ public class TestDefaultMeasureGeometryOperations {
     @Test
     public void testCreateGetMeasureOpThrowsExceptionOnNull() {
         try {
-            measureOps.createGetMeasureOp(null, Points.create(1, 2)).execute();
+            measureOps.createGetMeasureOp(null, Points.create2D(1, 2)).execute();
             fail("createGetMeasureOp created on null parameter. Should throw exception");
         } catch (IllegalArgumentException e) {
             //OK
@@ -135,41 +135,41 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
-        double m = measureOps.createGetMeasureOp(LineString.EMPTY, Points.create(1, 2)).execute();
+        double m = measureOps.createGetMeasureOp(LineString.EMPTY, Points.create2D(1, 2)).execute();
         assertTrue(Double.isNaN(m));
     }
 
     @Test
     public void testGetMeasureOpReturnsNaNWhenPointNotOnMeasuredGeometry() {
-        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create(5, 5)).execute();
+        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create2D(5, 5)).execute();
         assertTrue(Double.isNaN(m));
     }
 
     @Test
     public void testGetMeasureOpOnRegularLine() {
-        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create(1.5, 1)).execute();
+        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create2D(1.5, 1)).execute();
         assertEquals(2.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiLine() {
-        double m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create(4.5, 1)).execute();
+        double m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create2D(4.5, 1)).execute();
         assertEquals(4.5, m, Math.ulp(10));
 
-        m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create(2.5, 1)).execute();
+        m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create2D(2.5, 1)).execute();
         assertTrue(Double.isNaN(m));
 
     }
 
     @Test
     public void testGetMeasureOpOnRegularLinearRing() {
-        double m = measureOps.createGetMeasureOp(tc.measuredLinearRing, Points.create(0, 0.5)).execute();
+        double m = measureOps.createGetMeasureOp(tc.measuredLinearRing, Points.create2D(0, 0.5)).execute();
         assertEquals(3.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiPoint() {
-        double m = measureOps.createGetMeasureOp(tc.measuredMultiPoint, Points.create(1, 2)).execute();
+        double m = measureOps.createGetMeasureOp(tc.measuredMultiPoint, Points.create2D(1, 2)).execute();
         assertEquals(2d, m, Math.ulp(10));
     }
 

@@ -24,7 +24,10 @@ package org.geolatte.geom.jts;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import org.geolatte.geom.*;
+import org.geolatte.geom.DimensionalFlag;
+import org.geolatte.geom.PointSequenceBuilder;
+import org.geolatte.geom.PointSequenceBuilders;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * A <code>CoordinateSequenceFactory</code> that creates <code>PointSequences</code> (which extend
@@ -38,7 +41,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
         DimensionalFlag flag = determineDimensionFlag(coordinates);
-        return fromCoordinateArray(coordinates, flag);
+        return fromCoordinateArray(coordinates, flag, CrsId.UNDEFINED);
     }
 
     @Override
@@ -52,14 +55,14 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.XY;
+        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.d2D;
         if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
-        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.XY;
-        return DimensionalFlag.XYZ;
+        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.d2D;
+        return DimensionalFlag.d3D;
     }
 
-    private CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim) {
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(coordinates.length, dim);
+    private CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim, CrsId crsId) {
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(coordinates.length, dim, crsId);
         double[] ordinates = new double[dim.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
             copy(co,ordinates, dim);

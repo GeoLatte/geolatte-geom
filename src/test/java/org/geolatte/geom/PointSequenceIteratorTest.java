@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
  */
 public class PointSequenceIteratorTest {
 
-    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, DimensionalFlag.XY);
+    PointSequence sequence = new PackedPointSequence(new double[]{0,0, 1, 2, 3, 4}, DimensionalFlag.d2D, CrsId.UNDEFINED);
     PointSequence emptySequence = EmptyPointSequence.INSTANCE;
 
     PointSequenceIterator itSeq;

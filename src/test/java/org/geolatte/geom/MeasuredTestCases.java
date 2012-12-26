@@ -103,39 +103,39 @@ public class MeasuredTestCases {
 
 
     MeasuredTestCases(){
-         PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XY);
+         PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d2D, CrsId.parse("EPSG:4326"));
         psBuilder.add(0, 0)
                 .add(1, 0)
                 .add(1, 1)
                 .add(2, 1);
-        lineString2d = new LineString(psBuilder.toPointSequence(), CrsId.parse("EPSG:4326"));
+        lineString2d = new LineString(psBuilder.toPointSequence());
 
-        psBuilder = PointSequenceBuilders.fixedSized(3, DimensionalFlag.XY);
+        psBuilder = PointSequenceBuilders.fixedSized(3, DimensionalFlag.d2D, CrsId.parse("EPSG:4326"));
         psBuilder.add(3, 1).add(4, 1).add(5, 1);
-        LineString test2DLine2 = new LineString(psBuilder.toPointSequence(), CrsId.parse("EPSG:4326"));
+        LineString test2DLine2 = new LineString(psBuilder.toPointSequence());
         multiLineString2D = new MultiLineString(new LineString[]{lineString2d, test2DLine2});
 
 
-        psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.XYZM);
+        psBuilder = PointSequenceBuilders.fixedSized(4, DimensionalFlag.d3DM, CrsId.parse("EPSG:4326"));
         psBuilder.add(0, 0, 2, 5)
                 .add(1, 0, 3, 10)
                 .add(1, 1, 4, 20)
                 .add(2, 1, 5, 30);
-        lineString3DM = new LineString(psBuilder.toPointSequence(), CrsId.parse("EPSG:4326"));
+        lineString3DM = new LineString(psBuilder.toPointSequence());
 
         measuredMultiPoint = new MultiPoint(new Point[]{
-                Points.createMeasured(0,0,1, CrsId.UNDEFINED),
-                Points.createMeasured(1,2,2, CrsId.UNDEFINED)
+                Points.create2DM(0, 0, 1, CrsId.UNDEFINED),
+                Points.create2DM(1, 2, 2, CrsId.UNDEFINED)
                 });
 
 
-        psBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.XYM);
+        psBuilder = PointSequenceBuilders.fixedSized(5, DimensionalFlag.d2DM, CrsId.UNDEFINED);
         psBuilder.add(0, 0, 0)
                 .add(1, 0, 0)
                 .add(1, 1, 0)
                 .add(0, 1, 0)
                 .add(0, 0, 0);
-        linearRing = new LineString(psBuilder.toPointSequence(), null);
+        linearRing = new LineString(psBuilder.toPointSequence());
 
 
 

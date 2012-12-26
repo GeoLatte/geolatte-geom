@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 /**
  * A factory for <code>PointSequenceBuilder</code>s.
  *
@@ -37,20 +39,22 @@ public class PointSequenceBuilders {
      *
      * @param numPoints the number of <code>Point</code>s that will be added to the returned builder.
      * @param flag the <code>DimensionalFlag</code> for the <code>PointSequence</code> being built by the returned builder.
+     * @param crsId the <code>CrsId</code> for the Coordinate Reference System of the <code>Point</code>s.
      * @return a <code>PointSequenceBuilder</code> that builds a <code>PointSequence</code> containing <code>numPoints</code> <code>Point</code>s.
      */
-    public static PointSequenceBuilder fixedSized(int numPoints, DimensionalFlag flag){
-        return new FixedSizePointSequenceBuilder(numPoints, flag);
+    public static PointSequenceBuilder fixedSized(int numPoints, DimensionalFlag flag, CrsId crsId){
+        return new FixedSizePointSequenceBuilder(numPoints, flag, crsId);
     }
 
     /**
      * Creates a <code>PointSequenceBuilder</code> of variable size.
      *
      * @param flag the <code>DimensionalFlag</code> for the <code>PointSequence</code> being built by the returned builder.
+     * @param crsId the <code>CrsId</code> for the Coordinate Reference System of the <code>Point</code>s.
      * @return a <code>PointSequenceBuilder</code> that builds a <code>PointSequence</code> for an arbitrary number of <code>Point</code>s.
      */
-    public static PointSequenceBuilder variableSized(DimensionalFlag flag) {
-        return new VariableSizePointSequenceBuilder(flag);
+    public static PointSequenceBuilder variableSized(DimensionalFlag flag, CrsId crsId) {
+        return new VariableSizePointSequenceBuilder(flag, crsId);
     }
 
 }

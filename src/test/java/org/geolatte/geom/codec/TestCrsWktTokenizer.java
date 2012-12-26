@@ -36,7 +36,7 @@ public class TestCrsWktTokenizer {
 
     @Test
     public void testGEOGCSWords() {
-        WktTokenizer tokenizer = new WktTokenizer(wkt, symbols, false);
+        CrsWktTokenizer tokenizer = new CrsWktTokenizer(wkt, symbols);
         //read type coordinate system
         assertTrue(tokenizer.moreTokens());
         assertEquals(CrsWktVariant.GEOGCS, tokenizer.nextToken());

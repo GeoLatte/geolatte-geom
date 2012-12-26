@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CrsId;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -34,13 +36,19 @@ class NestedPointCollection extends AbstractPointCollection implements ComplexPo
 
 
     NestedPointCollection(PointCollection[] children) {
-        super(extractDimensionalFlag(children));
+        super(extractDimensionalFlag(children), extractCrsId(children));
         this.children = children;
         this.size = calculateSize();
     }
 
     private static DimensionalFlag extractDimensionalFlag(PointCollection[] children) {
-        return (children == null || children.length == 0) ? DimensionalFlag.XY : children[0].getDimensionalFlag();
+        //TODO -- check that all children have the same DimensionalFlag
+        return (children == null || children.length == 0) ? DimensionalFlag.d2D : children[0].getDimensionalFlag();
+    }
+
+    private static CrsId extractCrsId(PointCollection[] children) {
+        //TODO -- check that all children have the same CrsId
+        return (children == null || children.length == 0) ? CrsId.UNDEFINED : children[0].getCrsId();
     }
 
     private int calculateSize() {

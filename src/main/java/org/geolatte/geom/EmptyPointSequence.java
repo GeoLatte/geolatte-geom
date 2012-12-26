@@ -24,13 +24,16 @@ package org.geolatte.geom;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
+import org.geolatte.geom.crs.CrsId;
 
 import java.util.Iterator;
 
 /**
+ * Represents an empty <code>PointSequence</code>.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class EmptyPointSequence implements PointSequence, CoordinateSequence {
+public class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     public static final EmptyPointSequence INSTANCE = new EmptyPointSequence();
 
@@ -48,7 +51,12 @@ class EmptyPointSequence implements PointSequence, CoordinateSequence {
 
     @Override
     public DimensionalFlag getDimensionalFlag() {
-        return DimensionalFlag.XY;
+        return DimensionalFlag.d2D;
+    }
+
+    @Override
+    public CrsId getCrsId() {
+        return CrsId.UNDEFINED;
     }
 
     @Override
