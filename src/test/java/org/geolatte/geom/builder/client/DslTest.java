@@ -21,9 +21,12 @@
 
 package org.geolatte.geom.builder.client;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
+
+import java.util.*;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
@@ -35,9 +38,23 @@ import static org.junit.Assert.assertTrue;
  */
 public class DslTest {
 
+    static private double DELTA = 0.00000001;
+
     @Test
     public void testLineString2D() {
         LineString ls = linestring(4326, c(0, 0), c(1, 0), c(2, 0));
+
+        assertEquals(ls.getDimensionalFlag(), DimensionalFlag.d2D);
+        assertEquals(ls.getCrsId(), CrsId.valueOf(4326));
+
+        ArrayList<Point> points = new ArrayList<Point>();
+        CollectionUtils.addAll(points, ls.getPoints().iterator());
+        assertEquals(points.get(0).getX(), 0, DELTA);
+        assertEquals(points.get(0).getY(), 0, DELTA);
+        assertEquals(points.get(1).getX(), 1, DELTA);
+        assertEquals(points.get(1).getY(), 0, DELTA);
+        assertEquals(points.get(2).getX(), 2, DELTA);
+        assertEquals(points.get(2).getY(), 0, DELTA);
     }
 
     @Test
@@ -56,11 +73,29 @@ public class DslTest {
     public void testLinearRing3D(){
         LinearRing lr = ring(4326, cZ(0, 0, 0), cZ(1, 0, 0), cZ(1, 1, 0), cZ(0, 1, 0), cZ(0, 0, 0));
         assertEquals(DimensionalFlag.d3D, lr.getDimensionalFlag());
+
+        ArrayList<Point> points = new ArrayList<Point>();
+        CollectionUtils.addAll(points, lr.getPoints().iterator());
+        assertEquals(points.get(0).getX(), 0, DELTA);
+        assertEquals(points.get(0).getY(), 0, DELTA);
+        assertEquals(points.get(0).getZ(), 0, DELTA);
+        assertEquals(points.get(1).getX(), 1, DELTA);
+        assertEquals(points.get(1).getY(), 0, DELTA);
+        assertEquals(points.get(1).getZ(), 0, DELTA);
+        assertEquals(points.get(2).getX(), 1, DELTA);
+        assertEquals(points.get(2).getY(), 1, DELTA);
+        assertEquals(points.get(2).getZ(), 0, DELTA);
+        assertEquals(points.get(3).getX(), 0, DELTA);
+        assertEquals(points.get(3).getY(), 1, DELTA);
+        assertEquals(points.get(3).getZ(), 0, DELTA);
+        assertEquals(points.get(4).getX(), 0, DELTA);
+        assertEquals(points.get(4).getY(), 0, DELTA);
+        assertEquals(points.get(4).getZ(), 0, DELTA);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLinearRing3D(){
-            LinearRing lr = ring(4326, cZ(0,0,0), cZ(1,0,0), cZ(1,1,0), cZ(0,1,0));
+        LinearRing lr = ring(4326, cZ(0,0,0), cZ(1,0,0), cZ(1,1,0), cZ(0,1,0));
     }
 
     @Test
@@ -68,6 +103,17 @@ public class DslTest {
         Polygon p = polygon(4326, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPoints(), 5);
+
+        assertEquals(p.getPoints().getX(0), 0, DELTA);
+        assertEquals(p.getPoints().getY(0), 0, DELTA);
+        assertEquals(p.getPoints().getX(1), 0, DELTA);
+        assertEquals(p.getPoints().getY(1), 1, DELTA);
+        assertEquals(p.getPoints().getX(2), 1, DELTA);
+        assertEquals(p.getPoints().getY(2), 1, DELTA);
+        assertEquals(p.getPoints().getX(3), 1, DELTA);
+        assertEquals(p.getPoints().getY(3), 0, DELTA);
+        assertEquals(p.getPoints().getX(4), 0, DELTA);
+        assertEquals(p.getPoints().getY(4), 0, DELTA);
     }
 
     @Test
@@ -76,6 +122,22 @@ public class DslTest {
         assertEquals(0, p.getNumInteriorRing());
         assertEquals(DimensionalFlag.d2DM, p.getDimensionalFlag());
         assertEquals(32100, p.getSRID());
+
+        assertEquals(p.getPoints().getX(0), 0, DELTA);
+        assertEquals(p.getPoints().getY(0), 0, DELTA);
+        assertEquals(p.getPoints().getM(0), 2, DELTA);
+        assertEquals(p.getPoints().getX(1), 0, DELTA);
+        assertEquals(p.getPoints().getY(1), 1, DELTA);
+        assertEquals(p.getPoints().getM(1), 3, DELTA);
+        assertEquals(p.getPoints().getX(2), 1, DELTA);
+        assertEquals(p.getPoints().getY(2), 1, DELTA);
+        assertEquals(p.getPoints().getM(2), 4, DELTA);
+        assertEquals(p.getPoints().getX(3), 1, DELTA);
+        assertEquals(p.getPoints().getY(3), 0, DELTA);
+        assertEquals(p.getPoints().getM(3), 3, DELTA);
+        assertEquals(p.getPoints().getX(4), 0, DELTA);
+        assertEquals(p.getPoints().getY(4), 0, DELTA);
+        assertEquals(p.getPoints().getM(4), 2, DELTA);
     }
 
     @Test
@@ -84,6 +146,28 @@ public class DslTest {
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPoints(), 10);
         assertEquals(p.getNumInteriorRing(), 1);
+
+        assertEquals(p.getInteriorRingN(0).getPointN(0).getX(), 3, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(0).getY(), 3, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(1).getX(), 3, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(1).getY(), 6, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(2).getX(), 6, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(2).getY(), 6, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(3).getX(), 6, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(3).getY(), 3, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(0).getX(), 3, DELTA);
+        assertEquals(p.getInteriorRingN(0).getPointN(0).getY(), 3, DELTA);
+
+        assertEquals(p.getExteriorRing().getPointN(0).getX(), 0, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(0).getY(), 0, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(1).getX(), 0, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(1).getY(), 10, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(2).getX(), 10, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(2).getY(), 10, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(3).getX(), 10, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(3).getY(), 0, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(4).getX(), 0, DELTA);
+        assertEquals(p.getExteriorRing().getPointN(4).getY(), 0, DELTA);
     }
 
     @Test
@@ -131,7 +215,8 @@ public class DslTest {
                 point(c(1, 2)),
                 linestring(c(0, 0), c(1, 1), c(2, 1)),
                 polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
-                geometrycollection(point(c(1, 1)), linestring(c(1, 2), c(2, 3)))
+                geometrycollection(point(c(1, 1)),
+                linestring(c(1, 2), c(2, 3)))
         );
         assertEquals(4,gc.getNumGeometries());
         assertEquals(GeometryType.GEOMETRY_COLLECTION, gc.getGeometryN(3).getGeometryType());

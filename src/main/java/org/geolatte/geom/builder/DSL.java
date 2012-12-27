@@ -25,6 +25,21 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
 
 /**
+ * Contains a Domain Specific Language for constructing Geometries.
+ *
+ * Usage example:
+ * <pre>
+ * {@code
+ *
+ * import static org.geolatte.geom.builder.DSL.*;
+ *
+ * public Polygon createPolygon() {
+ *     return polygon(4326, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)));
+ * }
+ *
+ * }
+ * </pre>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/10/12
  */

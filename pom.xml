@@ -185,6 +185,14 @@
             <version>1.5.2</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.directory.studio</groupId>
+            <artifactId>org.apache.commons.collections</artifactId>
+            <version>3.2.1</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <repositories>
