@@ -62,7 +62,7 @@ public class MultiPolygon extends GeometryCollection {
      * @return the sum of the areas of all element <code>Polygon</code>s.
      */
     public double area() {
-        int totalArea = 0;
+        double totalArea = 0;
         for (int i = 0; i < getNumGeometries(); i++) {
             totalArea += getGeometryN(i).getArea();
         }
