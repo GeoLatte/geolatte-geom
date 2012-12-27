@@ -48,7 +48,7 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
 
 
     @Test
-    public void test_codec_cases_with_srid()  {
+    public void test_codec_cases_with_srid() {
         for (Integer testCase : getTestCases().getCases()) {
             ByteBuffer wkb = prependSRID(getTestCases().getWKB(testCase));
 
@@ -62,13 +62,13 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
         }
     }
 
-    private Geometry addSrid(Geometry expected)  {
+    private Geometry addSrid(Geometry expected) {
         Geometry geom = null;
-        Class gClass = expected.getClass();
+        Class<?> gClass = expected.getClass();
         try {
             Constructor cons = gClass.getConstructor(PointSequence.class, CrsId.class, GeometryOperations.class);
-            geom =  (Geometry) cons.newInstance(expected.getPoints(), CrsId.valueOf(4326), expected.getGeometryOperations());
-        }catch (Exception e){
+            geom = (Geometry) cons.newInstance(expected.getPoints(), CrsId.valueOf(4326), expected.getGeometryOperations());
+        } catch (Exception e) {
             //Ignore exceptions. Exceptions only thrown for geometries that do not accept PSeqs in their constructor.
             //LOGGER.warn("failure to create geom", e);
         }
