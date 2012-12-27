@@ -71,7 +71,7 @@ public class DslTest {
 
     @Test
     public void testLinearRing3D(){
-        LinearRing lr = ring(4326, cZ(0, 0, 0), cZ(1, 0, 0), cZ(1, 1, 0), cZ(0, 1, 0), cZ(0, 0, 0));
+        LinearRing lr = ring(4326, c(0, 0, 0), c(1, 0, 0), c(1, 1, 0), c(0, 1, 0), c(0, 0, 0));
         assertEquals(DimensionalFlag.d3D, lr.getDimensionalFlag());
 
         ArrayList<Point> points = new ArrayList<Point>();
@@ -95,7 +95,7 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLinearRing3D(){
-        LinearRing lr = ring(4326, cZ(0,0,0), cZ(1,0,0), cZ(1,1,0), cZ(0,1,0));
+        LinearRing lr = ring(4326, c(0, 0, 0), c(1, 0, 0), c(1, 1, 0), c(0, 1, 0));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class DslTest {
 
     @Test
     public void testvalidPoint3D() {
-        Point pnt = point(4326, cZ(1, 2, 3));
+        Point pnt = point(4326, c(1, 2, 3));
         assertEquals(pnt, Points.create3D(1, 2, 3, CrsId.valueOf(4326)));
     }
 
@@ -190,7 +190,7 @@ public class DslTest {
 
     @Test
     public void testvalidPoint3DM() {
-        Point pnt = point(4326, c(1, 2, 3, 4));
+        Point pnt = point(4326, cM(1, 2, 3, 4));
         assertEquals(pnt, Points.create3DM(1, 2, 3, 4, CrsId.valueOf(4326)));
     }
 
@@ -205,7 +205,7 @@ public class DslTest {
         assertEquals(DimensionalFlag.d2D, gc.getDimensionalFlag());
 
         GeometryCollection gc3D = geometrycollection(31370,
-                point(cZ(1, 2, 3)), linestring(cZ(1, 2, 3), cZ(2, 3, 4)));
+                point(c(1, 2, 3)), linestring(c(1, 2, 3), c(2, 3, 4)));
         assertEquals(DimensionalFlag.d3D, gc3D.getDimensionalFlag());
     }
 
@@ -224,7 +224,7 @@ public class DslTest {
 
     @Test
     public void testValidMultiPoint() {
-        MultiPoint mp = multipoint(4326, point(c(2, 1, 3, 4)), point(c(3, 1, 5, 6)));
+        MultiPoint mp = multipoint(4326, point(cM(2, 1, 3, 4)), point(cM(3, 1, 5, 6)));
         assertEquals(GeometryType.MULTI_POINT, mp.getGeometryType());
         assertEquals(2,mp.getNumGeometries());
         assertEquals(4326, mp.getSRID());
@@ -239,7 +239,7 @@ public class DslTest {
 
     @Test
     public void testValidMultiLineString() {
-        MultiLineString mls = multilinestring(4326, linestring(cZ(1, 2, 5), cZ(3, 4, 2)), linestring(cZ(4, 5, 1), cZ(6, 5, 0)));
+        MultiLineString mls = multilinestring(4326, linestring(c(1, 2, 5), c(3, 4, 2)), linestring(c(4, 5, 1), c(6, 5, 0)));
         assertEquals(GeometryType.MULTI_LINE_STRING, mls.getGeometryType());
         assertEquals(2,mls.getNumGeometries());
         assertEquals(4326, mls.getSRID());
@@ -248,7 +248,7 @@ public class DslTest {
 
     @Test
     public void testMultiLineStringCanBeEmbeddedInGeometryCollection() {
-        GeometryCollection geometryCollection = geometrycollection(4326, multilinestring(linestring(cZ(1, 2, 5), cZ(3, 4, 2)), linestring(cZ(4, 5, 1), cZ(6, 5, 0))));
+        GeometryCollection geometryCollection = geometrycollection(4326, multilinestring(linestring(c(1, 2, 5), c(3, 4, 2)), linestring(c(4, 5, 1), c(6, 5, 0))));
         assertEquals(GeometryType.MULTI_LINE_STRING, geometryCollection.getGeometryN(0).getGeometryType());
     }
 

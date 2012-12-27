@@ -760,7 +760,7 @@ public class DSL {
      * @param z
      * @return
      */
-    public static Vertex3DToken cZ(double x, double y, double z) {
+    public static Vertex3DToken c(double x, double y, double z) {
         return new Vertex3DToken(x, y, z);
     }
 
@@ -773,7 +773,7 @@ public class DSL {
      * @param m
      * @return
      */
-    public static Vertex3DMToken c(double x, double y, double z, double m) {
+    public static Vertex3DMToken cM(double x, double y, double z, double m) {
         return new Vertex3DMToken(x, y, z, m);
     }
 
