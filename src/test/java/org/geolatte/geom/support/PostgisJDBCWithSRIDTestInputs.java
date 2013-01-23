@@ -46,6 +46,7 @@ public class PostgisJDBCWithSRIDTestInputs extends CodecTestBase {
 
     private Geometry addCrsId(PostgisJDBCUnitTestInputs base, Integer testCase) {
         Geometry geom = base.getExpected(testCase);
+        if (geom.isEmpty()) return geom;
         return addCrsId(geom);
 
     }
@@ -110,9 +111,32 @@ public class PostgisJDBCWithSRIDTestInputs extends CodecTestBase {
         }
     }
 
-    //for now we only test for WktEncoding/decoding with SRID
     private String toSRIDPrefixedWKB(PostgisJDBCUnitTestInputs base, Integer testCase) {
-        return base.getWKBHexString(testCase);
+        if (base.getExpected(testCase).isEmpty()) {
+            return base.getWKBHexString(testCase);
+        }
+        String hexBase = base.getWKBHexString(testCase);
+        ByteBuffer inBuffer = ByteBuffer.from(hexBase);
+        //get the relevant parts
+        inBuffer.setByteOrder(ByteOrder.NDR);
+        byte bo = inBuffer.get();
+        int type = inBuffer.getInt();
+        byte[] bytes = inBuffer.toByteArray();
+
+        //calculate the output size
+        int outputSize = 4 + bytes.length;
+        ByteBuffer outBuffer = ByteBuffer.allocate(outputSize);
+
+        outBuffer.setByteOrder(ByteOrder.NDR);
+        outBuffer.put(bo);
+        type |= 0x20000000; // OR with the SRID-flag
+        outBuffer.putInt(type);
+        //write the srid
+        outBuffer.putInt(4326);
+        for (int i = 5; i < bytes.length; i++) {
+            outBuffer.put(bytes[i]);
+        }
+        return outBuffer.toString();
     }
 
 }

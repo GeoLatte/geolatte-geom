@@ -29,9 +29,11 @@ import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
 import org.geolatte.geom.support.CodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
+import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -51,6 +53,11 @@ public class TestJTS {
     @Test
     public void test_postgis_cases() {
         testInputs(new PostgisJDBCUnitTestInputs());
+    }
+
+    @Test
+    public void test_postgis_cases_with_srid() {
+            testInputs(new PostgisJDBCWithSRIDTestInputs());
     }
 
     @Test
@@ -125,6 +132,23 @@ public class TestJTS {
 
     }
 
+    @Test
+    public void test_from_with_srid() {
+        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(0, c(1, 2)));
+        geometry.setSRID(4326);
+        assertEquals(4326, JTS.from(geometry).getSRID());
+
+        geometry = JTS.to(polygon(0, ring(c(0, 0), c(1,0), c(1,1), c(0,1), c(0,0))));
+        geometry.setSRID(4326);
+        assertEquals(4326, JTS.from(geometry).getSRID());
+
+    }
+
+    @Test
+    public void test_to_with_srid() {
+        assertEquals(4326, JTS.to( point(4326, c(1.0, 2.0))).getSRID());
+    }
+
     private void test_empty(Geometry empty) {
         com.vividsolutions.jts.geom.Geometry jts = JTS.to(empty);
         assertTrue(jts.isEmpty());
@@ -141,7 +165,9 @@ public class TestJTS {
             com.vividsolutions.jts.geom.Geometry jtsGeom = null;
             jtsGeom = parseWKTtoJTS(wkt, jtsGeom);
             if (jtsGeom == null) {
-                //some EWKT forms cannot be parse, so we skip these cases
+                //some EWKT forms cannot be parse, so in this case we just check that the To/From methods are consistent
+                com.vividsolutions.jts.geom.Geometry jts = JTS.to(geolatteGeom);
+                assertEquals(geolatteGeom, JTS.from(jts));
                 continue;
             }
             if (com.vividsolutions.jts.geom.GeometryCollection.class.isInstance(jtsGeom)) {
@@ -163,6 +189,8 @@ public class TestJTS {
             //note: this can't be changed to an assertEquals: the c.v.j.g.Geometry.equals(Geometry) method must be called
             // not Object.equals(Object)
             assertTrue(failureMsg, jtsGeom.equals(JTS.to(geolatteGeom)));
+//            assertTrue(failureMsg, (geolatteGeom.getCrsId() == CrsId.UNDEFINED && jtsGeom.getSRID() < 1)
+//                    || (geolatteGeom.getSRID() == jtsGeom.getSRID()));
         }
     }
 

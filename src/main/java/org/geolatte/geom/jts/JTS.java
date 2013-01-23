@@ -290,7 +290,7 @@ public class JTS {
      */
     private static org.geolatte.geom.LineString from(LineString jtsLineString, CrsId crsId) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return new org.geolatte.geom.LineString(toPointSequence(cs, CrsId.valueOf(jtsLineString.getSRID())));
+        return new org.geolatte.geom.LineString(toPointSequence(cs, crsId));
 
     }
 
@@ -312,7 +312,7 @@ public class JTS {
      */
     private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return new org.geolatte.geom.Point(toPointSequence(cs, CrsId.valueOf(jtsPoint.getSRID())));
+        return new org.geolatte.geom.Point(toPointSequence(cs, crsId));
     }
 
     ///
@@ -349,11 +349,12 @@ public class JTS {
     }
 
     private static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
-        MultiPoint mp = geometryFactory().createMultiPoint(sequenceOf(multiPoint));
-        copySRID(multiPoint, mp);
-        for (int i = 0; i < mp.getNumGeometries(); i++) {
-            copySRID(multiPoint, mp.getGeometryN(i));
+        Point[] points = new Point[multiPoint.getNumGeometries()];
+        for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+            points[i] = to(multiPoint.getGeometryN(i));
         }
+        MultiPoint mp = geometryFactory().createMultiPoint(points);
+        copySRID(multiPoint, mp);
         return mp;
     }
 
@@ -396,7 +397,8 @@ public class JTS {
      * Helpermethod that transforms a coordinatesequence into a pointsequence.
      */
     private static PointSequence toPointSequence(CoordinateSequence cs, CrsId crsId) {
-        if (cs instanceof PointSequence) {
+        if (cs instanceof PointSequence &&
+                ((PointSequence) cs).getCrsId().equals(crsId)) {
             return (PointSequence) cs;
         }
         if (cs.size() == 0) {
