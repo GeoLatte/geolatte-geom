@@ -23,7 +23,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.support.CodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
-import org.junit.Test;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -38,9 +37,4 @@ public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
         return testCasesWithSRID;
     }
 
-    @Override
-    @Test
-    public void test_wkb_codec() {
-        //Don't test WKB with SRID at this point - we don't have the WKB's yet
-    }
 }
