@@ -21,31 +21,43 @@
 
 package org.geolatte.geom.curve;
 
+import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * A context for the calculation of Morton codes.
  *
- * <p>This class holds the the maximum spatial extent and the depth of the implied
- * QuadTree-index for a <code>MortonCode</code>. </p>
+ * <p>This class holds the the maximum spatial extent and tree-depth of the implied
+ * QuadTree-index for a <code>MortonCode</code>.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
 public class MortonContext {
 
-    final private double maxX;
-    final private double maxY;
-    final private double minX;
-    final private double minY;
-    final private int depth;
+    final private static String ERR_MSG_MAX_DEPTH = "Max. depth is limited to 31.";
+    final private static String ERR_MSG_NULL = "No Null arguments allowed.";
 
-    public MortonContext(Point lowerLeft, Point upperRight, int depth){
-        this.minX = lowerLeft.getX();
-        this.minY = lowerLeft.getY();
-        this.maxX = upperRight.getX();
-        this.maxY = upperRight.getY();
+    final private int depth;
+    final private Envelope extent;
+
+    /**
+     * Constructs a <code>MortonContext</code> with the specified extent and max. tree depth
+     *
+     * @param extent the extent for this instance
+     * @param depth the tree-depth
+     */
+    public MortonContext(Envelope extent, int depth){
+        if (extent == null) {
+            throw new IllegalArgumentException(ERR_MSG_NULL);
+        }
+
+        if (depth >= Integer.SIZE) {
+            throw new IllegalArgumentException(ERR_MSG_MAX_DEPTH);
+        }
         this.depth = depth;
+        this.extent = extent;
     }
 
     /**
@@ -53,23 +65,38 @@ public class MortonContext {
      * @return
      */
     public double getMaxX() {
-        return maxX;
+        return extent.getMaxX();
     }
 
     public double getMaxY() {
-        return maxY;
+        return extent.getMaxY();
     }
 
     public double getMinX() {
-        return minX;
+        return extent.getMinX();
     }
 
     public double getMinY() {
-        return minY;
+        return extent.getMinY();
     }
 
     public int getDepth() {
         return depth;
     }
 
+    public CrsId getCrsId() {
+        return extent.getCrsId();
+    }
+
+    int getMaxGridNum() {
+        return (int) Math.pow(2, depth) - 1;
+    }
+
+    public boolean extentContains(Point pnt) {
+        return this.extent.contains(pnt);
+    }
+
+    public boolean extentContains(Envelope envelope) {
+        return this.extent.contains(envelope);
+    }
 }

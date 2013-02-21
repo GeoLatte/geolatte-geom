@@ -24,6 +24,7 @@ package org.geolatte.geom.curve;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * Calculates the Morton code (Morton-order or Z-order) of Geometries
@@ -59,15 +60,17 @@ public class MortonCode {
 
     public String ofEnvelope(Envelope envelope) {
 
+        checkValidCrsId(envelope.getCrsId());
+        checkWithinExtent(envelope);
         // recalculate the X,Y coordinates to grid-cell coordinates. These are
         // the row,column-indices of
         // the lowest-level grid that is formed by the Quadtree with a depth
         // of levelCount.
 
-        int colMin = (int) Math.floor((envelope.getMinX() - mortonContext.getMinX()) / baseX);
-        int rowMin = (int) Math.floor((envelope.getMinY() - mortonContext.getMinY()) / baseY);
-        int colMax = (int) Math.floor((envelope.getMaxX() - mortonContext.getMinX()) / baseX);
-        int rowMax = (int) Math.floor((envelope.getMaxY() - mortonContext.getMinY()) / baseY);
+        int colMin = getCol(envelope.getMinX());
+        int rowMin = getRow(envelope.getMinY());
+        int colMax = getCol(envelope.getMaxX());
+        int rowMax = getCol(envelope.getMaxY());
         int[] cols = {colMin, colMax};
         int[] rows = {rowMin, rowMax};
 
@@ -108,25 +111,58 @@ public class MortonCode {
     }
 
     public String ofPoint(Point point) {
-        int col = (int) Math.floor((point.getX() - mortonContext.getMinX()) / baseX);
-        int row = (int) Math.floor((point.getY() - mortonContext.getMinY()) / baseY);
-        long interLeaved = 0L;
+        //check inputs
+        checkValidCrsId(point.getCrsId());
+        checkWithinExtent(point);
+
+        int col = getCol(point.getX());
+        int row = getRow(point.getY());
+        long interleaved = 0L;
         int level = mortonContext.getDepth();
         while (level > 0) {
-            interLeaved = interLeaved << 1;
-            interLeaved = interLeaved | (col % 2);
-            interLeaved = interLeaved << 1;
-            interLeaved = interLeaved | (row % 2);
+            interleaved = interleaved << 1;
+            interleaved = interleaved | (col % 2);
+            interleaved = interleaved << 1;
+            interleaved = interleaved | (row % 2);
             row = row / 2;
             col = col / 2;
             level--;
         }
         StringBuilder stb = new StringBuilder();
         for (int i = 0; i < mortonContext.getDepth(); i++) {
-            int cell = (int) (interLeaved & 3);
+            int cell = (int) (interleaved & 3);
             stb.append(cell);
+            interleaved = interleaved >> 2;
         }
         return stb.toString();
+    }
+
+    private int getRow(double y) {
+        int col = (int) Math.floor((y - mortonContext.getMinY()) / baseY);
+        return col > mortonContext.getMaxGridNum() ? col - 1 : col;
+    }
+
+    private int getCol(double x) {
+        int row = (int) Math.floor((x - mortonContext.getMinX()) / baseX);
+        return row > mortonContext.getMaxGridNum() ? row -1 : row;
+    }
+
+    private void checkValidCrsId(CrsId crsId) {
+        if(!this.mortonContext.getCrsId().equals(crsId)){
+            throw new IllegalArgumentException(String.format("Geometry object has wrong CrsId. %s expected", mortonContext.getCrsId().toString()));
+        }
+    }
+
+    private void checkWithinExtent(Point pnt) {
+        if(! mortonContext.extentContains(pnt)) {
+            throw new IllegalArgumentException("Point not in extent of this MortonCodeContext.");
+        }
+    }
+
+    private void checkWithinExtent(Envelope envelope) {
+        if(! mortonContext.extentContains(envelope)) {
+            throw new IllegalArgumentException("Geometry envelope not in extent of this MortonCodeContext.");
+        }
     }
 
 

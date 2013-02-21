@@ -50,7 +50,7 @@ public class TestCrsWktWordMatcher {
         assertEquals(CrsWktVariant.GEOGCS, token);
     }
 
-        @Test
+    @Test
     public void testMatchingGeoAXIS(){
         String test = " AXIS  ";
         WktToken token = matcher.matchKeyword(test, 1, 5);
