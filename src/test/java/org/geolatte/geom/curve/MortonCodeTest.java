@@ -22,11 +22,13 @@
 package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.Polygon;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.c;
-import static org.geolatte.geom.builder.DSL.point;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -74,6 +76,34 @@ public class MortonCodeTest {
         assertEquals("32", mcLevel2.ofPoint(point(0, c(76, 74))));
         assertEquals("33", mcLevel2.ofPoint(point(0, c(76, 79))));
 
+    }
+
+    @Test
+    public void testPolygonLevel2(){
+        Polygon pg = polygon(0, ring(c(10,10), c(10, 40), c(40, 40), c(40,10), c(10,10)));
+        assertEquals("0", mcLevel2.ofGeometry(pg));
+
+        pg = polygon(0, ring(c(60,60), c(60, 90), c(90, 90), c(90,60), c(60,60)));
+        assertEquals("3", mcLevel2.ofGeometry(pg));
+
+        pg = polygon(0, ring(c(10,10), c(10, 90), c(90, 90), c(90,10), c(10,10)));
+        assertTrue(mcLevel2.ofGeometry(pg).isEmpty());
+
+    }
+
+    @Test
+    public void testofPointandofGeometryGiveSameResultForPoints(){
+        Point pnt = point(0, c(0, 0));
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+
+        pnt = point(0, c(10, 55));
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+
+        pnt = point(0, c(76, 24));
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+
+        pnt = point(0, c(76, 79));
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
     }
 
     @Test(expected = IllegalArgumentException.class)
