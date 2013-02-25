@@ -27,28 +27,30 @@ import org.geolatte.geom.crs.CrsId;
 
 /**
  * A context for the calculation of Morton codes.
- *
+ * <p/>
  * <p>This class holds the the maximum spatial extent and tree-depth of the implied
- * QuadTree-index for a <code>MortonCode</code>.</p>
+ * QuadTree-index for a {@code MortonCode}.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
 public class MortonContext {
 
-    final private static String ERR_MSG_MAX_DEPTH = "Max. depth is limited to 31.";
+    final private static String ERR_MSG_MAX_DEPTH = "Max. depth is limited to " + (Integer.SIZE - 1);
     final private static String ERR_MSG_NULL = "No Null arguments allowed.";
-
     final private int depth;
     final private Envelope extent;
+    final private int numLeaves;
+    final private double leafWidth;
+    final private double leafHeight;
 
     /**
-     * Constructs a <code>MortonContext</code> with the specified extent and max. tree depth
+     * Constructs a {@code MortonContext} with the specified extent and max. tree-depth
      *
      * @param extent the extent for this instance
-     * @param depth the tree-depth
+     * @param depth  the tree-depth
      */
-    public MortonContext(Envelope extent, int depth){
+    public MortonContext(Envelope extent, int depth) {
         if (extent == null) {
             throw new IllegalArgumentException(ERR_MSG_NULL);
         }
@@ -58,44 +60,109 @@ public class MortonContext {
         }
         this.depth = depth;
         this.extent = extent;
+
+        this.numLeaves = (int) (Math.pow(2, depth));
+        this.leafWidth =  (extent.getMaxX() - extent.getMinX()) / numLeaves;
+        this.leafHeight = (extent.getMaxY() - extent.getMinY()) / numLeaves;
+
     }
 
     /**
-     * Returns the Maximum
-     * @return
+     * Returns the maximum X-coordinate of the extent
+     *
+     * @return the maximum X-coordinate of the extent
      */
     public double getMaxX() {
         return extent.getMaxX();
     }
 
+    /**
+     * Returns the maximum Y-coordinate of the extent
+     *
+     * @return
+     */
     public double getMaxY() {
         return extent.getMaxY();
     }
 
+    /**
+     * Returns the minimum X-coordinate of the extent
+     *
+     * @return the minimum X-coordinate of the extent
+     */
     public double getMinX() {
         return extent.getMinX();
     }
-
+    /**
+     * Returns the minimum Y-coordinate of the extent
+     *
+     * @return the minimum Y-coordinate of the extent
+     */
     public double getMinY() {
         return extent.getMinY();
     }
 
+    /**
+     * Returns the maximum tree-depth
+     * @return the maximum tree-depth
+     */
     public int getDepth() {
         return depth;
     }
 
+    /**
+     * Returns the CrsId of the spatial extent
+     * @return the CrsId of the spatial extent
+     */
     public CrsId getCrsId() {
         return extent.getCrsId();
     }
 
-    int getMaxGridNum() {
-        return (int) Math.pow(2, depth) - 1;
+    /**
+     * Returns the number of leaves in the QuadTree at the tree-depth (lowest-level).
+     *
+     * @return the number of leaves in the QuadTree at the tree-depth (lowest-level).
+     */
+    public int getNumberOfLeaves() {
+        return this.numLeaves;
     }
 
+    /**
+     * Returns the width of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
+     *
+     * @return the width of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
+     */
+    public double getLeafWidth(){
+        return this.leafWidth;
+    }
+
+    /**
+     * Returns the height of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
+     *
+     * @return the height of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
+     */
+    public double getLeafHeight(){
+        return this.leafHeight;
+    }
+
+    /**
+     * Checks whether the specified {@code Point} is contained in the extent.
+     *
+     * @param pnt a {@code Point} value
+     * @return true if the specified point is contained in the extent, false otherwise
+     * @throws IllegalArgumentException if the specified point does not share this extent's {@code CrsId}
+     */
     public boolean extentContains(Point pnt) {
         return this.extent.contains(pnt);
     }
 
+    /**
+     * Checks whether the specified {@code Envelope} is contained in the extent.
+     *
+     * @param envelope an {@code Envelope} value
+     * @return true if the specified envelope is contained in the extent, false otherwise
+     * @throws IllegalArgumentException if the specified envelope does not share this extent's {@code CrsId}
+     */
     public boolean extentContains(Envelope envelope) {
         return this.extent.contains(envelope);
     }

@@ -31,10 +31,10 @@ import org.geolatte.geom.Point;
  * <p>Morton codes are labels for the nodes of a QuadTree. A QuadTree is a partition of a spatial extent
  * by recursively decomposing it into four equal quadrants. A QuadTree is determined
  * by a spatial extent and depth of the tree (the number of recursive subdivisions of the extent). Both are
- * specified by the <code>MortonContext</code> passed during construction of instances of this class.</p>
+ * specified by the {@code MortonContext} passed during construction of instances of this class.</p>
  *
- * <p>The Morton code of a <code>Geometry</code> can be viewed as a path to the quadrant containing the envelope of that
- * <code>Geometry</code>. The left-most character of the code contains the label of the quadrant at depth 1, the second at
+ * <p>The Morton code of a {@code Geometry} can be viewed as a path to the quadrant containing the envelope of that
+ * {@code Geometry}. The left-most character of the code contains the label of the quadrant at depth 1, the second at
  * depth 2, etc. If the Morton code is the empty string, then the envelope fits in no single quandrant of the QuadTree.</p>
  *
  * <p>At each level the four quadrants are labeled:</p>
@@ -53,37 +53,40 @@ public class MortonCode {
 
     private final MortonContext mortonContext;
     /**
-     * The width of the lowest-level leaves of the quadtree implied by the MortonContext
+     * The width of the leaves of the quadtree implied by the MortonContext
      */
-    private final double baseX;
+    private final double gridWidth;
     /**
-     * The height of the lowest-level leaves of the quadtree implied by the MortonContext
+     * The height of the leaves of the quadtree implied by the MortonContext
      */
-    private final double baseY;
+    private final double gridHeight;
+
+    private final int maxGridCellCoordinate;
 
     /**
-     * Constructs an instance with the given <code>Mortoncontext</code>.
+     * Constructs an instance with the given {@code Mortoncontext}
      *
-     * <p>The specified <code>MortonCode</code> determines a QuadTree for which
+     * <p>The specified {@code MortonCode} determines a QuadTree for which
      * this instance calculates labels.
      *
      * @param mortonContext the context to  use when calculating morton codes.
      */
     public MortonCode(MortonContext mortonContext) {
         this.mortonContext = mortonContext;
-        baseX = (mortonContext.getMaxX() - mortonContext.getMinX()) / Math.pow(2, mortonContext.getDepth());
-        baseY = (mortonContext.getMaxY() - mortonContext.getMinY()) / Math.pow(2, mortonContext.getDepth());
+        gridWidth = mortonContext.getLeafWidth();
+        gridHeight = mortonContext.getLeafHeight();
+        this.maxGridCellCoordinate = mortonContext.getNumberOfLeaves() - 1;
     }
 
     /**
-     * Returns the Morton code for the specified <code>Geometry</code>.
+     * Returns the Morton code for the specified {@code Geometry}.
      *
-     * <p>This method is equivalent to <code>ofEnvelope(geometry.getEnvelope())</code>.
+     * <p>This method is equivalent to {@code ofEnvelope(geometry.getEnvelope())}.
      *
-     * @param geometry a <code>Geometry</code> value.
-     * @return the morton code for the envelope of the specified <code>Geometry</code>.
+     * @param geometry a {code Geometry} value.
+     * @return the morton code for the envelope of the specified {@code Geometry}.
      * @throws IllegalArgumentException if the geometry is null, or has an envelope which is not contained in
-     *          the spatial extent of this instance's <code>MortonContext</code>
+     *          the spatial extent of this instance's {@code MortonContext}
      */
     public String ofGeometry(Geometry geometry) {
         checkForNull(geometry);
@@ -91,20 +94,20 @@ public class MortonCode {
     }
 
     /**
-     * Returns the Morton code for the specified <code>Envelope</code>.
+     * Returns the Morton code for the specified {@code Envelope}.
      *
-     * @param envelope a <code>Envelope</code> value.
-     * @return the morton code for the specified <code>Envelope</code> value.
+     * @param envelope an {@code Envelope} value.
+     * @return the morton code for the specified {@code Envelope} value.
      * @throws IllegalArgumentException if the envelope is null, or has an envelope which is not contained in
-     *          the spatial extent of this instance's <code>MortonContext</code>
+     *          the spatial extent of this instance's {@code MortonContext}
      */
     public String ofEnvelope(Envelope envelope) {
         checkForNull(envelope);
         checkWithinExtent(envelope);
 
         // recalculate the X,Y coordinates to grid-cell coordinates. These are
-        // the row,column-indices of
-        // the lowest-level grid that is formed by the Quadtree
+        // the row,column-indices of grid formed by the (lowest-level) leaves
+        // of the Quadtree
         int colMin = getCol(envelope.getMinX());
         int rowMin = getRow(envelope.getMinY());
         int colMax = getCol(envelope.getMaxX());
@@ -124,6 +127,7 @@ public class MortonCode {
 
     public String ofPoint(Point point) {
         //check inputs
+        checkForNull(point);
         checkWithinExtent(point);
         int col = getCol(point.getX());
         int row = getRow(point.getY());
@@ -132,19 +136,19 @@ public class MortonCode {
     }
 
     private int getRow(double y) {
-        int col = (int) Math.floor((y - mortonContext.getMinY()) / baseY);
+        int col = (int) Math.floor((y - mortonContext.getMinY()) / gridHeight);
         //if col > mortonContext.getMaxGridNum(), then it should fall in the last column
         // this happens only for coordinates that are exactly equal mortonContext.getMaxY()
         // since we test for containment in the extent.
-        return col > mortonContext.getMaxGridNum() ? col - 1 : col;
+        return col > maxGridCellCoordinate ? col - 1 : col;
     }
 
     private int getCol(double x) {
-        int row = (int) Math.floor((x - mortonContext.getMinX()) / baseX);
+        int row = (int) Math.floor((x - mortonContext.getMinX()) / gridWidth);
         //if col > mortonContext.getMaxGridNum(), then it should fall in the last row
         // this happens only for coordinates that are exactly equal mortonContext.getMaxX()
         // since we test for containment in the extent.
-        return row > mortonContext.getMaxGridNum() ? row - 1 : row;
+        return row > maxGridCellCoordinate ? row - 1 : row;
     }
 
     private void checkWithinExtent(Point pnt) {
@@ -207,7 +211,7 @@ public class MortonCode {
     /**
      * Transforms the morton code long value into a string such that each character is a label for the quadrant.
      *
-     * (note: <code>Long.toString(interleaved, 4)</code> was not used since this turns morton code '001' into '1')
+     * (note: {@code Long.toString(interleaved, 4)} was not used since this turns morton code '001' into '1')
      *
      * @param interleaved the morton code as a long
      * @param level the level of the morton code
@@ -224,8 +228,8 @@ public class MortonCode {
     }
 
 
-    private void checkForNull(Object envelope) {
-        if (envelope == null) {
+    private void checkForNull(Object object) {
+        if (object == null) {
             throw new IllegalArgumentException("Null geometry is not allowed.");
         }
     }
