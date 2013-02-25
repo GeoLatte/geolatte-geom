@@ -1,3 +1,5 @@
+[![Build Status](http://teamcity.geolatte.org/app/rest/builds/buildType:\(id:bt2\)/statusIcon)](http://teamcity.geolatte.org/viewType.html?buildTypeId=bt2&guest=1)
+
 Geolatte-geom is a Geometry model for Java that conforms to the Simple Features For SQL specification 1.2.1.
 
 It is intended as a drop-in replacement for the Java Topology Suite (JTS) geometry model. GeoLatte-geom is fully interoperable with JTS but offers the following additional features:
