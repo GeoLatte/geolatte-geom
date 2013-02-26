@@ -28,12 +28,18 @@ public class Envelope {
      * Creates an instance from specified lower-left and upper-right <code>Point</code>s.
      * @param lowerLeft the <code>Point</code> designating the lower-left coordinates
      * @param upperRight the <code>Point</code> designating the upper-right coordinates
-     * @param crsId the <code>CrsId</code> that identifies the <code>CoordinateReferenceSystem</code> for the coordinates
      * of the envelope.
+     * @throws IllegalArgumentException if lowerLeft and upperRight have different <code>CrsId</code>'s
      */
-    public Envelope(Point lowerLeft, Point upperRight, CrsId crsId) {
-        //TODO -- what if crsId and lowerleft/upperright.getCrsId() do not correspond?
-        this(lowerLeft.getX(), lowerLeft.getY(), upperRight.getX(), upperRight.getY(), crsId);
+    public Envelope(Point lowerLeft, Point upperRight) {
+        if (!lowerLeft.getCrsId().equals(upperRight.getCrsId())) {
+            throw new IllegalArgumentException("LowerLeft and UpperRight points must have same Coordinate Ref. System.");
+        }
+        this.crsId = lowerLeft.getCrsId();
+        this.minX = lowerLeft.getX();
+        this.minY = lowerLeft.getY();
+        this.maxX = upperRight.getX();
+        this.maxY = upperRight.getY();
     }
 
     /**
