@@ -21,6 +21,7 @@
 
 package org.geolatte.geom.curve;
 
+import junit.framework.Assert;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.junit.Test;
@@ -29,6 +30,8 @@ import static org.geolatte.geom.builder.DSL.c;
 import static org.geolatte.geom.builder.DSL.point;
 
 /**
+ * Unit test for {@link MortonContext}
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/21/13
  */
@@ -36,15 +39,35 @@ public class MortonContextTest {
 
     Point p0 = point(4326, c(0, 0));
     Point p1 = point(4326, c(10, 10));
+    Envelope envelope = new Envelope(p0, p1);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentIfLevelExceedsLimit() {
-        new MortonContext(new Envelope(p0, p1), 32);
+        new MortonContext(envelope, 32);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentExcOnNullExtent() {
         new MortonContext(null, 4);
+    }
+
+    /**
+     * Tests the properties of a MortonContext.
+     */
+    @Test
+    public void testProperties() {
+        MortonContext context = new MortonContext(envelope, 3);
+
+        Assert.assertEquals(p0.getX(), context.getMinX());
+        Assert.assertEquals(p0.getY(), context.getMinY());
+        Assert.assertEquals(p1.getX(), context.getMaxX());
+        Assert.assertEquals(p1.getY(), context.getMaxY());
+        Assert.assertEquals(3, context.getDepth());
+        Assert.assertEquals(p0.getCrsId(), context.getCrsId());
+        // TODO: shouldn't this be 16?
+        Assert.assertEquals(8, context.getNumberOfLeaves());
+        Assert.assertEquals(1.25, context.getLeafHeight());
+        Assert.assertEquals(1.25, context.getLeafWidth());
     }
 
 }

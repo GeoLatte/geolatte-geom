@@ -31,6 +31,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit test for {@link MortonCode}
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/21/13
  */

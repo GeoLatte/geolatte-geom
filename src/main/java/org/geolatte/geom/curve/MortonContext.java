@@ -68,7 +68,7 @@ public class MortonContext {
     }
 
     /**
-     * Returns the maximum X-coordinate of the extent
+     * Returns the maximum X-coordinate of the extent.
      *
      * @return the maximum X-coordinate of the extent
      */
@@ -77,9 +77,9 @@ public class MortonContext {
     }
 
     /**
-     * Returns the maximum Y-coordinate of the extent
+     * Returns the maximum Y-coordinate of the extent.
      *
-     * @return
+     * @return the maximum Y-coordinate of the extent
      */
     public double getMaxY() {
         return extent.getMaxY();
@@ -104,6 +104,7 @@ public class MortonContext {
 
     /**
      * Returns the maximum tree-depth
+     *
      * @return the maximum tree-depth
      */
     public int getDepth() {
@@ -112,6 +113,7 @@ public class MortonContext {
 
     /**
      * Returns the CrsId of the spatial extent
+     *
      * @return the CrsId of the spatial extent
      */
     public CrsId getCrsId() {

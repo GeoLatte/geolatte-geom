@@ -28,14 +28,15 @@ import org.geolatte.geom.Point;
 /**
  * Calculates the Morton code (Morton-order or Z-order) of Geometries
  * <p/>
- * <p>Morton codes are labels for the nodes of a QuadTree. A QuadTree is a partition of a spatial extent
- * by recursively decomposing it into four equal quadrants. A QuadTree is determined
- * by a spatial extent and depth of the tree (the number of recursive subdivisions of the extent). Both are
- * specified by the {@code MortonContext} passed during construction of instances of this class.</p>
+ * <p>Morton codes are labels for the nodes of a QuadTree. A QuadTree is a partition of a spatial extent by recursively
+ * decomposing it into four equal quadrants. A QuadTree is determined by a spatial extent and depth of the tree (the
+ * number of recursive subdivisions of the extent). Both are specified by the {@code MortonContext} passed during
+ * construction of instances of this class.</p>
  *
  * <p>The Morton code of a {@code Geometry} can be viewed as a path to the quadrant containing the envelope of that
  * {@code Geometry}. The left-most character of the code contains the label of the quadrant at depth 1, the second at
- * depth 2, etc. If the Morton code is the empty string, then the envelope fits in no single quandrant of the QuadTree.</p>
+ * depth 2, etc. If the Morton code is the empty string, then the envelope fits in no single quandrant of the QuadTree.
+ * </p>
  *
  * <p>At each level the four quadrants are labeled:</p>
  * <ul>
