@@ -75,7 +75,7 @@ public class MortonCode {
         this.mortonContext = mortonContext;
         gridWidth = mortonContext.getLeafWidth();
         gridHeight = mortonContext.getLeafHeight();
-        this.maxGridCellCoordinate = mortonContext.getNumberOfLeaves() - 1;
+        this.maxGridCellCoordinate = mortonContext.getNumberOfDivisionsAlongAxis() - 1;
     }
 
     /**
