@@ -40,7 +40,7 @@ public class MortonContext {
     final private static String ERR_MSG_NULL = "No Null arguments allowed.";
     final private int depth;
     final private Envelope extent;
-    final private int numLeaves;
+    final private int numOfDivisionsAlongAxis;
     final private double leafWidth;
     final private double leafHeight;
 
@@ -61,9 +61,9 @@ public class MortonContext {
         this.depth = depth;
         this.extent = extent;
 
-        this.numLeaves = (int) (Math.pow(2, depth));
-        this.leafWidth =  (extent.getMaxX() - extent.getMinX()) / numLeaves;
-        this.leafHeight = (extent.getMaxY() - extent.getMinY()) / numLeaves;
+        this.numOfDivisionsAlongAxis = (int) (Math.pow(2, depth));
+        this.leafWidth =  (extent.getMaxX() - extent.getMinX()) / numOfDivisionsAlongAxis;
+        this.leafHeight = (extent.getMaxY() - extent.getMinY()) / numOfDivisionsAlongAxis;
 
     }
 
@@ -121,12 +121,16 @@ public class MortonContext {
     }
 
     /**
-     * Returns the number of leaves in the QuadTree at the tree-depth (lowest-level).
+     * Returns the number of subdivisions along an (X- or Y-)axis.
      *
-     * @return the number of leaves in the QuadTree at the tree-depth (lowest-level).
+     * <p>The leaves of a Quadtree form a grid-cell structure that completely
+     * covers the extent. This method returns the number of subdivisions along
+     * a single axis. It is the square root of the total number of leaves.</p>
+     *
+     * @return the number of subdivisions along an (X- or Y-)axis.
      */
-    public int getNumberOfLeaves() {
-        return this.numLeaves;
+    int getNumberOfDivisionsAlongAxis() {
+        return this.numOfDivisionsAlongAxis;
     }
 
     /**
@@ -134,7 +138,7 @@ public class MortonContext {
      *
      * @return the width of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
      */
-    public double getLeafWidth(){
+    double getLeafWidth(){
         return this.leafWidth;
     }
 
@@ -143,7 +147,7 @@ public class MortonContext {
      *
      * @return the height of the extent of a leaf in the QuadTree at tree-depth (lowest-level)
      */
-    public double getLeafHeight(){
+    double getLeafHeight(){
         return this.leafHeight;
     }
 
