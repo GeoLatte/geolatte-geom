@@ -36,6 +36,7 @@ import java.io.Serializable;
 public abstract class Geometry implements Serializable {
 
     private final static GeometryEquality geomEq = new GeometryPointEquality();
+    private final static GeometryOperations defaultGeometryOperations = new JTSGeometryOperations();
 
     private final GeometryOperations geometryOperations;
 
@@ -60,7 +61,7 @@ public abstract class Geometry implements Serializable {
     }
 
     protected Geometry(GeometryOperations geometryOperations) {
-        this.geometryOperations = (geometryOperations == null ? new JTSGeometryOperations() : geometryOperations);
+        this.geometryOperations = (geometryOperations == null ? defaultGeometryOperations : geometryOperations);
     }
 
     /**
