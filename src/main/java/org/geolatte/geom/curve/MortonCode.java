@@ -112,7 +112,7 @@ public class MortonCode {
         int colMin = getCol(envelope.getMinX());
         int rowMin = getRow(envelope.getMinY());
         int colMax = getCol(envelope.getMaxX());
-        int rowMax = getCol(envelope.getMaxY());
+        int rowMax = getRow(envelope.getMaxY());
         int[] cols = {colMin, colMax};
         int[] rows = {rowMin, rowMax};
 

@@ -24,6 +24,8 @@ package org.geolatte.geom.curve;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Polygon;
+import org.geolatte.geom.codec.Wkt;
+import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
@@ -126,6 +128,15 @@ public class MortonCodeTest {
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateToRightOfExtentGeometry() {
         mcLevel1.ofGeometry(point(0, c(101, 101)));
+    }
+
+    //test code for bug
+    @Test
+    public void testMortonCodeShouldNotReturnEmptyString(){
+        String wkt = "SRID=4326;POINT(-87.064293 33.087386)";
+        Point geom = (Point)Wkt.fromWkt(wkt);
+        MortonCode mortonCode = new MortonCode(new MortonContext(new Envelope(-140.0, 15, -40.0, 50.0, CrsId.valueOf(4326)), 8));
+        assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPoint(geom));
     }
 
 
