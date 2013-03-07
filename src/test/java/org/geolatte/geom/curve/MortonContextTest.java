@@ -64,8 +64,7 @@ public class MortonContextTest {
         Assert.assertEquals(p1.getY(), context.getMaxY());
         Assert.assertEquals(3, context.getDepth());
         Assert.assertEquals(p0.getCrsId(), context.getCrsId());
-        // TODO: shouldn't this be 16?
-        Assert.assertEquals(8, context.getNumberOfLeaves());
+        Assert.assertEquals(3, context.getDepth());
         Assert.assertEquals(1.25, context.getLeafHeight());
         Assert.assertEquals(1.25, context.getLeafWidth());
     }
