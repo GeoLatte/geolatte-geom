@@ -130,11 +130,49 @@ public class MortonCodeTest {
         mcLevel1.ofGeometry(point(0, c(101, 101)));
     }
 
+    @Test
+    public void testMCReturnsMaxLength() {
+        assertEquals(1, mcLevel1.getMaxLength());
+        assertEquals(2, mcLevel2.getMaxLength());
+    }
+
+    @Test
+    public void testEnvelopeOfMortonCodeLevel1() {
+        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf(""));
+        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(50.0, 50.0))), mcLevel2.envelopeOf("0"));
+        assertEquals(new Envelope(point(0, c(0.0, 50.0)), point(0, c(50.0, 100.0))), mcLevel2.envelopeOf("1"));
+        assertEquals(new Envelope(point(0, c(50.0, 0.0)), point(0, c(100.0, 50.0))), mcLevel2.envelopeOf("2"));
+        assertEquals(new Envelope(point(0, c(50.0, 50.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf("3"));
+    }
+
+    @Test
+    public void testEnvelopeOfMortonCodeLevel2() {
+        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(25.0, 25.0))), mcLevel2.envelopeOf("00"));
+        assertEquals(new Envelope(point(0, c(25.0, 50.0)), point(0, c(50.0, 75.0))), mcLevel2.envelopeOf("12"));
+        assertEquals(new Envelope(point(0, c(50.0, 25.0)), point(0, c(75.0, 50.0))), mcLevel2.envelopeOf("21"));
+        assertEquals(new Envelope(point(0, c(75.0, 75.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf("33"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEnvelopeOfMCOnNullParameter() {
+        mcLevel2.envelopeOf(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEnvelopeOfMCOnToLongMortonCode() {
+        mcLevel2.envelopeOf("123");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+        public void testEnvelopeOfMCInvalidMortonCode() {
+            mcLevel2.envelopeOf("42");
+    }
+
     //test code for bug
     @Test
-    public void testMortonCodeShouldNotReturnEmptyString(){
+    public void testMortonCodeShouldNotReturnEmptyString() {
         String wkt = "SRID=4326;POINT(-87.064293 33.087386)";
-        Point geom = (Point)Wkt.fromWkt(wkt);
+        Point geom = (Point) Wkt.fromWkt(wkt);
         MortonCode mortonCode = new MortonCode(new MortonContext(new Envelope(-140.0, 15, -40.0, 50.0, CrsId.valueOf(4326)), 8));
         assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPoint(geom));
     }

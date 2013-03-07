@@ -172,4 +172,12 @@ public class MortonContext {
     public boolean extentContains(Envelope envelope) {
         return this.extent.contains(envelope);
     }
+
+    /**
+     * Returns the spatial extent of this instance
+     * @return an {@code Envelope} representing the spatial extent of this instance
+     */
+    public Envelope getExtent() {
+        return extent;
+    }
 }
