@@ -14,27 +14,28 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2012 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2013 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.support.WktWkbCodecTestBase;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+
+import org.geolatte.geom.Geometry;
 
 /**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/1/12
+ * Decodes native database objects to geometries of type T.
+ *
+ * @author Karel Maesen, Geovise BVBA.
  */
-public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
+public interface Decoder<T extends Geometry> {
 
-    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
+	public T decode(SqlServerGeometry nativeGeom);
 
-    @Override
-    protected WktWkbCodecTestBase getTestCases() {
-        return testCasesWithSRID;
-    }
+	public boolean accepts(SqlServerGeometry nativeGeom);
+
+	public boolean accepts(OpenGisType type);
+
 
 }

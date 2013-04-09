@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-public class MySqlUnitTestInputs extends CodecTestBase {
+public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
 
     public MySqlUnitTestInputs() {
         addCase(1,

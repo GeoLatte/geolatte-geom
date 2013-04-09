@@ -14,27 +14,31 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2012 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2013 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.support.WktWkbCodecTestBase;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.MultiPolygon;
+import org.geolatte.geom.Polygon;
 
-/**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/1/12
- */
-public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
+import java.util.List;
 
-    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
+class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder<MultiPolygon> {
 
-    @Override
-    protected WktWkbCodecTestBase getTestCases() {
-        return testCasesWithSRID;
-    }
+	@Override
+	protected OpenGisType getOpenGisType() {
+		return OpenGisType.MULTIPOLYGON;
+	}
+
+	@Override
+	protected MultiPolygon createGeometry(List<Geometry> geometries, boolean hasM) {
+		Polygon[] polygons = geometries != null ? geometries.toArray( new Polygon[geometries.size()] ) : null;
+		return new MultiPolygon( polygons );
+	}
+
 
 }

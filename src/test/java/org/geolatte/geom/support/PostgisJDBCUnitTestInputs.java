@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CrsId;
  *         creation-date: 10/13/12
  */
 
-public class PostgisJDBCUnitTestInputs extends CodecTestBase {
+public class PostgisJDBCUnitTestInputs extends WktWkbCodecTestBase {
 
     public PostgisJDBCUnitTestInputs() {
 

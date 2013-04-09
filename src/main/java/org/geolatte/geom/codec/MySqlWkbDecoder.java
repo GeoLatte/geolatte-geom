@@ -30,7 +30,7 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-public class MySqlWkbDecoder extends AbstractWkbDecoder {
+class MySqlWkbDecoder extends AbstractWkbDecoder {
 
     /**
      * Read the first four bytes: this contains the SRID

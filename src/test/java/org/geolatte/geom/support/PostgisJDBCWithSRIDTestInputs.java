@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 10/13/12
  */
-public class PostgisJDBCWithSRIDTestInputs extends CodecTestBase {
+public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
     final CrsId crsId = CrsId.valueOf(4326);
 

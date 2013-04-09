@@ -27,7 +27,7 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
 import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.PostgisTestCases;
@@ -157,7 +157,7 @@ public class TestJTS {
 
 
     // Note that the d2DM and d3DM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
-    private void testInputs(CodecTestBase testCases) {
+    private void testInputs(WktWkbCodecTestBase testCases) {
         for (Integer testCase : testCases.getCases()) {
             String failureMsg = "Failure in testcase " + testCase;
             String wkt = testCases.getWKT(testCase);

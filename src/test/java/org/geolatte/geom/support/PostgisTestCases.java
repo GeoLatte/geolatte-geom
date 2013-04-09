@@ -27,7 +27,7 @@ import org.geolatte.geom.crs.CrsId;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class PostgisTestCases extends CodecTestBase {
+public class PostgisTestCases extends WktWkbCodecTestBase {
 
 
     public static final Integer POINT_2D = 0;
