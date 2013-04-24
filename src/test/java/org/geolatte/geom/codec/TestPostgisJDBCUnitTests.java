@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
 
 /**
@@ -39,7 +39,7 @@ public class TestPostgisJDBCUnitTests extends CodecUnitTestBase {
 
 
     @Override
-    protected CodecTestBase getTestCases() {
+    protected WktWkbCodecTestBase getTestCases() {
         return testCases;
     }
 

@@ -25,7 +25,7 @@ import junit.framework.Assert;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -60,7 +60,7 @@ abstract public class CodecUnitTestBase {
     }
 
 
-    abstract protected CodecTestBase getTestCases();
+    abstract protected WktWkbCodecTestBase getTestCases();
 
     abstract protected WktDecoder getWktDecoder();
     abstract protected WktEncoder getWktEncoder();

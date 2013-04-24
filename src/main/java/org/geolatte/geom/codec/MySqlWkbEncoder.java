@@ -31,7 +31,7 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-public class MySqlWkbEncoder extends AbstractWkbEncoder {
+class MySqlWkbEncoder extends AbstractWkbEncoder {
 
     @Override
     public ByteBuffer encode(Geometry geometry, ByteOrder byteOrder) {

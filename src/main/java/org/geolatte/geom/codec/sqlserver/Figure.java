@@ -14,27 +14,45 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2012 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2013 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.support.WktWkbCodecTestBase;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+import java.nio.ByteBuffer;
 
-/**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/1/12
- */
-public class TestPostgisJDBCWithSRIDUnitTests extends TestPostgisJDBCUnitTests {
+class Figure {
 
-    PostgisJDBCWithSRIDTestInputs testCasesWithSRID = new PostgisJDBCWithSRIDTestInputs();
 
-    @Override
-    protected WktWkbCodecTestBase getTestCases() {
-        return testCasesWithSRID;
-    }
+	final FigureAttribute figureAttribute;
+	final int pointOffset;
+
+	Figure(FigureAttribute attribute, int offset) {
+		this.figureAttribute = attribute;
+		this.pointOffset = offset;
+	}
+
+	static int getByteSize() {
+		return 5;
+	}
+
+	void store(ByteBuffer buffer) {
+		buffer.put( figureAttribute.byteValue );
+		buffer.putInt( pointOffset );
+	}
+
+	boolean isInteriorRing() {
+		return this.figureAttribute.equals( FigureAttribute.InteriorRing );
+	}
+
+	boolean isExteriorRing() {
+		return this.figureAttribute.equals( FigureAttribute.ExteriorRing );
+	}
+
+	boolean isStroke() {
+		return this.figureAttribute.equals( FigureAttribute.Stroke );
+	}
 
 }

@@ -24,7 +24,7 @@ package org.geolatte.geom.codec;
 import junit.framework.Assert;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.support.CodecTestBase;
+import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.geolatte.geom.support.MySqlUnitTestInputs;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -88,7 +88,7 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
     }
 
     @Override
-    protected CodecTestBase getTestCases() {
+    protected WktWkbCodecTestBase getTestCases() {
         return testCases;
     }
 

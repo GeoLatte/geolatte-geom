@@ -40,7 +40,7 @@ import java.util.Map;
 public class Wkb {
 
     public enum Dialect {
-        //the PostGIS EWKB dialect (versions 1.0 to 1.5).
+        //the PostGIS EWKB dialect (versions 1.0 to 1.6).
         POSTGIS_EWKB_1,
         MYSQL_WKB
     }
