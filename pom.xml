@@ -58,9 +58,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:GeoLatte/geolatte-common.git</connection>
-        <url>scm:git:git@github.com:GeoLatte/geolatte-common.git</url>
-        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-common.git</developerConnection>
+        <connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
+        <url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
+        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
     </scm>
 
     <developers>
