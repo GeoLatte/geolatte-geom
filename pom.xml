@@ -12,22 +12,19 @@
   ~     GNU Lesser General Public License for more details.
   ~
   ~     You should have received a copy of the GNU Lesser General Public License
-  ~     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+  ~     along with GeoLatte.  If not, see <http://www.gnu.org/licenses />.
   ~
   ~ Copyright (C) 2010 - 2011 and Ownership of code is shared by:
   ~ Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
   ~ Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
   -->
 
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geom</artifactId>
     <packaging>jar</packaging>
-    <version>0.12-SNAPSHOT</version>
+    <version>0.13-SNAPSHOT</version>
     <description>
         This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL specification.
     </description>
@@ -58,9 +55,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:GeoLatte/geolatte-common.git</connection>
-        <url>scm:git:git@github.com:GeoLatte/geolatte-common.git</url>
-        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-common.git</developerConnection>
+        <connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
+        <url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
+        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
     </scm>
 
     <developers>
