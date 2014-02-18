@@ -32,8 +32,9 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a <code>GeometryOperation</code> to calculate the measure value
      * at the specified point
+     *
      * @param geometry a linear <code>Geometry</code>
-     * @param point a <code>Point</code> on the geometry
+     * @param point    a <code>Point</code> on the geometry
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
     public GeometryOperation<Double> createGetMeasureOp(Geometry geometry, Point point);
@@ -42,14 +43,38 @@ public interface MeasureGeometryOperations {
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
      * that has the same 2D/3D-coordinates as the specified <code>Geometry</code>, and
      * with measure values that correspond with the length along it (or begin-measure + length).
-     *
+     * <p/>
      * <p>The length is calculated in the 2-dimensional X/Y-plane.</p>
      *
-     * @param geometry the <code>Geometry</code> for which to build measures
+     * @param geometry         the <code>Geometry</code> for which to build measures
      * @param keepBeginMeasure if true, than the measure of the first coordinate is used as start-value
      * @return a <code>GeometryOperation</code> that returns a Geometry with measures increasing with length
      */
     public GeometryOperation<Geometry> createMeasureOnLengthOp(Geometry geometry, boolean keepBeginMeasure);
+
+    /**
+     * Creates a {@code GeometryOperation} that returns the minimum measure value of the points
+     * of the specified Geometry.
+     *
+     * If the geometry is empty, this method returns Double.NaN
+     *
+     * @param geometry the geometry for which the minimum measure is sought
+     * @return the minimum measure
+     * @throws IllegalArgumentException if the geometry is not a measured geometry
+     */
+    public GeometryOperation<Double> createGetMinimumMeasureOp(Geometry geometry);
+
+    /**
+     * Creates a {@code GeometryOperation} that returns the maximum measure value of the points
+     * of the specified Geometry.
+     *
+     * If the geometry is empty, this method returns Double.NaN
+     *
+     * @param geometry the geometry for which the maximum measure is sought
+     * @return the minimum measure
+     * @throws IllegalArgumentException if the geometry is not a measured geometry
+     */
+    public GeometryOperation<Double> createGetMaximumMeasureOp(Geometry geometry);
 
 
 }

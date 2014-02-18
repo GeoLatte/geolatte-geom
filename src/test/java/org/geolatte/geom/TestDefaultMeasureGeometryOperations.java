@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
@@ -173,5 +174,39 @@ public class TestDefaultMeasureGeometryOperations {
         assertEquals(2d, m, Math.ulp(10));
     }
 
+    @Test
+    public void testGetMinimumMeasureOpOnRegularMultiLineString() {
+        double m = measureOps.createGetMinimumMeasureOp(tc.lineString3DM).execute();
+        assertEquals(5d, m, Math.ulp(10));
+
+        m = measureOps.createGetMinimumMeasureOp(tc.caseD1A).execute();
+        assertEquals(0d, m, Math.ulp(10));
+
+        m = measureOps.createGetMinimumMeasureOp(tc.emptyLineString).execute();
+        assertTrue(Double.isNaN(m));
+
+    }
+
+    @Test
+    public void testGetMaximumMeasureOpOnRegularMultiLineString() {
+        double m = measureOps.createGetMaximumMeasureOp(tc.lineString3DM).execute();
+        assertEquals(30d, m, Math.ulp(10));
+
+        m = measureOps.createGetMaximumMeasureOp(tc.caseD1A).execute();
+        assertEquals(4d, m, Math.ulp(10));
+
+        m = measureOps.createGetMaximumMeasureOp(tc.emptyLineString).execute();
+        assertTrue(Double.isNaN(m));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetMinimumMeasureOpOnNull() {
+        double m = measureOps.createGetMinimumMeasureOp(null).execute();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetMinimumMeasureOpOnNonMeasured() {
+        double m = measureOps.createGetMinimumMeasureOp(Wkt.fromWkt("LINESTRING(1 2, 3 4, 5 6)")).execute();
+    }
 
 }

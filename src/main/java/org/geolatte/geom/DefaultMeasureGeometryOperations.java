@@ -113,6 +113,43 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         };
     }
 
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public GeometryOperation<Double> createGetMinimumMeasureOp(Geometry geometry) {
+        return createGetExtrMeasureOp(geometry, true);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public GeometryOperation<Double> createGetMaximumMeasureOp(Geometry geometry) {
+        return createGetExtrMeasureOp(geometry, false);
+    }
+
+    private GeometryOperation<Double> createGetExtrMeasureOp(final Geometry geometry, final boolean  min) {
+        return new GeometryOperation<Double>() {
+
+            @Override
+            public Double execute() {
+                if (geometry == null) {
+                    throw new IllegalArgumentException("Operation expects a non-empty geometry");
+                }
+                if (geometry.isEmpty()) {
+                    return Double.NaN;
+                }
+                if (! geometry.isMeasured()) {
+                    throw new IllegalArgumentException("Operation expects a measured geometry");
+                }
+                FindExtremumMeasureVisitor visitor = new FindExtremumMeasureVisitor(min);
+                geometry.getPoints().accept(visitor);
+                return visitor.extremum;
+            }
+        };
+    }
+
     private static class InterpolatingVisitor implements GeometryVisitor {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
@@ -170,5 +207,28 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         public void visit(PolyHedralSurface surface) {
             throw new IllegalArgumentException(INVALID_TYPE_MSG);
         }
+    }
+
+    private static class FindExtremumMeasureVisitor  implements PointVisitor {
+
+        final boolean findMinimum;
+        double extremum;
+
+        FindExtremumMeasureVisitor(boolean minimum) {
+            findMinimum = minimum;
+            extremum = minimum ? Double.MAX_VALUE : Double.MIN_VALUE;
+        }
+
+        @Override
+        public void visit(double[] coordinates) {
+            //assume measure value is last component (must be guaranteed by calling method).
+            double m = coordinates[coordinates.length-1];
+            if (findMinimum) {
+                extremum = m < extremum ? m : extremum;
+            } else {
+                extremum = m > extremum ? m : extremum;
+            }
+        }
+
     }
 }
