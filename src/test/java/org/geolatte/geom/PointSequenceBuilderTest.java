@@ -44,7 +44,6 @@ public class PointSequenceBuilderTest {
 
     }
 
-
     @Test
     public void testAdding3DOr3DMCoordinates() {
         PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d3D, CrsId.UNDEFINED);
@@ -64,5 +63,21 @@ public class PointSequenceBuilderTest {
 
     }
 
+    @Test(expected=IllegalStateException.class)
+    public void testFixedSizePSBuilderThrowsIllegalStateExceptionIfNotCompletelyFilled() {
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(10, DimensionalFlag.d2D, CrsId.UNDEFINED);
+        builder.add(2, 3);
+        builder.add(1, 2);
+        builder.toPointSequence();
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testFixedSizePSBuilderThrowsIndexOutOfBoundsExcpIfFilledBeyondCapacity() {
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
+        builder.add(2, 3);
+        builder.add(1, 2);
+        builder.add(4, 4);
+        builder.toPointSequence();
+    }
 
 }
