@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.PointSequence;
+import org.geolatte.geom.PositionSequence;
 
 /**
  * A <code>WktToken</code> for point sequences in the input text.
@@ -31,18 +31,18 @@ import org.geolatte.geom.PointSequence;
  */
 class WktPointSequenceToken implements WktToken {
 
-    private final PointSequence points;
+    private final PositionSequence<?> positions;
 
-    public WktPointSequenceToken(PointSequence points) {
-        this.points = points;
+    public WktPointSequenceToken(PositionSequence<?> positions) {
+        this.positions = positions;
     }
 
-    public PointSequence getPoints() {
-        return this.points;
+    public PositionSequence<?> getPositions() {
+        return this.positions;
     }
 
     public String toString(){
-        return points.toString();
+        return positions.toString();
     }
 
 }

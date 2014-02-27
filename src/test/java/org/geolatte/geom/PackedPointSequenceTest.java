@@ -23,9 +23,12 @@ package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -38,71 +41,56 @@ import static org.junit.Assert.*;
  */
 public class PackedPointSequenceTest {
 
-    PackedPointSequence testSeq2D;
-    PackedPointSequence testSeq3D;
-    PackedPointSequence testSeq2DM;
-    PackedPointSequence testSeq3DM;
-    PointSequence testEmpty;
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+
+    PackedPositionSequence<P2D> testSeq2D;
+    PackedPositionSequence<P3D> testSeq3D;
+    PackedPositionSequence<P2DM> testSeq2DM;
+    PackedPositionSequence<P3DM> testSeq3DM;
+    PositionSequence<P2D> testEmpty;
 
 
     @Before
     public void setUp() {
-        testSeq2D = new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED);
-        testSeq3D = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d3D, CrsId.UNDEFINED);
-        testSeq2DM = new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d2DM, CrsId.UNDEFINED);
-        testSeq3DM = new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.d3DM, CrsId.UNDEFINED);
-        testEmpty = EmptyPointSequence.INSTANCE;
+        testSeq2D = new PackedPositionSequence<>(crs, new double[]{0, 0, 1, -1, 2, -2});
+        testSeq3D = new PackedPositionSequence<>(crsZ, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
+        testSeq2DM = new PackedPositionSequence<>(crsM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
+        testSeq3DM = new PackedPositionSequence<>(crsZM, new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3});
+        testEmpty = new PackedPositionSequence<>(crs, new double[0]);
     }
 
 
-    @Test
+    @Test  @Ignore("Determine whether this is still desired behavior")
     public void testConstructorThrowsIllegalArgumentOnWrongNumberOfCoordinates() {
         try {
-            new PackedPointSequence(new double[]{0, 0, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
+            new PackedPositionSequence<P2D>(crs, new double[]{0, 0, 1, 1});
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
+            new PackedPositionSequence<P3D>(crsZ, new double[]{0, 0, 0, 1, 1, 1, 1});
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPointSequence(new double[]{0, 0, 0, 1, 1, 1, 1, 1}, DimensionalFlag.d3D, CrsId.UNDEFINED);
+            new PackedPositionSequence<P3D>(crsZ, new double[]{0, 0, 0, 1, 1, 1, 1, 1});
             fail();
         } catch (IllegalArgumentException e) {
         }
     }
 
-
-    @Test
-    public void testIs3D() throws Exception {
-
-        assertFalse(testSeq2D.is3D());
-        assertTrue(testSeq3D.is3D());
-        assertFalse(testSeq2DM.is3D());
-        assertTrue(testSeq3DM.is3D());
-        assertFalse(testEmpty.is3D());
-
-    }
-
-    @Test
-    public void testIsMeasured() throws Exception {
-        assertFalse(testSeq2D.isMeasured());
-        assertFalse(testSeq3D.isMeasured());
-        assertTrue(testSeq2DM.isMeasured());
-        assertTrue(testSeq3DM.isMeasured());
-        assertFalse(testEmpty.isMeasured());
-    }
 
     @Test
     public void testGetDimension() throws Exception {
-        assertEquals(2, testSeq2D.getDimension());
-        assertEquals(3, testSeq3D.getDimension());
-        assertEquals(3, testSeq2DM.getDimension());
-        assertEquals(4, testSeq3DM.getDimension());
+        assertEquals(2, testSeq2D.getCoordinateDimension());
+        assertEquals(3, testSeq3D.getCoordinateDimension());
+        assertEquals(3, testSeq2DM.getCoordinateDimension());
+        assertEquals(4, testSeq3DM.getCoordinateDimension());
     }
 
     @Test
@@ -155,70 +143,70 @@ public class PackedPointSequenceTest {
         // test2D
         double[] result;
         result = new double[2];
-        testSeq2D.getCoordinates(result, 0);
+        testSeq2D.getCoordinates(0, result);
         assertTrue(Arrays.equals(new double[]{0, 0}, result));
-        testSeq2D.getCoordinates(result, 1);
+        testSeq2D.getCoordinates(1, result);
         assertTrue(Arrays.equals(new double[]{1, -1}, result));
-        testSeq2D.getCoordinates(result, 2);
+        testSeq2D.getCoordinates(2, result);
         assertTrue(Arrays.equals(new double[]{2, -2}, result));
 
         result = new double[3];
-        testSeq3D.getCoordinates(result, 0);
+        testSeq3D.getCoordinates(0, result);
         assertTrue(Arrays.equals(new double[]{0, 0, 0}, result));
-        testSeq3D.getCoordinates(result, 1);
+        testSeq3D.getCoordinates(1, result);
         assertTrue(Arrays.equals(new double[]{1, -1, 1}, result));
-        testSeq3D.getCoordinates(result, 2);
+        testSeq3D.getCoordinates(2, result);
         assertTrue(Arrays.equals(new double[]{2, -2, 2}, result));
 
 
-        testSeq2DM.getCoordinates(result, 0);
+        testSeq2DM.getCoordinates(0, result);
         assertTrue(Arrays.equals(new double[]{0, 0, 0}, result));
-        testSeq2DM.getCoordinates(result, 1);
+        testSeq2DM.getCoordinates(1, result);
         assertTrue(Arrays.equals(new double[]{1, -1, 1}, result));
-        testSeq2DM.getCoordinates(result, 2);
+        testSeq2DM.getCoordinates(2, result);
         assertTrue(Arrays.equals(new double[]{2, -2, 2}, result));
 
         result = new double[4];
-        testSeq3DM.getCoordinates(result, 0);
+        testSeq3DM.getCoordinates(0, result);
         assertTrue(Arrays.equals(new double[]{0, 0, 0, 1}, result));
-        testSeq3DM.getCoordinates(result, 1);
+        testSeq3DM.getCoordinates(1, result);
         assertTrue(Arrays.equals(new double[]{1, -1, 1, 2}, result));
-        testSeq3DM.getCoordinates(result, 2);
+        testSeq3DM.getCoordinates(2, result);
         assertTrue(Arrays.equals(new double[]{2, -2, 2, 3}, result));
 
         try {
-            testSeq2D.getCoordinates(result, 3);
+            testSeq2D.getCoordinates(3, result);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
-            testSeq3D.getCoordinates(result, 3);
+            testSeq3D.getCoordinates(3, result);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
-            testSeq2DM.getCoordinates(result, 3);
+            testSeq2DM.getCoordinates(3, result);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
-            testSeq3DM.getCoordinates(result, 3);
+            testSeq3DM.getCoordinates(3, result);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
-            testEmpty.getCoordinates(result, 0);
+            testEmpty.getCoordinates(0, result);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
 
         result = new double[2];
         try {
-            testSeq3D.getCoordinates(result, 1);
+            testSeq3D.getCoordinates(1, result);
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -290,21 +278,15 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testGetZ() {
-        assertTrue(Double.isNaN(testSeq2D.getZ(0)));
-        assertTrue(Double.isNaN(testSeq2D.getZ(1)));
-        assertTrue(Double.isNaN(testSeq2D.getZ(2)));
-        assertTrue(Double.isNaN(testSeq2DM.getZ(0)));
-        assertTrue(Double.isNaN(testSeq2DM.getZ(1)));
-        assertTrue(Double.isNaN(testSeq2DM.getZ(2)));
-        assertEquals(0d, testSeq3D.getZ(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3D.getZ(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3D.getZ(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getZ(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getZ(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getZ(2), Math.ulp(10d));
+        assertEquals(0d, testSeq3D.getPositionN(0).getAltitude(), Math.ulp(10d));
+        assertEquals(1d, testSeq3D.getPositionN(1).getAltitude(), Math.ulp(10d));
+        assertEquals(2d, testSeq3D.getPositionN(2).getAltitude(), Math.ulp(10d));
+        assertEquals(0d, testSeq3DM.getPositionN(0).getAltitude(), Math.ulp(10d));
+        assertEquals(1d, testSeq3DM.getPositionN(1).getAltitude(), Math.ulp(10d));
+        assertEquals(2d, testSeq3DM.getPositionN(2).getAltitude(), Math.ulp(10d));
 
         try {
-            testSeq3D.getZ(3);
+            testSeq3D.getPositionN(3);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
@@ -312,18 +294,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testGetM() {
-        assertTrue(Double.isNaN(testSeq2D.getM(0)));
-        assertTrue(Double.isNaN(testSeq2D.getM(1)));
-        assertTrue(Double.isNaN(testSeq2D.getM(2)));
-        assertTrue(Double.isNaN(testSeq3D.getM(0)));
-        assertTrue(Double.isNaN(testSeq3D.getM(1)));
-        assertTrue(Double.isNaN(testSeq3D.getM(2)));
-        assertEquals(0d, testSeq2DM.getM(0), Math.ulp(10d));
-        assertEquals(1d, testSeq2DM.getM(1), Math.ulp(10d));
-        assertEquals(2d, testSeq2DM.getM(2), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getM(0), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getM(1), Math.ulp(10d));
-        assertEquals(3d, testSeq3DM.getM(2), Math.ulp(10d));
+        assertEquals(0d, testSeq2DM.getPositionN(0).getM(), Math.ulp(10d));
+        assertEquals(1d, testSeq2DM.getPositionN(1).getM(), Math.ulp(10d));
+        assertEquals(2d, testSeq2DM.getPositionN(2).getM(), Math.ulp(10d));
+        assertEquals(1d, testSeq3DM.getPositionN(0).getM(), Math.ulp(10d));
+        assertEquals(2d, testSeq3DM.getPositionN(1).getM(), Math.ulp(10d));
+        assertEquals(3d, testSeq3DM.getPositionN(2).getM(), Math.ulp(10d));
 
         try {
             testSeq3D.getX(3);
@@ -349,16 +325,13 @@ public class PackedPointSequenceTest {
             Assert.assertEquals(testSeq3DM.getY(i), testSeq3DM.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
 
             //Z
-            Assert.assertEquals(testSeq2D.getZ(i), testSeq2D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-            Assert.assertEquals(testSeq2DM.getZ(i), testSeq2DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-            Assert.assertEquals(testSeq3D.getZ(i), testSeq3D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getZ(i), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
+            Assert.assertEquals(testSeq3D.getPositionN(i).getAltitude(), testSeq3D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
+            Assert.assertEquals(testSeq3DM.getPositionN(i).getAltitude(), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
 
             //M
-            Assert.assertEquals(testSeq2D.getM(i), testSeq2D.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
-            Assert.assertEquals(testSeq2DM.getM(i), testSeq2DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
-            Assert.assertEquals(testSeq3D.getM(i), testSeq3D.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getM(i), testSeq3DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
+            Assert.assertEquals(testSeq2DM.getPositionN(i).getM(), testSeq2DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
+
+            Assert.assertEquals(testSeq3DM.getPositionN(i).getM(), testSeq3DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
 
 
             try {
@@ -393,12 +366,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testEquals() {
-        assertEquals(testSeq2D, new PackedPointSequence(new double[]{0, 0, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED));
-        assertEquals(testSeq3D, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d3D, CrsId.UNDEFINED));
-        assertEquals(testSeq2DM, new PackedPointSequence(new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-        assertEquals(testSeq3DM, new PackedPointSequence(new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}, DimensionalFlag.d3DM, CrsId.UNDEFINED));
+        assertEquals(testSeq2D, new PackedPositionSequence<>(crs, new double[]{0, 0, 1, -1, 2, -2}));
+        assertEquals(testSeq3D, new PackedPositionSequence<>(crsZ, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
+        assertEquals(testSeq2DM, new PackedPositionSequence<>(crsM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
+        assertEquals(testSeq3DM, new PackedPositionSequence<>(crsZM,new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}));
         assertFalse(testSeq2DM.equals(testSeq3D));
-        assertFalse(testSeq2D.equals(new PackedPointSequence(new double[]{0, 1, 1, -1, 2, -2}, DimensionalFlag.d2D, CrsId.UNDEFINED)));
+        assertFalse(testSeq2D.equals(new PackedPositionSequence<>(crs, new double[]{0, 1, 1, -1, 2, -2})));
 
     }
 

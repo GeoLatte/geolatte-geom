@@ -23,8 +23,8 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -40,16 +40,14 @@ class MySqlWkbDecoder extends AbstractWkbDecoder {
     protected void prepare(ByteBuffer byteBuffer) {
         byteBuffer.setByteOrder(ByteOrder.NDR);
         int srid = byteBuffer.getInt();
-        setCrsId(CrsId.valueOf(srid));
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+                CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+        setCoordinateReferenceSystem(crs);
     }
 
-    @Override
-    protected DimensionalFlag determineDimensionalFlag(int typeCode) {
-        return DimensionalFlag.d2D; // MYSQL only supports 2D geometries
-    }
 
     @Override
-    protected void readSridIfPresent(ByteBuffer byteBuffer, int typeCode) {
+    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
         //is already done in prepare() method
     }
 

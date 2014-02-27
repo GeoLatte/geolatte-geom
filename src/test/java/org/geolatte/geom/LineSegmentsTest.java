@@ -21,7 +21,9 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -33,18 +35,22 @@ import static org.junit.Assert.fail;
  */
 public class LineSegmentsTest {
 
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+
     @Test
     public void testLineSegments() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.d3D, CrsId.UNDEFINED);
-        builder.add(new double[]{1, 1, 1, 1});
-        builder.add(new double[]{2, 2, 2, 2});
-        builder.add(new double[]{3, 3, 3, 3});
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<>(3, crsZ);
+        builder.add(1, 1, 1);
+        builder.add(2, 2, 2);
+        builder.add(3, 3, 3);
+        PositionSequence<P3D> sequence = builder.toPositionSequence();
         int cnt = 0;
         double startX = 1.0d;
-        for (LineSegment ls : new LineSegments(sequence)) {
-            assertEquals(startX, ls.getStartPoint().getX(), Math.ulp(1.0d));
-            startX = ls.getEndPoint().getX();
+        for (LineSegment<P3D> ls : new LineSegments<>(sequence)) {
+            assertEquals(startX, ls.getStartPosition().getX(), Math.ulp(1.0d));
+            startX = ls.getEndPosition().getX();
             cnt++;
         }
         assertEquals(2, cnt);
@@ -52,9 +58,9 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(0, DimensionalFlag.d3DM, CrsId.UNDEFINED);
-        PointSequence sequence = builder.toPointSequence();
-        for (LineSegment ls : new LineSegments(sequence)) {
+        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<>(0, crs);
+        PositionSequence<P2D> sequence = builder.toPositionSequence();
+        for (LineSegment<P2D> ls : new LineSegments<>(sequence)) {
             fail();
         }
     }

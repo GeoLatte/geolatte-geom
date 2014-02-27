@@ -24,14 +24,14 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
 
-abstract class AbstractDecoder<G extends Geometry> implements Decoder<G> {
+abstract class AbstractDecoder implements Decoder {
 
-	public G decode(SqlServerGeometry nativeGeom) {
+	public Geometry<?> decode(SqlServerGeometry nativeGeom) {
 		if ( !accepts( nativeGeom ) ) {
 			throw new IllegalArgumentException( getClass().getSimpleName() + " received object of type " + nativeGeom.openGisType() );
 		}
 		if ( nativeGeom.isEmpty() ) {
-			G nullGeom = createNullGeometry();
+			Geometry<?> nullGeom = createNullGeometry();
 			return nullGeom;
 		}
 		return createGeometry( nativeGeom );
@@ -47,10 +47,10 @@ abstract class AbstractDecoder<G extends Geometry> implements Decoder<G> {
 
 	protected abstract OpenGisType getOpenGisType();
 
-	protected abstract G createNullGeometry();
+	protected abstract Geometry<?> createNullGeometry();
 
-	protected abstract G createGeometry(SqlServerGeometry nativeGeom);
+	protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom);
 
-	protected abstract G createGeometry(SqlServerGeometry nativeGeom, int shapeIndex);
+	protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex);
 
 }

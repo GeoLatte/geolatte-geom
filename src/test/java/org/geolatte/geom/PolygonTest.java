@@ -21,12 +21,13 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
+import static org.geolatte.geom.builder.DSL.point;
+import static org.junit.Assert.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -34,44 +35,46 @@ import static org.junit.Assert.fail;
  */
 public class PolygonTest {
 
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
 
-    PointSequence shellPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
-    PointSequence innerPoints = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
 
-    PointSequence shellPoints2 = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
-    PointSequence innerPoints2 = PointCollectionFactory.create(new double[]{1, 1, 9, 1, 9, 9, 1, 9, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PositionSequence<P2D> shellPoints = variableSized(crs).add(0, 0).add(10, 0).add(10, 10).add( 0, 10).add( 0, 0).toPositionSequence();
+    PositionSequence<P2D> innerPoints = variableSized(crs).add(1, 1).add( 9, 1).add(9, 9).add(1, 9).add( 1, 1).toPositionSequence();
 
-    PointSequence shellPoints3 = PointCollectionFactory.create(new double[]{1, 1, 10, 0, 10, 10, 0, 10, 1, 1}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PositionSequence<P2D> shellPoints2 = variableSized(crs).add(0, 0).add(10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
+    PositionSequence<P2D> innerPoints2 = variableSized(crs).add(1, 1).add( 9, 1).add( 9, 9).add( 1, 9).add( 1, 1).toPositionSequence();
+
+    PositionSequence<P2D> shellPoints3 = variableSized(crs).add(1, 1).add(10, 0).add(10, 10).add(0, 10).add(1, 1).toPositionSequence();
 
 
     @Test
     public void testEmptyRingsThrowIllegalArgumentException(){
         try {
-            LinearRing shell = LinearRing.createEmpty();
-            new Polygon(new LinearRing[]{shell});
+            LinearRing<P2D> shell = new LinearRing<P2D>(crs);
+            new Polygon<P2D>(new LinearRing[]{shell});
             fail("Polygon with empty shell should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
 
         try {
-            LinearRing shell = new LinearRing(shellPoints);
-            LinearRing emptyInner = LinearRing.createEmpty();
-            new Polygon(new LinearRing[]{shell, emptyInner});
+            LinearRing<P2D> shell = new LinearRing<>(shellPoints);
+            LinearRing<P2D> emptyInner = new LinearRing<>(crs);
+            new Polygon<P2D>(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
     }
 
     @Test
     public void testPolygonEquality() {
-        LinearRing shell = new LinearRing(shellPoints);
-        LinearRing inner = new LinearRing(innerPoints);
-        Polygon polygon1 = new Polygon(new LinearRing[]{shell, inner});
+        LinearRing<P2D> shell = new LinearRing<>(shellPoints);
+        LinearRing<P2D> inner = new LinearRing<>(innerPoints);
+        Polygon<P2D> polygon1 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing(shellPoints2);
-        inner = new LinearRing(innerPoints2);
-        Polygon polygon2 = new Polygon(new LinearRing[]{shell, inner});
+        shell = new LinearRing<>(shellPoints2);
+        inner = new LinearRing<>(innerPoints2);
+        Polygon<P2D> polygon2 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
         shell = new LinearRing(shellPoints3);
-        Polygon polygon3 = new Polygon(new LinearRing[]{shell, inner});
+        Polygon<P2D> polygon3 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
 
         assertTrue(polygon1.equals(polygon1));
@@ -84,7 +87,7 @@ public class PolygonTest {
         assertFalse(polygon1.equals(polygon3));
         assertFalse(polygon3.equals(polygon1));
 
-        assertFalse(polygon1.equals(Points.create2D(1, 2)));
+        assertFalse(polygon1.equals(point(crs, 1, 2)));
 
     }
 

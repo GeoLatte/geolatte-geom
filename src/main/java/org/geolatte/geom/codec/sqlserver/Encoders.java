@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class Encoders {
 
-	final private static List<Encoder<? extends Geometry>> ENCODERS = new ArrayList<Encoder<? extends Geometry>>();
+	final private static List<Encoder> ENCODERS = new ArrayList<>();
 
 
 	static {
@@ -41,15 +41,15 @@ public class Encoders {
 		ENCODERS.add( new PointEncoder() );
 		ENCODERS.add( new LineStringEncoder() );
 		ENCODERS.add( new PolygonEncoder() );
-		ENCODERS.add( new GeometryCollectionEncoder<MultiPoint>(OpenGisType.MULTIPOINT) );
-		ENCODERS.add( new GeometryCollectionEncoder<MultiLineString>( OpenGisType.MULTILINESTRING ) );
-		ENCODERS.add( new GeometryCollectionEncoder<MultiPolygon>( OpenGisType.MULTIPOLYGON ) );
-		ENCODERS.add( new GeometryCollectionEncoder<GeometryCollection>( OpenGisType.GEOMETRYCOLLECTION ) );
+		ENCODERS.add( new GeometryCollectionEncoder(OpenGisType.MULTIPOINT) );
+		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.MULTILINESTRING ) );
+		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.MULTIPOLYGON ) );
+		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.GEOMETRYCOLLECTION ) );
 
 	}
 
-	public static Encoder<? extends Geometry> encoderFor(Geometry geom) {
-		for ( Encoder<? extends Geometry> encoder : ENCODERS ) {
+	public static Encoder encoderFor(Geometry<?> geom) {
+		for ( Encoder encoder : ENCODERS ) {
 			if ( encoder.accepts( geom ) ) {
 				return encoder;
 			}
@@ -57,8 +57,8 @@ public class Encoders {
 		throw new IllegalArgumentException( "No encoder for type " + geom.getGeometryType() );
 	}
 
-	public static <T extends Geometry> byte[] encode(T geom) {
-		Encoder<T> encoder = (Encoder<T>) encoderFor( geom );
+	public static byte[] encode(Geometry<?> geom) {
+		Encoder encoder = encoderFor( geom );
 		SqlServerGeometry sqlServerGeometry = encoder.encode( geom );
 		return SqlServerGeometry.serialize( sqlServerGeometry );
 	}

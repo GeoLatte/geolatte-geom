@@ -29,9 +29,9 @@ import org.geolatte.geom.Geometry;
  *
  * @author Karel Maesen, Geovise BVBA.
  */
-public interface Decoder<T extends Geometry> {
+public interface Decoder {
 
-	public T decode(SqlServerGeometry nativeGeom);
+	public Geometry<?> decode(SqlServerGeometry nativeGeom);
 
 	public boolean accepts(SqlServerGeometry nativeGeom);
 

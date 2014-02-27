@@ -62,7 +62,7 @@ public class Wkt {
      * @param wkt the WKT string to decode
      * @return The decoded Geometry
      */
-    public static Geometry fromWkt(String wkt) {
+    public static Geometry<?> fromWkt(String wkt) {
         WktDecoder decoder = newDecoder();
         return decoder.decode(wkt);
     }
@@ -74,7 +74,7 @@ public class Wkt {
      * @param geometry the <code>Geometry</code> to encode
      * @return the WKT representation of the given geometry
      */
-    public static String toWkt(Geometry geometry) {
+    public static String toWkt(Geometry<?> geometry) {
         WktEncoder encoder = newEncoder();
         return encoder.encode(geometry);
     }

@@ -34,10 +34,12 @@ public class TestCoordinateReferenceSystem {
 
     //test Equality
     @Test
-    public void testEquality(){
-        CoordinateReferenceSystem crs1 = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326);
-        CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), crs1.getName(),crs1.getAxes());
+    public void testEquality() {
+        GeographicCoordinateReferenceSystem crs1 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+        GeographicCoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
+                CrsId.parse("4326"), crs1.getName(), crs1.getCoordinateSystem().getAxes());
+        crs2.setDatum(crs1.getDatum());
+        crs2.setPrimeMeridian(crs1.getPrimeMeridian());
         assertEquals(crs1, crs2);
         assertEquals(crs1.hashCode(), crs2.hashCode());
     }
@@ -45,12 +47,13 @@ public class TestCoordinateReferenceSystem {
     //test Equality
     @Test
     public void testInEquality(){
-        CoordinateReferenceSystem crs1 = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326);
+        CoordinateReferenceSystem crs1 = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326, null);
         CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), "Other name",crs1.getAxes());
+                CrsId.parse("4326"), "Other name",crs1.getCoordinateSystem().getAxes());
         assertNotSame(crs1, crs2);
         crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), crs1.getName(), crs1.getAxes()[1], crs1.getAxes()[0]);
+                CrsId.parse("4326"), crs1.getName(), crs1.getCoordinateSystem().getAxes()[1],
+                crs1.getCoordinateSystem().getAxes()[0]);
         assertNotSame(crs1, crs2);
     }
 

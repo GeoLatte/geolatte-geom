@@ -22,30 +22,31 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.PointCollection;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-abstract class AbstractEncoder<G extends Geometry> implements Encoder<G> {
+abstract class AbstractEncoder implements Encoder {
 
-	public SqlServerGeometry encode(G geom) {
+    public <P extends Position<P>, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 		SqlServerGeometry nativeGeom = new SqlServerGeometry();
 		int srid = geom.getSRID();
 		nativeGeom.setSrid( srid < 0 ? 0 : srid );
 		nativeGeom.setIsValid();
 
-		if ( geom.isMeasured() ) {
+		if ( geom.getCoordinateReferenceSystem().hasMeasureAxis() ) {
 			nativeGeom.setHasMValues();
 		}
 
-        CountingPointSequenceBuilder coordinates = new CountingPointSequenceBuilder(geom.getDimensionalFlag(), geom.getCrsId());
-		List<Figure> figures = new ArrayList<Figure>();
-		List<Shape> shapes = new ArrayList<Shape>();
+        CountingPositionSequenceBuilder<P> coordinates = new CountingPositionSequenceBuilder<>(geom.getCoordinateReferenceSystem());
+		List<Figure> figures = new ArrayList<>();
+		List<Shape> shapes = new ArrayList<>();
 
 		encode( geom, -1, coordinates, figures, shapes );
-		encodePoints( nativeGeom, coordinates.toPointSequence() );
+		encodePoints( nativeGeom, coordinates.toPositionSequence() );
 		encodeFigures( nativeGeom, figures );
 		encodeShapes( nativeGeom, shapes );
 		return nativeGeom;
@@ -60,7 +61,9 @@ abstract class AbstractEncoder<G extends Geometry> implements Encoder<G> {
 	 * @param figures figure list to append to
 	 * @param shapes shape list to append to
 	 */
-	protected abstract void encode(Geometry geom, int parentShapeIndex, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes);
+	protected abstract void encode(Geometry<?> geom, int parentShapeIndex,
+                                   CountingPositionSequenceBuilder<?> coordinates,
+                                   List<Figure> figures, List<Shape> shapes);
 
 	protected void encodeShapes(SqlServerGeometry nativeGeom, List<Shape> shapes) {
 		nativeGeom.setNumberOfShapes( shapes.size() );
@@ -77,7 +80,7 @@ abstract class AbstractEncoder<G extends Geometry> implements Encoder<G> {
 	}
 
 
-	protected void encodePoints(SqlServerGeometry nativeGeom, PointCollection coordinates) {
+	protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
 		nativeGeom.setNumberOfPoints( coordinates.size() );
 		nativeGeom.allocateMValueArray();
 		for ( int i = 0; i < coordinates.size(); i++ ) {
@@ -85,12 +88,11 @@ abstract class AbstractEncoder<G extends Geometry> implements Encoder<G> {
 		}
 	}
 
-	protected void setCoordinate(SqlServerGeometry nativeGeom, int idx, PointCollection coordinate) {
-		if ( !nativeGeom.hasZValues() && !Double.isNaN( coordinate.getZ(idx) ) ) {
+	protected <P extends Position<P>> void setCoordinate(SqlServerGeometry nativeGeom, int idx, PositionSequence<P> coordinate) {
+		if ( !nativeGeom.hasZValues() && coordinate.getCoordinateReferenceSystem().hasVerticalAxis() )  {
 			nativeGeom.setHasZValues();
 			nativeGeom.allocateZValueArray();
 		}
-
 		nativeGeom.setCoordinate( idx, coordinate );
 	}
 

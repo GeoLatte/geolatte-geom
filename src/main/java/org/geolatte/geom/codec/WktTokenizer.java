@@ -21,10 +21,11 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilders;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.PositionSequenceBuilders;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 
 /**
  * A tokenizer for WKT representations.
@@ -37,38 +38,38 @@ import org.geolatte.geom.crs.CrsId;
 class WktTokenizer extends AbstractWktTokenizer {
 
     private boolean isMeasured = false;
-    private final CrsId crsId;
+    private final CoordinateReferenceSystem<?> baseCRS;
 
     /**
      * A Tokenizer for the specified WKT string
      *
      * @param wkt                     the string to tokenize
      * @param variant                 the list of words to recognize as separate variant
-     * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
+     * @param baseCRS   the <code>CoordinateReferenceSystem</code> for the points in the WKT representation.
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId) {
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS) {
         super(wkt, variant);
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
-        if (crsId == null) {
-            this.crsId = CrsId.UNDEFINED;
+        if (baseCRS == null) {
+            this.baseCRS = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         } else {
-            this.crsId = crsId;
+            this.baseCRS = baseCRS;
         }
     }
 
     @Override
     WktToken numericToken() {
-        DimensionalFlag dimensionalFlag = countDimension();
+        CoordinateReferenceSystem<?> crs = countDimension();
         int numPoints = countPoints();
-        double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag, crsId);
+        double[] coords = new double[crs.getCoordinateDimension()];
+        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPoints, crs);
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);
             skipPointDelimiter();
         }
-        return new WktPointSequenceToken(psBuilder.toPointSequence());
+        return new WktPointSequenceToken(psBuilder.toPositionSequence());
     }
 
     private void readPoint(double[] coords) {
@@ -145,7 +146,7 @@ class WktTokenizer extends AbstractWktTokenizer {
      *
      * @return
      */
-    private DimensionalFlag countDimension() {
+    private CoordinateReferenceSystem countDimension() {
         int pos = currentPos;
         int num = 1;
         boolean inNumber = true;
@@ -161,11 +162,22 @@ class WktTokenizer extends AbstractWktTokenizer {
             if (pos == wkt.length() - 1) throw new WktDecodeException("");
             c = wkt.charAt(++pos);
         }
-        if (num == 4) return DimensionalFlag.d3DM;
-        if (num == 3 && isMeasured) return DimensionalFlag.d2DM;
-        if (num == 3 && !isMeasured) return DimensionalFlag.d3D;
-        if (num == 2) return DimensionalFlag.d2D;
+        if (num == 4) return ensureZM(baseCRS, true, true);
+        if (num == 3 && isMeasured) return ensureZM(baseCRS, false, true);
+        if (num == 3 && !isMeasured) return ensureZM(baseCRS, true, false);
+        if (num == 2) return baseCRS;
         throw new WktDecodeException("Point with less than 2 coordinates at position " + currentPos);
+    }
+
+    private CoordinateReferenceSystem<?> ensureZM(CoordinateReferenceSystem<?> crs, boolean needZ, boolean needM) {
+        CoordinateReferenceSystem<?> compound = crs;
+        if (needZ && !compound.hasVerticalAxis()) {
+            compound = compound.addVerticalAxis(LengthUnit.METER);
+        }
+        if(needM && !compound.hasMeasureAxis()) {
+            compound = compound.addMeasureAxis(LengthUnit.METER);
+        }
+        return compound;
     }
 
     private void skipPointDelimiter() {
@@ -178,9 +190,9 @@ class WktTokenizer extends AbstractWktTokenizer {
         if (token instanceof WktGeometryToken) {
             this.isMeasured = isMeasured || ((WktGeometryToken) token).isMeasured();
         }
-        if (token instanceof WktDimensionMarkerToken) {
-            this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
-        }
+//        if (token instanceof WktDimensionMarkerToken) {
+//            this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
+//        }
         return token;
     }
 

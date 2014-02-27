@@ -23,8 +23,9 @@ package org.geolatte.geom.codec;
 
 
 import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
@@ -38,16 +39,16 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
 
     //size of an empty geometry is the size of an emp
     @Override
-    protected int sizeEmptyGeometry(Geometry geometry) {
+    protected <P extends Position<P>> int sizeEmptyGeometry(Geometry<P> geometry) {
         return ByteBuffer.UINT_SIZE;
     }
 
 
-    protected WkbVisitor newWkbVisitor(ByteBuffer output) {
-        return new PostgisWkbVisitor(output);
+    protected <P extends Position<P>> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
+        return new PostgisWkbVisitor<>(output);
     }
 
-    static private class PostgisWkbVisitor extends WkbVisitor {
+    static private class PostgisWkbVisitor<P extends Position<P>> extends WkbVisitor<P> {
 
         private boolean hasWrittenSrid = false;
 
@@ -55,16 +56,17 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
             super(byteBuffer);
         }
 
-        protected void writeTypeCodeAndSrid(Geometry geometry, DimensionalFlag dimension, ByteBuffer output) {
+        protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
             int typeCode = getGeometryType(geometry);
             boolean hasSrid = (geometry.getSRID() > 0);
+            CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
             if (hasSrid && !hasWrittenSrid) {
                 typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
             }
-            if (dimension.isMeasured()) {
+            if (crs.hasMeasureAxis()) {
                 typeCode |= PostgisWkbTypeMasks.M_FLAG;
             }
-            if (dimension.is3D()) {
+            if (crs.hasVerticalAxis()) {
                 typeCode |= PostgisWkbTypeMasks.Z_FLAG;
             }
             output.putUInt(typeCode);

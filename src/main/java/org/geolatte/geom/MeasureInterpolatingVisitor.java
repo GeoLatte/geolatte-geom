@@ -21,7 +21,7 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,24 +50,23 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/10/12
  */
-public class MeasureInterpolatingVisitor implements GeometryVisitor {
+public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> implements GeometryVisitor<P> {
 
     private static final String INVALID_TYPE_MSG =
             "Operation only valid on Point, MultiPoint, LineString, and MultiLineString Geometries.";
 
 
+    private final Geometry<P> geometry;
     private final double startMeasure;
     private final double endMeasure;
-    private final CrsId crsId;
-    private final GeometryOperations ops;
-    private final DimensionalFlag dimFlag;
+
 
     //data structures for the result
-    private final List<PointSequence> pointSequences = new ArrayList<PointSequence>();
-    private PointSequenceBuilder currentBuilder;
+    private final List<PositionSequence<P>> positionSequences = new ArrayList<PositionSequence<P>>();
+    private PositionSequenceBuilder<P> currentBuilder;
     private boolean sequenceIsEmpty = true;
 
-    public MeasureInterpolatingVisitor(Geometry geometry, double startMeasure, double endMeasure) {
+    public MeasureInterpolatingVisitor(Geometry<P> geometry, double startMeasure, double endMeasure) {
         if (startMeasure <= endMeasure) {
             this.startMeasure = startMeasure;
             this.endMeasure = endMeasure;
@@ -76,28 +75,27 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             this.endMeasure = startMeasure;
         }
 
-        this.crsId = geometry.getCrsId();
-        this.ops = geometry.getGeometryOperations();
-        this.dimFlag = DimensionalFlag.valueOf(geometry.is3D(), geometry.isMeasured());
+        this.geometry = geometry;
     }
 
     @Override
-    public void visit(Point point) {
-        if (point.getM() >= startMeasure && point.getM() <= endMeasure) {
-            pointSequences.add(point.getPoints());
+    public void visit(Point<P> point) {
+        P pos = point.getPosition();
+        if (pos.getM() >= startMeasure && pos.getM() <= endMeasure) {
+            positionSequences.add(point.getPositions());
         }
     }
 
     //TODO -- make this more robust against rounding errors
 
     @Override
-    public void visit(LineString lineString) {
-        currentBuilder = PointSequenceBuilders.variableSized(dimFlag, crsId);
-        Point lastAddedPoint = null;
-        LineSegments segments = new LineSegments(lineString.getPoints());
-        for (LineSegment segment : segments) {
-            Point p0 = segment.getStartPoint();
-            Point p1 = segment.getEndPoint();
+    public void visit(LineString<P> lineString) {
+        currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getCoordinateReferenceSystem());
+        P lastAddedPoint = null;
+        LineSegments<P> segments = new LineSegments<P>(lineString.getPositions());
+        for (LineSegment<P> segment : segments) {
+            P p0 = segment.getStartPosition();
+            P p1 = segment.getEndPosition();
 
             //determine the interpolation factors
             //Note: rs and re can be Infinite (when p1 and p0 have the same M-value).
@@ -134,22 +132,22 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             }
         }
 
-        PointSequence last = currentBuilder.toPointSequence();
+        PositionSequence<P> last = currentBuilder.toPositionSequence();
         if (!last.isEmpty()) {
-            pointSequences.add(last);
+            positionSequences.add(last);
         }
 
     }
 
     private void startNewPointSequenceIfNotEmpty() {
         if (!sequenceIsEmpty) {
-            pointSequences.add(currentBuilder.toPointSequence());
-            currentBuilder = PointSequenceBuilders.variableSized(dimFlag, crsId);
+            positionSequences.add(currentBuilder.toPositionSequence());
+            currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getCoordinateReferenceSystem());
             sequenceIsEmpty = true;
         }
     }
 
-    private Point addIfNotEqualLast(Point lastPoint, Point newPnt) {
+    private P addIfNotEqualLast(P lastPoint, P newPnt) {
         assert (newPnt != null);
         if (!newPnt.equals(lastPoint)) {
             currentBuilder.add(newPnt);
@@ -159,15 +157,17 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
         return lastPoint;
     }
 
-    private Point interpolate(Point p0, Point p1, double r) {
+    private P  interpolate(P p0, P p1, double r) {
         double x = p0.getX() + r * (p1.getX() - p0.getX());
         double y = p0.getY() + r * (p1.getY() - p0.getY());
         double m = p0.getM() + r * (p1.getM() - p0.getM());
-        if (p0.is3D()) {
-            double z = p0.getZ() + r * (p1.getZ() - p0.getZ());
-            return Points.create3DM(x, y, z, m);
+        if (p0 instanceof Vertical) {
+            Vertical v0 = (Vertical)p0;
+            Vertical v1 = (Vertical)p1;
+            double z = v0.getAltitude() + r * (v1.getAltitude() - v0.getAltitude());
+            return Positions.mkPosition(getCrs(), x, y, z, m);
         } else {
-            return Points.create2DM(x, y, m);
+            return Positions.mkPosition(getCrs(), x, y, m);
         }
     }
 
@@ -178,23 +178,15 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
 
     @Override
     public void visit(GeometryCollection collection) {
+
     }
 
-    @Override
-    public void visit(LinearRing linearRing) {
-        visit((LineString) linearRing);
-    }
-
-    @Override
-    public void visit(PolyHedralSurface surface) {
-        throw new IllegalArgumentException(INVALID_TYPE_MSG);
-    }
-
-    public Geometry result() {
+    @SuppressWarnings("unchecked")
+    public Geometry<P> result() {
         int number0Dimensional = 0;
         int number1Dimensional = 0;
 
-        for (PointSequence ps : pointSequences) {
+        for (PositionSequence ps : positionSequences) {
             assert (!ps.isEmpty());
             if (ps.size() > 1) {
                 number1Dimensional++;
@@ -204,49 +196,58 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
         }
 
         if (number0Dimensional == 0 && number1Dimensional == 0) {
-            return Point.EMPTY;
+            Position p = Positions.mkPosition(getCrs(), Double.NaN, Double.NaN);
+            return new Point(p, getOps());
         }
 
         if (number0Dimensional > 1 && number1Dimensional == 0) {
-            Point[] pnts = new Point[number0Dimensional];
+            Point<P>[] pnts = (Point<P>[])new Point[number0Dimensional];
             int i = 0;
-            for (PointSequence ps : pointSequences) {
-                pnts[i++] = new Point(ps, this.ops);
+            for (PositionSequence<P> ps : positionSequences) {
+                pnts[i++] = new Point<P>(ps, getOps());
             }
-            return new MultiPoint(pnts);
+            return new MultiPoint<P>(pnts);
         }
 
         if (number0Dimensional == 1 && number1Dimensional == 0) {
-            return new MultiPoint(
-                    new Point[]{new Point(pointSequences.get(0), this.ops)}
+            return new MultiPoint<P>(
+                    new Point[]{new Point<P>(positionSequences.get(0), getOps())}
             );
         }
 
         if (number0Dimensional == 0 && number1Dimensional >= 1) {
-            LineString[] lineStrings = new LineString[number1Dimensional];
+            LineString<P>[] lineStrings = (LineString<P>[])new LineString[number1Dimensional];
             int i = 0;
-            for (PointSequence ps : pointSequences) {
-                lineStrings[i++] = new LineString(ps,  this.ops);
+            for (PositionSequence ps : positionSequences) {
+                lineStrings[i++] = new LineString<P>(ps,  getOps());
             }
-            return new MultiLineString(lineStrings);
+            return new MultiLineString<P>(lineStrings);
         }
 
         if (number0Dimensional > 0 && number1Dimensional > 0) {
-            Geometry[] geometries = new Geometry[number1Dimensional + number0Dimensional];
+            Geometry<P>[] geometries = (Geometry<P>[])new Geometry[number1Dimensional + number0Dimensional];
             int i = 0;
-            for (PointSequence ps : pointSequences) {
+            for (PositionSequence<P> ps : positionSequences) {
                 if (ps.size() == 1) {
-                    geometries[i++] = new Point(ps, this.ops);
+                    geometries[i++] = new Point<P>(ps, getOps());
                 } else {
-                    geometries[i++] = new LineString(ps, this.ops);
+                    geometries[i++] = new LineString<P>(ps, getOps());
                 }
             }
-            return new GeometryCollection(geometries);
+            return new GeometryCollection<P, Geometry<P>>(geometries);
         }
 
 
         throw new IllegalStateException(String.format(
                 "Programming error: Case of % d 0-Dim. en %d 1-Dim not properly handled",
                 number0Dimensional, number1Dimensional));
+    }
+
+    private CoordinateReferenceSystem<P> getCrs(){
+        return this.geometry.getCoordinateReferenceSystem();
+    }
+
+    private GeometryOperations<P> getOps(){
+        return this.geometry.getGeometryOperations();
     }
 }

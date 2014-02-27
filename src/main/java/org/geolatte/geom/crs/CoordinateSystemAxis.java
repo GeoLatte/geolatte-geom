@@ -33,12 +33,29 @@ public class CoordinateSystemAxis {
     private final CoordinateSystemAxisDirection coordinateSystemAxisDirection;
     private final Unit unit;
 
+    public static CoordinateSystemAxis mkLonAxis() {
+        return new CoordinateSystemAxis("Longitude", CoordinateSystemAxisDirection.EAST, LengthUnit.DEGREE);
+    }
+
+    public static CoordinateSystemAxis mkLatAxis() {
+        return new CoordinateSystemAxis("Latitude", CoordinateSystemAxisDirection.NORTH, LengthUnit.DEGREE);
+    }
+
+    public static CoordinateSystemAxis mkXAxis() {
+        return new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, LengthUnit.METER);
+    }
+
+    public static CoordinateSystemAxis mkYAxis() {
+        return new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, LengthUnit.METER);
+    }
+
+
     /**
      * Creates an instance.
      *
-     * @param axisName the name for this axis
+     * @param axisName                      the name for this axis
      * @param coordinateSystemAxisDirection the direction for this axis
-     * @param unit the unit of this axis
+     * @param unit                          the unit of this axis
      */
     public CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Unit unit) {
         this.axisName = axisName;
@@ -48,6 +65,7 @@ public class CoordinateSystemAxis {
 
     /**
      * Returns the name of this axis.
+     *
      * @return
      */
     public String getAxisName() {
@@ -60,6 +78,14 @@ public class CoordinateSystemAxis {
 
     public Unit getUnit() {
         return unit;
+    }
+
+    public boolean isMeasureAxis() {
+        return getAxisDirection().isMeasureAxisDirection();
+    }
+
+    public boolean isVerticalAxis() {
+        return getAxisDirection().isVerticalAxisDirection();
     }
 
     @Override

@@ -21,27 +21,117 @@
 
 package org.geolatte.geom.crs;
 
+import org.geolatte.geom.*;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Coordinate Reference System.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
+public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentifiable {
+
+    private final static Map<Class<? extends Position>, Class<? extends Measured>> measuredVariants =
+            new HashMap<Class<? extends Position>, Class<? extends Measured>>();
+
+    private final static Map<Class<? extends Position>, Class<? extends Vertical>> verticalVariants =
+            new HashMap<Class<? extends Position>, Class<? extends Vertical>>();
+
+
+    static {
+        measuredVariants.put(P2D.class, P2DM.class);
+        measuredVariants.put(P3D.class, P3DM.class);
+        measuredVariants.put(G2D.class, G2DM.class);
+        measuredVariants.put(G3D.class, G3DM.class);
+
+        verticalVariants.put(P2D.class, P3D.class);
+        verticalVariants.put(P2DM.class, P3DM.class);
+        verticalVariants.put(G2D.class, G3D.class);
+        verticalVariants.put(G2DM.class, G3DM.class);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Position<T>, M extends Position<M> & Measured> Class<M> getMeasuredVariant(Class<T> positionTypeClass) {
+        if (Measured.class.isAssignableFrom(positionTypeClass)) return (Class<M>) positionTypeClass;
+        return (Class<M>) measuredVariants.get(positionTypeClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Position<T>, V extends Position<V> & Vertical> Class<V> getVerticalVariant(Class<T> positionTypeClass) {
+        if (Vertical.class.isAssignableFrom(positionTypeClass)) return (Class<V>) positionTypeClass;
+        return (Class<V>) verticalVariants.get(positionTypeClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Position<T>, M extends Position<M> & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
+            CoordinateReferenceSystem<T> crs, CoordinateSystemAxis measureAxis) {
+
+        if (crs.hasMeasureAxis()) return (CoordinateReferenceSystem<M>) crs;
+        if (!measureAxis.isMeasureAxis()) throw new IllegalArgumentException("Require a MeasureAxis");
+        Class<?> measuredClass = measuredVariants.get(crs.getPositionClass());
+        return (CoordinateReferenceSystem<M>) crs.addAxes(crs.getName() + "_M", (Class<M>) measuredClass, measureAxis);
+    }
+
+    public static <T extends Position<T>, M extends Position<M> & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
+            CoordinateReferenceSystem<T> crs) {
+        return getMeasuredVariant(crs, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Position<T>, V extends Position<V> & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
+            CoordinateReferenceSystem<T> crs, CoordinateSystemAxis verticalAxis) {
+
+        if (crs.hasVerticalAxis()) return (CoordinateReferenceSystem<V>) crs;
+        if (!verticalAxis.isVerticalAxis()) {
+            throw new IllegalArgumentException("Require a VerticalAxis");
+        }
+        Class<?> verticalClass = verticalVariants.get(crs.getPositionClass());
+
+        return (CoordinateReferenceSystem<V>) crs.addAxes(crs.getName() + "_Z", (Class<V>) verticalClass, verticalAxis);
+    }
+
+    public static <T extends Position<T>, V extends Position<V> & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
+            CoordinateReferenceSystem<T> crs) {
+        return getVerticalVariant(crs, new CoordinateSystemAxis("V", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
+    }
 
     private final CoordinateSystem coordinateSystem;
+    private final Class<P> positionType;
+    private final CoordinateSystemAxis[] measureAxes;
+    private final NormalizedOrder normalizedOrder;
+
+    //TODO -- check that there are no more than there are no more than one LAT/Northing or EAST/Lon etc. are.
 
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.
      *
      * @param crsId the {@link CrsId} that identifies this <code>CoordinateReferenceSystem</code> uniquely
-     * @param name the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @param name  the commonly used name for this <code>CoordinateReferenceSystem</code>
+     * @param axes  the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
      * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
-    public CoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
+    public CoordinateReferenceSystem(CrsId crsId, String name, Class<P> positionType, CoordinateSystemAxis... axes) {
         super(crsId, name);
-        this.coordinateSystem = new CoordinateSystem(axes);
+        CoordinateSystem cs = new CoordinateSystem(axes);
+        this.coordinateSystem = cs;
+        this.positionType = positionType;
+        this.measureAxes = getCoordinateSystem().getMeasureAxes();
+        normalizedOrder = new NormalizedOrder(cs);
+    }
+
+
+    /**
+     * Returns the type token for the type of <code>Position</code>s referenced in this system.
+     *
+     * @return a Class object
+     */
+    public Class<P> getPositionClass() {
+        return this.positionType;
     }
 
 
@@ -55,14 +145,167 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
     }
 
     /**
-     * Return the {@link CoordinateSystemAxis CoordinateSystemAxes} associated with this <code>CoordinateRefereeceSystem</code>.
+     * Returns the coordinate dimension, i.e. the number of axes in this coordinate reference system.
+     *
+     * @return the coordinate dimension
+     */
+    public int getCoordinateDimension() {
+        return getCoordinateSystem().getCoordinateDimension();
+    }
+
+    /**
+     * Return the {@link CoordinateSystemAxis CoordinateSystemAxes} associated with this <code>CoordinateReferenceSystem</code>.
      *
      * @return an array of {@link CoordinateSystemAxis CoordinateSystemAxes}.
-     *
      */
-    public CoordinateSystemAxis[] getAxes(){
-        return coordinateSystem.getAxes();
+    public CoordinateSystemAxis getAxis(int idx) {
+        return coordinateSystem.getAxis(idx);
     }
+
+    /**
+     * Returns the index of the specified axis in this {@code CoordinateReferenceSystem}, or
+     * -1 if it is not an axis of this system.
+     */
+    public int getAxisIndex(CoordinateSystemAxis axis) {
+        return getCoordinateSystem().getAxisIndex(axis);
+    }
+
+    public CoordinateSystemAxis getVerticalAxis() {
+        return getCoordinateSystem().getVerticalAxis();
+    }
+
+    /**
+     * Returns the index of this system's vertical axis, or -1 if there is none.
+     * <p/>
+     * An axis is vertical if its {@code AxisDirection} is UP or DOWN.
+     *
+     * @return true if this instance contains a vertical axis.
+     */
+    public int getIndexVerticalAxis() {
+        CoordinateSystemAxis axis = getCoordinateSystem().getVerticalAxis();
+        return axis == null ? -1 : getAxisIndex(axis);
+    }
+
+    /**
+     * Returns the index of this system's vertical axis, or -1 if there is none.
+     * <p/>
+     * An axis is vertical if its {@code AxisDirection} is UP or DOWN.
+     *
+     * @return true if this instance contains a vertical axis.
+     */
+    public boolean hasVerticalAxis() {
+        return getVerticalAxis() != null;
+    }
+
+    /**
+     * Returns the indices of this system's measure axes, if any.
+     * <p/>
+     * An axis is a measure axis if its {@code AxisDirection} is UNKNOWN or OTHER.
+     *
+     * @return true if this instance contains a vertical axis.
+     */
+    public CoordinateSystemAxis[] getMeasureAxes() {
+        return this.measureAxes;
+    }
+
+
+    /**
+     * Returns the first measure axis, or null if there are no measure axes.
+     *
+     * @return
+     */
+    public CoordinateSystemAxis getMeasureAxis() {
+        CoordinateSystemAxis[] measureAxes = getMeasureAxes();
+        return measureAxes.length == 0 ? null : measureAxes[0];
+    }
+
+    /**
+     * Returns true if this system has at least one measure axis.
+     * <p/>
+     * An axis is a measure axis if its {@code AxisDirection} is UNKNOWN or OTHER.
+     *
+     * @return true if this instance contains a vertical axis.
+     */
+    public boolean hasMeasureAxis() {
+        return getMeasureAxes().length > 0;
+    }
+
+    public boolean isCompound() {
+        return false;
+    }
+
+    /**
+     * Derive a compound CRS from this instance by adding the specified axes.
+     *
+     * @param name
+     * @param axes
+     * @param <Q>  the expected type of Position for the resulting compound CRS.
+     * @return
+     */
+    //TODO -- remove this with addMeasure, addVertical axes + use reflection to derive appropriate targetPositionType
+    public <Q extends Position<Q>> CompoundCoordinateReferenceSystem<Q, P> addAxes(String name, Class<Q> targetPositionType, CoordinateSystemAxis... axes) {
+        boolean hasMeasure = false;
+        boolean hasVert = false;
+
+        for (CoordinateSystemAxis axis : getCoordinateSystem().getAxes()) {
+            if (axis.isMeasureAxis()) {
+                hasMeasure = true;
+            } else if (axis.isVerticalAxis()) {
+                hasVert = true;
+            }
+        }
+
+        for (CoordinateSystemAxis axis : axes) {
+            if (axis.isMeasureAxis()) {
+                hasMeasure = true;
+            } else if (axis.isVerticalAxis()) {
+                hasVert = true;
+            }
+        }
+
+        if (Vertical.class.isAssignableFrom(targetPositionType) && !hasVert) {
+            throw new IllegalStateException("Attempt to create a CRS without Vertical axis, but for Position with Vertical component.");
+        }
+
+        if (!Vertical.class.isAssignableFrom(targetPositionType) && hasVert) {
+            throw new IllegalStateException("Attempt to create a CRS with a Vertical axis, but for Position without Vertical component.");
+        }
+
+        if (Measured.class.isAssignableFrom(targetPositionType) && !hasMeasure) {
+            throw new IllegalStateException("Attempt to create a CRS without Measure axis, but for Position with Measure component.");
+        }
+
+        if (!Measured.class.isAssignableFrom(targetPositionType) && hasMeasure) {
+            throw new IllegalStateException("Attempt to create a CRS with a Measure axis, but for Position without Measure component.");
+        }
+
+        return new CompoundCoordinateReferenceSystem<Q, P>(name, this, targetPositionType, axes);
+    }
+
+    public <M extends Position<M> & Measured> CompoundCoordinateReferenceSystem<M, P> addMeasureAxis(Unit unit) {
+        Class<M> targetPType = CoordinateReferenceSystem.getMeasuredVariant(getPositionClass());
+        return addAxes(getName() + " [+M]", targetPType, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, unit));
+    }
+
+    public <V extends Position<V> & Vertical> CompoundCoordinateReferenceSystem<V, P> addVerticalAxis(Unit unit) {
+        Class<V> targetPType = CoordinateReferenceSystem.getVerticalVariant(getPositionClass());
+        return addAxes(getName() + " [+Z]", targetPType, new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.UP, unit));
+    }
+
+    public CoordinateReferenceSystem<?> getBaseCoordinateReferenceSystem() {
+        return this;
+    }
+
+    /**
+     * Provides the normalized order of {@code CoordinateSystemAxis}es to the axis order
+     * in this reference system.
+     *
+     * @return the normalized order mapping
+     */
+    public NormalizedOrder getNormalizedOrder() {
+        return this.normalizedOrder;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -72,14 +315,17 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
 
         CoordinateReferenceSystem that = (CoordinateReferenceSystem) o;
 
-        return !(coordinateSystem != null ? !coordinateSystem.equals(that.coordinateSystem) : that.coordinateSystem != null);
+        if (!coordinateSystem.equals(that.coordinateSystem)) return false;
+        if (!Arrays.equals(measureAxes, that.measureAxes)) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (coordinateSystem != null ? coordinateSystem.hashCode() : 0);
+        result = 31 * result + coordinateSystem.hashCode();
+        result = 31 * result + Arrays.hashCode(measureAxes);
         return result;
     }
 }

@@ -21,48 +21,41 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
  * A <code>LineString</code> that is both closed and simple.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
-public class LinearRing extends LineString {
+public class LinearRing<P extends Position<P>> extends LineString<P> {
 
-
-    final static LinearRing EMPTY = new LinearRing(EmptyPointSequence.INSTANCE, null);
-
-    public static LinearRing createEmpty(){
-        return EMPTY;
-    }
-
-    protected LinearRing(LineString lineString) {
+    protected LinearRing(LineString<P> lineString) {
         super(lineString);
         checkIsClosed();
     }
 
-    public LinearRing(PointSequence points, GeometryOperations geometryOperations) {
+    public LinearRing(CoordinateReferenceSystem<P> crs) {
+        super(crs);
+    }
+
+    public LinearRing(PositionSequence<P> points, GeometryOperations<P> geometryOperations) {
         super(points, geometryOperations);
         checkIsClosed();
     }
 
-    public LinearRing(PointSequence points) {
+    public LinearRing(PositionSequence<P> points) {
         this(points, null);
     }
-
 
     @Override
     public GeometryType getGeometryType() {
         return GeometryType.LINEAR_RING;
     }
 
-    @Override
-    public void accept(GeometryVisitor visitor) {
-        visitor.visit(this);
-    }
-
     private void checkIsClosed(){
-        if (isEmpty() || (isClosed() && getNumPoints() > 3)) return;
+        if (isEmpty() || (isClosed() && getNumPositions() > 3)) return;
         throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed or contains < 4 points.");
     }
 }

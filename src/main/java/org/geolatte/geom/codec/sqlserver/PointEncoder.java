@@ -23,6 +23,7 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
  */
-class PointEncoder extends AbstractEncoder<Point> {
+class PointEncoder extends AbstractEncoder {
 
 	/**
 	 * Encodes a point as an <code>SQLGeometryV1</code> object.
@@ -43,7 +44,7 @@ class PointEncoder extends AbstractEncoder<Point> {
 	 * @return
 	 */
 	@Override
-	public SqlServerGeometry encode(Point geom) {
+	public <P extends Position<P>, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 
 		SqlServerGeometry sqlServerGeom = new SqlServerGeometry();
 		int srid = geom.getSRID();
@@ -60,20 +61,20 @@ class PointEncoder extends AbstractEncoder<Point> {
 
 		sqlServerGeom.setIsSinglePoint();
 		sqlServerGeom.setNumberOfPoints( 1 );
-		if ( geom.is3D() ) {
+		if ( geom.getCoordinateReferenceSystem().hasVerticalAxis() ) {
 			sqlServerGeom.setHasZValues();
 			sqlServerGeom.allocateZValueArray();
 		}
-		if ( geom.isMeasured() ) {
+		if ( geom.getCoordinateReferenceSystem().hasMeasureAxis() ) {
 			sqlServerGeom.setHasMValues();
 			sqlServerGeom.allocateMValueArray();
 		}
-		sqlServerGeom.setCoordinate( 0, geom.getPoints() );
+		sqlServerGeom.setCoordinate( 0, geom.getPositions() );
 		return sqlServerGeom;
 	}
 
     @Override
-    protected void encode(Geometry geom, int parentIdx, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
+    protected void encode(Geometry<?> geom, int parentIdx, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
 		if ( !( geom instanceof Point ) ) {
 			throw new IllegalArgumentException( "Require Point geometry" );
 		}
@@ -83,7 +84,8 @@ class PointEncoder extends AbstractEncoder<Point> {
 		}
 		int pntOffset = coordinates.getNumAdded();
 		int figureOffset = figures.size();
-		coordinates.add( geom.getPointN(0) );
+        double[] c = new double[coordinates.getCoordinateReferenceSystem().getCoordinateDimension()];
+        coordinates.add( geom.getPositionN(0).toArray(c) );
 		Figure figure = new Figure( FigureAttribute.Stroke, pntOffset );
 		figures.add( figure );
 		Shape shape = new Shape( parentIdx, figureOffset, OpenGisType.POINT );

@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.crs;
 
+import org.geolatte.geom.*;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -36,7 +38,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem {
+public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem<P2D> {
 
     private final Projection projection;
     private final GeographicCoordinateReferenceSystem geoCRS;
@@ -57,7 +59,7 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
     public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
                                               CoordinateSystemAxis... axes) {
-        super(crsId, name, axes);
+        super(crsId, name, P2D.class, axes);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
@@ -93,22 +95,25 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProjectedCoordinateReferenceSystem)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         ProjectedCoordinateReferenceSystem that = (ProjectedCoordinateReferenceSystem) o;
 
-        if (geoCRS != null ? !geoCRS.equals(that.geoCRS) : that.geoCRS != null) return false;
-        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
-        if (projection != null ? !projection.equals(that.projection) : that.projection != null) return false;
+        if (!geoCRS.equals(that.geoCRS)) return false;
+        if (!parameters.equals(that.parameters)) return false;
+        if (!projection.equals(that.projection)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = projection != null ? projection.hashCode() : 0;
-        result = 31 * result + (geoCRS != null ? geoCRS.hashCode() : 0);
-        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        int result = super.hashCode();
+        result = 31 * result + projection.hashCode();
+        result = 31 * result + geoCRS.hashCode();
+        result = 31 * result + parameters.hashCode();
         return result;
     }
+
 }

@@ -21,9 +21,11 @@
 
 package org.geolatte.geom.crs;
 
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.P2D;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.CrsWktDecoder;
 import org.geolatte.geom.codec.WktDecodeException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.geolatte.geom.crs.CoordinateSystemAxis.*;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
@@ -45,7 +49,7 @@ import java.util.Map;
 public class CrsRegistry {
 
     final private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
-    final private static Map<Integer, CoordinateReferenceSystem> crsMap = new HashMap<Integer, CoordinateReferenceSystem>(4000);
+    final private static Map<Integer, CoordinateReferenceSystem<? extends Position>> crsMap = new HashMap<Integer, CoordinateReferenceSystem<? extends Position>>(4000);
     final private static Map<Integer, CrsId> crsIdMap = new HashMap<Integer, CrsId>(4000);
     final private static String DELIM = "\\|";
 
@@ -87,11 +91,13 @@ public class CrsRegistry {
         }
         Integer srid = Integer.valueOf(tokens[1]);
         try {
-            CoordinateReferenceSystem crs = decoder.decode(tokens[2]);
+            CoordinateReferenceSystem crs = decoder.decode(tokens[2], srid);
             crsMap.put(srid, crs);
             crsIdMap.put(srid, crs.getCrsId());
         } catch (WktDecodeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid, tokens[2], e.getMessage()));
+        } catch (InconsistentCoordinateSystemException e) {
+            LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
         }
 
     }
@@ -101,18 +107,46 @@ public class CrsRegistry {
      *
      * @param epsgCode the EPSG code
      * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
-     *         no such system is registered.
+     * no such system is registered.
      */
-    public static CoordinateReferenceSystem getCoordinateRefenceSystemForEPSG(int epsgCode) {
-        return crsMap.get(epsgCode);
+    public static CoordinateReferenceSystem<?> getCoordinateRefenceSystemForEPSG(int epsgCode, CoordinateReferenceSystem<?> fallback) {
+        CoordinateReferenceSystem<?> crs = crsMap.get(epsgCode);
+        return crs != null ? crs : fallback;
     }
+
+    public static GeographicCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
+        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
+        if (crs.getPositionClass().equals(G2D.class)) {
+            return (GeographicCoordinateReferenceSystem) crs;
+        }
+        throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
+    }
+
+    public static ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystemForEPSG(int epsgCode) {
+        CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
+        if (crs.getPositionClass().equals(P2D.class)) {
+            return (ProjectedCoordinateReferenceSystem) crs;
+        }
+        throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
+    }
+
+    public static CoordinateReferenceSystem<G2D> getUndefinedGeographicCoordinateReferenceSystem() {
+        return new GeographicCoordinateReferenceSystem(CrsId.UNDEFINED, "UNDEFINED",
+                mkLonAxis(), mkLatAxis());
+    }
+
+    public static CoordinateReferenceSystem<P2D> getUndefinedProjectedCoordinateReferenceSystem() {
+        return new CoordinateReferenceSystem<>(CrsId.UNDEFINED, "UNDEFINED", P2D.class, mkXAxis(), mkYAxis());
+    }
+
+
 
     /**
      * Returns the {@code CrsId} for the specified EPSG Code.
      *
      * @param epsgCode the EPSG code
      * @return the <code>CrsId</code> corresponding to the specified EPSG code, or null if
-     *         no such system is registered.
+     * no such system is registered.
      */
     public static CrsId getCrsIdForEPSG(int epsgCode) {
         return crsIdMap.get(epsgCode);

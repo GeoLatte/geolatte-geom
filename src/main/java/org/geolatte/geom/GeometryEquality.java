@@ -37,7 +37,7 @@ public interface GeometryEquality {
      * @param second a second <code>Geometry</code>
      * @return true if and only if both both <code>Geometry</code>s are equal.
      */
-    public boolean equals(Geometry first, Geometry second);
+    public <P extends Position<P>> boolean equals(Geometry<P> first, Geometry<P> second);
 
 
 

@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class Decoders {
 
-	final private static List<Decoder<? extends Geometry>> DECODERS = new ArrayList<Decoder<? extends Geometry>>();
+	final private static List<Decoder> DECODERS = new ArrayList<>();
 
 	static {
 		//Decoders
@@ -47,8 +47,8 @@ public class Decoders {
 	}
 
 
-	private static Decoder<? extends Geometry> decoderFor(SqlServerGeometry object) {
-		for ( Decoder<? extends Geometry> decoder : DECODERS ) {
+	private static Decoder decoderFor(SqlServerGeometry object) {
+		for ( Decoder decoder : DECODERS ) {
 			if ( decoder.accepts( object ) ) {
 				return decoder;
 			}
@@ -76,8 +76,8 @@ public class Decoders {
 	 *
 	 * @return
 	 */
-	public static Decoder<? extends Geometry> decoderFor(OpenGisType type) {
-		for ( Decoder<? extends Geometry> decoder : DECODERS ) {
+	public static Decoder decoderFor(OpenGisType type) {
+		for ( Decoder decoder : DECODERS ) {
 			if ( decoder.accepts( type ) ) {
 				return decoder;
 			}

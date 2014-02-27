@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.*;
 
@@ -44,6 +45,8 @@ class PostgisWktVariant extends WktVariant {
     }
 
     static {
+
+        //TODO -- this doesn't work well with LinearRings (geometry type doesn't match 1-1 to WKT types)
         //register the geometry tokens
         add(GeometryType.POINT, false, "POINT");
         add(GeometryType.POINT, true, "POINTM");
@@ -94,7 +97,10 @@ class PostgisWktVariant extends WktVariant {
     }
 
     private boolean sameGeometryType(WktGeometryToken token, Geometry geometry) {
-        return token.getType() == geometry.getGeometryType();
+        //TODO Need better handling for difference WKT/Geometry types. See comment above .
+        return token.getType() == geometry.getGeometryType() ||
+                (token.getType().equals(GeometryType.LINE_STRING) &&
+                geometry.getGeometryType().equals(GeometryType.LINEAR_RING));
     }
 
     /**
@@ -116,7 +122,8 @@ class PostgisWktVariant extends WktVariant {
         if (ignoreMeasureMarker) {
             return !candidate.isMeasured();
         }
-        if (geometry.isMeasured() && !geometry.is3D()) {
+        CoordinateReferenceSystem<?> crs = geometry.getCoordinateReferenceSystem();
+        if (crs.hasMeasureAxis() && !crs.hasVerticalAxis()) {
             return candidate.isMeasured();
         } else {
             return !candidate.isMeasured();

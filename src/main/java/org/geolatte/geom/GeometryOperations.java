@@ -30,7 +30,7 @@ package org.geolatte.geom;
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public interface GeometryOperations {
+public interface GeometryOperations<P extends Position<P>> {
 
     /**
      * Creates an operation to test the simplicity of the specified <code>Geometry</code>.
@@ -38,7 +38,7 @@ public interface GeometryOperations {
      * @param geometry the <code>Geometry</code> to test for simplicity.
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code> is simple.
      */
-    GeometryOperation<Boolean> createIsSimpleOp(final Geometry geometry);
+    GeometryOperation<Boolean> createIsSimpleOp(final Geometry<P> geometry);
 
     /**
      * Creates an operation to calculate the boundary of the specified <code>Geometry</code>.
@@ -46,7 +46,7 @@ public interface GeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the boundary.
      * @return a <code>GeometryOperation</code> that calculates a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
-    GeometryOperation<Geometry> createBoundaryOp(final Geometry geometry);
+    GeometryOperation<Geometry<P>> createBoundaryOp(final Geometry<P> geometry);
 
     /**
      * Creates an operation to calculate the <code>Envelope</code> of the specified <code>Geometry</code>.
@@ -54,7 +54,7 @@ public interface GeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the envelope.
      * @return a <code>GeometryOperation</code> that calculates the <code>Envelope</code> of the specified <code>Geometry</code>.
      */
-    GeometryOperation<Envelope> createEnvelopeOp(final Geometry geometry);
+    GeometryOperation<Envelope<P>> createEnvelopeOp(final Geometry<P> geometry);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s intersect.
@@ -63,7 +63,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the intersection test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially intersect
      */
-    GeometryOperation<Boolean> createIntersectsOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Boolean> createIntersectsOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s touch.
@@ -72,7 +72,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the touch test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially touch
      */
-    GeometryOperation<Boolean> createTouchesOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Boolean> createTouchesOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s cross.
@@ -81,7 +81,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the cross test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially cross
      */
-    GeometryOperation<Boolean> createCrossesOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Boolean> createCrossesOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the first specified <code>Geometry</code> spatially
@@ -91,7 +91,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the containment test
      * @return a <code>GeometryOperation</code> that checks if the first specified <code>Geometry</code> spatially contains the second
      */
-    GeometryOperation<Boolean> createContainsOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Boolean> createContainsOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s overlap.
@@ -100,7 +100,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the overlap test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially overlap
      */
-    GeometryOperation<Boolean> createOverlapsOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Boolean> createOverlapsOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s are spatially related by testing
@@ -113,7 +113,7 @@ public interface GeometryOperations {
      * @param matrix   the intersection pattern matrix
      * @return a <code>GeometryOperation</code> that checks if this instance intersects the specifed other <code>Geometry</code>
      */
-    GeometryOperation<Boolean> createRelateOp(final Geometry geometry, final Geometry other, final String matrix);
+    GeometryOperation<Boolean> createRelateOp(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
 
     /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
@@ -124,10 +124,10 @@ public interface GeometryOperations {
      * @param geometry the geometry on which to perform the calculation
      * @param mValue   the specified M-coordinate value
      * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching
-     *         the specified M-coordinate value.
+     * the specified M-coordinate value.
      * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
      */
-    GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue);
+    GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue);
 
     /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified range of M-coordinate value
@@ -140,10 +140,10 @@ public interface GeometryOperations {
      * @param startMeasure the start of the specified range of M-coordinate values
      * @param endMeasure   the end of the specified range of M-coordinate values
      * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching the
-     *         specified range of M-coordinate values.
+     * specified range of M-coordinate values.
      * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
      */
-    GeometryOperation<Geometry> createLocateBetweenOp(final Geometry geometry, final double startMeasure, final double endMeasure);
+    GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure);
 
     /**
      * Returns an operation to calculate the shortest distance between any two points in the two <code>Geometry</code>s in the
@@ -154,7 +154,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the shortest distance between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Double> createDistanceOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate a <code>Geometry</code> that represents all points whose distance from the specified
@@ -167,9 +167,9 @@ public interface GeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the buffer
      * @param distance the buffer distance
      * @return a <code>GeometryOperation</code> that calculates a 2D <code>Geometry</code> representing the
-     *         buffer of the specified <code>Geometry</code> with the specified distance.
+     * buffer of the specified <code>Geometry</code> with the specified distance.
      */
-    GeometryOperation<Geometry> createBufferOp(final Geometry geometry, final double distance);
+    GeometryOperation<Geometry<P>> createBufferOp(final Geometry<P> geometry, final double distance);
 
     /**
      * Returns an operation to calculate the convex hull of the specified <code>Geometry</code>.
@@ -177,7 +177,7 @@ public interface GeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the convex hull.
      * @return a <code>GeometryOperation</code> that calculates the convex hull for the specified <code>Geometry</code>.
      */
-    GeometryOperation<Geometry> createConvexHullOp(final Geometry geometry);
+    GeometryOperation<Geometry<P>> createConvexHullOp(final Geometry<P> geometry);
 
     /**
      * Returns an operation to calculate the point set intersection of the specified <code>Geometry</code>s.
@@ -186,7 +186,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set intersection between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry> createIntersectionOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Geometry<P>> createIntersectionOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set union of the specified <code>Geometry</code>s.
@@ -195,7 +195,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set union between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry> createUnionOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Geometry<P>> createUnionOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set difference of the specified <code>Geometry</code>s.
@@ -204,7 +204,7 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set difference between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry> createDifferenceOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Geometry<P>> createDifferenceOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set symmetric difference of the specified <code>Geometry</code>s.
@@ -213,25 +213,52 @@ public interface GeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set symmetric difference between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry> createSymDifferenceOp(final Geometry geometry, final Geometry other);
+    GeometryOperation<Geometry<P>> createSymDifferenceOp(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to encode the specified <code>Geometry</code> to Well-Known Text (WKT).
-     *
+     * <p/>
      * <p>Which "dialect" of WKT is used, is implementation defined. </p>
      *
      * @param geometry the <code>Geometry</code> to encode into WKT
      * @return An operation that encodes the specified <code>Geometry</code> to WKT
      */
-    GeometryOperation<String> createToWktOp(final Geometry geometry);
+    GeometryOperation<String> createToWktOp(final Geometry<P> geometry);
 
     /**
-      * Creates an operation to encode the specified <code>Geometry</code> to Well-Known Binary format (WKB).
-      *
-      * <p>Which "dialect" of WKB is used, is implementation defined. </p>
-      *
-      * @param geometry the <code>Geometry</code> to encode to WKB
-      * @return An operation that encodes the specified <code>Geometry</code> to WKB
-      */
-     GeometryOperation<ByteBuffer> createToWkbOp(final Geometry geometry);
+     * Creates an operation to encode the specified <code>Geometry</code> to Well-Known Binary format (WKB).
+     * <p/>
+     * <p>Which "dialect" of WKB is used, is implementation defined. </p>
+     *
+     * @param geometry the <code>Geometry</code> to encode to WKB
+     * @return An operation that encodes the specified <code>Geometry</code> to WKB
+     */
+    GeometryOperation<ByteBuffer> createToWkbOp(final Geometry<P> geometry);
+
+    /**
+     * Creates an operation to determine the length of the specified {@code Geometry}.
+     *
+     * @param geometry the Geometry
+     * @return the length of the specified Geometry
+     */
+    <G extends Geometry<P> & Linear<P>> GeometryOperation<Double> createGetLengthOp(final G geometry);
+
+    /**
+     * Creates an operation to determine the area of the specified {@code Geometry}.
+     *
+     * @param geometry the Geometry
+     * @return the area of the specified Geometry
+     */
+    <G extends Geometry<P> & Polygonal<P>> GeometryOperation<Double> createGetAreaOp(final G geometry);
+
+    /**
+     * Creates an operation that calculates a centroid for the specified {@code Geometry}.
+     *
+     * @param geometry the Geometry
+     * @param <G>      Polygonal  Geometry
+     * @return the centroid of the specified Geometry as a {@code Point}
+     */
+    <G extends Geometry<P> & Polygonal<P>> GeometryOperation<Point<P>> createGetCentroidOp(final G geometry);
+
+
 }

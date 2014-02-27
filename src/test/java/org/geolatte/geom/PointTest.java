@@ -21,10 +21,13 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
 
 /**
@@ -32,55 +35,49 @@ import static org.junit.Assert.*;
  */
 public class PointTest {
 
-    CrsId wgs84 = CrsId.valueOf(4326);
-    PointSequence seq2D = new PackedPointSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
-    PointSequence seq3D = new PackedPointSequence(new double[]{1,2, -3} , DimensionalFlag.d3D, wgs84);
-    PointSequence seq2DM = new PackedPointSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
-    PointSequence seq3DM = new PackedPointSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
-    Point point2D =  new Point(seq2D);
-    Point point3D =  new Point(seq3D);
-    Point point2DM = new Point(seq2DM);
-    Point point3DM = new Point(seq3DM);
-    Point emptyPoint = Points.createEmpty();
+//    PositionSequence seq2D = new PackedPositionSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
+//    PositionSequence seq3D = new PackedPositionSequence(new double[]{1,2, -3} , DimensionalFlag.d3D, wgs84);
+//    PositionSequence seq2DM = new PackedPositionSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
+//    PositionSequence seq3DM = new PackedPositionSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
+
+    Point<P2D> point2D = point(crs, 1, 2);
+    Point<P3D> point3D =  point(crsZ, 1,2,-3);
+    Point<P2DM> point2DM = point(crsM, 1, 2, 3);
+    Point<P3DM> point3DM = point(crsZM, 1, 2, 3, 4);
+    Point<P2D> emptyPoint = point(crs);
 
     @Test
     public void testGetX() throws Exception {
-        assertEquals(1, point2D.getX(), Math.ulp(10d));
-        assertEquals(1, point2DM.getX(), Math.ulp(10d));
-        assertEquals(1, point3D.getX(), Math.ulp(10d));
-        assertEquals(1, point3DM.getX(), Math.ulp(10d));
-        assertTrue(Double.isNaN(emptyPoint.getX()));
+        assertEquals(1, point2D.getPosition().getX(), Math.ulp(10d));
+        assertEquals(1, point2DM.getPosition().getX(), Math.ulp(10d));
+        assertEquals(1, point3D.getPosition().getX(), Math.ulp(10d));
+        assertEquals(1, point3DM.getPosition().getX(), Math.ulp(10d));
     }
 
     @Test
     public void testGetY() throws Exception {
-        assertEquals(2, point2D.getY(), Math.ulp(10d));
-        assertEquals(2, point2DM.getY(), Math.ulp(10d));
-        assertEquals(2, point3D.getY(), Math.ulp(10d));
-        assertEquals(2, point3DM.getY(), Math.ulp(10d));
-        assertTrue(Double.isNaN(emptyPoint.getY()));
-
+        assertEquals(2, point2D.getPosition().getY(), Math.ulp(10d));
+        assertEquals(2, point2DM.getPosition().getY(), Math.ulp(10d));
+        assertEquals(2, point3D.getPosition().getY(), Math.ulp(10d));
+        assertEquals(2, point3DM.getPosition().getY(), Math.ulp(10d));
     }
 
     @Test
     public void testGetZ() throws Exception {
-        assertTrue(Double.isNaN(point2D.getZ()));
-        assertTrue(Double.isNaN(point2DM.getZ()));
-        assertEquals(-3, point3D.getZ(), Math.ulp(10d));
-        assertEquals(3, point3DM.getZ(), Math.ulp(10d));
-        assertTrue(Double.isNaN(emptyPoint.getZ()));
-
+        assertEquals(-3, point3D.getPosition().getAltitude(), Math.ulp(10d));
+        assertEquals(3, point3DM.getPosition().getAltitude(), Math.ulp(10d));
     }
 
     @Test
     public void testGetM() throws Exception {
-        assertTrue(Double.isNaN(point2D.getM()));
-        assertTrue(Double.isNaN(point3D.getM()));
-        assertEquals(3, point2DM.getM(), Math.ulp(10d));
-        assertEquals(4, point3DM.getM(), Math.ulp(10d));
-        assertTrue(Double.isNaN(emptyPoint.getM()));
-
+        assertEquals(3, point2DM.getPosition().getM(), Math.ulp(10d));
+        assertEquals(4, point3DM.getPosition().getM(), Math.ulp(10d));
     }
 
     @Test
@@ -104,8 +101,8 @@ public class PointTest {
 
     @Test
     public void testSrid() throws Exception {
-        assertEquals(4326, point2D.getSRID());
-//        assertEquals(4326, emptyPoint3DM.getCrsId());
+        assertEquals(-1, point2D.getSRID());
+//        assertEquals(4326, emptyPoint3DM.getCoordinateReferenceSystem());
     }
 
 
@@ -122,24 +119,6 @@ public class PointTest {
     }
 
     @Test
-    public void testIs3D() throws Exception {
-        assertTrue(point3D.is3D());
-        assertTrue(point3DM.is3D());
-        assertFalse(point2D.is3D());
-        assertFalse(point2DM.is3D());
-        assertFalse(emptyPoint.is3D());
-    }
-
-    @Test
-    public void testIsMeasured() throws Exception {
-        assertTrue(point3DM.isMeasured());
-        assertTrue(point2DM.isMeasured());
-        assertFalse(emptyPoint.isMeasured());
-        assertFalse(point2D.isMeasured());
-        assertFalse(point3D.isMeasured());
-    }
-
-    @Test
     public void testBoundaryIsUnsupported() throws Exception {
         try{
             point2D.getBoundary();
@@ -149,46 +128,45 @@ public class PointTest {
 
     @Test
     public void testEmptyPointsAreAlwaysEqual(){
-        Point empty = Points.createEmpty();
+        Point<P2D> empty = new Point<>(crs);
         assertTrue(empty.equals(emptyPoint));
     }
 
     @Test
     public void testEqualsAndHashCode(){
-        Point test2D = Points.create(new double[]{1, 2}, DimensionalFlag.d2D, wgs84);
+        Point<P2D> test2D = point(crs, 1, 2);
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point test3D = Points.create(new double[]{1, 2, -3}, DimensionalFlag.d3D, wgs84);
+        Point<P3D> test3D = point(crsZ, 1, 2, -3);
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point test2DM = Points.create(new double[]{1, 2, 3}, DimensionalFlag.d2DM, wgs84);
+        Point<P2DM> test2DM = point(crsM, 1, 2, 3);
+
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point test3DM = Points.create(new double[]{1, 2, 3, 4}, DimensionalFlag.d3DM, wgs84);
+        Point<P3DM> test3DM = point(crsZM, 1, 2, 3, 4);
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2}, DimensionalFlag.d2D, CrsId.UNDEFINED)));
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.d3D, wgs84)));
-        assertFalse(point2D.equals(Points.create(new double[]{1, 2, 3}, DimensionalFlag.d2DM, wgs84)));
+        assertFalse(point2D.equals( point(l72, 1, 2)));
+        assertFalse(point2D.equals(point(crsZ, 1,2,3)));
+        assertFalse(point2D.equals(point(crsM, 1, 2, 3)));
     }
 
     @Test
     public void testPointEquality() {
-        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactCoordinatePointEquality(DimensionalFlag.d2D));
-        assertTrue(point3DM.equals(Points.create3DM(1, 2, 3, 4, wgs84)));
-        assertTrue(eq2D.equals(point3DM, Points.create2D(1, 2, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create2D(2, 1, wgs84)));
-        assertFalse(eq2D.equals(point3DM, Points.create2D(1, 2, CrsId.UNDEFINED)));
-        assertFalse(point2D.equals(Points.createEmpty()));
+        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactPositionEquality());
+        assertTrue(point3DM.equals(point(crsZM, 1, 2, 3, 4)));
+        assertTrue(eq2D.equals(point2D, point(crs, 1, 2)));
+        assertFalse(point2D.equals(emptyPoint));
     }
 
 
     @Test
     public void testEqualsAndHashCodeOnEmptyPoints(){
-        Point empty1 = Points.createEmpty();
-        Point empty2 = Points.createEmpty();
+        Point<P2D> empty1 = new Point<>(crs);
+        Point<P2D> empty2 = new Point<>(crs);
         assertEquals(empty1, empty2);
-        Point empty3 = new Point(EmptyPointSequence.INSTANCE,null);
+        Point<P2D> empty3 = point(crs);
         assertEquals(empty1, empty3);
     }
 }

@@ -29,16 +29,42 @@ package org.geolatte.geom.crs;
  */
 public enum CoordinateSystemAxisDirection {
 
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
-    UP,
-    DOWN,
-    OTHER,
-    UNKNOWN,
-    GeocentricX,
-    GeocentricY,
-    GeocentricZ
+    //TODO add enum value MEASURE
+
+    NORTH(Type.BASE),
+    EAST(Type.BASE),
+    SOUTH(Type.BASE),
+    WEST(Type.BASE),
+    UP(Type.VERTICAL),
+    DOWN(Type.VERTICAL),
+    OTHER(Type.MEASURE),
+    UNKNOWN(Type.MEASURE),
+    GeocentricX(Type.BASE),
+    GeocentricY(Type.BASE),
+    GeocentricZ(Type.BASE);
+
+    public  static enum Type {
+        VERTICAL,
+        MEASURE,
+        BASE        //axis of a project plane, or geodetic
+    }
+
+    public final Type type;
+
+    private CoordinateSystemAxisDirection(Type type) {
+        this.type = type;
+    }
+
+
+
+    public boolean isMeasureAxisDirection() {
+        return type == Type.MEASURE;
+    }
+
+    public boolean isVerticalAxisDirection() {
+        return type == Type.VERTICAL;
+    }
+
 
 }
+

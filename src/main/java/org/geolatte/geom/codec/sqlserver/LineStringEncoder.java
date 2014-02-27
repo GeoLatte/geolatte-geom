@@ -26,10 +26,10 @@ import org.geolatte.geom.*;
 import java.util.List;
 
 
-class LineStringEncoder extends AbstractEncoder<LineString> {
+class LineStringEncoder extends AbstractEncoder {
 
 	@Override
-	protected void encode(Geometry geom, int parentShapeIndex, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
+	protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
 		if ( !( geom instanceof LineString ) ) {
 			throw new IllegalArgumentException( "Require LineString geometry" );
 		}
@@ -39,15 +39,16 @@ class LineStringEncoder extends AbstractEncoder<LineString> {
 		}
 		int figureOffset = figures.size();
         int pointOffset = coordinates.getNumAdded();
-		for ( Point point : (PointSequence)geom.getPoints() ) {
-			coordinates.add( point );
+        double[] c = new double[coordinates.getCoordinateReferenceSystem().getCoordinateDimension()];
+        for ( Position<?> pos : geom.getPositions() ) {
+			coordinates.add( pos.toArray(c) );
 		}
 		figures.add( new Figure( FigureAttribute.Stroke, pointOffset ) );
 		shapes.add( new Shape( parentShapeIndex, figureOffset, OpenGisType.LINESTRING ) );
 	}
 
 	@Override
-	protected void encodePoints(SqlServerGeometry nativeGeom, PointCollection coordinates) {
+	protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
 		super.encodePoints( nativeGeom, coordinates );
 		if ( coordinates.size() == 2 ) {
 			nativeGeom.setIsSingleLineSegment();
@@ -57,4 +58,6 @@ class LineStringEncoder extends AbstractEncoder<LineString> {
 	public boolean accepts(Geometry geom) {
 		return geom instanceof LineString;
 	}
+
+
 }

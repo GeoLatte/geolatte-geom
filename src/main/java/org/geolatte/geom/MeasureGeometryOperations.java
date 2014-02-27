@@ -34,10 +34,10 @@ public interface MeasureGeometryOperations {
      * at the specified point
      *
      * @param geometry a linear <code>Geometry</code>
-     * @param point    a <code>Point</code> on the geometry
+     * @param pos    a <code>Position</code> on the geometry
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
-    public GeometryOperation<Double> createGetMeasureOp(Geometry geometry, Point point);
+    public <P extends Projected<P> & Measured> GeometryOperation<Double> createGetMeasureOp(Geometry<P> geometry, P pos);
 
     /**
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
@@ -50,7 +50,7 @@ public interface MeasureGeometryOperations {
      * @param keepBeginMeasure if true, than the measure of the first coordinate is used as start-value
      * @return a <code>GeometryOperation</code> that returns a Geometry with measures increasing with length
      */
-    public GeometryOperation<Geometry> createMeasureOnLengthOp(Geometry geometry, boolean keepBeginMeasure);
+    public <P extends Projected<P>> GeometryOperation<Geometry<?>> createMeasureOnLengthOp(Geometry<P> geometry, boolean keepBeginMeasure);
 
     /**
      * Creates a {@code GeometryOperation} that returns the minimum measure value of the points
@@ -62,7 +62,7 @@ public interface MeasureGeometryOperations {
      * @return the minimum measure
      * @throws IllegalArgumentException if the geometry is not a measured geometry
      */
-    public GeometryOperation<Double> createGetMinimumMeasureOp(Geometry geometry);
+    public <P extends Position<P> & Measured> GeometryOperation<Double> createGetMinimumMeasureOp(Geometry<P> geometry);
 
     /**
      * Creates a {@code GeometryOperation} that returns the maximum measure value of the points
@@ -74,7 +74,7 @@ public interface MeasureGeometryOperations {
      * @return the minimum measure
      * @throws IllegalArgumentException if the geometry is not a measured geometry
      */
-    public GeometryOperation<Double> createGetMaximumMeasureOp(Geometry geometry);
+    public <P extends Position<P> & Measured> GeometryOperation<Double> createGetMaximumMeasureOp(Geometry<P> geometry);
 
 
 }

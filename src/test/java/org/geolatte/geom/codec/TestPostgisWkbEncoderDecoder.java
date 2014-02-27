@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
@@ -170,13 +171,13 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_multilinestring_with_srid() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID);
-        MultiLineString geom = (MultiLineString) decode(byteBuffer);
+        MultiLineString<?> geom = (MultiLineString<?>) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
-        for (Geometry part : geom) {
-            assertEquals(4326, geom.getSRID());
+        for (Geometry<?> part : geom) {
+            assertEquals(4326, part.getSRID());
         }
         testEncoding(byteBuffer, geom);
     }
@@ -219,7 +220,7 @@ public class TestPostgisWkbEncoderDecoder {
 
     @Test
     public void test_empty_point() {
-        Geometry g = Points.createEmpty();
+        Geometry<G2D> g = new Point<>(CrsRegistry.getUndefinedGeographicCoordinateReferenceSystem());
         ByteBuffer buf = Wkb.toWkb(g);
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT);
         Geometry geom = decode(byteBuffer);
@@ -235,7 +236,7 @@ public class TestPostgisWkbEncoderDecoder {
     }
 
 
-    private Geometry decode(ByteBuffer byteBuffer) {
+    private Geometry<?> decode(ByteBuffer byteBuffer) {
         return Wkb.fromWkb(byteBuffer);
     }
 

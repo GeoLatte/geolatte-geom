@@ -29,8 +29,8 @@ package org.geolatte.geom;
  *     <li> both are empty</li>
  * </ul>
  *
- * <p>Point equality is determined by the {@link PointEquality} instance that is passed to the constructor. In
- * case of the default no-args constructor, {@link ExactCoordinatePointEquality} is used.</p>
+ * <p>Point equality is determined by the {@link PositionEquality} instance that is passed to the constructor. In
+ * case of the default no-args constructor, {@link ExactPositionEquality} is used.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/12
@@ -38,25 +38,25 @@ package org.geolatte.geom;
 public class GeometryPointEquality implements GeometryEquality {
 
 
-    private final PointCollectionEquality pointSeqEq;
+    private final PositionSequenceEquality pointSeqEq;
 
     /**
-     * Constructs an instance that uses the specified <code>PointEquality</code> to determine
-     * whether the <code>Geometry</code>s have the same <code>Point</code>s.
+     * Constructs an instance that uses the specified <code>PositionEquality</code> to determine
+     * whether the <code>Geometry</code>s have the same <code>Positions</code>s.
      *
      * @param pointEq
      */
-    public GeometryPointEquality(PointEquality pointEq) {
-        this.pointSeqEq = new PointCollectionPointEquality(pointEq);
+    public GeometryPointEquality(PositionEquality pointEq) {
+        this.pointSeqEq = new PositionSequencePositionEquality(pointEq);
     }
 
 /**
-     * Constructs an instance that uses {@ExactCoordinatePointEquality} to determine
-     * whether the <code>Geometry</code>s have the same <code>Point</code>s.
+     * Constructs an instance that uses {@code ExactPositionEquality} to determine
+     * whether the <code>Geometry</code>s have the same <code>Positions</code>s.
      */
     public GeometryPointEquality() {
-        ExactCoordinatePointEquality pointEquality = new ExactCoordinatePointEquality();
-        this.pointSeqEq = new PointCollectionPointEquality(pointEquality);
+        ExactPositionEquality pointEquality = new ExactPositionEquality();
+        this.pointSeqEq = new PositionSequencePositionEquality(pointEquality);
     }
 
 
@@ -66,26 +66,25 @@ public class GeometryPointEquality implements GeometryEquality {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Geometry first, Geometry second) {
+    public <P extends Position<P>> boolean equals(Geometry<P> first, Geometry<P> second) {
         if (first == second) return true;
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
         if (first.isEmpty() || second.isEmpty()) return false;
-        if (! first.getCrsId().equals(second.getCrsId())) return false;
+        if (! first.getCoordinateReferenceSystem().equals(second.getCoordinateReferenceSystem())) return false;
         if (first.getGeometryType() != second.getGeometryType()) return false;
         if (first instanceof GeometryCollection) {
             assert(second instanceof GeometryCollection);
-            return equals((GeometryCollection)first, (GeometryCollection)second);
+            return equals((GeometryCollection<?,?>)first, (GeometryCollection<?,?>)second);
         }
-        //TODO -- this is no longer necessary once we have nested sequences (as interfaces)
         if (first instanceof Polygon) {
             assert(second instanceof Polygon);
-            return equals((Polygon)first, (Polygon)second);
+            return equals((Polygon<P>)first, (Polygon<P>)second);
         }
-        return pointSeqEq.equals(first.getPoints(), second.getPoints());
+        return pointSeqEq.equals(first.getPositions(), second.getPositions());
     }
 
-    private boolean equals (Polygon first, Polygon second){
+    private <P extends Position<P>> boolean equals (Polygon<P> first, Polygon<P> second){
         if (first.getNumInteriorRing() != second.getNumInteriorRing()) return false;
         if (!equals(first.getExteriorRing(), second.getExteriorRing())) return false;
         for (int i = 0; i < first.getNumInteriorRing(); i++) {

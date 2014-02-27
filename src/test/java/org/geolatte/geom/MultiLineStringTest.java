@@ -21,7 +21,9 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,10 +36,16 @@ import static org.junit.Assert.assertNotNull;
  */
 public class MultiLineStringTest {
 
-    private MultiLineString ml1;
-    private MultiLineString ml2;
-    private MultiLineString empty;
-    private MultiLineString closedSimple;
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+//    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+//    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+//    private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+
+    private MultiLineString<P2DM> ml1;
+    private MultiLineString<P2DM> ml2;
+    private MultiLineString<P2DM> empty;
+    private MultiLineString<P2DM> closedSimple;
 
     double[] c1 = new double[]{0,0,1, 1,1,2, 2,2, 3};
     double[] c2 = new double[]{3,2,1, 4,2,2, 5,1, 3};
@@ -45,27 +53,21 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = new LineString(new PackedPointSequence(c1, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString ls2 = new LineString(new PackedPointSequence(c2, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString ls3 = new LineString(new PackedPointSequence(c3, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString lcs = new LineString(new PackedPointSequence(cClosedSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString lcns = new LineString(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString<P2DM> ls1 = new LineString<>(new PackedPositionSequence<>(crsM, c1));
+    LineString<P2DM> ls2 = new LineString<>(new PackedPositionSequence<>(crsM, c2));
+    LineString<P2DM> ls3 = new LineString<>(new PackedPositionSequence<>(crsM,c3));
+    LineString<P2DM> lcs = new LineString<>(new PackedPositionSequence<>(crsM, cClosedSimple));
+    LineString<P2DM> lcns = new LineString<>(new PackedPositionSequence<>(crsM, cClosedNonSimple));
 
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() {
-        ml1 = new MultiLineString(new LineString[]{ls1, ls2});
-        ml2 = new MultiLineString(new LineString[]{ls2, ls3});
-        empty = MultiLineString.createEmpty();
-        closedSimple = new MultiLineString(new LineString[]{lcs});
-        MultiLineString closedNonSimple = new MultiLineString(new LineString[]{lcs,lcns});
-    }
-
-    @Test
-    public void testConstituentsHaveSameDimension(){
-        for (int i = 0; i < ml1.getNumGeometries(); i++) {
-            assertEquals(((LineString) ml1.getGeometryN(i)).getPoints().getDimensionalFlag(), ml1.getPoints().getDimensionalFlag());
-        }
+        ml1 = new MultiLineString<>(ls1, ls2);
+        ml2 = new MultiLineString<>(ls2, ls3);
+        empty = new MultiLineString(crs);
+        closedSimple = new MultiLineString<>(lcs);
+        MultiLineString closedNonSimple = new MultiLineString(lcs,lcns);
     }
 
     @Test
@@ -146,16 +148,6 @@ public class MultiLineStringTest {
 
         @Override
         public void visit(GeometryCollection collection) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(LinearRing linearRing) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(PolyHedralSurface surface) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

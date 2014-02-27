@@ -26,12 +26,14 @@ import org.geolatte.geom.GeometryCollection;
 
 import java.util.List;
 
+import static org.geolatte.geom.Geometries.mkGeometryCollection;
+
 /**
  * <code>Decoder</code> for GeometryCollections.
  *
  * @Author Karel Maesen
  */
-class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder<GeometryCollection> {
+class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder<Geometry<?>> {
 
 
 	@Override
@@ -39,9 +41,8 @@ class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder<Geomet
 		return OpenGisType.GEOMETRYCOLLECTION;
 	}
 
-	protected GeometryCollection createGeometry(List<Geometry> geometries, boolean hasM) {
-		Geometry[] geomArray = geometries != null ? geometries.toArray( new Geometry[geometries.size()] ) : null;
-		return new GeometryCollection( geomArray );
+	protected GeometryCollection<?, ?> createGeometry(List<Geometry<?>> geometries, boolean hasM) {
+		return mkGeometryCollection( geometries);
 	}
 
 

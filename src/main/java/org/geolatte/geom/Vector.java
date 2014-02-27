@@ -42,19 +42,19 @@ public class Vector {
      * @param p1 the end point of the line segment
      * @param y  the point to project onto the linesegment
      * @return an array of length 2, with first element being the squared distance of Point y to the linesegment,
-     *         and second element the projection factor
+     * and second element the projection factor
      */
-    public static double[] pointToSegment2D(Point p0, Point p1, Point y) {
+    public static <P extends Projected<P>> double[] pointToSegment2D(P p0, P p1, P y) {
         //for algorithm, see "Geometric Tools for Computer Graphics", Ch. 6.
-        Point d = Vector.substract(p1, p0);
-        Point ymp0 = Vector.substract(y, p0);
+        P d = Vector.substract(p1, p0);
+        P ymp0 = Vector.substract(y, p0);
         double t = Vector.dot(d, ymp0, true);
         double dd = Vector.dot(d, d);
         if (t <= 0) {
             return new double[]{Vector.dot(ymp0, ymp0), t / dd};
         }
         if (t >= dd) {
-            Point ymp1 = Vector.substract(y, p1);
+            P ymp1 = Vector.substract(y, p1);
             return new double[]{Vector.dot(ymp1, ymp1), t / dd};
         }
         return new double[]{Vector.dot(ymp0, ymp0) - (t * t / dd), t / dd};
@@ -67,13 +67,13 @@ public class Vector {
      * @param p1 second operand
      * @return the dot-product of p0 and p1
      */
-    public static double dot(Point p0, Point p1) {
+    public static <P extends Projected<P>> double dot(P p0, P p1) {
         return dot(p0, p1, false);
     }
 
     /**
      * Returns the dot-product of the specified <code>Point</code>s
-     *
+     * <p/>
      * <p>If limit2D is set to true, Z-coordinates will be ignored so that the product is calculated in 2D.</p>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
@@ -82,46 +82,51 @@ public class Vector {
      * @param limit2D if true, the dot-product will be in 2D.
      * @return the dot-product of p0 and p1.
      */
-    public static double dot(Point p0, Point p1, boolean limit2D) {
-        if (limit2D || !p0.is3D() || !p1.is3D()) {
+    public static <P extends Projected> double dot(P p0, P p1, boolean limit2D) {
+        if (p0.isEmpty() || p1.isEmpty()) return Double.NaN;
+        if (limit2D || !(p0 instanceof Vertical) || !(p1 instanceof Vertical)) {
             return p0.getX() * p1.getX() + p0.getY() * p1.getY();
         } else {
-            return p0.getX() * p1.getX() + p0.getY() * p1.getY() + p0.getZ() * p1.getZ();
+            Vertical v0 = (Vertical) p0;
+            Vertical v1 = (Vertical) p1;
+            return p0.getX() * p1.getX() + p0.getY() * p1.getY() + ((Vertical) p0).getAltitude() * ((Vertical) p1).getAltitude();
         }
     }
 
     /**
      * Adds two <code>Point</code>s.
-     *
+     * <p/>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
      * @param p0 first operand
      * @param p1 second operand
      * @returns the sum of p0 and p1.
      */
-    public static Point add(Point p0, Point p1) {
-        if (p0.is3D() && p1.is3D()) {
-            return Points.create3D(p0.getX() + p1.getX(), p0.getY() + p1.getY(), p0.getZ() + p1.getZ());
-        } else {
-            return Points.create2D(p0.getX() + p1.getX(), p0.getY() + p1.getY());
+    public static <P extends Projected<P>> P add(P p0, P p1) {
+        int dim = p0.getCoordinateReferenceSystem().getCoordinateDimension();
+        double[] result = new double[dim];
+        for (int i = 0; i < dim; i++) {
+            result[i] = p0.getCoordinate(i) + p1.getCoordinate(i);
         }
+        return Positions.mkPosition(p0.getCoordinateReferenceSystem(), result);
     }
 
     /**
      * Subtracts two <code>Point</code>s.
-     *
+     * <p/>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
      * @param p0 first operand
      * @param p1 second operand
      * @returns the Point x = p0 - p1.
      */
-    public static Point substract(Point p0, Point p1) {
-        if (p0.is3D() && p1.is3D()) {
-            return Points.create3D(p0.getX() - p1.getX(), p0.getY() - p1.getY(), p0.getZ() - p1.getZ());
-        } else {
-            return Points.create2D(p0.getX() - p1.getX(), p0.getY() - p1.getY());
+    public static <P extends Projected<P>> P substract(P p0, P p1) {
+        int dim = p0.getCoordinateReferenceSystem().getCoordinateDimension();
+        double[] result = new double[dim];
+        for (int i = 0; i < dim; i++) {
+            result[i] = p0.getCoordinate(i) - p1.getCoordinate(i);
         }
+        return Positions.mkPosition(p0.getCoordinateReferenceSystem(), result);
     }
 
     /**
@@ -130,40 +135,35 @@ public class Vector {
      * from <code>P</code> in the 2D (X/Y) plane.</p>
      *
      * @param p a vector represented by a point.
-     * @return  the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
+     * @return the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
      */
-    public static Point perp(Point p){
-        if (p == null || p.isEmpty()) return Points.createEmpty();
-        if (p.is3D() && p.isMeasured()) {
-            return Points.create3DM(-p.getY(), p.getX(), p.getZ(), p.getM(), p.getCrsId());
-        }
-        if (p.is3D()) {
-            return Points.create3D(-p.getY(), p.getX(), p.getZ(), p.getCrsId());
-        }
-        if (p.isMeasured()) {
-            return Points.create2DM(-p.getY(), p.getX(), p.getM(), p.getCrsId());
-        }
-        return Points.create2D(-p.getY(), p.getX(), p.getCrsId());
+    public static <P extends Projected<P>> P perp(P p) {
+        if (p == null || p.isEmpty()) return p;
+        double[] crds = p.toArray(null);
+        double h = crds[0];
+        crds[0] = -crds[1];
+        crds[1] = h;
+        return Positions.mkPosition(p.getCoordinateReferenceSystem(), crds);
     }
 
 
     /**
      * Applies the perp dot-operation on the specified <code>Point</code>s
-     *
+     * <p/>
      * <p>The perp dot operation on vectors <code>P</code>, <code>Q</code> is defined as
      * <code>dot(perp(P),Q)</code>.</p>
-     *
+     * <p/>
      * <p>This operation will be performed in 2D only.</p>
      *
-     * @param p0      first operand
-     * @param p1      second operand
+     * @param p0 first operand
+     * @param p1 second operand
      * @return the Perp dot of p0 and p1.
      */
-    public static double perpDot(Point p0, Point p1) {
-        if (p0 == null || p1 == null || p0.isEmpty() || p1.isEmpty()) {
+    public static <P extends Projected<P>> double perpDot(P p0, P p1) {
+        if (p0 == null || p1 == null || p0.isEmpty() | p1.isEmpty()) {
             throw new IllegalArgumentException("Null or empty Point passed.");
         }
-            return -p0.getY() * p1.getX() + p0.getX() * p1.getY();
+        return -p0.getY() * p1.getX() + p0.getX() * p1.getY();
 
     }
 

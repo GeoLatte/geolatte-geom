@@ -11,16 +11,16 @@ import java.util.Set;
  * Base class for specifying Wkt/Wkb test cases
  */
 abstract public class WktWkbCodecTestBase {
-    public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
+    public final Map<Integer, CodecTestInput> testCases = new HashMap<>();
 
     public WktWkbCodecTestBase() {
     }
 
-    public void addCase(Integer key, String wkt, String wkb, Geometry geom) {
+    public void addCase(Integer key, String wkt, String wkb, Geometry<?> geom) {
         addCase(key, wkt, wkb, geom, true);
     }
 
-    public void addCase(Integer key, String wkt, String wkb, Geometry geom, boolean testEncoding) {
+    public void addCase(Integer key, String wkt, String wkb, Geometry<?> geom, boolean testEncoding) {
         CodecTestInput testInput = new CodecTestInput();
         testInput.wkt = wkt;
         testInput.wkbHex = wkb;
@@ -45,7 +45,7 @@ abstract public class WktWkbCodecTestBase {
      * @param testCase
      * @return
      */
-    public Geometry getExpected(Integer testCase) {
+    public Geometry<?> getExpected(Integer testCase) {
         return this.testCases.get(testCase).expected;
     }
 

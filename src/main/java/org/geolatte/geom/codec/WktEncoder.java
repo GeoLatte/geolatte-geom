@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 
 /**
  * An Encoder for WKT (Well-Known Text) representations.
@@ -36,5 +37,5 @@ public interface WktEncoder {
      * @param geometry the <code>Geometry</code> instance to encode
      * @return a WKT representation of the specified object.
      */
-    String encode(Geometry geometry);
+    <P extends Position<P>> String encode(Geometry<P> geometry);
 }

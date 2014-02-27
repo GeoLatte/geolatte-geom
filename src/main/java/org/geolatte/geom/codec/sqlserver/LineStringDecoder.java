@@ -22,9 +22,10 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.PointSequence;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.crs.CrsRegistry;
 
-class LineStringDecoder extends AbstractDecoder<LineString> {
+class LineStringDecoder extends AbstractDecoder {
 
 
 	@Override
@@ -32,16 +33,16 @@ class LineStringDecoder extends AbstractDecoder<LineString> {
 		return OpenGisType.LINESTRING;
 	}
 
-	protected LineString createNullGeometry() {
-		return LineString.createEmpty();
+	protected LineString<?> createNullGeometry() {
+		return new LineString<>(CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
 	}
 
-	protected LineString createGeometry(SqlServerGeometry nativeGeom) {
+	protected LineString<?> createGeometry(SqlServerGeometry nativeGeom) {
 		return createLineString( nativeGeom, new IndexRange( 0, nativeGeom.getNumPoints() ) );
 	}
 
 	@Override
-	protected LineString createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected LineString<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
 		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
 			return createNullGeometry();
 		}
@@ -50,8 +51,8 @@ class LineStringDecoder extends AbstractDecoder<LineString> {
 		return createLineString( nativeGeom, pntIndexRange );
 	}
 
-	protected LineString createLineString(SqlServerGeometry nativeGeom, IndexRange pntIndexRange) {
-		PointSequence coordinates = nativeGeom.coordinateRange( pntIndexRange );
-		return new LineString(coordinates);
+	protected LineString<?> createLineString(SqlServerGeometry nativeGeom, IndexRange pntIndexRange) {
+		PositionSequence<?> coordinates = nativeGeom.coordinateRange( pntIndexRange );
+		return new LineString<>(coordinates);
 	}
 }

@@ -21,25 +21,18 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
  * A LineString is a 1-dimensional <code>Geometry</code> consisting of the <code>LineSegment</code>s defined by
  * consecutive pairs of <code>Point</code>s of a <code>PointSequence</code>.
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class LineString extends Geometry {
+public class LineString<P extends Position<P>> extends Geometry<P> implements Linear<P>, Simple {
 
-    static final LineString EMPTY = new LineString(EmptyPointSequence.INSTANCE, null);
-
-    private final PointSequence points;
-
-    /**
-     * Constructs an empty <code>LineString</code>.
-     *
-     * @return
-     */
-    public static LineString createEmpty() {
-        return EMPTY;
+    public LineString(CoordinateReferenceSystem<P> crs) {
+        super(crs);
     }
 
     /**
@@ -47,49 +40,34 @@ public class LineString extends Geometry {
      *
      * @param base
      */
-    protected LineString(LineString base) {
-        super(base.getGeometryOperations());
-        this.points = base.points;
+    protected LineString(LineString<P> base) {
+        super(base.getPositions(), base.getGeometryOperations());
     }
 
     /**
-     * Constructs a <code>LineString</code> from the specified <code>PointSequence</code>, coordinate reference system
+     * Constructs a <code>LineString</code> from the specified positions
      * and <code>GeometryOperations</code> implementation.
      *
-     * @param points             the <code>PointSequence</code>
+     * @param positions the {@code PositionSequence} that determines this geometry
      * @param geometryOperations the <code>GeometryOperations</code> implementation
      * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size < 2
      */
-    public LineString(PointSequence points, GeometryOperations geometryOperations) {
-        super(geometryOperations);
-        if (points == null) {
-            points = EmptyPointSequence.INSTANCE;
+    public LineString(PositionSequence<P> positions, GeometryOperations<P> geometryOperations) {
+        super(positions, geometryOperations);
+        if (positions.size() != 0 && positions.size() < 2) {
+            throw new IllegalArgumentException("Require at least two points for a linestring");
         }
-        if (!points.isEmpty() && points.size() < 2) {
-            throw new IllegalArgumentException(
-                    String.format("Constructor of class %s requires PointSequence of size at least 2.",
-                            this.getClass().getSimpleName()));
-        }
-        this.points = points;
     }
+
+
 
     /**
-     * Constructs a <code>LineString</code> from the specified <code>PointSequence</code> and coordinate reference system
+     * Constructs a <code>LineString</code> from the specified positions
      *
-     * @param points the <code>PointSequence</code>
+     * @param positions the <code>PointSequence</code>
      */
-    public LineString(PointSequence points) {
-        this(points, null);
-    }
-
-
-    private boolean determineSimple() {
-        return super.isSimple();
-    }
-
-    @Override
-    public PointSequence getPoints() {
-        return points;
+    public LineString(PositionSequence<P> positions) {
+        this(positions, null);
     }
 
     /**
@@ -98,41 +76,27 @@ public class LineString extends Geometry {
      * @return the length of this <code>LineString</code> in its coordinate reference system.
      */
     public double getLength() {
-        double length = 0d;
-        Point prev = null;
-        for (Point pnt : getPoints()) {
-            if (prev == null) {
-                prev = pnt;
-                continue;
-            }
-            length += Math.hypot(pnt.getX() - prev.getX(), pnt.getY() - prev.getY());
-            prev = pnt;
-        }
-        return length;
+        return this.getGeometryOperations().createGetLengthOp(this).execute();
     }
 
 
     /**
-     * Returns the first <code>Point</code> of this <code>LineString</code>.
+     * Returns the first <code>Position</code> of this <code>LineString</code>.
      *
-     * @return the first <code>Point</code> of this <code>LineString</code>.
+     * @return the first <code>Position</code> of this <code>LineString</code>.
      */
-    public Point getStartPoint() {
-        return isEmpty() ?
-                Points.createEmpty() :
-                getPointN(0);
+    public P getStartPosition() {
+        return getPositionN(0);
     }
 
 
     /**
-     * Returns the last <code>Point</code> of this <code>LineString</code>.
+     * Returns the last <code>Position</code> of this <code>LineString</code>.
      *
-     * @return the last <code>Point</code> of this <code>LineString</code>.
+     * @return the last <code>Position</code> of this <code>LineString</code>.
      */
-    public Point getEndPoint() {
-        return isEmpty() ?
-                Points.createEmpty() :
-                getPointN(getNumPoints() - 1);
+    public P getEndPosition() {
+        return getPositionN(getNumPositions() - 1);
     }
 
     /**
@@ -141,7 +105,7 @@ public class LineString extends Geometry {
      * @return true if this <code>LineString</code> is closed.
      */
     public boolean isClosed() {
-        return !isEmpty() && getStartPoint().equals(getEndPoint());
+        return !isEmpty() && getStartPosition().equals(getEndPosition());
     }
 
     /**
@@ -164,7 +128,7 @@ public class LineString extends Geometry {
     }
 
     @Override
-    public void accept(GeometryVisitor visitor) {
+    public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
     }
 }

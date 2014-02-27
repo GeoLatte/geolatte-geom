@@ -21,13 +21,14 @@
 
 package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.Geometry;
 import org.geolatte.geom.MultiPolygon;
 import org.geolatte.geom.Polygon;
 
 import java.util.List;
 
-class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder<MultiPolygon> {
+import static org.geolatte.geom.Geometries.mkMultiPolygon;
+
+class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder<Polygon<?>> {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
@@ -35,9 +36,8 @@ class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder<MultiPolygon
 	}
 
 	@Override
-	protected MultiPolygon createGeometry(List<Geometry> geometries, boolean hasM) {
-		Polygon[] polygons = geometries != null ? geometries.toArray( new Polygon[geometries.size()] ) : null;
-		return new MultiPolygon( polygons );
+	protected MultiPolygon<?> createGeometry(List<Polygon<?>> geometries, boolean hasM) {
+		return mkMultiPolygon( geometries );
 	}
 
 

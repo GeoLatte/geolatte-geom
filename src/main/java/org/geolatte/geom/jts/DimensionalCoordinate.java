@@ -22,7 +22,6 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.geolatte.geom.DimensionalFlag;
 
 /**
  * A <code>Coordinate</code> with an associated <code>DimensionalFlag</code>.
@@ -33,38 +32,23 @@ import org.geolatte.geom.DimensionalFlag;
 public class DimensionalCoordinate extends Coordinate {
 
     public double m;
-    private final DimensionalFlag dimensionalFlag;
 
-    public DimensionalCoordinate(DimensionalFlag dimensionalFlag){
+    public DimensionalCoordinate(){
         super();
         this.m = Double.NaN;
-        this.dimensionalFlag = dimensionalFlag;
     }
 
-    public DimensionalCoordinate(Coordinate c, double m, DimensionalFlag dimensionalFlag) {
+    public DimensionalCoordinate(Coordinate c, double m) {
         super(c);
         this.m = m;
-        this.dimensionalFlag = dimensionalFlag;
     }
 
     public double getZ(){
-        return  (this.dimensionalFlag.is3D()) ? this.z : Double.NaN;
+        return  this.z;
     }
 
     public double getM(){
-        return (this.dimensionalFlag.isMeasured()) ? this.m : Double.NaN;
-    }
-
-    public boolean is3D(){
-        return this.dimensionalFlag.is3D();
-    }
-
-    public boolean isMeasured(){
-        return this.dimensionalFlag.isMeasured();
-    }
-
-    public DimensionalFlag getDimensionalFlag(){
-        return this.dimensionalFlag;
+        return this.m;
     }
 
 

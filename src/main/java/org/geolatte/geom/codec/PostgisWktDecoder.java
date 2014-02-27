@@ -22,39 +22,49 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.geolatte.geom.Geometries.*;
+import static org.geolatte.geom.builder.DSL.point;
+
 /**
  * A decoder for the Postgis WKT/EWKT representations as used in Postgis (at least 1.0 to 1.5+).
- *
+ * <p/>
  * <p>This class is not thread-safe</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecoder {
+class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDecoder {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
 
     private String wktString;
-    private CrsId crsId;
+    private CoordinateReferenceSystem<?> baseCrs;
 
     public PostgisWktDecoder() {
         super(WKT_GEOM_TOKENS);
     }
 
-    public Geometry decode(String wkt) {
+
+    public Geometry<?> decode(String wkt) {
+        return decode(wkt, (CoordinateReferenceSystem<?>)null);
+    }
+
+    @Override
+    public <P extends Position<P>> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> forceCrs) {
         if (wkt == null || wkt.isEmpty()) {
             throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
         }
-        prepare(wkt);
+        prepare(wkt, forceCrs);
         initializeTokenizer();
-        return decodeGeometry();
+        return (Geometry<P>)decodeGeometry();
     }
 
     /**
@@ -63,23 +73,29 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
      *
      * @param wkt the WKT representation
      */
-    private void prepare(String wkt) {
+    private void prepare(String wkt, CoordinateReferenceSystem<?> crs) {
+        if (crs != null) {
+            baseCrs = crs;
+            return;
+        }
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
-            crsId = CrsId.valueOf(Integer.parseInt(matcher.group(1)));
+            int srid = Integer.parseInt(matcher.group(1));
+            baseCrs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+                    CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
             wktString = wkt.substring(matcher.end());
         } else {
-            crsId = CrsId.UNDEFINED;
+            baseCrs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
             wktString = wkt;
         }
     }
 
     private void initializeTokenizer() {
-        setTokenizer(new WktTokenizer(wktString, getWktVariant(), crsId));
+        setTokenizer(new WktTokenizer(wktString, getWktVariant(), baseCrs));
         nextToken();
     }
 
-    private Geometry decodeGeometry() {
+    private Geometry<?> decodeGeometry() {
         if (!(currentToken instanceof WktGeometryToken)) {
             throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
         }
@@ -104,45 +120,45 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
         throw new WktDecodeException("Unsupported geometry type in Wkt: " + type);
     }
 
-    private Geometry decodeMultiPolygon() {
+    private Geometry<?> decodeMultiPolygon() {
         if (matchesOpenList()) {
-            List<Polygon> polygons = new ArrayList<Polygon>();
+            List<Polygon<?>> polygons = new ArrayList<>();
             while (!matchesCloseList()) {
                 polygons.add(decodePolygonText());
                 matchesElementSeparator();
             }
-            return new MultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+            return mkMultiPolygon(polygons);
         }
         if (matchesEmptyToken()) {
-            return MultiPolygon.createEmpty();
+            return new MultiPolygon<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private Geometry decodeMultiLineString() {
+    private Geometry<?> decodeMultiLineString() {
         if (matchesOpenList()) {
-            List<LineString> lineStrings = new ArrayList<LineString>();
+            List<LineString<?>> lineStrings = new ArrayList<>();
             while (!matchesCloseList()) {
                 lineStrings.add(decodeLineStringText());
                 matchesElementSeparator();
             }
-            return new MultiLineString(lineStrings.toArray(new LineString[lineStrings.size()]));
+            return mkMultiLineString(lineStrings);
         }
         if (matchesEmptyToken()) {
-            return MultiLineString.createEmpty();
+            return new MultiLineString<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private Geometry decodeMultiPoint() {
+    private Geometry<?> decodeMultiPoint() {
         if (matchesOpenList()) {
-            List<Point> points = new ArrayList<Point>();
+            List<Point<?>> points = new ArrayList<>();
             //this handles the case of the non-compliant MultiPoints in Postgis (e.g.
             // MULTIPOINT(10 10, 12 13) rather than MULTIPOINT((10 20), (30 40))
             if (currentToken instanceof WktPointSequenceToken) {
-                PointSequence pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
-                for (Point pnt : pointSequence) {
-                    points.add(new Point(pnt));
+                PositionSequence<?> positionSequence = ((WktPointSequenceToken) currentToken).getPositions();
+                for (Position p : positionSequence) {
+                    points.add(point(p.getCoordinateReferenceSystem(), p.toArray(null)));
                 }
                 nextToken();
             }
@@ -150,71 +166,71 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
                 points.add(decodePointText());
                 matchesElementSeparator();
             }
-            return new MultiPoint(points.toArray(new Point[points.size()]));
+            return mkMultiPoint(points);
         }
         if (matchesEmptyToken()) {
-            return MultiPoint.createEmpty();
+            return new MultiPoint<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private GeometryCollection decodeGeometryCollection() {
+    private GeometryCollection<?, ?> decodeGeometryCollection() {
         if (matchesOpenList()) {
-            List<Geometry> geometries = new ArrayList<Geometry>();
+            List<Geometry<?>> geometries = new ArrayList<>();
             while (!matchesCloseList()) {
                 geometries.add(decodeGeometry());
                 matchesElementSeparator();
             }
-            return new GeometryCollection(geometries.toArray(new Geometry[geometries.size()]));
+            return mkGeometryCollection(geometries);
         }
         if (matchesEmptyToken()) {
-            return GeometryCollection.createEmpty();
+            return new GeometryCollection(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private Polygon decodePolygonText() {
+    private Polygon<?> decodePolygonText() {
         if (matchesOpenList()) {
-            List<LinearRing> rings = new ArrayList<LinearRing>();
+            List<LinearRing<?>> rings = new ArrayList<>();
             while (!matchesCloseList()) {
-                LinearRing ring = decodeLinearRingText();
+                LinearRing<?> ring = decodeLinearRingText();
                 rings.add(ring);
                 matchesElementSeparator();
             }
-            return new Polygon(rings.toArray(new LinearRing[rings.size()]));
+            return mkPolygon(rings);
         }
         if (matchesEmptyToken()) {
-            return Polygon.createEmpty();
+            return new Polygon<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private LinearRing decodeLinearRingText() {
+    private LinearRing<?> decodeLinearRingText() {
         try {
-            return new LinearRing(decodePointSequence());
+            return new LinearRing<>(decodePointSequence());
         } catch (IllegalArgumentException ex) {
             throw new WktDecodeException(ex.getMessage());
         }
     }
 
-    private LineString decodeLineStringText() {
-        PointSequence pointSequence = decodePointSequence();
-        if (pointSequence != null) {
-            return new LineString(pointSequence);
+    private LineString<?> decodeLineStringText() {
+        PositionSequence<?> positionSequence = decodePointSequence();
+        if (positionSequence != null) {
+            return new LineString<>(positionSequence);
         }
         if (matchesEmptyToken()) {
-            return LineString.createEmpty();
+            return new LineString<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private Point decodePointText() {
-        PointSequence pointSequence = decodePointSequence();
-        if (pointSequence != null) {
-            return new Point(pointSequence);
+    private Point<?> decodePointText() {
+        PositionSequence<?> positionSequence = decodePointSequence();
+        if (positionSequence != null) {
+            return new Point<>(positionSequence);
         }
         if (matchesEmptyToken()) {
-            return Points.createEmpty();
+            return new Point<>(baseCrs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
@@ -227,11 +243,11 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
         return false;
     }
 
-    private PointSequence decodePointSequence() {
-        PointSequence pointSequence = null;
+    private PositionSequence<?> decodePointSequence() {
+        PositionSequence positionSequence = null;
         if (matchesOpenList()) {
             if (currentToken instanceof WktPointSequenceToken) {
-                pointSequence = ((WktPointSequenceToken) currentToken).getPoints();
+                positionSequence = ((WktPointSequenceToken) currentToken).getPositions();
                 nextToken();
             } else {
                 throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
@@ -240,7 +256,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry> implements WktDecod
                 throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
             }
         }
-        return pointSequence;
+        return positionSequence;
     }
 
     private String buildWrongSymbolAtPositionMsg() {

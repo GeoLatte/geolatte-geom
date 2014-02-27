@@ -24,10 +24,15 @@ package org.geolatte.geom.jts;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilders;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.PositionSequenceBuilders;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
+import java.util.Arrays;
+
+import static org.geolatte.geom.crs.CommonCoordinateReferenceSystems.*;
 
 /**
  * A <code>CoordinateSequenceFactory</code> that creates <code>PointSequences</code> (which extend
@@ -40,8 +45,8 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
-        DimensionalFlag flag = determineDimensionFlag(coordinates);
-        return fromCoordinateArray(coordinates, flag, CrsId.UNDEFINED);
+        CoordinateReferenceSystem<?> crs = determineCRS(coordinates);
+        return fromCoordinateArray(coordinates, crs);
     }
 
     @Override
@@ -54,31 +59,65 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         throw new UnsupportedOperationException();
     }
 
-    private DimensionalFlag determineDimensionFlag(Coordinate[] coordinates) {
-        if (coordinates == null || coordinates.length == 0) return DimensionalFlag.d2D;
-        if (coordinates[0] instanceof DimensionalCoordinate) return ((DimensionalCoordinate)coordinates[0]).getDimensionalFlag();
-        if (Double.isNaN(coordinates[0].z)) return DimensionalFlag.d2D;
-        return DimensionalFlag.d3D;
+    @SuppressWarnings("unchecked")
+    public <P extends Position<P>> PositionSequence<P> toPositionSequence(CoordinateSequence cs, CoordinateReferenceSystem<P> crs) {
+        if (cs instanceof PositionSequence &&
+                ((PositionSequence) cs).getCoordinateReferenceSystem().equals(crs)) {
+            return (PositionSequence<P>) cs;
+        }
+
+        Coordinate c = new Coordinate();
+        double[] psc = new double[crs.getCoordinateDimension()];
+        Arrays.fill(psc, Double.NaN);
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(cs.size(), crs);
+        for (int i = 0; i < cs.size(); i++) {
+            psc[0] = cs.getOrdinate(i, 0);
+            psc[1] = cs.getOrdinate(i, 1);
+            if(crs.hasVerticalAxis()) {
+                psc[2] = cs.getOrdinate(i, 2);
+            }
+            builder.add(psc);
+        }
+        return builder.toPositionSequence();
     }
 
-    private CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, DimensionalFlag dim, CrsId crsId) {
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(coordinates.length, dim, crsId);
-        double[] ordinates = new double[dim.getCoordinateDimension()];
+    private CoordinateReferenceSystem<?> determineCRS(Coordinate[] coordinates) {
+        boolean hasZ, hasM = false;
+        if (coordinates == null || coordinates.length == 0) return PROJECTED_2D_METER;
+        if (coordinates[0] instanceof DimensionalCoordinate) {
+            hasM = !Double.isNaN(((DimensionalCoordinate) coordinates[0]).getM());
+        }
+        hasZ = !Double.isNaN(coordinates[0].z);
+        if (hasM && hasZ) {
+            return PROJECTED_3DM_METER;
+        } else if (hasM) {
+            return PROJECTED_2DM_METER;
+        } else if (hasZ) {
+            return PROJECTED_3D_METER;
+        } else {
+            return PROJECTED_2D_METER;
+        }
+    }
+
+    private <P extends Position<P>> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateReferenceSystem<P> crs) {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(coordinates.length, crs);
+        double[] ordinates = new double[crs.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
-            copy(co,ordinates, dim);
+            copy(co, ordinates, crs);
             builder.add(ordinates);
         }
-        return (CoordinateSequence)builder.toPointSequence();
+        return (CoordinateSequence) builder.toPositionSequence();
     }
 
-    private void copy(Coordinate co, double[] ordinates, DimensionalFlag flag) {
-        ordinates[flag.X] = co.x;
-        ordinates[flag.Y] = co.y;
-        if (flag.is3D()) ordinates[flag.Z] = co.z;
-        if (flag.isMeasured()) {
-            ordinates[flag.M] = (co instanceof DimensionalCoordinate) ?
-                   ((DimensionalCoordinate)co).m :
-                    Double.NaN;
+    private void copy(Coordinate co, double[] ordinates, CoordinateReferenceSystem crs) {
+        ordinates[0] = co.x;
+        ordinates[1] = co.y;
+        if (crs.hasVerticalAxis()){
+            ordinates[2] = co.z;
+        }
+        if (crs.hasMeasureAxis()) {
+            ordinates[3] = (co instanceof DimensionalCoordinate) ?
+                    ((DimensionalCoordinate) co).m : Double.NaN;
         }
     }
 

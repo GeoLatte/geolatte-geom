@@ -22,7 +22,12 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.geolatte.geom.Geometries.*;
 
 /**
  * Base class for <code>WkbDecoder</code>s.
@@ -32,7 +37,7 @@ import org.geolatte.geom.crs.CrsId;
  */
 abstract class AbstractWkbDecoder implements WkbDecoder {
 
-    private CrsId crsId;
+    private CoordinateReferenceSystem<?> crs;
 
     /**
      * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
@@ -41,32 +46,31 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
     @Override
-    public Geometry decode(ByteBuffer byteBuffer) {
-        crsId = CrsId.UNDEFINED;
+    public Geometry<?> decode(ByteBuffer byteBuffer) {
+        this.crs = null;
         byteBuffer.rewind();
         try {
             prepare(byteBuffer);
             Geometry geom = decodeGeometry(byteBuffer);
             byteBuffer.rewind();
             return geom;
-        } catch(BufferAccessException e){
+        } catch (BufferAccessException e) {
             throw new WkbDecodeException(e);
         }
     }
 
-    private Geometry decodeGeometry(ByteBuffer byteBuffer) {
+    private Geometry<?> decodeGeometry(ByteBuffer byteBuffer) {
         alignByteOrder(byteBuffer);
         int typeCode = readTypeCode(byteBuffer);
         WkbGeometryType wkbType = WkbGeometryType.parse((byte) typeCode);
-        readSridIfPresent(byteBuffer, typeCode);
-        DimensionalFlag flag = determineDimensionalFlag(typeCode);
+        readCrs(byteBuffer, typeCode);
         switch (wkbType) {
             case POINT:
-                return decodePoint(byteBuffer, flag);
+                return decodePoint(byteBuffer);
             case LINE_STRING:
-                return decodeLineString(byteBuffer, flag);
+                return decodeLineString(byteBuffer);
             case POLYGON:
-                return decodePolygon(byteBuffer, flag);
+                return decodePolygon(byteBuffer);
             case GEOMETRY_COLLECTION:
                 return decodeGeometryCollection(byteBuffer);
             case MULTI_POINT:
@@ -79,88 +83,100 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         throw new WkbDecodeException(String.format("WKBType %s is not supported.", wkbType));
     }
 
-    private MultiLineString decodeMultiLineString(ByteBuffer byteBuffer) {
+    private MultiLineString<?> decodeMultiLineString(ByteBuffer byteBuffer) {
         int numGeometries = byteBuffer.getInt();
-        LineString[] geometries = new LineString[numGeometries];
-        for (int i = 0; i < geometries.length; i++) {
-            geometries[i] = (LineString) decodeGeometry(byteBuffer);
+        if (numGeometries == 0) {
+            return new MultiLineString<>(crs);
         }
-        return new MultiLineString(geometries);
+        List<LineString<?>> geometries = new ArrayList<>(numGeometries);
+        for (int i = 0; i < numGeometries; i++) {
+            geometries.add((LineString<?>) decodeGeometry(byteBuffer));
+        }
+        return mkMultiLineString(geometries);
     }
 
-    private MultiPoint decodeMultiPoint(ByteBuffer byteBuffer) {
+    private MultiPoint<?> decodeMultiPoint(ByteBuffer byteBuffer) {
         int numGeometries = byteBuffer.getInt();
-        Point[] geometries = new Point[numGeometries];
-        for (int i = 0; i < geometries.length; i++) {
-            geometries[i] = (Point) decodeGeometry(byteBuffer);
+        if (numGeometries == 0) {
+            return new MultiPoint<>(crs);
         }
-        return new MultiPoint(geometries);
+        List<Point<?>> geometries = new ArrayList<>(numGeometries);
+        for (int i = 0; i < numGeometries; i++) {
+            geometries.add((Point<?>) decodeGeometry(byteBuffer));
+        }
+        return mkMultiPoint(geometries);
     }
 
-    private MultiPolygon decodeMultiPolygon(ByteBuffer byteBuffer) {
+    private MultiPolygon<?> decodeMultiPolygon(ByteBuffer byteBuffer) {
         int numGeometries = byteBuffer.getInt();
-        Polygon[] geometries = new Polygon[numGeometries];
-        for (int i = 0; i < geometries.length; i++) {
-            geometries[i] = (Polygon) decodeGeometry(byteBuffer);
+        if (numGeometries == 0) {
+            return new MultiPolygon<>(crs);
         }
-        return new MultiPolygon(geometries);
+        List<Polygon<?>> geometries = new ArrayList<>(numGeometries);
+        for (int i = 0; i < numGeometries; i++) {
+            geometries.add((Polygon<?>) decodeGeometry(byteBuffer));
+        }
+        return mkMultiPolygon(geometries);
     }
 
-    private GeometryCollection decodeGeometryCollection(ByteBuffer byteBuffer) {
+    private GeometryCollection<? extends Position<?>, ? extends Geometry<?>> decodeGeometryCollection(ByteBuffer byteBuffer) {
         int numGeometries = byteBuffer.getInt();
-        Geometry[] geometries = new Geometry[numGeometries];
-        for (int i = 0; i < geometries.length; i++) {
-            geometries[i] = decodeGeometry(byteBuffer);
+        if (numGeometries == 0) {
+            return new GeometryCollection<>(crs);
         }
-        return new GeometryCollection(geometries);
+        List<Geometry<?>> geometries = new ArrayList<>(numGeometries);
+        for (int i = 0; i < numGeometries; i++) {
+            geometries.add(decodeGeometry(byteBuffer));
+        }
+        return mkGeometryCollection(geometries);
     }
 
-    private Polygon decodePolygon(ByteBuffer byteBuffer, DimensionalFlag flag) {
+    private Polygon<?> decodePolygon(ByteBuffer byteBuffer) {
         int numRings = byteBuffer.getInt();
-        LinearRing[] rings = readPolygonRings(numRings, byteBuffer, flag, crsId);
-        return new Polygon(rings);
+        List<LinearRing<?>> rings = readPolygonRings(numRings, byteBuffer);
+        return mkPolygon(rings);
     }
 
-    private LineString decodeLineString(ByteBuffer byteBuffer, DimensionalFlag flag) {
+    private LineString decodeLineString(ByteBuffer byteBuffer) {
         int numPoints = byteBuffer.getInt();
-        PointSequence points = readPoints(numPoints, byteBuffer, flag);
-        return new LineString(points);
+        PositionSequence<?> points = readPositions(numPoints, byteBuffer);
+        return new LineString<>(points);
     }
 
-    private Point decodePoint(ByteBuffer byteBuffer, DimensionalFlag flag) {
-        PointSequence points = readPoints(1, byteBuffer, flag);
-        return new Point(points);
+    private Point<?> decodePoint(ByteBuffer byteBuffer) {
+        PositionSequence<?> points = readPositions(1, byteBuffer);
+        return new Point<>(points);
     }
 
-    private PointSequence readPoints(int numPoints, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag) {
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag, crsId);
-        double[] coordinates = new double[dimensionalFlag.getCoordinateDimension()];
-        for (int i = 0; i < numPoints; i++) {
-            readPoint(byteBuffer, dimensionalFlag, coordinates);
+    private PositionSequence<?> readPositions(int numPos, ByteBuffer byteBuffer) {
+        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPos, crs);
+        double[] coordinates = new double[crs.getCoordinateDimension()];
+        for (int i = 0; i < numPos; i++) {
+            readPosition(byteBuffer, coordinates);
             psBuilder.add(coordinates);
         }
-        return psBuilder.toPointSequence();
+        return psBuilder.toPositionSequence();
     }
 
-    private void readPoint(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, double[] coordinates) {
-        for (int ci = 0; ci < dimensionalFlag.getCoordinateDimension(); ci++) {
+    private void readPosition(ByteBuffer byteBuffer, double[] coordinates) {
+        for (int ci = 0; ci < crs.getCoordinateDimension(); ci++) {
             coordinates[ci] = byteBuffer.getDouble();
         }
     }
 
-    private LinearRing[] readPolygonRings(int numRings, ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
-        LinearRing[] rings = new LinearRing[numRings];
+    private List<LinearRing<?>> readPolygonRings(int numRings, ByteBuffer byteBuffer) {
+        List<LinearRing<?>> rings = new ArrayList<>(numRings);
         for (int i = 0; i < numRings; i++) {
-            rings[i] = readRing(byteBuffer, dimensionalFlag, crsId);
+            rings.add(readRing(byteBuffer));
         }
         return rings;
     }
 
-    private LinearRing readRing(ByteBuffer byteBuffer, DimensionalFlag dimensionalFlag, CrsId crsId) {
+    private LinearRing<?> readRing(ByteBuffer byteBuffer) {
         int numPoints = byteBuffer.getInt();
-        PointSequence ps = readPoints(numPoints, byteBuffer, dimensionalFlag);
+        PositionSequence<?> ps = readPositions(numPoints, byteBuffer);
         try {
-            return new LinearRing(ps);
+            return new LinearRing<>(ps);
         } catch (IllegalArgumentException e) {
             throw new WkbDecodeException(e);
         }
@@ -175,32 +191,26 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     protected abstract void prepare(ByteBuffer byteBuffer);
 
     /**
-     * Determine the DimensionalFlag from the typecode
-     *
-     * @param typeCode
-     * @return
-     */
-    protected abstract DimensionalFlag determineDimensionalFlag(int typeCode);
-
-    /**
      * Read and set the SRID (if it is present)
      *
      * @param byteBuffer
      * @param typeCode
      */
-    protected abstract void readSridIfPresent(ByteBuffer byteBuffer, int typeCode);
+    protected abstract void readCrs(ByteBuffer byteBuffer, int typeCode);
 
     protected abstract boolean hasSrid(int typeCode);
 
     protected int readTypeCode(ByteBuffer byteBuffer) {
         return (int) byteBuffer.getUInt();
     }
-    protected CrsId getCrsId() {
-        return crsId;
+
+    protected CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
+
+        return crs;
     }
 
-    protected void setCrsId(CrsId crsId) {
-        this.crsId = crsId;
+    protected void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
+        this.crs = crs;
     }
 
     private void alignByteOrder(ByteBuffer byteBuffer) {

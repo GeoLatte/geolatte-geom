@@ -28,27 +28,27 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/22/11
  */
-public interface GeometryVisitor {
+public interface GeometryVisitor<P extends Position<P>> {
 
     /**
      * Visits a <code>Point</code>
      * @param point
      */
-    public void visit(Point point);
+    public void visit(Point<P> point);
 
     /**
      * Visits a <code>LineString</code>.
      *
      * @param lineString
      */
-    public void  visit(LineString lineString);
+    public void  visit(LineString<P> lineString);
 
     /**
      * Visits a <code>Polygon</code>.
      *
      * @param polygon
      */
-    public void visit(Polygon polygon);
+    public void visit(Polygon<P> polygon);
 
     /**
      * Visits a <code>GeometryCollection</code>.
@@ -58,21 +58,13 @@ public interface GeometryVisitor {
      *
      * @param collection
      */
-    public void visit(GeometryCollection collection);
-
-    //TODO is this necessary? Does not visit(LineString) suffice?
-    /**
-     * Visits a <code>LinearRing</code>.
-     *
-     * @param linearRing
-     */
-    public void visit(LinearRing linearRing);
-
-    /**
-     * Visits a <code>PolyHedralSurface</code>.
-     *
-     * @param surface
-     */
-    public void visit(PolyHedralSurface surface);
+    public <G extends Geometry<P>> void visit(GeometryCollection<P,G> collection);
+//
+//    /**
+//     * Visits a <code>PolyHedralSurface</code>.
+//     *
+//     * @param surface
+//     */
+//    public void visit(PolyHedralSurface<P> surface);
 
 }

@@ -21,37 +21,33 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
-public class MultiLineString extends GeometryCollection {
+public class MultiLineString<P extends Position<P>> extends GeometryCollection<P, LineString<P>> implements Linear {
 
-
-    static final MultiLineString EMPTY = new MultiLineString(new LineString[0]);
-
-    /**
-     * Constructs an empty <code>MultiLineString</code>.
-     *
-     * @return an empty <code>MultiLineString</code>.
-     */
-    public static MultiLineString createEmpty() {
-        return EMPTY;
-    }
 
     /**
      * Constructs a <code>MultiLineString</code> from the specified <code>LineString</code>s
      *
      * @param lineStrings the element <code>LineString</code>s for the constructed <code>MultiLineString</code>
      */
-    public MultiLineString(LineString[] lineStrings) {
+    @SafeVarargs
+    public MultiLineString(LineString<P>... lineStrings) {
         super(lineStrings);
     }
 
-    @Override
-    public LineString getGeometryN(int i) {
-        return (LineString) super.getGeometryN(i);
+    public MultiLineString(CoordinateReferenceSystem<P> crs) {
+        super(crs);
     }
+
+//    @Override
+//    public LineString<P> getGeometryN(int i) {
+//        return super.getGeometryN(i);
+//    }
 
     public double getLength() {
         double l = 0.0d;
@@ -61,12 +57,22 @@ public class MultiLineString extends GeometryCollection {
         return l;
     }
 
-    public boolean isClosed() {
-        for (int i = 0; i < this.getNumGeometries(); i++) {
-            if (!getGeometryN(i).isClosed()) return false;
-        }
-        return true;
+    @Override
+    public Position getStartPosition() {
+        return getPositionN(0);
     }
+
+    @Override
+    public Position getEndPosition() {
+        return getPositionN(getNumPositions() - 1);
+    }
+
+//    public boolean isClosed() {
+//        for (int i = 0; i < this.getNumGeometries(); i++) {
+//            if (!getGeometryN(i).isClosed()) return false;
+//        }
+//        return true;
+//    }
 
     @Override
     public int getDimension() {
@@ -78,4 +84,8 @@ public class MultiLineString extends GeometryCollection {
         return GeometryType.MULTI_LINE_STRING;
     }
 
+    @Override
+    public Class<? extends Geometry> getComponentType() {
+        return LineString.class;
+    }
 }

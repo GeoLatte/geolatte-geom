@@ -1,156 +1,94 @@
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * An envelope or bounding box implementation.
- *
+ * <p/>
  * <p>An <code>Envelope</code> is characterised by the minimum and maximum x and y coordinates. An <code>Envelope</code>
  * is empty if the set of enclosed points is empty. </p>
- * @author Karel Maesen, Geovise BVBA, 2011
  *
- * <p>An empty Envelope has Double.NaN for min. and max. X and Y coordinates.</p>
+ * @author Karel Maesen, Geovise BVBA, 2011
+ *         <p/>
+ *         <p>An empty Envelope has Double.NaN for min. and max. X and Y coordinates.</p>
  */
-public class Envelope {
+public class Envelope<P extends Position<P>> {
+
+    private final P lowerLeft;
+    private final P upperRight;
+
 
     /**
-     * An empty <code>Envelope</code>
+     * Creates an empty Envelop
      */
-    public static final Envelope EMPTY = new Envelope(Double.NaN, Double.NaN, Double.NaN, Double.NaN, CrsId.UNDEFINED);
-
-    private final CrsId crsId;
-    private final double minX;
-    private final double maxX;
-    private final double minY;
-    private final double maxY;
-
+    public Envelope(CoordinateReferenceSystem<P> crs) {
+        lowerLeft = Positions.mkPosition(crs);
+        upperRight = lowerLeft;
+    }
     /**
      * Creates an instance from specified lower-left and upper-right <code>Point</code>s.
-     * @param lowerLeft the <code>Point</code> designating the lower-left coordinates
+     *
+     * @param lowerLeft  the <code>Point</code> designating the lower-left coordinates
      * @param upperRight the <code>Point</code> designating the upper-right coordinates
-     * of the envelope.
-     * @throws IllegalArgumentException if lowerLeft and upperRight have different <code>CrsId</code>'s
+     *                   of the envelope.
      */
-    public Envelope(Point lowerLeft, Point upperRight) {
-        if (!lowerLeft.getCrsId().equals(upperRight.getCrsId())) {
-            throw new IllegalArgumentException("LowerLeft and UpperRight points must have same Coordinate Ref. System.");
-        }
-        this.crsId = lowerLeft.getCrsId();
-        this.minX = lowerLeft.getX();
-        this.minY = lowerLeft.getY();
-        this.maxX = upperRight.getX();
-        this.maxY = upperRight.getY();
+    public Envelope(P lowerLeft, P upperRight) {
+        if (lowerLeft == null || upperRight == null)
+            throw new IllegalArgumentException("Envelope requires non-null Positions");
+        this.lowerLeft = lowerLeft;
+        this.upperRight = upperRight;
     }
 
+
     /**
-     * Create an instance using the specified coordinates.
+     * Create an instance using the specified coordinates and <code>CoordinateReferenceSystem</code>.
      *
-     * <p>The CrsId will be UNDEFINED.</p>
-     *
-     * @param minX minimum X-coordinate
-     * @param minY minimum Y-coordinate
-     * @param maxX minimum Y-coordinate
-     * @param maxY maximum Y-coordinate
+     * @param minC1 minimum first coordinate
+     * @param minC2 minimum second coordinate
+     * @param maxC1 maximum first coordinate
+     * @param maxC2 maximum second coordinate
+     * @param crs   the <code>CoordinateReferenceSystem</code> for the coordinates
+     *              of the envelope.
      */
-    public Envelope(double minX, double minY, double maxX, double maxY) {
-        this(minX, minY, maxX, maxY, CrsId.UNDEFINED);
-    }
-
-    /**
-     * Create an instance using the specified coordinates and <code>CrsId</code>.
-     *
-     * @param minX minimum X-coordinate
-     * @param minY minimum Y-coordinate
-     * @param maxX minimum Y-coordinate
-     * @param maxY maximum Y-coordinate
-     * @param crsId the <code>CrsId</code> that identifies the <code>CoordinateReferenceSystem</code> for the coordinates
-      * of the envelope.
-      */
-    public Envelope(double minX, double minY, double maxX, double maxY, CrsId crsId) {
-        if (minX > maxX || minY > maxY) {
-            this.minX = Double.NaN;
-            this.minY = Double.NaN;
-            this.maxX = Double.NaN;
-            this.maxY = Double.NaN;
-            this.crsId = CrsId.UNDEFINED;
-        } else {
-            this.minX = minX;
-            this.minY = minY;
-            this.maxX = maxX;
-            this.maxY = maxY;
-            this.crsId = crsId != null ? crsId : CrsId.UNDEFINED;
+    public Envelope(double minC1, double minC2, double maxC1, double maxC2, CoordinateReferenceSystem<P> crs) {
+        if (crs == null) {
+            throw new IllegalArgumentException("Null CRS argument not allowed");
         }
+
+        if (minC1 > maxC1) {
+            double h = maxC1;
+            maxC1 = minC1;
+            minC1 = h;
+        }
+        if (minC2 > maxC2) {
+            double h = maxC2;
+            maxC2 = minC2;
+            minC2 = h;
+        }
+
+        this.lowerLeft = Positions.mkPosition(crs, new double[]{minC1, minC2});
+        this.upperRight = Positions.mkPosition(crs, new double[]{maxC1, maxC2});
+
+
     }
 
     /**
-     * Returns the <code>CrsId</code> for this <code>Envelope</code>
+     * Returns the <code>CoordinateReferenceSystem</code> for this <code>Envelope</code>
+     *
      * @return
      */
-    public CrsId getCrsId(){
-        return this.crsId;
+    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
+        return lowerLeft().getCoordinateReferenceSystem();
     }
 
-    /**
-     * Return the minimum X-coordinate.
-     *
-     * @return minimum X-coordinate
-     */
-    public double getMinX() {
-        return minX;
-    }
-
-    /**
-     * Return the minimum Y-coordinate.
-     *
-     * @return minimum Y-coordinate
-     */
-    public double getMinY() {
-        return minY;
-    }
-
-    /**
-     * Return the maximum X-coordinate.
-     *
-     * @return maximum X-coordinate
-     */
-    public double getMaxX() {
-        return maxX;
-    }
-
-    /**
-     * Return the maximum Y-coordinate.
-     *
-     * @return maximum Y-coordinate
-     */
-    public double getMaxY() {
-        return maxY;
-    }
-
-    /**
-     * returns the width of this <code>Envelope</code>.
-     *
-     * @return this <code>Envelope</code>'s width
-     */
-    public double getWidth() {
-        return maxX - minX;
-    }
-
-    /**
-     * returns the height of this <code>Envelope</code>.
-     *
-     * @return this <code>Envelope</code>'s height
-     */
-    public double getHeight() {
-        return maxY - minY;
-    }
 
     /**
      * Returns the lower-left point of this <code>Envelope</code>.
      *
      * @return the lower-left point
      */
-    public Point lowerLeft() {
-        return Points.create2D(minX, minY, crsId);
+    public P lowerLeft() {
+        return this.lowerLeft;
     }
 
     /**
@@ -158,8 +96,8 @@ public class Envelope {
      *
      * @return the upper-right point
      */
-    public Point upperRight() {
-        return Points.create2D(maxX, maxY, crsId);
+    public P upperRight() {
+        return this.upperRight;
     }
 
     /**
@@ -167,8 +105,8 @@ public class Envelope {
      *
      * @return the upper-left point
      */
-    public Point upperLeft() {
-        return Points.create2D(minX, maxY, crsId);
+    public P upperLeft() {
+        return Positions.mkPosition(getCoordinateReferenceSystem(), lowerLeft.getCoordinate(0), upperRight.getCoordinate(1));
     }
 
     /**
@@ -176,39 +114,51 @@ public class Envelope {
      *
      * @return the lower-right point
      */
-    public Point lowerRight() {
-        return Points.create2D(maxX, minY, crsId);
+    public P lowerRight() {
+        return Positions.mkPosition(getCoordinateReferenceSystem(), upperRight.getCoordinate(0), lowerLeft.getCoordinate(1));
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder(this.crsId.toString());
+        StringBuilder builder = new StringBuilder(getCoordinateReferenceSystem().getCrsId().toString());
         builder.append("LL: ")
-                .append(minX)
-                .append(",")
-                .append(minY)
+                .append(this.lowerLeft.toString())
                 .append(" - UR: ")
-                .append(maxX)
-                .append(",")
-                .append(maxY);
+                .append(this.upperRight.toString());
         return builder.toString();
     }
 
+    public double getMinC0() {
+        return lowerLeft.getCoordinate(0);
+    }
+
+    public double getMinC1() {
+        return lowerLeft.getCoordinate(1);
+    }
+
+    public double getMaxC0() {
+        return upperRight.getCoordinate(0);
+    }
+
+    public double getMaxC1() {
+        return upperRight.getCoordinate(1);
+    }
+
     /**
-     * Creates an <code>Envelope</code> that is the set-theoretic union of the specified <code>Envelopes</code>.
-     * @param b1 first operand
-     * @param b2 second operand
+     * Creates an <code>Envelope</code> that is the set-theoretic union of this {@code Envelope} with the specified {@code Envelope}
+     *
+     * @param other other Envelope
      * @return an <code>Envelope</code> that encompasses both operands.
      * @throws IllegalArgumentException when the operand <code>Envelope</code>s don't have the same coordinate reference system.
      */
-    public static Envelope union(Envelope b1, Envelope b2) {
-        if (b1 == null || b1.isEmpty()) return b2;
-        if (b2 == null || b2.isEmpty()) return b1;
-        if (! b1.getCrsId().equals(b2.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
-        double minX = Math.min(b1.getMinX(), b2.getMinX());
-        double minY = Math.min(b1.getMinY(), b2.getMinY());
-        double maxX = Math.max(b1.getMaxX(), b2.getMaxX());
-        double maxY = Math.max(b1.getMaxY(), b2.getMaxY());
-        return new Envelope(minX, minY, maxX, maxY, b1.getCrsId());
+    public Envelope<P> union(Envelope<P> other) {
+        if (other == null || other.isEmpty()) return this;
+        if (!this.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem()))
+            throw new IllegalArgumentException("Envelopes have different CRS.");
+        double minC0 = Math.min(getMinC0(), other.getMinC0());
+        double minC1 = Math.min(getMinC1(), other.getMinC1());
+        double maxC0 = Math.max(getMaxC0(), other.getMaxC0());
+        double maxC1 = Math.max(getMaxC1(), other.getMaxC1());
+        return new Envelope<P>(minC0, minC1, maxC0, maxC1, this.getCoordinateReferenceSystem());
     }
 
     /**
@@ -219,16 +169,21 @@ public class Envelope {
      * @throws IllegalArgumentException when the specified <code>Envelope</code> doesn't have the same coordinate reference system as this instance.
      */
     public Envelope intersect(Envelope other) {
-        if (this.isEmpty() || other.isEmpty()) return EMPTY;
-        if (!this.getCrsId().equals(other.getCrsId())) throw new IllegalArgumentException("Envelopes have different CRS.");
-        double minX = Math.max(other.getMinX(), getMinX());
-        double minY = Math.max(other.getMinY(), getMinY());
-        double maxX = Math.min(other.getMaxX(), getMaxX());
-        double maxY = Math.min(other.getMaxY(), getMaxY());
-        if (minX > maxX || minY > maxY)
-            return EMPTY;
-        return new Envelope(minX, minY, maxX, maxY, this.getCrsId());
+        if (this.isEmpty() || other.isEmpty()) return mkEmpty();
+        if (!this.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem()))
+            throw new IllegalArgumentException("Envelopes have different CRS.");
+        double minC0 = Math.max(getMinC0(), other.getMinC0());
+        double minC1 = Math.max(getMinC1(), other.getMinC1());
+        double maxC0 = Math.min(getMaxC0(), other.getMaxC0());
+        double maxC1 = Math.min(getMaxC1(), other.getMaxC1());
+        if (minC0 > maxC0 || minC1 > maxC1)
+            return mkEmpty();
+        return new Envelope<P>(minC0, minC1, maxC0, maxC1, this.getCoordinateReferenceSystem());
 
+    }
+
+    private Envelope<P> mkEmpty() {
+        return new Envelope<P>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, getCoordinateReferenceSystem());
     }
 
     /**
@@ -237,8 +192,8 @@ public class Envelope {
      * @return true iff this instance  is empty (the empty set).
      */
     public boolean isEmpty() {
-        return Double.isNaN(this.minX)  || Double.isNaN(this.minY) ||
-                Double.isNaN(this.maxX) || Double.isNaN(this.maxY);
+        return Double.isNaN(getMinC0()) || Double.isNaN(getMinC1()) ||
+                Double.isNaN(getMaxC0()) || Double.isNaN(getMaxC1());
     }
 
     /**
@@ -251,12 +206,12 @@ public class Envelope {
     public boolean within(Envelope other) {
         if (isEmpty()) return true;
         if (other.isEmpty()) return false;
-        if (!this.getCrsId().equals(other.getCrsId()))
+        if (!this.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem()))
             throw new IllegalArgumentException("Envelopes have different CRS.");
-        return other.getMinX() <= this.getMinX() &&
-                other.getMaxX() >= this.getMaxX() &&
-                other.getMinY() <= this.getMinY() &&
-                other.getMaxY() >= this.getMaxY();
+        return other.getMinC0() <= this.getMinC0() &&
+                other.getMaxC0() >= this.getMaxC0() &&
+                other.getMinC1() <= this.getMinC1() &&
+                other.getMaxC1() >= this.getMaxC1();
     }
 
     /**
@@ -277,16 +232,19 @@ public class Envelope {
      * @return true iff this instance contains the specified <code>Point</code>
      * @throws IllegalArgumentException when the specified <code>Point</code> doesn't have the same coordinate reference system as this instance.
      */
-    public boolean contains(Point p) {
-        if (!this.getCrsId().equals(p.getCrsId()))
+    public boolean contains(P p) {
+        if (!this.getCoordinateReferenceSystem().equals(p.getCoordinateReferenceSystem()))
             throw new IllegalArgumentException("Envelopes have different CRS.");
         if (isEmpty()) return false;
-        return getMinX() <= p.getX() && getMaxX() >= p.getX() && getMinY() <= p.getY() && getMaxY() >= p.getY();
+        return getMinC0() <= p.getCoordinate(0) &&
+                getMaxC0() >= p.getCoordinate(0) &&
+                getMinC1() <= p.getCoordinate(1) &&
+                getMaxC1() >= p.getCoordinate(1);
     }
 
     /**
      * Checks whether this <code>Envelope</code> intersects the specifies <code>Envelope</code>.
-     *
+     * <p/>
      * <p>Two instances intersect when their set-theoretic intersection is non-empty.</p>
      *
      * @param other the other <code>Envelope</code>
@@ -295,7 +253,10 @@ public class Envelope {
      */
     public boolean intersects(Envelope other) {
         return !(isEmpty() || other.isEmpty()) &&
-                !(this.maxX < other.minX || this.minX > other.maxX || this.maxY < other.minY || this.minY > other.maxY);
+                !(this.getMaxC0() < other.getMinC0() ||
+                        this.getMinC0() > other.getMaxC0() ||
+                        this.getMaxC1() < other.getMinC1() ||
+                        this.getMinC1() > other.getMaxC1());
     }
 
     @Override
@@ -304,29 +265,15 @@ public class Envelope {
         if (!(o instanceof Envelope)) return false;
         Envelope that = (Envelope) o;
         if (this.isEmpty() && that.isEmpty()) return true;
-        if (!this.getCrsId().equals(that.getCrsId()) ) return false;
-        if (Double.compare(that.maxX, maxX) != 0) return false;
-        if (Double.compare(that.maxY, maxY) != 0) return false;
-        if (Double.compare(that.minX, minX) != 0) return false;
-        return Double.compare(that.minY, minY) == 0;
+        return this.lowerLeft.equals(that.lowerLeft()) &&
+                this.upperRight.equals(that.upperRight());
 
     }
-
-
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        temp = minX != +0.0d ? Double.doubleToLongBits(minX) : 0L;
-        result = (int) (temp ^ (temp >>> 32));
-        temp = maxX != +0.0d ? Double.doubleToLongBits(maxX) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = minY != +0.0d ? Double.doubleToLongBits(minY) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        temp = maxY != +0.0d ? Double.doubleToLongBits(maxY) : 0L;
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        int result = lowerLeft != null ? lowerLeft.hashCode() : 0;
+        result = 31 * result + (upperRight != null ? upperRight.hashCode() : 0);
         return result;
     }
-
 }

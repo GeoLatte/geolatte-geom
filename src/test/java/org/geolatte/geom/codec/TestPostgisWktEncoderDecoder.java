@@ -121,7 +121,7 @@ public class TestPostgisWktEncoderDecoder {
         String wkt = testcases.getWKT(PostgisTestCases.POINT_WITH_SRID);
         Geometry geom = decode(wkt);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
-        assertTrue("Result of 4-dim point wkt is not measured.", geom.isMeasured());
+        assertTrue("Result of 4-dim point wkt is not measured.", geom.getCoordinateReferenceSystem().hasMeasureAxis());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_WITH_SRID), geom);
         testEncoding(wkt, geom);
     }
@@ -190,13 +190,13 @@ public class TestPostgisWktEncoderDecoder {
     @Test
     public void test_multilinestring_with_srid() {
         String wkt = testcases.getWKT(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID);
-        MultiLineString geom = (MultiLineString) decode(wkt);
+        MultiLineString<?> geom = (MultiLineString<?>) decode(wkt);
         assertNotNull(geom);
         assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         for (Geometry part : geom) {
-            assertEquals(4326, geom.getSRID());
+            assertEquals(4326, part.getSRID());
         }
         testEncoding(wkt, geom);
     }
@@ -227,7 +227,7 @@ public class TestPostgisWktEncoderDecoder {
         Point pnt = (Point) decode(wkt);
         assertNotNull(pnt);
         GeometryPointEquality eq = new GeometryPointEquality(
-                new CoordinateWithinTolerancePointEquality(DimensionalFlag.d2D, 0.00000001));
+                new WithinTolerancePositionEquality(0.00000001));
         assertTrue(eq.equals(testcases.getExpected(PostgisTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
     }
 

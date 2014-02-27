@@ -23,6 +23,7 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Position;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ import java.util.List;
  *
  * @Author Karel Maesen
  */
-class GeometryCollectionEncoder<T extends GeometryCollection> extends AbstractEncoder<T> {
+class GeometryCollectionEncoder extends AbstractEncoder {
 
 	private final OpenGisType openGisType;
 
@@ -39,12 +40,12 @@ class GeometryCollectionEncoder<T extends GeometryCollection> extends AbstractEn
 		this.openGisType = openGisType;
 	}
 
-	public boolean accepts(Geometry geom) {
+	public <P extends Position<P>> boolean accepts(Geometry<P> geom) {
 		return this.openGisType.typeOf( geom );
 	}
 
 	@Override
-	protected void encode(Geometry geom, int parentShapeIndex, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
+	protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
 		if ( geom.isEmpty() ) {
 			shapes.add( new Shape( parentShapeIndex, -1, this.openGisType ) );
 			return;
@@ -67,8 +68,8 @@ class GeometryCollectionEncoder<T extends GeometryCollection> extends AbstractEn
 		return thisShape;
 	}
 
-	protected void encodeComponent(Geometry geom, int thisShapeIndex, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
-		AbstractEncoder<? extends Geometry> encoder = (AbstractEncoder<? extends Geometry>) Encoders.encoderFor( geom );
+	protected void encodeComponent(Geometry geom, int thisShapeIndex, CountingPositionSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
+		AbstractEncoder encoder = (AbstractEncoder) Encoders.encoderFor( geom );
 		encoder.encode( geom, thisShapeIndex, coordinates, figures, shapes );
 	}
 }

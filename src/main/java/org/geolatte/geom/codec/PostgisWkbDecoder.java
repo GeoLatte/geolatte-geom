@@ -22,8 +22,10 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
@@ -35,23 +37,39 @@ import org.geolatte.geom.crs.CrsId;
  */
 class PostgisWkbDecoder extends AbstractWkbDecoder {
 
+
     @Override
     protected void prepare(ByteBuffer byteBuffer) {
         //do nothing
     }
 
-    @Override
-    protected DimensionalFlag determineDimensionalFlag(int typeCode) {
-        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
-        return DimensionalFlag.valueOf(hasZ, hasM);
-    }
 
     @Override
-    protected void readSridIfPresent(ByteBuffer byteBuffer, int typeCode) {
+    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
+        //don't override a CRS, once set.
+        if (getCoordinateReferenceSystem() != null) return;
+
+                CoordinateReferenceSystem < ?>crs;
         if (hasSrid(typeCode)) {
-            setCrsId(CrsId.valueOf(byteBuffer.getInt()));
+            int srid = byteBuffer.getInt();
+            crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+                    CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+
+        } else {
+            crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         }
+        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
+        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
+
+        //TODO -- this creates a new CRS for each non-2D geometry!!
+        //TODO -- memoize compoundCrs methods
+        if (hasZ) {
+            crs = crs.addVerticalAxis(LengthUnit.METER);
+        }
+        if (hasM) {
+            crs = crs.addMeasureAxis(LengthUnit.METER);
+        }
+        setCoordinateReferenceSystem(crs);
     }
 
     @Override

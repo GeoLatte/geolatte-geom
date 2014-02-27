@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 /**
  * A coordinate system.
- *
+ * <p/>
  * <p>A coordinate system is characterized by its {@link CoordinateSystemAxis CoordinateSystemAxes} (in order).</p>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -37,7 +37,7 @@ public class CoordinateSystem {
 
     /**
      * Constructs a <code>CoordinateSystem</code>.
-     *
+     * <p/>
      * <p><code>CoordinateSystem</code>s are characterized by their {@link CoordinateSystemAxis CoordinateSystemAxes}. </p>
      *
      * @param axes the sequence (at least two) of its <code>CoordinateSystem</code>s.
@@ -52,6 +52,7 @@ public class CoordinateSystem {
 
     /**
      * Returns the {@link CoordinateSystemAxis CoordinateSystemAxes} of this <code>CoordinateSystem</code> (in order).
+     *
      * @return
      */
     public CoordinateSystemAxis[] getAxes() {
@@ -60,6 +61,7 @@ public class CoordinateSystem {
 
     /**
      * Returns the coordinate dimension, i.e. the number of axes in this coordinate system.
+     *
      * @return
      */
     public int getCoordinateDimension() {
@@ -67,14 +69,16 @@ public class CoordinateSystem {
     }
 
     /**
-     * Returns the position of the specified {@link CoordinateSystemAxis} in this <code>CoordinateSystem</code>.
+     * Returns the position of the specified {@link CoordinateSystemAxis} in this <code>CoordinateSystem</code>,
+     * or -1 if it is not an axis of this instance.
+     *
      * @param axis
      * @return
      */
     public int getAxisIndex(CoordinateSystemAxis axis) {
         int i = 0;
         for (CoordinateSystemAxis a : axes) {
-            if (a == axis) return i;
+            if (a.equals(axis)) return i;
             i++;
         }
         return -1;
@@ -96,8 +100,40 @@ public class CoordinateSystem {
      * @param index
      * @return
      */
-    public Unit getAxisUnit(int index){
+    public Unit getAxisUnit(int index) {
         return this.axes[index].getUnit();
+    }
+
+    /**
+     * Returns the index of the Vertical axis, or -1 if no axis is vertical.
+     * <p/>
+     * A vertical axis is defined as a axis with direction UP or DOWN. If the coordinate system
+     * contains more than one vertical axis, the first is returned.
+     *
+     * @return the index of the Vertical axis, or -1 if no axis is vertical
+     */
+    public CoordinateSystemAxis getVerticalAxis() {
+        for (CoordinateSystemAxis axis : axes) {
+            if (axis.isVerticalAxis()) return axis;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the index of the measure axes.
+     * <p/>
+     * Measure axes are all axes with axis direction UNKNOWN or OTHER.
+     *
+     * @return the indices of the measure axes.
+     */
+    public CoordinateSystemAxis[] getMeasureAxes() {
+        CoordinateSystemAxis[] result = new CoordinateSystemAxis[axes.length];
+        int num = 0;
+        for (CoordinateSystemAxis axis : axes) {
+            if (axis.isMeasureAxis())
+                result[num++] = axis;
+        }
+        return Arrays.copyOf(result, num);
     }
 
     @Override

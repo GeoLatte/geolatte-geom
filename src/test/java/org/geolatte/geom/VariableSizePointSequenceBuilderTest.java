@@ -21,7 +21,9 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,29 +34,32 @@ import static org.junit.Assert.assertEquals;
  */
 public class VariableSizePointSequenceBuilderTest {
 
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
 
     @Test
     public void test() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
+        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<>(crs);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
         }
 
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequence<P2D> sequence = builder.toPositionSequence();
         assertEquals(100, sequence.size());
 
     }
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
+        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<>(crs);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());
         }
 
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequence<P2D> sequence = builder.toPositionSequence();
         assertEquals(4, sequence.size());
 
     }

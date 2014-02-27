@@ -21,13 +21,12 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -35,26 +34,31 @@ import static org.junit.Assert.fail;
  */
 public class LinearRingTest {
 
-    PointSequence validPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
 
-    PointSequence tooFewPoints = PointCollectionFactory.create(new double[]{0, 0, 0, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PositionSequence<P2D> validPoints = PositionSequenceBuilders.variableSized(crs)
+            .add(0, 0).add( 10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
 
-    PointSequence notClosedPoints = PointCollectionFactory.create(new double[]{0, 0, 10, 0, 10, 10, 0, 10, 0.1, 0}, DimensionalFlag.d2D, CrsId.UNDEFINED);
+    PositionSequence<P2D> tooFewPoints = PositionSequenceBuilders.variableSized(crs)
+                .add(0, 0).add( 10, 0).toPositionSequence();
+
+    PositionSequence<P2D> notClosedPoints =  PositionSequenceBuilders.variableSized(crs)
+                .add(0, 0).add( 10, 0).add(10, 10).add(0, 10).toPositionSequence();
 
 
     @Test
     public void testValidLinearRing() {
-        LinearRing valid = new LinearRing(validPoints);
+        LinearRing<P2D> valid = new LinearRing<>(validPoints);
         assertNotNull(valid);
         assertFalse(valid.isEmpty());
-        assertEquals(CrsId.UNDEFINED, valid.getCrsId());
+        assertEquals(crs, valid.getCoordinateReferenceSystem());
     }
 
 
     @Test
     public void testLinearRingShouldHaveAtLeast4Points() {
         try {
-            new LinearRing(tooFewPoints);
+            new LinearRing<>(tooFewPoints);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -63,8 +67,8 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringShouldHaveAtLeast4Points() {
         try {
-            LineString l = new LineString(tooFewPoints);
-            new LinearRing(l);
+            LineString<P2D> l = new LineString<>(tooFewPoints);
+            new LinearRing<>(l);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -73,7 +77,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingMustBeClosed() {
         try {
-            new LinearRing(notClosedPoints);
+            new LinearRing<>(notClosedPoints);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }
@@ -82,8 +86,8 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringMustBeClosed() {
         try {
-            LineString l = new LineString(notClosedPoints);
-            new LinearRing(l);
+            LineString<P2D> l = new LineString<>(notClosedPoints);
+            new LinearRing<>(l);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }

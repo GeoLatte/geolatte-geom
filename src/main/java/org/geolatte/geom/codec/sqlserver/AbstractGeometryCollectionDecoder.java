@@ -22,12 +22,11 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class AbstractGeometryCollectionDecoder<T extends GeometryCollection> extends AbstractDecoder<T> {
+abstract class AbstractGeometryCollectionDecoder<G extends Geometry<?>> extends AbstractDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
@@ -35,35 +34,35 @@ abstract class AbstractGeometryCollectionDecoder<T extends GeometryCollection> e
 	}
 
 	@Override
-	protected T createNullGeometry() {
-		return createGeometry( (List<Geometry>) null, false );
+	protected Geometry<?> createNullGeometry() {
+		return createGeometry( (List<G>) null, false );
 	}
 
 	@Override
-	protected T createGeometry(SqlServerGeometry nativeGeom) {
+	protected Geometry<?> createGeometry(SqlServerGeometry nativeGeom) {
 		return createGeometry( nativeGeom, 0 );
 	}
 
 	@Override
-	protected T createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected Geometry<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
 		int startChildIdx = shapeIndex + 1;
-		List<Geometry> geometries = new ArrayList<Geometry>( nativeGeom.getNumShapes() );
+		List<G> geometries = new ArrayList<>( nativeGeom.getNumShapes() );
 		for ( int childIdx = startChildIdx; childIdx < nativeGeom.getNumShapes(); childIdx++ ) {
 			if ( !nativeGeom.isParentShapeOf( shapeIndex, childIdx ) ) {
 				continue;
 			}
-			AbstractDecoder<?> decoder = (AbstractDecoder<?>) Decoders.decoderFor(
+			AbstractDecoder decoder = (AbstractDecoder) Decoders.decoderFor(
 					nativeGeom.getOpenGisTypeOfShape(
 							childIdx
 					)
 			);
-			Geometry geometry = decoder.createGeometry( nativeGeom, childIdx );
+			G geometry = (G)decoder.createGeometry( nativeGeom, childIdx );
 			geometries.add( geometry );
 		}
 		return createGeometry( geometries, nativeGeom.hasMValues() );
 	}
 
-	abstract protected T createGeometry(List<Geometry> geometries, boolean hasM);
+	abstract protected Geometry<?> createGeometry(List<G> geometries, boolean hasM);
 
 
 }

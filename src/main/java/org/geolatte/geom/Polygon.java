@@ -21,9 +21,9 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.jts.JTS;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -50,43 +50,40 @@ import java.util.Iterator;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
-public class Polygon extends Geometry implements Iterable<LinearRing> {
+public class Polygon<P extends Position<P>> extends Geometry<P> implements Polygonal<P>, Complex<P, LinearRing<P>> {
 
 
-    private final PointCollection points;
-    private final LinearRing[] rings;
-    static final Polygon EMPTY = new Polygon(new LinearRing[0]);
-
+    private final LinearRing<P>[] rings;
+    
     /**
-     * Creates an empty <code>Polygon</code>.
+     * Creates a <code>Polygon</code> with no holes, and having the specified <code>PositionSequence</code> as exterior boundary
      *
-     * @return an empty <code>Polygon</code>.
-     */
-    public static Polygon createEmpty() {
-        return EMPTY;
-    }
-
-    /**
-     * Creates a <code>Polygon</code> with no holes, and having the specified <code>PointSequence</code> as exterior boundary
-     *
-     * @param pointSequence the <code>PointSequence</code> representing the exterior boundary
+     * @param positionSequence the <code>PositionSequence</code> representing the exterior boundary
      * @param ops           the <code>GeometryOperatoins</code> implementation for the constructed <code>Polygon</code>
-     * @throws IllegalArgumentException when the specified <code>PointSequence</code> does not form a
+     * @throws IllegalArgumentException when the specified <code>PositionSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    public Polygon(PointSequence pointSequence, GeometryOperations ops) {
-        this(new LinearRing[]{new LinearRing(pointSequence, ops)});
+    @SuppressWarnings("unchecked")
+    public Polygon(PositionSequence<P> positionSequence, GeometryOperations<P> ops) {
+        this((LinearRing<P>[])(new LinearRing[]{new LinearRing<P>(positionSequence, ops)}));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Polygon(CoordinateReferenceSystem<P> crs) {
+        super(crs);
+        rings = (LinearRing<P>[])new LinearRing[0];
     }
 
     /**
-     * Creates a <code>Polygon</code> with no holes, and having the specified <code>PointSequence</code> as exterior boundary
+     * Creates a <code>Polygon</code> with no holes, and having the specified <code>PositionSequence</code> as exterior boundary
      *
-     * @param pointSequence the <code>PointSequence</code> representing the exterior boundary
-     * @throws IllegalArgumentException when the specified <code>PointSequence</code> does not form a
+     * @param positionSequence the <code>PositionSequence</code> representing the exterior boundary
+     * @throws IllegalArgumentException when the specified <code>PositionSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    public Polygon(PointSequence pointSequence) {
-        this(new LinearRing[]{new LinearRing(pointSequence, null)});
+    @SuppressWarnings("unchecked")
+    public Polygon(PositionSequence<P> positionSequence) {
+        this(new LinearRing<P>(positionSequence));
     }
 
     /**
@@ -94,33 +91,28 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *
      * @param rings the array of the <code>Polygon</code>'s boundaries: the first element is the exterior boundary, all subsequent rings represent
      *              interior boundaries.
-     * @throws IllegalArgumentException when the specified <code>PointSequence</code> does not form a
+     * @throws IllegalArgumentException when the specified <code>PositionSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    public Polygon(LinearRing[] rings) {
-        super(getGeometryOperations(rings));
+    @SafeVarargs
+    public Polygon(LinearRing<P>... rings) {
+        super(nestPositionSequences(rings), getGeometryOperations(rings));
         checkRings(rings);
-        points = collectPointSets(rings);
-        this.rings = rings;
+        this.rings = Arrays.copyOf(rings, rings.length);
     }
 
 
-    private void checkRings(LinearRing[] rings) {
-        CrsId crsId = getCrsId(rings);
-        for (LinearRing ring : rings) {
-            checkLinearRing(ring, crsId);
+    private void checkRings(LinearRing<P>[] rings) {
+        CoordinateReferenceSystem<P> crs = getCrs(rings);
+        for (LinearRing<P> ring : rings) {
+            checkLinearRing(ring, crs);
         }
     }
 
-    private void checkLinearRing(LinearRing ring, CrsId crsId) {
+    private void checkLinearRing(LinearRing<P> ring, CoordinateReferenceSystem<P> crs) {
         if (ring == null) throw new IllegalArgumentException("NULL linear ring is not valid.");
         if (ring.isEmpty()) throw new IllegalArgumentException("Empty linear ring is not valid.");
-        if (!ring.getCrsId().equals(crsId)) throw new IllegalArgumentException("Linear ring with different CRS than exterior boundary.");
-    }
-
-    @Override
-    public PointCollection getPoints() {
-        return this.points;
+        if (!ring.getCoordinateReferenceSystem().equals(crs)) throw new IllegalArgumentException("Linear ring with different CRS than exterior boundary.");
     }
 
     /**
@@ -128,9 +120,9 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *
      * @return a <code>LinearRing</code> representing the exterior boundary of this <code>Polygon</code>.
      */
-    public LinearRing getExteriorRing() {
+    public LinearRing<P> getExteriorRing() {
         return this.isEmpty() ?
-                LinearRing.EMPTY :
+                new LinearRing<P>(getPositions()) :
                 this.rings[0];
     }
 
@@ -151,7 +143,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      * @param index the (zero-based) position of the interior boundary in the list of interior boundaries.
      * @return the <code>LinearRing</code> at the position specified by the parameter index.
      */
-    public LinearRing getInteriorRingN(int index) {
+    public LinearRing<P> getInteriorRingN(int index) {
         return this.rings[index + 1];
     }
 
@@ -162,7 +154,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      * @return the area of this <code>Polygon</code>.
      */
     public double getArea() {
-        return JTS.to(this).getArea();
+        return getGeometryOperations().createGetAreaOp(this).execute();
     }
 
     /**
@@ -172,8 +164,8 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *
      * @return the centroid <code>Point</code> for this <code>Polygon</code>
      */
-    public Point getCentroid() {
-        return (Point) JTS.from(JTS.to(this).getCentroid());
+    public Point<P> getCentroid() {
+        return getGeometryOperations().createGetCentroidOp(this).execute();
     }
 
     /**
@@ -181,8 +173,9 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *
      * @return a <code>Point</code> on this <code>Polygon</code>
      */
-    public Point getPointOnSurface() {
-        return getPointN(0);
+    public Point<P> getPointOnSurface() {
+        //TODO -- What if polygon is empty?
+        return new Point<P>(getPositionN(0));
     }
 
     @Override
@@ -196,11 +189,12 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
     }
 
     @Override
-    public MultiLineString getBoundary() {
+    @SuppressWarnings("unchecked")
+    public MultiLineString<P> getBoundary() {
 
         return isEmpty() ?
-                MultiLineString.EMPTY :
-                new MultiLineString(rings);
+                new MultiLineString<P>(new LinearRing[0]) :
+                new MultiLineString<P>(rings);
     }
 
     /**
@@ -210,8 +204,8 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
      *
      * @return
      */
-    public Iterator<LinearRing> iterator() {
-        return new Iterator<LinearRing>() {
+    public Iterator<LinearRing<P>> iterator() {
+        return new Iterator<LinearRing<P>>() {
             private int index = 0;
 
             @Override
@@ -220,7 +214,7 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
             }
 
             @Override
-            public LinearRing next() {
+            public LinearRing<P> next() {
                 return rings[index++];
             }
 
@@ -232,7 +226,17 @@ public class Polygon extends Geometry implements Iterable<LinearRing> {
     }
 
     @Override
-    public void accept(GeometryVisitor visitor) {
+    public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public int getNumGeometries() {
+        return rings.length;
+    }
+
+    @Override
+    public Class<? extends Geometry> getComponentType() {
+        return LinearRing.class;
     }
 }
