@@ -413,18 +413,17 @@ public class JTS {
 
         PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df, crsId);
         for (int i = 0; i < cs.size(); i++) {
+            // don't use cs.getOrdinate(i, ordinateIndex) because JTS 1.13 CoordinateArraySequence doesn't properly delegate to the Coordinate
+            Coordinate coordinate = cs.getCoordinate(i);
             coord[0] = cs.getX(i);
             coord[1] = cs.getY(i);
             if(hasZ && hasM) {
-                coord[2] = cs.getOrdinate(i, CoordinateSequence.Z);
-                coord[3] = cs.getOrdinate(i, CoordinateSequence.M);
+                coord[2] = coordinate.getOrdinate(CoordinateSequence.Z);
+                coord[3] = coordinate.getOrdinate(CoordinateSequence.M);
             } else if (hasZ) {
-                coord[2] = cs.getOrdinate(i, CoordinateSequence.Z);
+                coord[2] = coordinate.getOrdinate(CoordinateSequence.Z);
             } else if(hasM) {
-                coord[2] = cs.getOrdinate(i, CoordinateSequence.M);
-            }
-            for (int ci = 0; ci < coord.length; ci++) {
-                coord[ci] = cs.getOrdinate(i, ci);
+                coord[2] = coordinate.getOrdinate(CoordinateSequence.M);
             }
             builder.add(coord);
         }
