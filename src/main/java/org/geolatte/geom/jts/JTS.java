@@ -404,24 +404,48 @@ public class JTS {
         if (cs.size() == 0) {
             return EmptyPointSequence.INSTANCE;
         }
-        double[] coord;
-        DimensionalFlag df;
-        // TODO: A problem remains when the first point has a z value and the others don't
-        if (Double.isNaN(cs.getCoordinate(0).z)) {
-            df = DimensionalFlag.d2D;
-            coord = new double[2];
-        } else {
-            df = DimensionalFlag.d3D;
-            coord = new double[3];
-        }
+
+        boolean hasM = hasM(cs.getCoordinate(0));
+        boolean hasZ = hasZ(cs.getCoordinate(0));
+
+        DimensionalFlag df = DimensionalFlag.valueOf(hasZ,hasM);
+        double[] coord = new double[df.getCoordinateDimension()];
+
         PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df, crsId);
         for (int i = 0; i < cs.size(); i++) {
+            coord[0] = cs.getX(i);
+            coord[1] = cs.getY(i);
+            if(hasZ && hasM) {
+                coord[2] = cs.getOrdinate(i, CoordinateSequence.Z);
+                coord[3] = cs.getOrdinate(i, CoordinateSequence.M);
+            } else if (hasZ) {
+                coord[2] = cs.getOrdinate(i, CoordinateSequence.Z);
+            } else if(hasM) {
+                coord[2] = cs.getOrdinate(i, CoordinateSequence.M);
+            }
             for (int ci = 0; ci < coord.length; ci++) {
                 coord[ci] = cs.getOrdinate(i, ci);
             }
             builder.add(coord);
         }
         return builder.toPointSequence();
+    }
+
+    /**
+     * Checks if this Coordinate implementation supports M values (the default one doesn't, but some do, eg HibernateSpatial MCoordinates)
+     */
+    private static boolean hasM(Coordinate coordinate) {
+        try {
+            // M value is present and an actual number
+            return ! Double.isNaN(coordinate.getOrdinate(CoordinateSequence.M));
+        } catch (IllegalArgumentException e) {
+            // there is no M whatsoever
+            return false;
+        }
+    }
+
+    private static boolean hasZ(Coordinate coordinate) {
+        return ! Double.isNaN(coordinate.z);
     }
 
     private static CoordinateSequence sequenceOf(org.geolatte.geom.Geometry geometry) {
@@ -433,5 +457,4 @@ public class JTS {
         }
     }
 }
-
 
