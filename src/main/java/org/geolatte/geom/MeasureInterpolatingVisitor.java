@@ -65,7 +65,6 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
     //data structures for the result
     private final List<PointSequence> pointSequences = new ArrayList<PointSequence>();
     private PointSequenceBuilder currentBuilder;
-    private boolean sequenceIsEmpty = true;
 
     public MeasureInterpolatingVisitor(Geometry geometry, double startMeasure, double endMeasure) {
         if (startMeasure <= endMeasure) {
@@ -110,7 +109,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
             double r1 = Math.min(rs, re);
             double r2 = Math.max(rs, re);
 
-            if (p0.getM() >= startMeasure && p0.getM() <= endMeasure) {
+            if (startMeasure <= p0.getM() && p0.getM() <= endMeasure) {
                 lastAddedPoint = addIfNotEqualLast(lastAddedPoint, p0);
             } else {
                 //p0 not within [startMeasure, endMeasure], so next point to add will not be consecutive with
@@ -122,7 +121,7 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
                 }
             }
 
-            if (p1.getM() >= startMeasure && p1.getM() <= endMeasure) {
+            if (startMeasure <= p1.getM()  && p1.getM() <= endMeasure) {
                 lastAddedPoint = addIfNotEqualLast(lastAddedPoint, p1);
             } else {
                 if (r2 > 0 && r2 < 1) {
@@ -142,19 +141,18 @@ public class MeasureInterpolatingVisitor implements GeometryVisitor {
     }
 
     private void startNewPointSequenceIfNotEmpty() {
-        if (!sequenceIsEmpty) {
+        if (currentBuilder.getNumAdded() > 0) {
             pointSequences.add(currentBuilder.toPointSequence());
             currentBuilder = PointSequenceBuilders.variableSized(dimFlag, crsId);
-            sequenceIsEmpty = true;
         }
     }
 
+    //Adds newPnt to current Builder, unless the newPnt is equal to latPoint
     private Point addIfNotEqualLast(Point lastPoint, Point newPnt) {
         assert (newPnt != null);
         if (!newPnt.equals(lastPoint)) {
             currentBuilder.add(newPnt);
             lastPoint = newPnt;
-            sequenceIsEmpty = false;
         }
         return lastPoint;
     }

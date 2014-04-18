@@ -99,6 +99,11 @@ public interface PointSequenceBuilder {
      */
     CrsId getCrsId();
 
+    /**
+     * Returns the number of points already added to this <code>PointSequence</code>.
+     * @return
+     */
+    int getNumAdded();
 
     /**
      * Returns the result of this builder.

@@ -31,6 +31,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
 
     protected final DimensionalFlag dimensionalFlag;
     protected final CrsId crsId;
+    protected int numAdded;
 
     public AbstractPointSequenceBuilder(DimensionalFlag dimensionalFlag, CrsId crsId) {
         this.dimensionalFlag = dimensionalFlag;
@@ -44,6 +45,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
         for (int i = 0; i < dimensionalFlag.getCoordinateDimension(); i++) {
             add(coordinates[i]);
         }
+        numAdded++;
         return this;
     }
 
@@ -53,6 +55,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
             throw new IllegalArgumentException("Attempting to add 2D point to pointsequence of dimension " + dimensionalFlag);
         add(x);
         add(y);
+        numAdded++;
         return this;
     }
 
@@ -63,6 +66,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
         add(x);
         add(y);
         add(zOrm);
+        numAdded++;
         return this;
     }
 
@@ -74,6 +78,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
         add(y);
         add(z);
         add(m);
+        numAdded++;
         return this;
     }
 
@@ -86,6 +91,7 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
         for (double coord : coords) {
             add(coord);
         }
+        numAdded++;
         return this;
     }
 
@@ -97,6 +103,11 @@ abstract class AbstractPointSequenceBuilder implements PointSequenceBuilder {
     @Override
     public CrsId getCrsId() {
         return this.crsId;
+    }
+
+    @Override
+    public int getNumAdded() {
+        return numAdded;
     }
 
     private double[] getPointCoordinates(Point point) {

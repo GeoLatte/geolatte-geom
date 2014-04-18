@@ -24,6 +24,7 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -62,6 +63,16 @@ public class PointSequenceBuilderTest {
         }catch(IllegalArgumentException e){
         }
 
+    }
+
+    @Test
+    public void testNumAddedInvariants() {
+        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(2, DimensionalFlag.d2D, CrsId.UNDEFINED);
+        assertEquals(0, builder.getNumAdded());
+        builder.add(1,2);
+        assertEquals(1, builder.getNumAdded());
+        builder.add(3,4);
+        assertEquals(2, builder.getNumAdded());
     }
 
 
