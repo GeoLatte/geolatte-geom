@@ -150,4 +150,28 @@ public class LineStringTest {
         assertEquals(GeometryType.LINE_STRING, line2d.getGeometryType());
     }
 
+    @Test
+       public void testCreateEnvelopeOp() {
+           LineString<P2D> lineString = linestring(crs, p(-1, 3), p(2, 5), p(10, -8), p(9, -1));
+           assertEquals(new Envelope<>(-1, -8, 10, 5, crs), lineString.getEnvelope());
+       }
+
+       @Test
+       public void testCreateEnvelopeOpOnlyNegative() {
+           LineString<P2D> lineString = linestring(crs, p(-101, -97), p(-98, -95), p(-90, -108), p(-91, -101));
+           assertEquals(new Envelope<>(-101, -108, -90, -95, crs), lineString.getEnvelope());
+       }
+
+       @Test
+       public void testCreateEnvelopeOpOnlyPositive() {
+           LineString<P2D> lineString = linestring(crs, p(99, 103), p(102, 105), p(110, 92), p(109, 99));
+           assertEquals(new Envelope<>(99, 92, 110, 105, crs), lineString.getEnvelope());
+       }
+
+       @Test
+       public void testCreateEnvelopeOpOnEmpty() {
+           LineString<P2D> lineString = new LineString<>(crs);
+           assertEquals(new Envelope<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
+       }
+
 }

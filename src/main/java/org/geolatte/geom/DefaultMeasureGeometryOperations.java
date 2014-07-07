@@ -38,56 +38,46 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
     private final static PositionEquality pntEq = new ExactPositionEquality();
 
 
-
     @Override
-    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue) {
-        return createLocateBetweenOp(geometry, mValue, mValue);
+    public <P extends Projected<P> & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
+        return locateBetween(geometry, mValue, mValue);
     }
 
     @Override
-    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
-        return new GeometryOperation<Geometry<P>>() {
-            @Override
-            public Geometry<P> execute() {
-                if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
-                if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
-                if ( Projected.class.isAssignableFrom( geometry.getPositionClass()) &&
-                     Measured.class.isAssignableFrom( geometry.getPositionClass())) {
-                    MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
-                                    geometry.accept((GeometryVisitor<P>)visitor);
-                                    return (Geometry<P>)visitor.result();
-                }
-                throw new IllegalArgumentException("Requires projected coordinates");
-            }
-        };
+    public <P extends Projected<P> & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
+        if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
+        if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
+        if (Projected.class.isAssignableFrom(geometry.getPositionClass()) &&
+                Measured.class.isAssignableFrom(geometry.getPositionClass())) {
+            MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
+            geometry.accept((GeometryVisitor<P>) visitor);
+            return (Geometry<P>) visitor.result();
+        }
+        throw new IllegalArgumentException("Requires projected coordinates");
     }
 
     /**
      * @inheritDoc
      */
     @Override
-    public <P extends Projected<P> & Measured> GeometryOperation<Double> createGetMeasureOp(final Geometry<P> geometry, final P pos) {
+    public <P extends Projected<P> & Measured> double measureAt(final Geometry<P> geometry, final P pos) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
-        return new GeometryOperation<Double>() {
-            @Override
-            public Double execute() {
-                if (geometry.isEmpty()) return Double.NaN;
-                //TODO -- tolerance parameter into API
-                InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, Math.ulp(100));
-                geometry.accept(visitor);
-                return visitor.m();
-            }
-        };
+        if (geometry.isEmpty()) return Double.NaN;
+        //TODO -- tolerance parameter into API
+        InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, Math.ulp(100));
+        geometry.accept(visitor);
+        return visitor.m();
     }
 
     /**
      * @inheritDoc
      */
     @Override
-    public <P extends Projected<P>, M extends Projected<M> & Measured> GeometryOperation<Geometry<M>> createMeasureOnLengthOp(
+    public <P extends Projected<P>, M extends Projected<M> & Measured> Geometry<M> measureOnLength(
             final Geometry<P> geometry, final Class<M> positionTypeMarker, final boolean keepBeginMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
-        if (positionTypeMarker == null) throw new IllegalArgumentException("PositionTypeMarker parameter must not be NULL");
+        if (positionTypeMarker == null)
+            throw new IllegalArgumentException("PositionTypeMarker parameter must not be NULL");
         if (geometry.getGeometryType() != GeometryType.LINE_STRING
                 && geometry.getGeometryType() != GeometryType.MULTI_LINE_STRING) {
             throw new IllegalArgumentException("Geometry parameter must be of type LineString or MultiLineString");
@@ -100,78 +90,23 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                     measuredVariant.getPositionClass().getName(),
                     positionTypeMarker.getName()));
         }
-
-        return new GeometryOperation<Geometry<M>>() {
-            private double length = 0;
-
-            @Override
-            public Geometry<M> execute() {
-                Geometry<M> measured = Geometry.forceToCrs(geometry, measuredVariant);
-                if (measured.isEmpty()) return measured;
-                if (keepBeginMeasure) {
-                    double initialValue = measured.getPositionN(0).getM();
-                    length = (Double.isNaN(initialValue) ? 0 : initialValue);
-                }
-                if (measured instanceof LineString) {
-                    return measure((LineString<M>) measured);
-                } else if (geometry instanceof MultiLineString) {
-                    return measure((MultiLineString<M>) measured);
-                } else {
-                    throw new IllegalStateException(
-                            String.format("Requires a LineString or MultiLineString, but received %s",
-                                    geometry.getClass().getName()));
-                }
-            }
-
-            //TODO -- the measure() functions can probably be simplified
-
-            @SuppressWarnings("unchecked")
-            private <T extends Position<T> & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
-                LineString<T>[] measuredParts = (LineString<T>[]) new LineString[geometry.getNumGeometries()];
-                for (int part = 0; part < geometry.getNumGeometries(); part++) {
-                    LineString<T> lineString = geometry.getGeometryN(part);
-                    measuredParts[part] = measure(lineString);
-                }
-                return new MultiLineString<>(measuredParts);
-            }
-
-            private <T extends Position<T> & Measured> LineString<T> measure(LineString<T> geometry) {
-                CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
-                PositionSequence originalPoints = geometry.getPositions();
-                PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),
-                        geometry.getCoordinateReferenceSystem());
-                double[] coordinates = new double[geometry.getCoordinateDimension()];
-                double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
-                for (int i = 0; i < originalPoints.size(); i++) {
-                    originalPoints.getCoordinates(i, coordinates);
-                    if (i > 0) {
-                        length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
-                    }
-                    coordinates[crs.getNormalizedOrder().getNormalMeasure()] = length;
-                    builder.add(coordinates);
-                    prevCoordinates[0] = coordinates[0];
-                    prevCoordinates[1] = coordinates[1];
-                }
-                return new LineString<>(builder.toPositionSequence());
-            }
-
-        };
+        return new OnLengthMeasureOp<>(geometry, measuredVariant, keepBeginMeasure).execute();
     }
 
     /**
      * @inheritDoc
      */
     @Override
-    public <P extends Position<P> & Measured> GeometryOperation<Double> createGetMinimumMeasureOp(Geometry<P> geometry) {
-        return createGetExtrMeasureOp(geometry, true);
+    public <P extends Position<P> & Measured> double minimumMeasure(Geometry<P> geometry) {
+        return createGetExtrMeasureOp(geometry, true).execute();
     }
 
     /**
      * @inheritDoc
      */
     @Override
-    public <P extends Position<P> & Measured> GeometryOperation<Double> createGetMaximumMeasureOp(Geometry<P> geometry) {
-        return createGetExtrMeasureOp(geometry, false);
+    public <P extends Position<P> & Measured> double maximumMeasure(Geometry<P> geometry) {
+        return createGetExtrMeasureOp(geometry, false).execute();
     }
 
     private <P extends Position<P> & Measured> GeometryOperation<Double> createGetExtrMeasureOp(final Geometry<P> geometry, final boolean min) {
@@ -263,6 +198,73 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 extremum = m > extremum ? m : extremum;
             }
         }
+
+    }
+
+    private static class OnLengthMeasureOp<M extends Projected<M> & Measured> implements GeometryOperation<Geometry<M>> {
+        private double length = 0;
+
+        final private Geometry<?> geometry;
+        final private CoordinateReferenceSystem<M> measuredVariant;
+        final private boolean keepBeginMeasure;
+
+        OnLengthMeasureOp(Geometry<?> geometry, CoordinateReferenceSystem<M> measuredVariant, boolean keepBeginMeasure) {
+            this.geometry = geometry;
+            this.measuredVariant = measuredVariant;
+            this.keepBeginMeasure = keepBeginMeasure;
+        }
+
+        @Override
+        public Geometry<M> execute() {
+            Geometry<M> measured = Geometry.forceToCrs(geometry, measuredVariant);
+            if (measured.isEmpty()) return measured;
+            if (keepBeginMeasure) {
+                double initialValue = measured.getPositionN(0).getM();
+                length = (Double.isNaN(initialValue) ? 0 : initialValue);
+            }
+            if (measured instanceof LineString) {
+                return measure((LineString<M>) measured);
+            } else if (geometry instanceof MultiLineString) {
+                return measure((MultiLineString<M>) measured);
+            } else {
+                throw new IllegalStateException(
+                        String.format("Requires a LineString or MultiLineString, but received %s",
+                                geometry.getClass().getName()));
+            }
+        }
+
+        //TODO -- the measure() functions can probably be simplified
+
+        @SuppressWarnings("unchecked")
+        private <T extends Position<T> & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
+            LineString<T>[] measuredParts = (LineString<T>[]) new LineString[geometry.getNumGeometries()];
+            for (int part = 0; part < geometry.getNumGeometries(); part++) {
+                LineString<T> lineString = geometry.getGeometryN(part);
+                measuredParts[part] = measure(lineString);
+            }
+            return new MultiLineString<>(measuredParts);
+        }
+
+        private <T extends Position<T> & Measured> LineString<T> measure(LineString<T> geometry) {
+            CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
+            PositionSequence originalPoints = geometry.getPositions();
+            PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),
+                    geometry.getCoordinateReferenceSystem());
+            double[] coordinates = new double[geometry.getCoordinateDimension()];
+            double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
+            for (int i = 0; i < originalPoints.size(); i++) {
+                originalPoints.getCoordinates(i, coordinates);
+                if (i > 0) {
+                    length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
+                }
+                coordinates[crs.getNormalizedOrder().getNormalMeasure()] = length;
+                builder.add(coordinates);
+                prevCoordinates[0] = coordinates[0];
+                prevCoordinates[1] = coordinates[1];
+            }
+            return new LineString<>(builder.toPositionSequence());
+        }
+
 
     }
 }

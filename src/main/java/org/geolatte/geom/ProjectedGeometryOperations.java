@@ -1,36 +1,36 @@
 /*
- * This file is part of the GeoLatte project.
- *
- *     GeoLatte is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU Lesser General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     GeoLatte is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU Lesser General Public License for more details.
- *
- *     You should have received a copy of the GNU Lesser General Public License
- *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright (C) 2010 - 2011 and Ownership of code is shared by:
- * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
- * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
- */
+* This file is part of the GeoLatte project.
+*
+*     GeoLatte is free software: you can redistribute it and/or modify
+*     it under the terms of the GNU Lesser General Public License as published by
+*     the Free Software Foundation, either version 3 of the License, or
+*     (at your option) any later version.
+*
+*     GeoLatte is distributed in the hope that it will be useful,
+*     but WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*     GNU Lesser General Public License for more details.
+*
+*     You should have received a copy of the GNU Lesser General Public License
+*     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+*
+* Copyright (C) 2010 - 2011 and Ownership of code is shared by:
+* Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
+* Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
+*/
 
 package org.geolatte.geom;
 
 /**
- * Defines standard operations on {@code Geometry}s with projected coordinate systems.
- * <p/>
- * <p>The semantics of the operations is as specified in
- * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access - Part 1: common architecture</a>
- * </p>
- *
- * @author Karel Maesen, Geovise BVBA
- */
-public interface ProjectedGeometryOperations<P extends Projected<P>> {
+* Defines standard operations on {@code Geometry}s with projected coordinate systems.
+* <p/>
+* <p>The semantics of the operations is as specified in
+* <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access - Part 1: common architecture</a>
+* </p>
+*
+* @author Karel Maesen, Geovise BVBA
+*/
+public interface ProjectedGeometryOperations {
 
     /**
      * Creates an operation to test the simplicity of the specified <code>Geometry</code>.
@@ -38,7 +38,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param geometry the <code>Geometry</code> to test for simplicity.
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code> is simple.
      */
-    GeometryOperation<Boolean> createIsSimpleOp(final Geometry<P> geometry);
+    <P extends Projected<P>> boolean isSimple(final Geometry<P> geometry);
 
     /**
      * Creates an operation to calculate the boundary of the specified <code>Geometry</code>.
@@ -46,7 +46,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param geometry the <code>Geometry</code> for which to calculate the boundary.
      * @return a <code>GeometryOperation</code> that calculates a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
-    GeometryOperation<Geometry<P>> createBoundaryOp(final Geometry<P> geometry);
+    <P extends Projected<P>> Geometry<P> boundary(final Geometry<P> geometry);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s intersect.
@@ -55,7 +55,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code> operand of the intersection test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially intersect
      */
-    GeometryOperation<Boolean> createIntersectsOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> boolean intersects(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s touch.
@@ -64,7 +64,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code> operand of the touch test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially touch
      */
-    GeometryOperation<Boolean> createTouchesOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> boolean touches(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s cross.
@@ -73,7 +73,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code> operand of the cross test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially cross
      */
-    GeometryOperation<Boolean> createCrossesOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> boolean crosses(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the first specified <code>Geometry</code> spatially
@@ -83,7 +83,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code> operand of the containment test
      * @return a <code>GeometryOperation</code> that checks if the first specified <code>Geometry</code> spatially contains the second
      */
-    GeometryOperation<Boolean> createContainsOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> boolean contains(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s overlap.
@@ -92,7 +92,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code> operand of the overlap test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially overlap
      */
-    GeometryOperation<Boolean> createOverlapsOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s are spatially related by testing
@@ -100,12 +100,12 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * the values in the intersection pattern matrix. This returns false if all the tested intersections are empty except
      * exterior (this) intersect exterior (another).
      *
-     * @param geometry the first <code>Geometry</code> operand of the relate test
-     * @param other    the second <code>Geometry</code> operand of the relate test
+     * @param geometry the first <code>Geometry</code> operand of the relates test
+     * @param other    the second <code>Geometry</code> operand of the relates test
      * @param matrix   the intersection pattern matrix
      * @return a <code>GeometryOperation</code> that checks if this instance intersects the specifed other <code>Geometry</code>
      */
-    public GeometryOperation<Boolean> createRelateOp(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
+    <P extends Projected<P>> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
 
 
     /**
@@ -117,7 +117,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the shortest distance between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Double> createDistanceOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> double distance(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate a <code>Geometry</code> that represents all points whose distance from the specified
@@ -132,7 +132,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @return a <code>GeometryOperation</code> that calculates a 2D <code>Geometry</code> representing the
      * buffer of the specified <code>Geometry</code> with the specified distance.
      */
-    GeometryOperation<Geometry<P>> createBufferOp(final Geometry<P> geometry, final double distance);
+    <P extends Projected<P>> Geometry<P> buffer(final Geometry<P> geometry, final double distance);
 
     /**
      * Returns an operation to calculate the convex hull of the specified <code>Geometry</code>.
@@ -140,7 +140,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param geometry the <code>Geometry</code> for which to calculate the convex hull.
      * @return a <code>GeometryOperation</code> that calculates the convex hull for the specified <code>Geometry</code>.
      */
-    GeometryOperation<Geometry<P>> createConvexHullOp(final Geometry<P> geometry);
+    <P extends Projected<P>> Geometry<P> convexHull(final Geometry<P> geometry);
 
     /**
      * Returns an operation to calculate the point set intersection of the specified <code>Geometry</code>s.
@@ -149,7 +149,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set intersection between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry<P>> createIntersectionOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set union of the specified <code>Geometry</code>s.
@@ -158,7 +158,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set union between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry<P>> createUnionOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set difference of the specified <code>Geometry</code>s.
@@ -167,7 +167,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set difference between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry<P>> createDifferenceOp(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends Projected<P>> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set symmetric difference of the specified <code>Geometry</code>s.
@@ -176,27 +176,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set symmetric difference between the two specified <code>Geometries</code>
      */
-    GeometryOperation<Geometry<P>> createSymDifferenceOp(final Geometry<P> geometry, final Geometry<P> other);
-
-    /**
-     * Creates an operation to encode the specified <code>Geometry</code> to Well-Known Text (WKT).
-     * <p/>
-     * <p>Which "dialect" of WKT is used, is implementation defined. </p>
-     *
-     * @param geometry the <code>Geometry</code> to encode into WKT
-     * @return An operation that encodes the specified <code>Geometry</code> to WKT
-     */
-    GeometryOperation<String> createToWktOp(final Geometry<P> geometry);
-
-    /**
-     * Creates an operation to encode the specified <code>Geometry</code> to Well-Known Binary format (WKB).
-     * <p/>
-     * <p>Which "dialect" of WKB is used, is implementation defined. </p>
-     *
-     * @param geometry the <code>Geometry</code> to encode to WKB
-     * @return An operation that encodes the specified <code>Geometry</code> to WKB
-     */
-    GeometryOperation<ByteBuffer> createToWkbOp(final Geometry<P> geometry);
+    <P extends Projected<P>> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to determine the length of the specified {@code Geometry}.
@@ -204,7 +184,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param geometry the Geometry
      * @return the length of the specified Geometry
      */
-    <G extends Geometry<P> & Linear<P>> GeometryOperation<Double> createGetLengthOp(final G geometry);
+    <P extends Projected<P>, G extends Geometry<P> & Linear<P>> double length(final G geometry);
 
     /**
      * Creates an operation to determine the area of the specified {@code Geometry}.
@@ -212,7 +192,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param geometry the Geometry
      * @return the area of the specified Geometry
      */
-    <G extends Geometry<P> & Polygonal<P>> GeometryOperation<Double> createGetAreaOp(final G geometry);
+    <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
 
     /**
      * Creates an operation that calculates a centroid for the specified {@code Geometry}.
@@ -221,7 +201,7 @@ public interface ProjectedGeometryOperations<P extends Projected<P>> {
      * @param <G>      Polygonal  Geometry
      * @return the centroid of the specified Geometry as a {@code Point}
      */
-    <G extends Geometry<P> & Polygonal<P>> GeometryOperation<Point<P>> createGetCentroidOp(final G geometry);
+    <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry);
 
 
 }
