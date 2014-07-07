@@ -27,6 +27,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.linestring;
 import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
@@ -39,9 +40,9 @@ import static org.junit.Assert.*;
 public class TestDefaultMeasureGeometryOperations {
 
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-        private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-        private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-        private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
 
 
     DefaultMeasureGeometryOperations measureOps = new DefaultMeasureGeometryOperations();
@@ -52,18 +53,23 @@ public class TestDefaultMeasureGeometryOperations {
     @Test
     public void testCreateMeasureOnLengthOpThrowsExceptionOnNullParameter() {
         try {
-            measureOps.createMeasureOnLengthOp(null, false);
+            measureOps.createMeasureOnLengthOp(null, P2DM.class, false);
             fail("createMeasureOnLengthOp created on null parameter. Should throw exception");
         } catch (IllegalArgumentException e) {
             //OK
         }
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateMeasureOnLengthOpWithInconsistentTypeMarker() {
+        GeometryOperation<Geometry<P3DM>> op = measureOps.createMeasureOnLengthOp(linestring(crs, p(1, 2), p(3, 4)), P3DM.class, false);
+    }
+
     @Test
     public void testCreateMeasureOnLengthOpReturnsParameterOnEmptyGeometry() {
-        GeometryOperation<Geometry<?>> onLengthOp = measureOps.createMeasureOnLengthOp(tc.emptyLineString, false);
+        GeometryOperation<Geometry<P2DM>> onLengthOp = measureOps.createMeasureOnLengthOp(tc.emptyLineString, P2DM.class, false);
         Geometry geometry = onLengthOp.execute();
-        assertEquals("MeasureOnLengthOp returns non-empty geometry on empty geometry.",tc.emptyMeasuredLineString, geometry);
+        assertEquals("MeasureOnLengthOp returns non-empty geometry on empty geometry.", tc.emptyMeasuredLineString, geometry);
     }
 
     @Test
@@ -87,7 +93,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testCreateMeasureOnLengthOpOnRegularMLineStringWithKeepInitial() {
-        Geometry<P3DM> measured = (Geometry<P3DM>)measureOps.createMeasureOnLengthOp(tc.lineString3DM, true).execute();
+        Geometry<P3DM> measured = measureOps.createMeasureOnLengthOp(tc.lineString3DM, P3DM.class, true).execute();
         assertEquals("MeasureOnLengthOp creates wrong result at point 0:", 5.0, measured.getPositionN(0).getM(), Math.ulp(10));
         assertEquals("MeasureOnLengthOp creates wrong result at point 1:", 6.0, measured.getPositionN(1).getM(), Math.ulp(10));
         assertEquals("MeasureOnLengthOp creates wrong result at point 2:", 7.0, measured.getPositionN(2).getM(), Math.ulp(10));
@@ -119,7 +125,7 @@ public class TestDefaultMeasureGeometryOperations {
     public void testCreateMeasureOnLengthFailsForNonEmptyNonLinealGeometries() {
         Point point = point(crs, p(3, 4));
         try {
-            measureOps.createMeasureOnLengthOp(point, false);
+            measureOps.createMeasureOnLengthOp(point, P2DM.class, false);
             fail("createMeasureOnLengthOp should not accept a Point argument.");
         } catch (IllegalArgumentException e) {
             //OK
@@ -132,8 +138,8 @@ public class TestDefaultMeasureGeometryOperations {
             assertEquals("MeasureOnLenthOp does not preserve Y-coordinate:", expected.getPositionN(i).getY(), received.getPositionN(i).getY(), Math.ulp(10));
             if (expected.getCoordinateReferenceSystem().hasVerticalAxis()) {
                 assertEquals("MeasureOnLenthOp does not preserve Z-coordinate:",
-                        ((Vertical)expected.getPositionN(i)).getAltitude(),
-                        ((Vertical)received.getPositionN(i)).getAltitude(), Math.ulp(10));
+                        ((Vertical) expected.getPositionN(i)).getAltitude(),
+                        ((Vertical) received.getPositionN(i)).getAltitude(), Math.ulp(10));
             }
         }
     }
@@ -141,7 +147,7 @@ public class TestDefaultMeasureGeometryOperations {
     @Test
     public void testCreateGetMeasureOpThrowsExceptionOnNull() {
         try {
-            measureOps.createGetMeasureOp((Geometry<P2DM>)null, new P2DM(crsM, 1, 2, 0)).execute();
+            measureOps.createGetMeasureOp((Geometry<P2DM>) null, new P2DM(crsM, 1, 2, 0)).execute();
             fail("createGetMeasureOp created on null parameter. Should throw exception");
         } catch (IllegalArgumentException e) {
             //OK

@@ -152,11 +152,12 @@ public class MeasuredTestCases {
         emptyLineString = new LineString<>(crs);
 
         //measured lines
-        measuredLineString2D = (Geometry<P2DM>)measureOps.createMeasureOnLengthOp(lineString2d, false).execute();
-        measuredMultiLineString2D = (Geometry<P2DM>)measureOps.createMeasureOnLengthOp(multiLineString2D, false).execute();
-        measuredLineString3DM = (Geometry<P3DM>)measureOps.createMeasureOnLengthOp(lineString3DM, false).execute();
-        measuredLinearRing = (Geometry<P2DM>)measureOps.createMeasureOnLengthOp(linearRing, false).execute();
-        emptyMeasuredLineString = (LineString<P2DM>) measureOps.createMeasureOnLengthOp(emptyLineString, false).execute();
+
+        measuredLineString2D = measureOps.createMeasureOnLengthOp(lineString2d, P2DM.class, false).execute();
+        measuredMultiLineString2D = measureOps.createMeasureOnLengthOp(multiLineString2D, P2DM.class, false).execute();
+        measuredLineString3DM = measureOps.createMeasureOnLengthOp(lineString3DM, P3DM.class, false).execute();
+        measuredLinearRing = measureOps.createMeasureOnLengthOp(linearRing, P2DM.class, false).execute();
+        emptyMeasuredLineString = (LineString<P2DM>) measureOps.createMeasureOnLengthOp(emptyLineString, P2DM.class, false).execute();
     }
 
 }

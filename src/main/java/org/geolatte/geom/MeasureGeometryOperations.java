@@ -44,13 +44,16 @@ public interface MeasureGeometryOperations {
      * that has the same 2D/3D-coordinates as the specified <code>Geometry</code>, and
      * with measure values that correspond with the length along it (or begin-measure + length).
      * <p/>
-     * <p>The length is calculated in the 2-dimensional X/Y-plane.</p>
+     * <p>The positionTypeMarker is needed because the compiler can't figure our the relationship between the input CRS
+     * and its measured variant.</p>
      *
      * @param geometry         the <code>Geometry</code> for which to build measures
      * @param keepBeginMeasure if true, than the measure of the first coordinate is used as start-value
+     * @param positionTypeMarker  the type of {@code Position} for the result of the created operations
      * @return a <code>GeometryOperation</code> that returns a Geometry with measures increasing with length
      */
-    public <P extends Projected<P>> GeometryOperation<Geometry<?>> createMeasureOnLengthOp(Geometry<P> geometry, boolean keepBeginMeasure);
+    public <P extends Projected<P>, M extends Projected<M> & Measured> GeometryOperation<Geometry<M>> createMeasureOnLengthOp(
+            Geometry<P> geometry, Class<M> positionTypeMarker, boolean keepBeginMeasure);
 
     /**
      * Creates a {@code GeometryOperation} that returns the minimum measure value of the points
