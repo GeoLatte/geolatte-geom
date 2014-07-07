@@ -46,7 +46,7 @@ public class GeometryCollection<P extends Position<P>, G extends Geometry<P>> ex
      */
     @SafeVarargs
     public GeometryCollection(G... geometries) {
-        super(nestPositionSequences(geometries), getGeometryOperations(geometries));
+        super(nestPositionSequences(geometries));
         check(geometries);
         this.geometries = Arrays.copyOf(geometries, geometries.length);
     }
@@ -57,7 +57,7 @@ public class GeometryCollection<P extends Position<P>, G extends Geometry<P>> ex
      */
     @SuppressWarnings("unchecked")
     public GeometryCollection(CoordinateReferenceSystem<P> crs) {
-        super(new PackedPositionSequence<P>(crs, new double[0]), DefaultGeometryOperationsFactory.getOperations(crs.getPositionClass()));
+        super(new PackedPositionSequence<P>(crs, new double[0]));
         this.geometries = (Geometry<P>[])new Geometry[0];
     }
 

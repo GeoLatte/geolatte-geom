@@ -44,18 +44,7 @@ public class MultiLineString<P extends Position<P>> extends GeometryCollection<P
         super(crs);
     }
 
-//    @Override
-//    public LineString<P> getGeometryN(int i) {
-//        return super.getGeometryN(i);
-//    }
 
-    public double getLength() {
-        double l = 0.0d;
-        for (int i = 0; i < this.getNumGeometries(); i++) {
-            l += getGeometryN(i).getLength();
-        }
-        return l;
-    }
 
     @Override
     public Position getStartPosition() {
@@ -66,13 +55,6 @@ public class MultiLineString<P extends Position<P>> extends GeometryCollection<P
     public Position getEndPosition() {
         return getPositionN(getNumPositions() - 1);
     }
-
-//    public boolean isClosed() {
-//        for (int i = 0; i < this.getNumGeometries(); i++) {
-//            if (!getGeometryN(i).isClosed()) return false;
-//        }
-//        return true;
-//    }
 
     @Override
     public int getDimension() {

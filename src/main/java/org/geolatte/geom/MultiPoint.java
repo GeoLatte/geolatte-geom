@@ -53,20 +53,10 @@ public class MultiPoint<P extends Position<P>> extends GeometryCollection<P, Poi
         return GeometryType.MULTI_POINT;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public Geometry<P> getBoundary() {
-        return new MultiPoint<P>(getCoordinateReferenceSystem());
-    }
 
     @Override
     public Class<? extends Geometry> getComponentType() {
         return Point.class;
     }
-
-    //    @Override
-//    public Point<P> getGeometryN(int num) {
-//        return super.getGeometryN(num);
-//    }
 
 }

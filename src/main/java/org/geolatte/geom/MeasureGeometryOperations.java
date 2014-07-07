@@ -30,11 +30,41 @@ package org.geolatte.geom;
 public interface MeasureGeometryOperations {
 
     /**
+     * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified range of M-coordinate value
+     * inclusively.
+     * <p/>
+     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
+     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
+     *
+     * @param geometry     the geometry on which to perform the calculation
+     * @param startMeasure the start of the specified range of M-coordinate values
+     * @param endMeasure   the end of the specified range of M-coordinate values
+     * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching the
+     * specified range of M-coordinate values.
+     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
+     */
+    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure);
+
+    /**
+     * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
+     * <p/>
+     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
+     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
+     *
+     * @param geometry the geometry on which to perform the calculation
+     * @param mValue   the specified M-coordinate value
+     * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching
+     * the specified M-coordinate value.
+     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
+     */
+    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue);
+
+    /**
      * Creates a <code>GeometryOperation</code> to calculate the measure value
      * at the specified point
      *
      * @param geometry a linear <code>Geometry</code>
-     * @param pos    a <code>Position</code> on the geometry
+     * @param pos      a <code>Position</code> on the geometry
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
     public <P extends Projected<P> & Measured> GeometryOperation<Double> createGetMeasureOp(Geometry<P> geometry, P pos);
@@ -47,9 +77,9 @@ public interface MeasureGeometryOperations {
      * <p>The positionTypeMarker is needed because the compiler can't figure our the relationship between the input CRS
      * and its measured variant.</p>
      *
-     * @param geometry         the <code>Geometry</code> for which to build measures
-     * @param keepBeginMeasure if true, than the measure of the first coordinate is used as start-value
-     * @param positionTypeMarker  the type of {@code Position} for the result of the created operations
+     * @param geometry           the <code>Geometry</code> for which to build measures
+     * @param keepBeginMeasure   if true, than the measure of the first coordinate is used as start-value
+     * @param positionTypeMarker the type of {@code Position} for the result of the created operations
      * @return a <code>GeometryOperation</code> that returns a Geometry with measures increasing with length
      */
     public <P extends Projected<P>, M extends Projected<M> & Measured> GeometryOperation<Geometry<M>> createMeasureOnLengthOp(
@@ -58,7 +88,7 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a {@code GeometryOperation} that returns the minimum measure value of the points
      * of the specified Geometry.
-     *
+     * <p/>
      * If the geometry is empty, this method returns Double.NaN
      *
      * @param geometry the geometry for which the minimum measure is sought
@@ -70,7 +100,7 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a {@code GeometryOperation} that returns the maximum measure value of the points
      * of the specified Geometry.
-     *
+     * <p/>
      * If the geometry is empty, this method returns Double.NaN
      *
      * @param geometry the geometry for which the maximum measure is sought

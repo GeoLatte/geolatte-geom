@@ -38,7 +38,7 @@ import org.geolatte.geom.jts.JTS;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
-class JTSGeometryOperations<P extends Position<P>> implements GeometryOperations<P> {
+public class JTSGeometryOperations<P extends Projected<P>> implements ProjectedGeometryOperations<P> {
 
     private boolean envelopeIntersect(Geometry<P> geometry1, Geometry<P> geometry2) {
         return (geometry1.getEnvelope().intersects(geometry2.getEnvelope()));
@@ -83,22 +83,6 @@ class JTSGeometryOperations<P extends Position<P>> implements GeometryOperations
                 return JTS.from(boundaryOp.getBoundary(), crs);
             }
         };
-    }
-
-    @Override
-    public GeometryOperation<Envelope<P>> createEnvelopeOp(final Geometry<P> geometry) {
-        GeometryOperation<Envelope<P>> envelopeGeometryOperation = new GeometryOperation<Envelope<P>>() {
-
-            @Override
-            public Envelope<P> execute() {
-                if (geometry.isEmpty()) return new Envelope<>(geometry.getCoordinateReferenceSystem());
-                PositionSequence<P> positions = geometry.getPositions();
-                EnvelopeVisitor<P> visitor = new EnvelopeVisitor<P>(geometry.getCoordinateReferenceSystem());
-                positions.accept(visitor);
-                return visitor.result();
-            }
-        };
-        return envelopeGeometryOperation;
     }
 
     @Override
@@ -184,29 +168,6 @@ class JTSGeometryOperations<P extends Position<P>> implements GeometryOperations
         };
     }
 
-    //TODO -- remove these methods, and place in
-    @Override
-    public GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue) {
-        return createLocateBetweenOp(geometry, mValue, mValue);
-    }
-
-    @Override
-    public GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
-        return new GeometryOperation<Geometry<P>>() {
-            @Override
-            public Geometry<P> execute() {
-                if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
-                if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
-                if ( Projected.class.isAssignableFrom( geometry.getPositionClass()) &&
-                     Measured.class.isAssignableFrom( geometry.getPositionClass())) {
-                    MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
-                                    geometry.accept((GeometryVisitor<P>)visitor);
-                                    return (Geometry<P>)visitor.result();
-                }
-                throw new IllegalArgumentException("Requires projected coordinates");
-            }
-        };
-    }
 
     @Override
     public GeometryOperation<Double> createDistanceOp(final Geometry<P> geometry, final Geometry<P> other) {
@@ -356,34 +317,7 @@ class JTSGeometryOperations<P extends Position<P>> implements GeometryOperations
     }
 
 
-    private static class EnvelopeVisitor<P extends Position<P>> implements PositionVisitor<P> {
 
-        double[] coordinates;
-        double xMin = Double.POSITIVE_INFINITY;
-        double yMin = Double.POSITIVE_INFINITY;
-        double xMax = Double.NEGATIVE_INFINITY;
-        double yMax = Double.NEGATIVE_INFINITY;
-        final CoordinateReferenceSystem<P> crs;
-
-        EnvelopeVisitor(CoordinateReferenceSystem<P> crs) {
-            this.crs = crs;
-            coordinates = new double[crs.getCoordinateDimension()];
-        }
-
-
-        @Override
-        public void visit(P position) {
-            position.toArray(coordinates);
-            xMin = Math.min(xMin, coordinates[0]);
-            xMax = Math.max(xMax, coordinates[0]);
-            yMin = Math.min(yMin, coordinates[1]);
-            yMax = Math.max(yMax, coordinates[1]);
-        }
-
-        public Envelope<P> result() {
-            return new Envelope<P>(xMin, yMin, xMax, yMax, crs);
-        }
-    }
 
 
 }

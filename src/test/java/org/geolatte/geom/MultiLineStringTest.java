@@ -84,11 +84,6 @@ public class MultiLineStringTest {
         assertEquals(ls2, ml1.getGeometryN(1));
     }
 
-    @Test
-    public void testGetLength() throws Exception {
-        assertEquals(0.0d, empty.getLength(), Math.ulp(1d));
-        assertEquals(1+3 * Math.sqrt(2), ml1.getLength(), Math.ulp(1f));
-    }
 
     @Test
     public void testIterator() throws Exception {
@@ -100,13 +95,6 @@ public class MultiLineStringTest {
         assertEquals(2, i);
     }
 
-    @Test
-    public void testGeometryVisitor() throws Exception {
-        LengthCollectingVisitor visitor =  new LengthCollectingVisitor();
-        ml1.accept(visitor);
-        assertEquals(ml1.getLength(), visitor.length, Math.ulp(visitor.length));
-
-    }
 
     @Test
     public void testIsClosed() throws Exception {
@@ -128,29 +116,4 @@ public class MultiLineStringTest {
 
     }
 
-    static class LengthCollectingVisitor implements GeometryVisitor {
-            double length = 0.0d;
-
-        @Override
-        public void visit(Point point) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(LineString lineString) {
-            length += lineString.getLength();
-        }
-
-        @Override
-        public void visit(Polygon polygon) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(GeometryCollection collection) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-
-    }
 }

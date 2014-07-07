@@ -112,19 +112,6 @@ public class PointTest {
         assertTrue(emptyPoint.isEmpty());
     }
 
-    @Test
-    public void testIsSimple() throws Exception {
-        assertTrue(point3D.isSimple());
-        assertTrue(emptyPoint.isSimple());
-    }
-
-    @Test
-    public void testBoundaryIsUnsupported() throws Exception {
-        try{
-            point2D.getBoundary();
-        }catch(UnsupportedOperationException e){}
-    }
-
 
     @Test
     public void testEmptyPointsAreAlwaysEqual(){

@@ -45,42 +45,6 @@ public class MultiPolygon<P extends Position<P>> extends GeometryCollection<P, P
             super(crs);
         }
 
-//    @Override
-//    public Polygon getGeometryN(int num) {
-//        return (Polygon) super.getGeometryN(num);
-//    }
-
-    /**
-     * Returns the sum of the areas of all element <code>Polygon</code>s.
-     *
-     * @return the sum of the areas of all element <code>Polygon</code>s.
-     */
-    public double getArea() {
-        double totalArea = 0;
-        for (int i = 0; i < getNumGeometries(); i++) {
-            totalArea += getGeometryN(i).getArea();
-        }
-        return totalArea;
-    }
-
-    /**
-     * Returns the mathematical centroid for this <code>MultiPolygon</code>.
-     *
-     * @return the mathematical centroid for this <code>MultiPolygon</code>.
-     */
-    public Point<P> getCentroid() {
-        return getGeometryOperations().createGetCentroidOp(this).execute();
-    }
-
-    /**
-     * Returns a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
-     *
-     * @return a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
-     */
-    public Point<P> getPointOnSurface() {
-        return new Point<>(getPositionN(0));
-    }
-
     @Override
     public Class<? extends Geometry> getComponentType() {
         return Polygon.class;

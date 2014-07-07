@@ -32,20 +32,12 @@ public class Point<P extends Position<P>> extends Geometry<P> implements Simple 
         super(crs);
     }
 
-    public Point(PositionSequence<P> sequence, GeometryOperations<P> geometryOperations) {
-        super(sequence, geometryOperations);
+    public Point(PositionSequence<P> sequence) {
+        super(sequence);
     }
 
     public Point(P position) {
-        this(position, (GeometryOperations<P>)DefaultGeometryOperationsFactory.getOperations(position.getClass()));
-    }
-
-    public Point(P position, GeometryOperations<P> geometryOperations) {
-        this(new PackedPositionSequence<P>(position.getCoordinateReferenceSystem(), position.toArray(null)), geometryOperations);
-    }
-
-    public Point(PositionSequence<P> sequence) {
-        this(sequence, DefaultGeometryOperationsFactory.getOperations(sequence.getPositionClass()));
+        this(new PackedPositionSequence<P>(position.getCoordinateReferenceSystem(), position.coords));
     }
 
     public Point(Point<P> point) {
@@ -69,16 +61,6 @@ public class Point<P extends Position<P>> extends Geometry<P> implements Simple 
     @Override
     public GeometryType getGeometryType() {
         return GeometryType.POINT;
-    }
-
-    @Override
-    public boolean isSimple() {
-        return true;
-    }
-
-    @Override
-    public Geometry<P> getBoundary() {
-        return new Point<P>(new PackedPositionSequence<P>(this.getCoordinateReferenceSystem(), null));
     }
 
     @Override

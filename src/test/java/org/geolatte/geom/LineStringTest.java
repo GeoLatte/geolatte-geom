@@ -53,7 +53,6 @@ public class LineStringTest {
     LineString<P3DM> linestr3dm;
     LineString<P2D> emptyLine;
     LineString<P2D> simpleClosed;
-    LineString<P2D> nonSimpleClosed;
     LineString<P2D> line2d;
 
     @Before
@@ -65,7 +64,7 @@ public class LineStringTest {
         emptyLine = linestring(crs);
 
         simpleClosed = linestring(crs, p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0));
-        nonSimpleClosed = linestring(crs, p(1, 1), p(-1, -1), p(1, -1), p(-1, 1), p(1,1));
+//        nonSimpleClosed = linestring(crs, p(1, 1), p(-1, -1), p(1, -1), p(-1, 1), p(1,1));
         line2d = linestring(crs, p(0, 0), p(1, 1));
 
     }
@@ -94,20 +93,6 @@ public class LineStringTest {
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
-
-    }
-
-
-    @Test
-    public void testLength() {
-        //empty line is of getLength 0
-        assertEquals(0, emptyLine.getLength(), 10E-6);
-
-        assertEquals(2 * Math.sqrt(2), linestr2d.getLength(), 10E-6);
-        //getLength calculation only takes into account X/Y coordinates
-        //i.e. getLength calculated in 2D-plane
-        assertEquals(2 * Math.sqrt(2), linestr3d.getLength(), 10E-6);
-        assertEquals(2 * Math.sqrt(2), linestr2dm.getLength(), 10E-6);
 
     }
 
@@ -142,23 +127,13 @@ public class LineStringTest {
         assertFalse(linestr2d.isClosed());
         assertFalse(linestr3d.isClosed());
         assertTrue(simpleClosed.isClosed());
-        assertTrue(nonSimpleClosed.isClosed());
     }
 
-    @Test
-    public void testIsSimple() {
-        assertTrue(emptyLine.isSimple());
-        assertTrue(linestr2d.isSimple());
-        assertTrue(linestr3d.isSimple());
-        assertTrue(simpleClosed.isSimple());
-        assertTrue(!nonSimpleClosed.isSimple());
-    }
 
     @Test
     public void testIsRing() {
         assertFalse(emptyLine.isRing());
         assertFalse(linestr2d.isRing());
-        assertFalse(nonSimpleClosed.isRing());
         assertTrue(simpleClosed.isRing());
     }
 
@@ -174,31 +149,5 @@ public class LineStringTest {
         assertEquals(GeometryType.LINE_STRING, simpleClosed.getGeometryType());
         assertEquals(GeometryType.LINE_STRING, line2d.getGeometryType());
     }
-
-    @Test
-    public void testGetBoundary() {
-        assertEquals(new MultiPoint<>(crs), simpleClosed.getBoundary());
-        //TODO -- fix boundary unit test
-        //assertEquals(new MultiPoint(new Point<P2D>[]{linestr2d.getStartPosition(), linestr2d.getEndPosition()}), linestr2d.getBoundary());
-    }
-
-    //TODO -- fix locatealong unit test
-//    @Test
-//    public void testLocateAlong() {
-//        PositionSequenceBuilder builder = new FixedSizePositionSequenceBuilder(4, false, true);
-//        builder.add(new double[]{0,0,0});
-//        builder.add(new double[]{1,0,1});
-//        builder.add(new double[]{2,0,2});
-//        builder.add(new double[]{3,0,3});
-//        LineString ls = new LineString(builder.toPointSequence(), -1);
-//        MultiLineString result = ls.locateBetween(0.5, 1.5);
-//        assertFalse(result.isEmpty());
-//        assertEquals(1, result.getNumGeometries());
-//        LineString result1 = result.getGeometryN(0);
-//        assertEquals(3, result1.getNumPositions());
-//        assertEquals(Point.create(new double[]{0.5, 0, 0.5}, false, true, -1), result1.getStartPosition());
-//        assertEquals(Point.create(new double[]{1.5, 0, 1.5}, false, true, -1), result1.getEndPosition());
-//    }
-
 
 }

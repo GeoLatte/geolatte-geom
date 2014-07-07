@@ -40,13 +40,9 @@ public class LinearRing<P extends Position<P>> extends LineString<P> {
         super(crs);
     }
 
-    public LinearRing(PositionSequence<P> points, GeometryOperations<P> geometryOperations) {
-        super(points, geometryOperations);
-        checkIsClosed();
-    }
-
     public LinearRing(PositionSequence<P> points) {
-        this(points, null);
+        super(points);
+        checkIsClosed();
     }
 
     @Override

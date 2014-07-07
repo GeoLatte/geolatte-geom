@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.io.Serializable;
@@ -32,32 +33,28 @@ import java.lang.reflect.Array;
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 
-//TODO: explain topological relations in the class javadoc
-
 public abstract class Geometry<P extends Position<P>> implements Serializable {
 
     private static GeometryEquality geomEq = new GeometryPointEquality();
-
-    private final GeometryOperations<P> geometryOperations;
 
     protected final PositionSequence<P> positions;
 
     @SuppressWarnings("unchecked")
     public static <Q extends Position<Q>> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
-        if (crs == null || geometry == null) return (Geometry<Q>)geometry;
-        if (crs.equals(geometry.getCoordinateReferenceSystem())) return (Geometry<Q>)geometry;
+        if (crs == null || geometry == null) return (Geometry<Q>) geometry;
+        if (crs.equals(geometry.getCoordinateReferenceSystem())) return (Geometry<Q>) geometry;
         if (geometry instanceof Simple) {
-            Simple simple = (Simple)geometry;
+            Simple simple = (Simple) geometry;
             PositionSequence<Q> positions = Positions.copy(geometry.getPositions(), crs);
             return Geometries.mkGeometry(simple.getClass(), positions);
-        }else {
-            Complex<?,?> complex = (Complex<?,?>)geometry;
+        } else {
+            Complex<?, ?> complex = (Complex<?, ?>) geometry;
             if (complex.getNumGeometries() == 0) {
                 return Geometries.mkGeometry(complex.getClass(), crs);
             }
-            Geometry<Q>[] targetParts = (Geometry<Q>[])Array.newInstance(complex.getComponentType(), complex.getNumGeometries());//new Geometry[complex.getNumGeometries()];
+            Geometry<Q>[] targetParts = (Geometry<Q>[]) Array.newInstance(complex.getComponentType(), complex.getNumGeometries());//new Geometry[complex.getNumGeometries()];
             int idx = 0;
-            for (Geometry<?> part: complex) {
+            for (Geometry<?> part : complex) {
                 targetParts[idx++] = forceToCrs(part, crs);
             }
             return Geometries.mkGeometry(complex.getClass(), targetParts);
@@ -66,28 +63,16 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
 
     /**
      * Creates an empty Geometry
-     * @param crs  the CoordinateReferenceSystem to use
+     *
+     * @param crs the CoordinateReferenceSystem to use
      */
-    protected Geometry(CoordinateReferenceSystem<P> crs){
+    protected Geometry(CoordinateReferenceSystem<P> crs) {
         this.positions = PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence();
-        this.geometryOperations = DefaultGeometryOperationsFactory.getOperations(getPositionClass());
     }
 
-    protected Geometry(PositionSequence<P> positions, GeometryOperations<P> geometryOperations) {
+    protected Geometry(PositionSequence<P> positions) {
         if (positions == null) throw new IllegalArgumentException("Null Positions argument not allowd.");
         this.positions = positions;
-        this.geometryOperations = geometryOperations != null ?
-                geometryOperations :
-                DefaultGeometryOperationsFactory.getOperations(getPositionClass());
-    }
-
-    // Helper method to extract first Ops object from an array of Geometries.
-    //TODO -- check that all geoms in array have the SAME geomOps
-    protected static <T extends Position<T>> GeometryOperations<T> getGeometryOperations(Geometry<T>[] geometries) {
-        if (geometries == null || geometries.length == 0) {
-            return null;
-        }
-        return geometries[0].getGeometryOperations();
     }
 
     @SuppressWarnings("unchecked")
@@ -202,6 +187,18 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
         return geomEq.equals(this, otherGeometry);
     }
 
+    /**
+     * Returns the {@code Envelope} of this instance.
+     * @return the {@code Envelope} of this instance.
+     */
+    public Envelope<P> getEnvelope() {
+        if (isEmpty()) return new Envelope<>(getCoordinateReferenceSystem());
+        PositionSequence<P> positions = getPositions();
+        EnvelopeVisitor<P> visitor = new EnvelopeVisitor<P>(getCoordinateReferenceSystem());
+        positions.accept(visitor);
+        return visitor.result();
+    }
+
     @Override
     public int hashCode() {
         int result = getGeometryType().hashCode();
@@ -216,277 +213,14 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
      */
     public abstract GeometryType getGeometryType();
 
-    /**
-     * Tests if this <code>Geometry</code> is simple; i.e. has no anomalous geometric points such as
-     * self-intersections or self-tangency.
-     *
-     * @return
-     */
-    public boolean isSimple() {
-        GeometryOperation<Boolean> op = getGeometryOperations().createIsSimpleOp(this);
-        return op.execute();
-    }
-
-    /**
-     * Returns the boundary of this <code>Geometry</code>.
-     *
-     * @return
-     */
-    public Geometry<P> getBoundary() {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createBoundaryOp(this);
-        return operation.execute();
-    }
-
-    /**
-     * Returns the <code>Envelope</code>, or minimum bounding box, for this <code>Geometry</code>.
-     *
-     * @return
-     */
-    public Envelope<P> getEnvelope() {
-        GeometryOperation<Envelope<P>> operation = getGeometryOperations().createEnvelopeOp(this);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> is spatially disjoint from the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance is disjoint from other
-     */
-    public boolean disjoint(Geometry<P> other) {
-        return !intersects(other);
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> spatially intersects the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance intersects the specifed other <code>Geometry</code>
-     */
-    public boolean intersects(Geometry<P> other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createIntersectsOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> spatially touches the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance touches the specifed other <code>Geometry</code>
-     */
-    public boolean touches(Geometry<P> other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createTouchesOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> spatially crosses the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance crosses the specifed other <code>Geometry</code>
-     */
-    public boolean crosses(Geometry<P> other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createCrossesOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> is spatially within the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance is spatially within the specifed other <code>Geometry</code>
-     */
-    public boolean within(Geometry<P> other) {
-        return other.contains(this);
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> spatially contains the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance contains the specifed other <code>Geometry</code>
-     */
-    public boolean contains(Geometry<P> other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createContainsOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> spatially overlaps the specified <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to test against
-     * @return true if this instance overlaps the specifed other <code>Geometry</code>
-     */
-    public boolean overlaps(Geometry<P> other) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createOverlapsOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Tests whether this <code>Geometry</code> is spatially related to the specified <code>Geometry</code> by testing
-     * for intersections between the interior, boundary and exterior of the two geometric objects as specified by
-     * the values in the intersection pattern matrix. This returns false if all the tested intersections are empty except
-     * exterior (this) intersect exterior (another).
-     *
-     * @param other  the <code>Geometry</code> to test against
-     * @param matrix the intersection pattern matrix
-     * @return true if this instance intersects the specifed other <code>Geometry</code>
-     */
-    public boolean relate(Geometry<P> other, String matrix) {
-        GeometryOperation<Boolean> operation = getGeometryOperations().createRelateOp(this, other, matrix);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a derived <code>GeometryCollection</code> value that matches the specified M-coordinate value.
-     * <p/>
-     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
-     *
-     * @param mValue the specified M-coordinate value
-     * @return a <code>GeometryCollection</code> matching the specified M-value.
-     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
-     */
-    public Geometry<P> locateAlong(double mValue) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createLocateAlongOp(this, mValue);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a derived <code>GeometryCollection</code> value that matches the specified range of M-coordinate values
-     * inclusively.
-     * <p/>
-     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
-     *
-     * @param mStart the start of the range of M-coordinate values
-     * @param mEnd   the end of the range of M-coordinate values
-     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
-     */
-    public Geometry<P> locateBetween(double mStart, double mEnd) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createLocateBetweenOp(this, mStart, mEnd);
-        return operation.execute();
-    }
-
-    /**
-     * Returns the shortest distance between any two points in the two <code>Geometry</code>s as calculated in the
-     * coordinate reference system of this <code>Geometry</code>. Only the X/Y-coordinates are used in the distance
-     * calculation; M- and Z-coordinates are ignored.
-     * <p/>
-     * <p>The current implementation assumes that both <code>Geometry</code>s are in a Cartesian coordinate
-     * reference system. Using this method on <code>Geometry</code>s in a geocentric or geographic coordinate reference
-     * system returns a meaningless value.</p>
-     *
-     * @param other the <code>Geometry</code> to which the min. distance is calculated.
-     * @return the distance between this and the specified other <code>Geometry</code>.
-     */
-    public double distance(Geometry<P> other) {
-        GeometryOperation<Double> operation = getGeometryOperations().createDistanceOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a <code>Geometry</code> that represents all points whose distance from this <code>Geometry</code> is less
-     * than or equal the specified distance. Calculations are in the <code>CoordinateReferenceSystem</code> of this
-     * <code>Geometry</code>.
-     * <p/>
-     * <p>Z- or M-coordinates are ignored in the buffering operation; and the result will always be a 2D geometry.</p>
-     *
-     * @param distance the buffer distance
-     * @return a 2D <code>Geometry</code> representing this object buffered with the specified distance.
-     */
-    public Geometry<P> buffer(double distance) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createBufferOp(this, distance);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a <code>Geometry</code> that represents the convex hull of this <code>Geometry</code>.
-     *
-     * @return the convex hull of this instance.
-     */
-    public Geometry<P> convexHull() {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createConvexHullOp(this);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a <code>Geometry</code> that represents the point set intersection of this <code>Geometry</code> with the
-     * specified other <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to intersect with
-     * @return a <code>Geometry</code> representing the point set intersection
-     */
-    public Geometry<P> intersection(Geometry<P> other) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createIntersectionOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Returns the <code>Geometry</code> that represents the point set union of this <code>Geometry</code> with the
-     * specified other <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> to union with
-     * @return a <code>Geometry</code> representing the point set union.
-     */
-    public Geometry<P> union(Geometry<P> other) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createUnionOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a <code>Geometry</code> that represents the point set difference of this <code>Geometry</code> with the
-     * specified other <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> with which to calculate the difference
-     * @return a <code>Geometry</code> representing the point set difference.
-     */
-    public Geometry<P> difference(Geometry<P> other) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createDifferenceOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a <code>Geometry</code> that represents the point set symmetric difference of this <code>Geometry</code> with the
-     * specified other <code>Geometry</code>.
-     *
-     * @param other the <code>Geometry</code> with which to calculate the symmetric difference
-     * @return a <code>Geometry</code> representing the point set symmetric difference.
-     */
-    public Geometry<P> symDifference(Geometry<P> other) {
-        GeometryOperation<Geometry<P>> operation = getGeometryOperations().createSymDifferenceOp(this, other);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a Well-Known Text (WKT) representation of this <code>Geometry</code>.
-     *
-     * @return a Well-Known Text (WKT) representation of this <code>Geometry</code>.
-     */
-    public String asText() {
-        GeometryOperation<String> operation = getGeometryOperations().createToWktOp(this);
-        return operation.execute();
-    }
-
-    /**
-     * Returns a Well-Known Binary (WKB) representation of this <code>Geometry</code>.
-     *
-     * @return a byte array containt the WKB of this <code>Geometry</code>.
-     */
-    public byte[] asBinary() {
-        GeometryOperation<ByteBuffer> operation = getGeometryOperations().createToWkbOp(this);
-        return operation.execute().toByteArray();
-    }
 
     /**
      * Returns the Well-Known Text (WKT) representation of this <code>Geometry</code>.
-     * <p/>
-     * <p>This method is synonymous with {@link #asText()}. </p>
      *
      * @return
      */
     public String toString() {
-        return asText();
+        return Wkt.toWkt(this);
     }
 
     /**
@@ -506,12 +240,34 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
      */
     public abstract void accept(GeometryVisitor<P> visitor);
 
-    /**
-     * Returns the <code>GeometryOperations</code> instance used by this instance.
-     *
-     * @return
-     */
-    public GeometryOperations<P> getGeometryOperations() {
-        return this.geometryOperations;
-    }
+    private static class EnvelopeVisitor<P extends Position<P>> implements PositionVisitor<P> {
+
+            double[] coordinates;
+            double xMin = Double.POSITIVE_INFINITY;
+            double yMin = Double.POSITIVE_INFINITY;
+            double xMax = Double.NEGATIVE_INFINITY;
+            double yMax = Double.NEGATIVE_INFINITY;
+            final CoordinateReferenceSystem<P> crs;
+
+            EnvelopeVisitor(CoordinateReferenceSystem<P> crs) {
+                this.crs = crs;
+                coordinates = new double[crs.getCoordinateDimension()];
+            }
+
+
+            @Override
+            public void visit(P position) {
+                position.toArray(coordinates);
+                xMin = Math.min(xMin, coordinates[0]);
+                xMax = Math.max(xMax, coordinates[0]);
+                yMin = Math.min(yMin, coordinates[1]);
+                yMax = Math.max(yMax, coordinates[1]);
+            }
+
+            public Envelope<P> result() {
+                return new Envelope<P>(xMin, yMin, xMax, yMax, crs);
+            }
+        }
+
 }
+

@@ -41,42 +41,21 @@ public class LineString<P extends Position<P>> extends Geometry<P> implements Li
      * @param base
      */
     protected LineString(LineString<P> base) {
-        super(base.getPositions(), base.getGeometryOperations());
+        super(base.getPositions());
     }
 
     /**
      * Constructs a <code>LineString</code> from the specified positions
-     * and <code>GeometryOperations</code> implementation.
+     * and <code>ProjectedGeometryOperations</code> implementation.
      *
      * @param positions the {@code PositionSequence} that determines this geometry
-     * @param geometryOperations the <code>GeometryOperations</code> implementation
      * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size < 2
      */
-    public LineString(PositionSequence<P> positions, GeometryOperations<P> geometryOperations) {
-        super(positions, geometryOperations);
+    public LineString(PositionSequence<P> positions) {
+        super(positions);
         if (positions.size() != 0 && positions.size() < 2) {
             throw new IllegalArgumentException("Require at least two points for a linestring");
         }
-    }
-
-
-
-    /**
-     * Constructs a <code>LineString</code> from the specified positions
-     *
-     * @param positions the <code>PointSequence</code>
-     */
-    public LineString(PositionSequence<P> positions) {
-        this(positions, null);
-    }
-
-    /**
-     * Returns the length of this <code>LineString</code> in its coordinate reference system.
-     *
-     * @return the length of this <code>LineString</code> in its coordinate reference system.
-     */
-    public double getLength() {
-        return this.getGeometryOperations().createGetLengthOp(this).execute();
     }
 
 
@@ -109,12 +88,15 @@ public class LineString<P extends Position<P>> extends Geometry<P> implements Li
     }
 
     /**
-     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple.
+     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and non-empty.
+     *
+     * <p>Note that this implementation allows rings thate are non-simple.</p>
      *
      * @return true if this <code>LineString</code> is a ring.
      */
+    //TODO re-instate simplicity check?
     public boolean isRing() {
-        return !isEmpty() && isClosed() && isSimple();
+        return !isEmpty() && isClosed();
     }
 
     @Override

@@ -72,24 +72,6 @@ public class MultiPointTest {
 
     }
 
-    @Test
-    public void testGetBoundary() throws Exception {
-        assertEquals(new Point<G2D>(wgs84), pnt1.getBoundary());
-    }
-
-    @Test
-    public void testGetGeometryN() throws Exception {
-        for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(point(wgs84,g(i, i)), pnt1.getGeometryN(i));
-        }
-    }
-
-    @Test
-    public void testIsSimple() throws Exception{
-        assertTrue(pnt1.isSimple());
-        assertFalse(pnt2.isSimple());
-    }
-
     @SuppressWarnings("unchecked")
     private Point<G2D>[] createPointsNotAllDifferent(int size, CoordinateReferenceSystem<G2D> crs) {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");

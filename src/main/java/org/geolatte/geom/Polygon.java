@@ -55,18 +55,6 @@ public class Polygon<P extends Position<P>> extends Geometry<P> implements Polyg
 
     private final LinearRing<P>[] rings;
     
-    /**
-     * Creates a <code>Polygon</code> with no holes, and having the specified <code>PositionSequence</code> as exterior boundary
-     *
-     * @param positionSequence the <code>PositionSequence</code> representing the exterior boundary
-     * @param ops           the <code>GeometryOperatoins</code> implementation for the constructed <code>Polygon</code>
-     * @throws IllegalArgumentException when the specified <code>PositionSequence</code> does not form a
-     *                                  <code>LinearRing</code> (i.e., is empty or not closed).
-     */
-    @SuppressWarnings("unchecked")
-    public Polygon(PositionSequence<P> positionSequence, GeometryOperations<P> ops) {
-        this((LinearRing<P>[])(new LinearRing[]{new LinearRing<P>(positionSequence, ops)}));
-    }
 
     @SuppressWarnings("unchecked")
     public Polygon(CoordinateReferenceSystem<P> crs) {
@@ -96,7 +84,7 @@ public class Polygon<P extends Position<P>> extends Geometry<P> implements Polyg
      */
     @SafeVarargs
     public Polygon(LinearRing<P>... rings) {
-        super(nestPositionSequences(rings), getGeometryOperations(rings));
+        super(nestPositionSequences(rings));
         checkRings(rings);
         this.rings = Arrays.copyOf(rings, rings.length);
     }
@@ -147,36 +135,6 @@ public class Polygon<P extends Position<P>> extends Geometry<P> implements Polyg
         return this.rings[index + 1];
     }
 
-    /**
-     * Returns the area of this <code>Polygon</code> as measured in the <code>CoordinateReferenceSystem</code> of this
-     * <code>Polygon</code>.
-     *
-     * @return the area of this <code>Polygon</code>.
-     */
-    public double getArea() {
-        return getGeometryOperations().createGetAreaOp(this).execute();
-    }
-
-    /**
-     * Returns the mathematical centroid for this <code>Polygon</code>.
-     * <p/>
-     * <p>The result is not guaranteed to be on this surface.</p>
-     *
-     * @return the centroid <code>Point</code> for this <code>Polygon</code>
-     */
-    public Point<P> getCentroid() {
-        return getGeometryOperations().createGetCentroidOp(this).execute();
-    }
-
-    /**
-     * Returns a <code>Point</code> that is guaranteed to lie on this <code>Polygon</code>.
-     *
-     * @return a <code>Point</code> on this <code>Polygon</code>
-     */
-    public Point<P> getPointOnSurface() {
-        //TODO -- What if polygon is empty?
-        return new Point<P>(getPositionN(0));
-    }
 
     @Override
     public int getDimension() {
@@ -186,15 +144,6 @@ public class Polygon<P extends Position<P>> extends Geometry<P> implements Polyg
     @Override
     public GeometryType getGeometryType() {
         return GeometryType.POLYGON;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public MultiLineString<P> getBoundary() {
-
-        return isEmpty() ?
-                new MultiLineString<P>(new LinearRing[0]) :
-                new MultiLineString<P>(rings);
     }
 
     /**

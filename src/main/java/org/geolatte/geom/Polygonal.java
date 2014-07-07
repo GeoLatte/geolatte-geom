@@ -22,15 +22,11 @@
 package org.geolatte.geom;
 
 /**
+ * Marker interface for Polygonal {@code Geometry}s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/27/14
  */
 public interface Polygonal<P extends Position<P>> {
-
-    public double getArea();
-
-    public Point<P> getCentroid();
-
-    public Point<P> getPointOnSurface();
 
 }

@@ -37,6 +37,31 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     private final static PositionEquality pntEq = new ExactPositionEquality();
 
+
+
+    @Override
+    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue) {
+        return createLocateBetweenOp(geometry, mValue, mValue);
+    }
+
+    @Override
+    public <P extends Projected<P> & Measured> GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
+        return new GeometryOperation<Geometry<P>>() {
+            @Override
+            public Geometry<P> execute() {
+                if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
+                if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
+                if ( Projected.class.isAssignableFrom( geometry.getPositionClass()) &&
+                     Measured.class.isAssignableFrom( geometry.getPositionClass())) {
+                    MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
+                                    geometry.accept((GeometryVisitor<P>)visitor);
+                                    return (Geometry<P>)visitor.result();
+                }
+                throw new IllegalArgumentException("Requires projected coordinates");
+            }
+        };
+    }
+
     /**
      * @inheritDoc
      */
@@ -127,7 +152,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                     prevCoordinates[0] = coordinates[0];
                     prevCoordinates[1] = coordinates[1];
                 }
-                return new LineString<>(builder.toPositionSequence(), geometry.getGeometryOperations());
+                return new LineString<>(builder.toPositionSequence());
             }
 
         };

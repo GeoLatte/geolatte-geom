@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A factory for <code>GeometryOperation</code>s.
+ * Defines standard operations on {@code Geometry}s with projected coordinate systems.
  * <p/>
  * <p>The semantics of the operations is as specified in
  * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access - Part 1: common architecture</a>
@@ -30,7 +30,7 @@ package org.geolatte.geom;
  *
  * @author Karel Maesen, Geovise BVBA
  */
-public interface GeometryOperations<P extends Position<P>> {
+public interface ProjectedGeometryOperations<P extends Projected<P>> {
 
     /**
      * Creates an operation to test the simplicity of the specified <code>Geometry</code>.
@@ -47,14 +47,6 @@ public interface GeometryOperations<P extends Position<P>> {
      * @return a <code>GeometryOperation</code> that calculates a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
     GeometryOperation<Geometry<P>> createBoundaryOp(final Geometry<P> geometry);
-
-    /**
-     * Creates an operation to calculate the <code>Envelope</code> of the specified <code>Geometry</code>.
-     *
-     * @param geometry the <code>Geometry</code> for which to calculate the envelope.
-     * @return a <code>GeometryOperation</code> that calculates the <code>Envelope</code> of the specified <code>Geometry</code>.
-     */
-    GeometryOperation<Envelope<P>> createEnvelopeOp(final Geometry<P> geometry);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s intersect.
@@ -113,37 +105,8 @@ public interface GeometryOperations<P extends Position<P>> {
      * @param matrix   the intersection pattern matrix
      * @return a <code>GeometryOperation</code> that checks if this instance intersects the specifed other <code>Geometry</code>
      */
-    GeometryOperation<Boolean> createRelateOp(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
+    public GeometryOperation<Boolean> createRelateOp(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
 
-    /**
-     * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
-     * <p/>
-     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
-     *
-     * @param geometry the geometry on which to perform the calculation
-     * @param mValue   the specified M-coordinate value
-     * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching
-     * the specified M-coordinate value.
-     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
-     */
-    GeometryOperation<Geometry<P>> createLocateAlongOp(final Geometry<P> geometry, final double mValue);
-
-    /**
-     * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified range of M-coordinate value
-     * inclusively.
-     * <p/>
-     * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
-     *
-     * @param geometry     the geometry on which to perform the calculation
-     * @param startMeasure the start of the specified range of M-coordinate values
-     * @param endMeasure   the end of the specified range of M-coordinate values
-     * @return a <code>GeometryOperation</code> that calculates the <code>GeometryCollection</code> matching the
-     * specified range of M-coordinate values.
-     * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
-     */
-    GeometryOperation<Geometry<P>> createLocateBetweenOp(final Geometry<P> geometry, final double startMeasure, final double endMeasure);
 
     /**
      * Returns an operation to calculate the shortest distance between any two points in the two <code>Geometry</code>s in the

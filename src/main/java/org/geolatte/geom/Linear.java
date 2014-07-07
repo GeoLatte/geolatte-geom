@@ -29,8 +29,6 @@ package org.geolatte.geom;
  */
 public interface Linear<P extends Position<P>> {
 
-    public double getLength();
-
     public  P getStartPosition();
 
     public P getEndPosition();

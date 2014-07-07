@@ -49,25 +49,25 @@ public class TestJTSGeometryOperations {
     @Test
     public void testCreateEnvelopeOp() {
         LineString<P2D> lineString = linestring(crs, p(-1, 3), p(2, 5), p(10, -8), p(9, -1));
-        assertEquals(new Envelope<>(-1, -8, 10, 5, crs), ops.createEnvelopeOp(lineString).execute());
+        assertEquals(new Envelope<>(-1, -8, 10, 5, crs), lineString.getEnvelope());
     }
 
     @Test
     public void testCreateEnvelopeOpOnlyNegative() {
         LineString<P2D> lineString = linestring(crs, p(-101, -97), p(-98, -95), p(-90, -108), p(-91, -101));
-        assertEquals(new Envelope(-101, -108, -90, -95, crs), ops.createEnvelopeOp(lineString).execute());
+        assertEquals(new Envelope(-101, -108, -90, -95, crs), lineString.getEnvelope());
     }
 
     @Test
     public void testCreateEnvelopeOpOnlyPositive() {
         LineString<P2D> lineString = linestring(crs, p(99, 103), p(102, 105), p(110, 92), p(109, 99));
-        assertEquals(new Envelope(99, 92, 110, 105, crs), ops.createEnvelopeOp(lineString).execute());
+        assertEquals(new Envelope(99, 92, 110, 105, crs), lineString.getEnvelope());
     }
 
     @Test
     public void testCreateEnvelopeOpOnEmpty() {
         LineString<P2D> lineString = new LineString<>(crs);
-        assertEquals(new Envelope(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), ops.createEnvelopeOp(lineString).execute());        
+        assertEquals(new Envelope(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
     }
 
     @Test
@@ -140,7 +140,7 @@ public class TestJTSGeometryOperations {
     public void testBufferOp() {
         LineString<P2D> lineString = linestring(crs, p(0, 0), p(1, 1));
         Geometry<P2D> buffer = ops.createBufferOp(lineString, 10d).execute();
-        assertTrue(buffer.contains(lineString));
+        assertTrue(ops.createContainsOp(buffer, lineString).execute());
         assertEquals(JTS.from(JTS.to(lineString).buffer(10d), crs), buffer);
     }
 
@@ -149,7 +149,7 @@ public class TestJTSGeometryOperations {
     public void testConvexHullOp() {
         LineString<P2D> lineString = linestring(crs, p(0, 0), p(1, 1));
         Geometry<P2D> hull = ops.createConvexHullOp(lineString).execute();
-        assertTrue(hull.contains(lineString));
+        assertTrue(ops.createContainsOp(hull,lineString).execute());
         assertEquals(JTS.from(JTS.to(lineString).convexHull(), crs), hull);
     }
 
@@ -212,27 +212,6 @@ public class TestJTSGeometryOperations {
         assertEquals(expected, ops.createToWktOp(pg1).execute());
     }
 
-
-
-    @Test
-    public void testLocateAlongOpOnNullThrowsIllegalArgument() {
-        try {
-            ops.createLocateAlongOp(null, 10d).execute();
-            fail("No IllegalArgumentException thrown on NULL argument");
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-    }
-
-    @Test
-    public void testLocateBetweenOpOnNullThrowsIllegalArgument() {
-        try {
-            ops.createLocateBetweenOp(null, 10d, 12d).execute();
-            fail("No IllegalArgumentException thrown on NULL argument");
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-    }
 
     //TODO -- fix these unit tests (they no longer belong in this class).
 

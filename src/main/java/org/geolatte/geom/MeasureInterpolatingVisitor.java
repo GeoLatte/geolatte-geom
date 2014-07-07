@@ -197,21 +197,21 @@ public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> impl
 
         if (number0Dimensional == 0 && number1Dimensional == 0) {
             Position p = Positions.mkPosition(getCrs(), Double.NaN, Double.NaN);
-            return new Point(p, getOps());
+            return new Point(p);
         }
 
         if (number0Dimensional > 1 && number1Dimensional == 0) {
             Point<P>[] pnts = (Point<P>[])new Point[number0Dimensional];
             int i = 0;
             for (PositionSequence<P> ps : positionSequences) {
-                pnts[i++] = new Point<P>(ps, getOps());
+                pnts[i++] = new Point<P>(ps);
             }
             return new MultiPoint<P>(pnts);
         }
 
         if (number0Dimensional == 1 && number1Dimensional == 0) {
             return new MultiPoint<P>(
-                    new Point[]{new Point<P>(positionSequences.get(0), getOps())}
+                    new Point[]{new Point<P>(positionSequences.get(0))}
             );
         }
 
@@ -219,7 +219,7 @@ public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> impl
             LineString<P>[] lineStrings = (LineString<P>[])new LineString[number1Dimensional];
             int i = 0;
             for (PositionSequence ps : positionSequences) {
-                lineStrings[i++] = new LineString<P>(ps,  getOps());
+                lineStrings[i++] = new LineString<P>(ps);
             }
             return new MultiLineString<P>(lineStrings);
         }
@@ -229,9 +229,9 @@ public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> impl
             int i = 0;
             for (PositionSequence<P> ps : positionSequences) {
                 if (ps.size() == 1) {
-                    geometries[i++] = new Point<P>(ps, getOps());
+                    geometries[i++] = new Point<P>(ps);
                 } else {
-                    geometries[i++] = new LineString<P>(ps, getOps());
+                    geometries[i++] = new LineString<P>(ps);
                 }
             }
             return new GeometryCollection<P, Geometry<P>>(geometries);
@@ -247,7 +247,4 @@ public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> impl
         return this.geometry.getCoordinateReferenceSystem();
     }
 
-    private GeometryOperations<P> getOps(){
-        return this.geometry.getGeometryOperations();
-    }
 }
