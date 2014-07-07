@@ -28,7 +28,6 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -63,10 +62,10 @@ public class PackedPointSequenceTest {
     }
 
 
-    @Test  @Ignore("Determine whether this is still desired behavior")
+    @Test
     public void testConstructorThrowsIllegalArgumentOnWrongNumberOfCoordinates() {
         try {
-            new PackedPositionSequence<P2D>(crs, new double[]{0, 0, 1, 1});
+            new PackedPositionSequence<P2D>(crs, new double[]{0, 0, 1, 1,3});
             fail();
         } catch (IllegalArgumentException e) {
         }

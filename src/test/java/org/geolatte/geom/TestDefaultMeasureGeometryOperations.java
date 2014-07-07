@@ -27,6 +27,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
 
@@ -116,7 +117,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testCreateMeasureOnLengthFailsForNonEmptyNonLinealGeometries() {
-        Point point = point(crs, 3, 4);
+        Point point = point(crs, p(3, 4));
         try {
             measureOps.createMeasureOnLengthOp(point, false);
             fail("createMeasureOnLengthOp should not accept a Point argument.");

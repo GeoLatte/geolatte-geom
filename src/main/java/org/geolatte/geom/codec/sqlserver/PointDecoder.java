@@ -26,8 +26,6 @@ import org.geolatte.geom.Point;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CrsRegistry;
 
-import static org.geolatte.geom.builder.DSL.point;
-
 /**
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
@@ -41,7 +39,7 @@ class PointDecoder extends AbstractDecoder {
 	}
 
 	protected Point<?> createNullGeometry() {
-		return point(CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+		return new Point<>(CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
 	}
 
 	protected Point<?> createGeometry(SqlServerGeometry nativeGeom) {

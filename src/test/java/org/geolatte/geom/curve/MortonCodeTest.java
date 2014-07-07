@@ -123,7 +123,7 @@ public class MortonCodeTest {
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateWrongCrsIdOfGeometry() {
         CoordinateReferenceSystem<P2D> lFrN = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(27562);
-        mcLevel1.ofGeometry(point(lFrN, 1, 1));
+        mcLevel1.ofGeometry(point(lFrN, p(1, 1)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -138,7 +138,7 @@ public class MortonCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateToRightOfExtentGeometry() {
-        mcLevel1.ofGeometry(point(crs, 101, 101));
+        mcLevel1.ofGeometry(point(crs, p(101, 101)));
     }
 
     @Test

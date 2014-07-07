@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
 
@@ -73,13 +74,13 @@ public class MultiPointTest {
 
     @Test
     public void testGetBoundary() throws Exception {
-        assertEquals(point(wgs84), pnt1.getBoundary());
+        assertEquals(new Point<G2D>(wgs84), pnt1.getBoundary());
     }
 
     @Test
     public void testGetGeometryN() throws Exception {
         for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(point(wgs84,i, i), pnt1.getGeometryN(i));
+            Assert.assertEquals(point(wgs84,g(i, i)), pnt1.getGeometryN(i));
         }
     }
 
@@ -94,7 +95,7 @@ public class MultiPointTest {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");
         Point<G2D>[] points = (Point<G2D>[])new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = point(crs,i,i);
+            points[i] = point(crs,g(i,i));
         }
         points[0] = points[size -1];
         return points;
@@ -104,7 +105,7 @@ public class MultiPointTest {
     private Point<G2D>[] createPointsAllDifferent(int size, CoordinateReferenceSystem<G2D> crs) {
         Point<G2D>[] points = (Point<G2D>[])new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = point(crs, i, i);
+            points[i] = point(crs, g(i, i));
         }
         return points;
     }

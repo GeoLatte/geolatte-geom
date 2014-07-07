@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
 import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
+import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
 
@@ -87,7 +88,7 @@ public class PolygonTest {
         assertFalse(polygon1.equals(polygon3));
         assertFalse(polygon3.equals(polygon1));
 
-        assertFalse(polygon1.equals(point(crs, 1, 2)));
+        assertFalse(polygon1.equals(point(crs, p(1, 2))));
 
     }
 

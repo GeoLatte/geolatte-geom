@@ -27,7 +27,7 @@ import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.point;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
 
 /**
@@ -46,11 +46,11 @@ public class PointTest {
 //    PositionSequence seq2DM = new PackedPositionSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
 //    PositionSequence seq3DM = new PackedPositionSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
 
-    Point<P2D> point2D = point(crs, 1, 2);
-    Point<P3D> point3D =  point(crsZ, 1,2,-3);
-    Point<P2DM> point2DM = point(crsM, 1, 2, 3);
-    Point<P3DM> point3DM = point(crsZM, 1, 2, 3, 4);
-    Point<P2D> emptyPoint = point(crs);
+    Point<P2D> point2D = point(crs, p(1, 2));
+    Point<P3D> point3D =  point(crsZ, p(1,2,-3));
+    Point<P2DM> point2DM = point(crsM, pM(1, 2, 3));
+    Point<P3DM> point3DM = point(crsZM, p(1, 2, 3, 4));
+    Point<P2D> emptyPoint = new Point<>(crs);
 
     @Test
     public void testGetX() throws Exception {
@@ -134,29 +134,29 @@ public class PointTest {
 
     @Test
     public void testEqualsAndHashCode(){
-        Point<P2D> test2D = point(crs, 1, 2);
+        Point<P2D> test2D = point(crs, p(1, 2));
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point<P3D> test3D = point(crsZ, 1, 2, -3);
+        Point<P3D> test3D = point(crsZ, p(1, 2, -3));
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point<P2DM> test2DM = point(crsM, 1, 2, 3);
+        Point<P2DM> test2DM = point(crsM, pM(1, 2, 3));
 
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point<P3DM> test3DM = point(crsZM, 1, 2, 3, 4);
+        Point<P3DM> test3DM = point(crsZM, p(1, 2, 3, 4));
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals( point(l72, 1, 2)));
-        assertFalse(point2D.equals(point(crsZ, 1,2,3)));
-        assertFalse(point2D.equals(point(crsM, 1, 2, 3)));
+        assertFalse(point2D.equals( point(l72, p(1, 2))));
+        assertFalse(point2D.equals(point(crsZ, p(1,2,3))));
+        assertFalse(point2D.equals(point(crsM, pM(1, 2, 3))));
     }
 
     @Test
     public void testPointEquality() {
         GeometryPointEquality eq2D = new GeometryPointEquality(new ExactPositionEquality());
-        assertTrue(point3DM.equals(point(crsZM, 1, 2, 3, 4)));
-        assertTrue(eq2D.equals(point2D, point(crs, 1, 2)));
+        assertTrue(point3DM.equals(point(crsZM, p(1, 2, 3, 4))));
+        assertTrue(eq2D.equals(point2D, point(crs, p(1, 2))));
         assertFalse(point2D.equals(emptyPoint));
     }
 
@@ -166,7 +166,7 @@ public class PointTest {
         Point<P2D> empty1 = new Point<>(crs);
         Point<P2D> empty2 = new Point<>(crs);
         assertEquals(empty1, empty2);
-        Point<P2D> empty3 = point(crs);
+        Point<P2D> empty3 = new Point<>(crs);
         assertEquals(empty1, empty3);
     }
 }

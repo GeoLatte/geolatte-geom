@@ -28,8 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.linestring;
-import static org.geolatte.geom.builder.DSL.p;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
 
 /**
@@ -61,7 +60,7 @@ public class LineStringTest {
     public void setUp() {
         linestr2d = linestring(crs, p(0, 0), p(1, -1), p(2, -2));
         linestr3d = linestring(crsZ, p(0, 0, 0), p(1, -1, 1), p(2, -2, 3));
-        linestr2dm = linestring(crsM, p(0, 0, 0), p(1, -1, 2), p(2, -2, 4));
+        linestr2dm = linestring(crsM, pM(0, 0, 0), pM(1, -1, 2), pM(2, -2, 4));
         linestr3dm = linestring(crsZM, p(0, 0, 0, 0), p(1, -1, 1, 2), p(2, -2, 3, 4));
         emptyLine = linestring(crs);
 

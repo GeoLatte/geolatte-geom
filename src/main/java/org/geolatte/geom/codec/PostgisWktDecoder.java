@@ -31,7 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.geolatte.geom.Geometries.*;
-import static org.geolatte.geom.builder.DSL.point;
 
 /**
  * A decoder for the Postgis WKT/EWKT representations as used in Postgis (at least 1.0 to 1.5+).
@@ -158,7 +157,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             if (currentToken instanceof WktPointSequenceToken) {
                 PositionSequence<?> positionSequence = ((WktPointSequenceToken) currentToken).getPositions();
                 for (Position p : positionSequence) {
-                    points.add(point(p.getCoordinateReferenceSystem(), p.toArray(null)));
+                    points.add(new Point(p));
                 }
                 nextToken();
             }

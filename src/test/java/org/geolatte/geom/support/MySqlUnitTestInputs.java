@@ -40,17 +40,17 @@ public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
         addCase(1,
                 "POINT(10 10)",
                 "00000000010100000000000000000024400000000000002440",
-                point(crs, 10, 10));
+                point(crs, p(10, 10)));
 
         addCase(2,
                 "POINT(10 10)",
                 "00000000010100000000000000000024400000000000002440",
-                point(crs, 10, 10));
+                point(crs, p(10, 10)));
 
         addCase(5, //-- broken format
                 "MULTIPOINT(11 12, 20 20)",
                 "00000000010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint<>(point(crs, 11, 12), point(crs, 20, 20)),
+                new MultiPoint<>(point(crs, p(11, 12)), point(crs, p(20, 20))),
                 false);
 
         addCase(13,
@@ -84,7 +84,7 @@ public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
         addCase(29,
                 "GEOMETRYCOLLECTION(POINT(10 10),POINT(20 20))",
                 "00000000010700000002000000010100000000000000000024400000000000002440010100000000000000000034400000000000003440",
-                geometrycollection(point(crs, 10, 10), point(crs, 20, 20)));
+                geometrycollection(point(crs, p(10, 10)), point(crs, p(20, 20))));
 
     }
 

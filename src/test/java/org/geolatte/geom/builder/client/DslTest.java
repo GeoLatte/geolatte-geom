@@ -51,7 +51,7 @@ public class DslTest {
     @Test
     public void testLineString2D() {
 
-        LineString<G2D> ls = linestring(WGS84, p(0, 0), p(1, 0), p(2, 0));
+        LineString<G2D> ls = linestring(WGS84, g(0, 0), g(1, 0), g(2, 0));
 
         assertEquals(2, ls.getCoordinateDimension());
         assertEquals(WGS84, ls.getCoordinateReferenceSystem());
@@ -74,13 +74,13 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLineString() {
-        LineString ls = linestring(WGS84, p(0, 0));
+        LineString ls = linestring(WGS84, g(0, 0));
     }
 
     @Test
     public void testLinearRing3D() {
 
-        LinearRing lr = ring(WGS84_Z, p(0, 0, 0), p(1, 0, 0), p(1, 1, 0), p(0, 1, 0), p(0, 0, 0));
+        LinearRing lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0), g(0, 0, 0));
         assertTrue(lr.getCoordinateReferenceSystem().hasVerticalAxis());
 
         ArrayList<G3D> points = new ArrayList<>();
@@ -104,12 +104,12 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLinearRing3D() {
-        LinearRing lr = ring(WGS84_Z, p(0, 0, 0), p(1, 0, 0), p(1, 1, 0), p(0, 1, 0));
+        LinearRing lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0));
     }
 
     @Test
     public void testValidPolygon() {
-        Polygon p = polygon(ring(WGS84, p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0)));
+        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPositions(), 5);
 
@@ -137,15 +137,15 @@ public class DslTest {
 
     @Test
     public void testValidPolygonAlternativeSyntax() {
-        Polygon p = polygon(ring(WGS84, p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0)));
-        Polygon p2 = polygon(WGS84, ring(p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0)));
+        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
+        Polygon p2 = polygon(WGS84, ring(g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
         assertEquals(p, p2);
     }
 
 
     @Test
     public void testValidPolygon2DM() {
-        Polygon p = polygon(ring(WGS84_M, p(0, 0, 2), p(0, 1, 3), p(1, 1, 4), p(1, 0, 3), p(0, 0, 2)));
+        Polygon p = polygon(ring(WGS84_M, gM(0, 0, 2), gM(0, 1, 3), gM(1, 1, 4), gM(1, 0, 3), gM(0, 0, 2)));
         assertEquals(0, p.getNumInteriorRing());
         assertTrue(p.getCoordinateReferenceSystem().hasMeasureAxis());
         assertEquals(4326, p.getSRID());
@@ -180,7 +180,7 @@ public class DslTest {
 
     @Test
     public void testvalidPolygonWithInteriorRing() {
-        Polygon p = polygon(ring(WGS84, p(0, 0), p(0, 10), p(10, 10), p(10, 0), p(0, 0)), ring(WGS84, p(3, 3), p(3, 6), p(6, 6), p(6, 3), p(3, 3)));
+        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPositions(), 10);
         assertEquals(p.getNumInteriorRing(), 1);
@@ -229,41 +229,41 @@ public class DslTest {
     }
 
     public void testvalidPolygonWithInteriorRingAlternativeSyntax() {
-        Polygon p = polygon(ring(WGS84, p(0, 0), p(0, 10), p(10, 10), p(10, 0), p(0, 0)), ring(WGS84, p(3, 3), p(3, 6), p(6, 6), p(6, 3), p(3, 3)));
-        Polygon p2 = polygon(WGS84, ring(p(0, 0), p(0, 10), p(10, 10), p(10, 0), p(0, 0)), ring(p(3, 3), p(3, 6), p(6, 6), p(6, 3), p(3, 3)));
+        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
+        Polygon p2 = polygon(WGS84, ring(g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
         assertEquals(p, p2);
     }
 
     @Test
     public void testvalidPoint2D() {
-        Point pnt = point(WGS84, 1, 2);
+        Point pnt = point(WGS84, g(1, 2));
         assertEquals(pnt, new Point<>(new G2D(WGS84, 1, 2)));
     }
 
     @Test
     public void testvalidPoint3D() {
-        Point pnt = point(WGS84_Z, 1, 2, 3);
+        Point pnt = point(WGS84_Z, g(1, 2, 3));
         assertEquals(pnt, new Point<>(new G3D(WGS84_Z, 1, 2, 3)));
     }
 
     @Test
     public void testvalidPoint2DM() {
-        Point pnt = point(WGS84_M, 1, 2, 3);
+        Point pnt = point(WGS84_M, gM(1, 2, 3));
         assertEquals(pnt, new Point<>(new G2DM(WGS84_M, 1, 2, 3)));
     }
 
     @Test
     public void testvalidPoint3DM() {
-        Point pnt = point(WGS84_ZM, 1, 2, 3, 4);
+        Point pnt = point(WGS84_ZM, g(1, 2, 3, 4));
         assertEquals(pnt, new Point<>(new G3DM(WGS84_ZM, 1, 2, 3, 4)));
     }
 
     @Test
     public void testValidGeometryCollection() {
         GeometryCollection gc = geometrycollection(
-                point(WGS84, 1, 2),
-                linestring(WGS84, p(0, 0), p(1, 1), p(2, 1)),
-                polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                point(WGS84, g(1, 2)),
+                linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
+                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
         );
         assertEquals(3, gc.getNumGeometries());
         assertEquals(2, gc.getCoordinateDimension());
@@ -272,14 +272,14 @@ public class DslTest {
     @Test
     public void testValidGeometryCollectionAlternativeSyntax() {
         GeometryCollection gc = geometrycollection(
-                point(WGS84, 1, 2),
-                linestring(WGS84, p(0, 0), p(1, 1), p(2, 1)),
-                polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                point(WGS84, g(1, 2)),
+                linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
+                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
         );
         GeometryCollection gc2 = geometrycollection(WGS84,
-                point(1, 2),
-                linestring(p(0, 0), p(1, 1), p(2, 1)),
-                polygon(ring(p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                point(g(1, 2)),
+                linestring(g(0, 0), g(1, 1), g(2, 1)),
+                polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
         );
         assertEquals(gc, gc2);
 
@@ -300,7 +300,7 @@ public class DslTest {
 
     @Test
     public void testValidMultiPoint() {
-        MultiPoint mp = multipoint(point(WGS84_ZM, 2, 1, 3, 4), point(WGS84_ZM, 3, 1, 5, 6));
+        MultiPoint mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
         assertEquals(GeometryType.MULTI_POINT, mp.getGeometryType());
         assertEquals(2, mp.getNumGeometries());
         assertEquals(4326, mp.getSRID());
@@ -309,16 +309,16 @@ public class DslTest {
 
     @Test
     public void testValidMultiPointAlternativeSyntax() {
-        MultiPoint mp = multipoint(point(WGS84_ZM, 2, 1, 3, 4), point(WGS84_ZM, 3, 1, 5, 6));
-        MultiPoint mp2 = multipoint(WGS84_ZM, point(2, 1, 3, 4), point(3, 1, 5, 6));
+        MultiPoint mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
+        MultiPoint mp2 = multipoint(WGS84_ZM, point(g(2, 1, 3, 4)), point(g(3, 1, 5, 6)));
         assertEquals(mp, mp2);
     }
 
     @Test
     public void testMultiPointCanBeEmbeddedInGeometryCollection() {
         GeometryCollection geometryCollection = geometrycollection(
-                multipoint(point(WGS84, 1, 2)),
-                point(WGS84, 3, 4)
+                multipoint(point(WGS84, g(1, 2))),
+                point(WGS84, g(3, 4))
         );
         assertEquals(GeometryType.MULTI_POINT, geometryCollection.getGeometryN(0).getGeometryType());
     }
@@ -326,8 +326,8 @@ public class DslTest {
     @Test
     public void testValidMultiLineString() {
         MultiLineString mls = multilinestring(
-                linestring(WGS84_Z, p(1, 2, 5), p(3, 4, 2)),
-                linestring(WGS84_Z, p(4, 5, 1), p(6, 5, 0)));
+                linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
+                linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0)));
         assertEquals(GeometryType.MULTI_LINE_STRING, mls.getGeometryType());
         assertEquals(2, mls.getNumGeometries());
         assertEquals(4326, mls.getSRID());
@@ -337,11 +337,11 @@ public class DslTest {
     @Test
     public void testValidMultiLineStringAlternativeSyntax() {
         MultiLineString mls = multilinestring(
-                linestring(WGS84_Z, p(1, 2, 5), p(3, 4, 2)),
-                linestring(WGS84_Z, p(4, 5, 1), p(6, 5, 0)));
+                linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
+                linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0)));
         MultiLineString mls2 = multilinestring(WGS84_Z,
-                linestring(p(1, 2, 5), p(3, 4, 2)),
-                linestring(p(4, 5, 1), p(6, 5, 0)));
+                linestring(g(1, 2, 5), g(3, 4, 2)),
+                linestring(g(4, 5, 1), g(6, 5, 0)));
         assertEquals(mls, mls2);
     }
 
@@ -350,10 +350,10 @@ public class DslTest {
     public void testMultiLineStringCanBeEmbeddedInGeometryCollection() {
         GeometryCollection geometryCollection = geometrycollection(
                 multilinestring(
-                        linestring(WGS84_Z, p(1, 2, 5), p(3, 4, 2)),
-                        linestring(WGS84_Z, p(4, 5, 1), p(6, 5, 0))
+                        linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
+                        linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0))
                 ),
-                linestring(WGS84_Z, p(4, 5, 1), p(6, 5, 0))
+                linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0))
         );
         assertEquals(GeometryType.MULTI_LINE_STRING, geometryCollection.getGeometryN(0).getGeometryType());
     }
@@ -361,8 +361,8 @@ public class DslTest {
     @Test
     public void testValidMultiPolygonString() {
         MultiPolygon mp = multipolygon(
-                polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                polygon(ring(WGS84, p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
         assertEquals(GeometryType.MULTI_POLYGON, mp.getGeometryType());
         assertEquals(2, mp.getNumGeometries());
@@ -373,13 +373,13 @@ public class DslTest {
     @Test
     public void testValidMultiPolygonStringAlternativeSyntax() {
         MultiPolygon mp = multipolygon(
-                polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                polygon(ring(WGS84, p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
 
         MultiPolygon mp2 = multipolygon(WGS84,
-                polygon(ring(p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                polygon(ring(p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                polygon(ring(g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
         assertEquals(mp, mp2);
     }
@@ -389,10 +389,10 @@ public class DslTest {
         GeometryCollection geometryCollection =
                 geometrycollection(
                         multipolygon(
-                                polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                                polygon(ring(WGS84, p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                                polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
                         ),
-                        polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                        polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                 );
         assertEquals(GeometryType.MULTI_POLYGON, geometryCollection.getGeometryN(0).getGeometryType());
     }
@@ -402,19 +402,19 @@ public class DslTest {
             GeometryCollection g1=
                     geometrycollection(
                             multipolygon(
-                                    polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                                    polygon(ring(WGS84, p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                                    polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                                    polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
                             ),
-                            polygon(ring(WGS84, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                            polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                     );
 
         GeometryCollection g2=
                             geometrycollection(WGS84,
                                     multipolygon(
-                                            polygon(ring(p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))),
-                                            polygon(ring(p(0, 0), p(10, 0), p(10, 10), p(0, 10), p(0, 0)))
+                                            polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                                            polygon(ring(g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
                                     ),
-                                    polygon(ring(p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0)))
+                                    polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                             );
         assertEquals(g1, g2);
         }

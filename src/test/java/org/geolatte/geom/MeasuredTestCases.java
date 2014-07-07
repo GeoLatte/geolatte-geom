@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LengthUnit;
 
+import static org.geolatte.geom.builder.DSL.pM;
 import static org.geolatte.geom.builder.DSL.point;
 
 /**
@@ -134,8 +135,8 @@ public class MeasuredTestCases {
         lineString3DM = new LineString<>(psBuilder3DM.toPositionSequence());
 
         measuredMultiPoint = new MultiPoint<>(
-                point(crsM, 0, 0, 1),
-                point(crsM, 1, 2, 2)
+                point(crsM, pM(0, 0, 1)),
+                point(crsM, pM(1, 2, 2))
         );
 
 

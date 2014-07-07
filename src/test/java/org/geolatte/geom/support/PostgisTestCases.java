@@ -68,23 +68,23 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
     public PostgisTestCases() {
         addCase(POINT_2D,
                 "POINT(1 1)", "0101000000000000000000F03F000000000000F03F",
-                point(crs, 1, 1));
+                point(crs, p(1, 1)));
         addCase(POINT_3D,
                 "POINT(1 2 3)",
                 "0101000080000000000000F03F00000000000000400000000000000840",
-                point(crsZ, 1,2,3));
+                point(crsZ, p(1,2,3)));
         addCase(POINT_3DM,
                 "POINT(1 2 3 4)",
                 "01010000C0000000000000F03F000000000000004000000000000008400000000000001040",
-                point(crsZM, 1,2,3,4));
+                point(crsZM, p(1,2,3,4)));
         addCase(POINT_2DM,
                 "POINTM(1 2 4)",
                 "0101000040000000000000F03F00000000000000400000000000001040",
-                point(crsM, 1,2,4));
+                point(crsM, pM(1,2,4)));
         addCase(POINT_WITH_SRID,
                 "SRID=4326;POINT(1 2 3 4)",
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
-                point(wgs84_ZM, 1, 2, 3, 4));
+                point(wgs84_ZM, g(1, 2, 3, 4)));
 
 
 
@@ -111,8 +111,8 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 expected);
 
 
-        Point<P2D> pnt1 = point(crs, 1, 1);
-        Point<P2D> pnt2 = point(crs, 2, 2);
+        Point<P2D> pnt1 = point(crs, p(1, 1));
+        Point<P2D> pnt2 = point(crs, p(2, 2));
         expected = geometrycollection(pnt1, pnt2 );
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
@@ -129,8 +129,8 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
                 multipoint( pnt1, pnt2));
 
-        Point<G2D> gpnt1 = point(wgs84, 1, 2);
-        Point<G2D> gpnt2 = point(wgs84, 3, 4);
+        Point<G2D> gpnt1 = point(wgs84, g(1, 2));
+        Point<G2D> gpnt2 = point(wgs84, g(3, 4));
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
@@ -147,7 +147,7 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(MULTILINESTRING_2D_WITH_SRID,
                 "SRID=4326;MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "0105000020E610000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
-                , multilinestring( linestring (wgs84 ,p(1, 2),p(2, 3),p(4, 5) ), linestring(wgs84 ,p(6, 7),p(8, 9) )));
+                , multilinestring( linestring (wgs84 ,g(1, 2),g(2, 3),g(4, 5) ), linestring(wgs84 ,g(6, 7),g(8, 9) )));
 
 
 
@@ -170,12 +170,12 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(POINT_SCIENTIFIC_NOTATION,
                 "POINT(1e100 1.2345e-100 -2e-5)",
                 "01010000807DC39425AD49B25402EBD79DF147312BF168E388B5F8F4BE",
-                point(crsZ, 1e100, 1.23454e-100, -2e-5));
+                point(crsZ, p(1e100, 1.23454e-100, -2e-5)));
 
         addCase(INVALID_POINT,
                 "POINT(10,12)",
                 "01010000807DC39425AD4",
-                point(crs));
+                new Point<>(crs));
 
         addCase(INVALID_POLYGON,
                 "POLYGON((0 0,1 0,1 1,0 1))",

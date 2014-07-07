@@ -99,7 +99,7 @@ public class TestJTS {
 
     @Test
     public void test_empty_point() {
-        test_empty( point(crsZ) );
+        test_empty( new Point(crsZ) );
     }
 
     @Test
@@ -146,7 +146,7 @@ public class TestJTS {
 
     @Test
     public void test_from_with_srid() {
-        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, 1, 2));
+        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, p(1, 2)));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 
@@ -158,7 +158,7 @@ public class TestJTS {
 
     @Test
     public void test_to_with_srid() {
-        assertEquals(4326, JTS.to(point(wgs84, 1.0, 2.0)).getSRID());
+        assertEquals(4326, JTS.to(point(wgs84, g(1.0, 2.0))).getSRID());
     }
 
     private void test_empty(Geometry empty) {
