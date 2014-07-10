@@ -237,6 +237,7 @@ public class Envelope<P extends Position> {
      * @throws IllegalArgumentException when the specified <code>Point</code> doesn't have the same coordinate reference system as this instance.
      */
     public boolean contains(P p) {
+        //TODO -- is this test required??
         if (!p.getClass().equals(this.getCoordinateReferenceSystem().getPositionClass()))
             throw new IllegalArgumentException("Position and envelope of different types");
         if (isEmpty()) return false;

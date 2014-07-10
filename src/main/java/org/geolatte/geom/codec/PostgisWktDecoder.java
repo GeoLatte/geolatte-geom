@@ -154,7 +154,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             if (currentToken instanceof WktPointSequenceToken) {
                 PositionSequence<?> positionSequence = ((WktPointSequenceToken) currentToken).getPositions();
                 for (Position p : positionSequence) {
-                    points.add(new Point(p, baseCrs));
+                    points.add(new Point(p, positionSequence.getCoordinateReferenceSystem()));
                 }
                 nextToken();
             }

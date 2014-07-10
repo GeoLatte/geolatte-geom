@@ -125,7 +125,7 @@ public class MortonCodeTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateWrongCrsIdOfPosition() {
-        mcLevel1.ofPosition(new P2D(1, 1));
+        mcLevel1.ofPosition(new P2DM(1, 1, 3));
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -36,10 +36,11 @@ abstract public class Position{
         if (isEmpty()) {
             return new double[0];
         }
-        if (dest == null) {
-            dest = new double[getCoordinateDimension()];
+        int dim = getCoordinateDimension();
+        if (dest == null || dest.length < dim) {
+            dest = new double[dim];
         }
-        System.arraycopy(this.coords, 0, dest, 0, this.coords.length);
+        System.arraycopy(this.coords, 0, dest, 0, dim);
         return dest;
     }
 
