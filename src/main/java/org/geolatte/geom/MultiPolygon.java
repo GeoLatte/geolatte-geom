@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/20/11
  */
-public class MultiPolygon<P extends Position<P>> extends GeometryCollection<P, Polygon<P>> implements Polygonal<P> {
+public class MultiPolygon<P extends Position> extends GeometryCollection<P, Polygon<P>> implements Polygonal<P> {
 
     /**
      * Constructs a <code>MultiPolygon</code> from the specified array of <code>Polygon</code>s.

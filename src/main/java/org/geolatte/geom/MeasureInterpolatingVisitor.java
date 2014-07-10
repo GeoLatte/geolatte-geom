@@ -50,7 +50,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/10/12
  */
-public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> implements GeometryVisitor<P> {
+public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements GeometryVisitor<P> {
 
     private static final String INVALID_TYPE_MSG =
             "Operation only valid on Point, MultiPoint, LineString, and MultiLineString Geometries.";
@@ -197,7 +197,7 @@ public class MeasureInterpolatingVisitor<P extends Projected<P> & Measured> impl
 
         if (number0Dimensional == 0 && number1Dimensional == 0) {
             Position p = Positions.mkPosition(getCrs(), Double.NaN, Double.NaN);
-            return new Point(p);
+            return new Point(p, getCrs());
         }
 
         if (number0Dimensional > 1 && number1Dimensional == 0) {

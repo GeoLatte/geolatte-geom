@@ -30,7 +30,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public interface PositionSequenceBuilder<P extends Position<P>> {
+public interface PositionSequenceBuilder<P extends Position> {
 
     /**
      * Adds a <code>Position</code> to the <code>PositionSequence</code> being built.

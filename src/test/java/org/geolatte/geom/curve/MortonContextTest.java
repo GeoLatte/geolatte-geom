@@ -38,9 +38,9 @@ public class MortonContextTest {
 
     CoordinateReferenceSystem<P2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
-    P2D p0 = new P2D(crs, 0, 0);
-    P2D p1 = new P2D(crs, 10, 10);
-    Envelope<P2D> envelope = new Envelope<>(p0, p1);
+    P2D p0 = new P2D(0, 0);
+    P2D p1 = new P2D(10, 10);
+    Envelope<P2D> envelope = new Envelope<>(p0, p1, crs);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentIfLevelExceedsLimit() {
@@ -64,7 +64,6 @@ public class MortonContextTest {
         Assert.assertEquals(p1.getX(), context.getMaxX());
         Assert.assertEquals(p1.getY(), context.getMaxY());
         Assert.assertEquals(3, context.getDepth());
-        Assert.assertEquals(p0.getCoordinateReferenceSystem(), context.getCoordinateReferenceSystem());
         Assert.assertEquals(3, context.getDepth());
         Assert.assertEquals(1.25, context.getLeafHeight());
         Assert.assertEquals(1.25, context.getLeafWidth());

@@ -35,23 +35,23 @@ import java.util.List;
  */
 public class Geometries {
 
-    public static <P extends Position<P>> Point<P> mkPoint(PositionSequence<P> seq) {
+    public static <P extends Position> Point<P> mkPoint(PositionSequence<P> seq) {
         return new Point<P>(seq);
     }
 
-    public static <P extends Position<P>> Point<P> mkPoint(P pos) {
-        return new Point<P>(pos);
+    public static <P extends Position> Point<P> mkPoint(P pos, CoordinateReferenceSystem<P> crs) {
+        return new Point<P>(pos, crs);
     }
 
-    public static <P extends Position<P>> LineString<P> mkLineString(PositionSequence<P> seq) {
+    public static <P extends Position> LineString<P> mkLineString(PositionSequence<P> seq) {
         return new LineString<P>(seq);
     }
 
-    public static <P extends Position<P>> LinearRing<P> mkLinearRing(PositionSequence<P> seq) {
+    public static <P extends Position> LinearRing<P> mkLinearRing(PositionSequence<P> seq) {
         return new LinearRing<P>(seq);
     }
 
-    public static <P extends Position<P>> Polygon<P> mkPolygon(LinearRing<P>... rings) {
+    public static <P extends Position> Polygon<P> mkPolygon(LinearRing<P>... rings) {
         return new Polygon<P>(rings);
     }
 
@@ -60,7 +60,7 @@ public class Geometries {
         return new Polygon(rings.toArray(ringArr));
     }
 
-    public static <P extends Position<P>> GeometryCollection<P, Geometry<P>> mkGeometryCollection(Geometry<P>... geometries) {
+    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkGeometryCollection(Geometry<P>... geometries) {
         return new GeometryCollection<>(geometries);
     }
 
@@ -70,7 +70,7 @@ public class Geometries {
     }
 
 
-    public static <P extends Position<P>> MultiPoint<P> mkMultiPoint(Point<P>... points) {
+    public static <P extends Position> MultiPoint<P> mkMultiPoint(Point<P>... points) {
         return new MultiPoint<P>(points);
     }
 
@@ -84,11 +84,11 @@ public class Geometries {
         return new MultiLineString(lineStrings.toArray(lsArr));
     }
 
-    public static <P extends Position<P>> MultiLineString<P> mkMultiLineString(LineString<P>... linestrings) {
+    public static <P extends Position> MultiLineString<P> mkMultiLineString(LineString<P>... linestrings) {
         return new MultiLineString<>(linestrings);
     }
 
-    public static <P extends Position<P>> MultiPolygon<P> mkMultiPolygon(Polygon<P>... polygons) {
+    public static <P extends Position> MultiPolygon<P> mkMultiPolygon(Polygon<P>... polygons) {
         return new MultiPolygon<>(polygons);
     }
 
@@ -99,7 +99,7 @@ public class Geometries {
 
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position<P>> Geometry<P> mkGeometry(Class<? extends Simple> geometryClass, PositionSequence<P> positions) {
+    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Simple> geometryClass, PositionSequence<P> positions) {
 
         if (geometryClass == null) {
             throw new IllegalArgumentException("Null argument not allowed");
@@ -120,7 +120,7 @@ public class Geometries {
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position<P>> Geometry<P> mkGeometry(Class<? extends Complex> geometryClass, Geometry<P>... parts) {
+    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Complex> geometryClass, Geometry<P>... parts) {
         if (Polygon.class.isAssignableFrom(geometryClass)) {
             return new Polygon((LinearRing<P>[]) parts);
         }
@@ -140,9 +140,9 @@ public class Geometries {
 
     }
 
-    public static <Q extends Position<Q>> Geometry<Q> mkGeometry(Class<? extends Complex> geometryClass, CoordinateReferenceSystem<Q> crs) {
+    public static <Q extends Position> Geometry<Q> mkGeometry(Class<? extends Complex> geometryClass, CoordinateReferenceSystem<Q> crs) {
         if (Polygon.class.isAssignableFrom(geometryClass)) {
-                   return new Polygon(crs);
+                   return new Polygon<>(crs);
                }
                if (MultiLineString.class.isAssignableFrom(geometryClass)) {
                    return new MultiLineString<>(crs);

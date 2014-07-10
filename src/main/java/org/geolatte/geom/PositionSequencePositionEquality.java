@@ -45,7 +45,7 @@ public class PositionSequencePositionEquality implements PositionSequenceEqualit
     }
 
     @Override
-    public <P extends Position<P>> boolean equals(PositionSequence<P> first, PositionSequence<P> second) {
+    public <P extends Position> boolean equals(PositionSequence<P> first, PositionSequence<P> second) {
 
         if (first == second) return true;
         if (first == null || second == null) return false;
@@ -55,7 +55,7 @@ public class PositionSequencePositionEquality implements PositionSequenceEqualit
 
     }
 
-    private <P extends Position<P>> boolean testPointSequenceEquality(PositionSequence<P> first, PositionSequence<P> second) {
+    private <P extends Position> boolean testPointSequenceEquality(PositionSequence<P> first, PositionSequence<P> second) {
         CoordinateReferenceSystem crs1 = first.getCoordinateReferenceSystem();
         CoordinateReferenceSystem crs2 = second.getCoordinateReferenceSystem();
         double[] c1 = new double[first.getCoordinateDimension()];
@@ -63,7 +63,7 @@ public class PositionSequencePositionEquality implements PositionSequenceEqualit
         for (int idx = 0; idx < first.size(); idx++) {
             first.getCoordinates(idx, c1);
             second.getCoordinates(idx, c2);
-            if(!this.positionEquality.equals(c1, crs1, c2, crs2)) return false;
+            if(!this.positionEquality.equals(c1, c2)) return false;
         }
         return true;
     }

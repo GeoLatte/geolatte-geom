@@ -44,7 +44,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
 
 
     @Override
-    public <P extends Position<P>> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         this.crs = crs;
         // if a null crs is specified, then no validation is needed.
         this.crsValidated = (crs == null);
@@ -124,7 +124,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkMultiPolygon(geometries);
     }
 
-    private GeometryCollection<? extends Position<?>, ? extends Geometry<?>> decodeGeometryCollection(ByteBuffer byteBuffer) {
+    private GeometryCollection<? extends Position, ? extends Geometry<?>> decodeGeometryCollection(ByteBuffer byteBuffer) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new GeometryCollection<>(crs);

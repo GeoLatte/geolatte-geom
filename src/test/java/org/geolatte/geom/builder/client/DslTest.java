@@ -237,25 +237,25 @@ public class DslTest {
     @Test
     public void testvalidPoint2D() {
         Point pnt = point(WGS84, g(1, 2));
-        assertEquals(pnt, new Point<>(new G2D(WGS84, 1, 2)));
+        assertEquals(pnt, new Point<>(new G2D(1, 2), WGS84));
     }
 
     @Test
     public void testvalidPoint3D() {
         Point pnt = point(WGS84_Z, g(1, 2, 3));
-        assertEquals(pnt, new Point<>(new G3D(WGS84_Z, 1, 2, 3)));
+        assertEquals(pnt, new Point<>(new G3D(1, 2, 3), WGS84_Z));
     }
 
     @Test
     public void testvalidPoint2DM() {
         Point pnt = point(WGS84_M, gM(1, 2, 3));
-        assertEquals(pnt, new Point<>(new G2DM(WGS84_M, 1, 2, 3)));
+        assertEquals(pnt, new Point<>(new G2DM(1, 2, 3), WGS84_M));
     }
 
     @Test
     public void testvalidPoint3DM() {
         Point pnt = point(WGS84_ZM, g(1, 2, 3, 4));
-        assertEquals(pnt, new Point<>(new G3DM(WGS84_ZM, 1, 2, 3, 4)));
+        assertEquals(pnt, new Point<>(new G3DM(1, 2, 3, 4), WGS84_ZM));
     }
 
     @Test

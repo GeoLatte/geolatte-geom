@@ -29,7 +29,7 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-class VariableSizePositionSequenceBuilder<P extends Position<P>> extends AbstractPositionSequenceBuilder<P> {
+class VariableSizePositionSequenceBuilder<P extends Position> extends AbstractPositionSequenceBuilder<P> {
 
     private double[] coordinates;
     private int index = 0;

@@ -40,7 +40,7 @@ class GeometryCollectionEncoder extends AbstractEncoder {
 		this.openGisType = openGisType;
 	}
 
-	public <P extends Position<P>> boolean accepts(Geometry<P> geom) {
+	public <P extends Position> boolean accepts(Geometry<P> geom) {
 		return this.openGisType.typeOf( geom );
 	}
 

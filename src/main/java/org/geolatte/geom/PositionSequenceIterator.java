@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PositionSequenceIterator<P extends Position<P>> implements Iterator<P> {
+class PositionSequenceIterator<P extends Position> implements Iterator<P> {
 
     private final PositionSequence<P> sequence;
     private int index = 0;

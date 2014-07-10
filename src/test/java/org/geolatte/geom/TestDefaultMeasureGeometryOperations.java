@@ -121,7 +121,7 @@ public class TestDefaultMeasureGeometryOperations {
         measureOps.measureOnLength(point, P2DM.class, false);
     }
 
-    private void checkXYZcoordinateEquality(Geometry<? extends Projected> expected, Geometry<? extends Projected> received) {
+    private void checkXYZcoordinateEquality(Geometry<? extends P2D> expected, Geometry<? extends P2D> received) {
         for (int i = 0; i < expected.getNumPositions(); i++) {
             assertEquals("MeasureOnLenthOp does not preserve X-coordinate:", expected.getPositionN(i).getX(), received.getPositionN(i).getX(), Math.ulp(10));
             assertEquals("MeasureOnLenthOp does not preserve Y-coordinate:", expected.getPositionN(i).getY(), received.getPositionN(i).getY(), Math.ulp(10));
@@ -135,7 +135,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateGetMeasureOpThrowsExceptionOnNullGeometry() {
-        measureOps.measureAt((Geometry<P2DM>) null, new P2DM(crsM, 1, 2, 0));
+        measureOps.measureAt((Geometry<P2DM>) null, new P2DM(1, 2, 0));
 
     }
 
@@ -147,41 +147,41 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
-        double m = measureOps.measureAt(new LineString<>(crsM), new P2DM(crsM, 1, 2, 0));
+        double m = measureOps.measureAt(new LineString<>(crsM), new P2DM(1, 2, 0));
         assertTrue(Double.isNaN(m));
     }
 
     @Test
     public void testGetMeasureOpReturnsNaNWhenPointNotOnMeasuredGeometry() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(crsM, 5, 5, 0));
+        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(5, 5, 0));
         assertTrue(Double.isNaN(m));
     }
 
     @Test
     public void testGetMeasureOpOnRegularLine() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(crsM, 1.5, 1, 0));
+        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(1.5, 1, 0));
         assertEquals(2.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiLine() {
-        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(crsM, 4.5, 1, 0));
+        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(4.5, 1, 0));
         assertEquals(4.5, m, Math.ulp(10));
 
-        m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(crsM, 2.5, 1, 0));
+        m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(2.5, 1, 0));
         assertTrue(Double.isNaN(m));
 
     }
 
     @Test
     public void testGetMeasureOpOnRegularLinearRing() {
-        double m = measureOps.measureAt(tc.measuredLinearRing, new P2DM(crsM, 0, 0.5, 0));
+        double m = measureOps.measureAt(tc.measuredLinearRing, new P2DM(0, 0.5, 0));
         assertEquals(3.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiPoint() {
-        double m = measureOps.measureAt(tc.measuredMultiPoint, new P2DM(crsM, 1, 2, 0));
+        double m = measureOps.measureAt(tc.measuredMultiPoint, new P2DM(1, 2, 0));
         assertEquals(2d, m, Math.ulp(10));
     }
 

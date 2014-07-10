@@ -66,7 +66,7 @@ public class GeometryPointEquality implements GeometryEquality {
      * {@inheritDoc}
      */
     @Override
-    public <P extends Position<P>> boolean equals(Geometry<P> first, Geometry<P> second) {
+    public <P extends Position> boolean equals(Geometry<P> first, Geometry<P> second) {
         if (first == second) return true;
         if (first == null || second == null) return false;
         if (first.isEmpty() && second.isEmpty()) return true;
@@ -84,7 +84,7 @@ public class GeometryPointEquality implements GeometryEquality {
         return pointSeqEq.equals(first.getPositions(), second.getPositions());
     }
 
-    private <P extends Position<P>> boolean equals (Polygon<P> first, Polygon<P> second){
+    private <P extends Position> boolean equals (Polygon<P> first, Polygon<P> second){
         if (first.getNumInteriorRing() != second.getNumInteriorRing()) return false;
         if (!equals(first.getExteriorRing(), second.getExteriorRing())) return false;
         for (int i = 0; i < first.getNumInteriorRing(); i++) {

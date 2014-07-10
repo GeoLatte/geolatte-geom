@@ -41,5 +41,5 @@ public interface WkbEncoder {
      * @param byteOrder the bye-order for the WKB representation
      * @return a ByteBuffer containing the binary WKB representation of the specified geometry using the specified byte-order
      */
-    <P extends Position<P>> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder);
+    <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder);
 }

@@ -32,8 +32,8 @@ import org.geolatte.geom.Position;
  */
 public interface Encoder {
 
-	public <P extends Position<P>, G extends Geometry<P>> SqlServerGeometry encode(G geom);
+	public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom);
 
-	public <P extends Position<P>> boolean accepts(Geometry<P> geom);
+	public <P extends Position> boolean accepts(Geometry<P> geom);
 
 }

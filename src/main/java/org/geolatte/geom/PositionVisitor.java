@@ -27,7 +27,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
-public interface PositionVisitor<P extends Position<P>> {
+public interface PositionVisitor<P extends Position> {
 
     /**
      * The visit method to be executed for each Position

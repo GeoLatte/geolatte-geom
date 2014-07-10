@@ -29,7 +29,7 @@ import org.geolatte.geom.jts.DimensionalCoordinate;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-abstract class AbstractPositionSequence<P extends Position<P>> implements PositionSequence<P>, CoordinateSequence {
+abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, CoordinateSequence {
 
     private final CoordinateReferenceSystem<P> crs;
 
@@ -184,7 +184,7 @@ abstract class AbstractPositionSequence<P extends Position<P>> implements Positi
     @Override
     abstract public void accept(PositionVisitor<P> visitor);
 
-    private static class EnvelopeExpander<P extends Position<P>> implements PositionVisitor<P> {
+    private static class EnvelopeExpander<P extends Position> implements PositionVisitor<P> {
 
         final private Envelope env;
         final double[] buffer = new double[2];

@@ -30,7 +30,7 @@ import org.geolatte.geom.*;
 class MySqlWkbEncoder extends AbstractWkbEncoder {
 
     @Override
-    public <P extends Position<P>> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
+    public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
         if (geometry == null || hasEmpty(geometry)) return null;
         //size is size for WKB + 4 bytes for the SRID
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, false) + 4);
@@ -44,11 +44,11 @@ class MySqlWkbEncoder extends AbstractWkbEncoder {
     }
 
     @Override
-    protected  <P extends Position<P>> int sizeEmptyGeometry(Geometry<P> geometry) {
+    protected  <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
         return 0;
     }
 
-    private  <P extends Position<P>> boolean hasEmpty(Geometry<P> geometry) {
+    private  <P extends Position> boolean hasEmpty(Geometry<P> geometry) {
         if (geometry.isEmpty()) {
             return true;
         }

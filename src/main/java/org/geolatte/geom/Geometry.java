@@ -33,14 +33,14 @@ import java.lang.reflect.Array;
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 
-public abstract class Geometry<P extends Position<P>> implements Serializable {
+public abstract class Geometry<P extends Position> implements Serializable {
 
     private static GeometryEquality geomEq = new GeometryPointEquality();
 
     protected final PositionSequence<P> positions;
 
     @SuppressWarnings("unchecked")
-    public static <Q extends Position<Q>> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
+    public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
         if (crs == null || geometry == null) return (Geometry<Q>) geometry;
         if (crs.equals(geometry.getCoordinateReferenceSystem())) return (Geometry<Q>) geometry;
         if (geometry instanceof Simple) {
@@ -76,7 +76,7 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <T extends Position<T>> PositionSequence<T> nestPositionSequences(Geometry<T>[] geometries) {
+    protected static <T extends Position> PositionSequence<T> nestPositionSequences(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {
             return null;
         }
@@ -90,7 +90,7 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
 
     //TODO -- check that all geoms have the SAME CRS
     @SuppressWarnings("unchecked")
-    protected static <T extends Position<T>> CoordinateReferenceSystem<T> getCrs(Geometry<T>[] geometries) {
+    protected static <T extends Position> CoordinateReferenceSystem<T> getCrs(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {
             throw new IllegalArgumentException("Expecting non-null, non-empty array of Geometry.");
         }
@@ -240,7 +240,7 @@ public abstract class Geometry<P extends Position<P>> implements Serializable {
      */
     public abstract void accept(GeometryVisitor<P> visitor);
 
-    private static class EnvelopeVisitor<P extends Position<P>> implements PositionVisitor<P> {
+    private static class EnvelopeVisitor<P extends Position> implements PositionVisitor<P> {
 
             double[] coordinates;
             double xMin = Double.POSITIVE_INFINITY;

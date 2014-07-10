@@ -50,7 +50,7 @@ import java.util.Iterator;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
-public class Polygon<P extends Position<P>> extends Geometry<P> implements Polygonal<P>, Complex<P, LinearRing<P>> {
+public class Polygon<P extends Position> extends Geometry<P> implements Polygonal<P>, Complex<P, LinearRing<P>> {
 
 
     private final LinearRing<P>[] rings;

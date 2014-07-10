@@ -65,7 +65,7 @@ class PostgisWktEncoder implements WktEncoder {
      * @return the WKT representation of the given geometry
      */
     @Override
-    public <P extends Position<P>> String encode(Geometry<P> geometry) {
+    public <P extends Position> String encode(Geometry<P> geometry) {
         prepare();
         addSridIfValid(geometry);
         addGeometry(geometry);
@@ -77,7 +77,7 @@ class PostgisWktEncoder implements WktEncoder {
         inGeometryCollection = false;
     }
 
-    private <P extends Position<P>> void addSridIfValid(Geometry<P> geometry) {
+    private <P extends Position> void addSridIfValid(Geometry<P> geometry) {
         if (geometry.getSRID() < 1) {
             return;
         }
@@ -86,12 +86,12 @@ class PostgisWktEncoder implements WktEncoder {
                 .append(";");
     }
 
-    private <P extends Position<P>> void addGeometry(Geometry<P> geometry) {
+    private <P extends Position> void addGeometry(Geometry<P> geometry) {
         addGeometryTag(geometry);
         addGeometryText(geometry);
     }
 
-    private <P extends Position<P>> void addGeometryText(Geometry<P> geometry) {
+    private <P extends Position> void addGeometryText(Geometry<P> geometry) {
         if (geometry.isEmpty()) {
             addEmptyKeyword();
             return;
@@ -125,7 +125,7 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private <P extends Position<P>, G extends Geometry<P>> void addGeometries(GeometryCollection<P,G> collection, boolean withTag) {
+    private <P extends Position, G extends Geometry<P>> void addGeometries(GeometryCollection<P,G> collection, boolean withTag) {
         inGeometryCollection = true;
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             if (i > 0) {
@@ -140,7 +140,7 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private <P extends Position<P>> void addLinearRings(Polygon<P> geometry) {
+    private <P extends Position> void addLinearRings(Polygon<P> geometry) {
         addRing(geometry.getExteriorRing());
         for (int i = 0; i < geometry.getNumInteriorRing(); i++) {
             addDelimiter();
@@ -148,11 +148,11 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private <P extends Position<P>> void addRing(LinearRing<P> ring) {
+    private <P extends Position> void addRing(LinearRing<P> ring) {
         addPointList(ring.getPositions());
     }
 
-    private <P extends Position<P>> void addPointList(PositionSequence<P> points) {
+    private <P extends Position> void addPointList(PositionSequence<P> points) {
         addStartList();
         double[] coords = new double[points.getCoordinateDimension()];
         for (int i = 0; i < points.size(); i++) {

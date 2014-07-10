@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PackedPositionSequence<P extends Position<P>> extends AbstractPositionSequence<P> {
+class PackedPositionSequence<P extends Position> extends AbstractPositionSequence<P> {
 
     private final double[] coordinates;
 

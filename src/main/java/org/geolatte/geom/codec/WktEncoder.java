@@ -37,5 +37,5 @@ public interface WktEncoder {
      * @param geometry the <code>Geometry</code> instance to encode
      * @return a WKT representation of the specified object.
      */
-    <P extends Position<P>> String encode(Geometry<P> geometry);
+    <P extends Position> String encode(Geometry<P> geometry);
 }

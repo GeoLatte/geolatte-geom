@@ -26,7 +26,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class Point<P extends Position<P>> extends Geometry<P> implements Simple {
+public class Point<P extends Position> extends Geometry<P> implements Simple {
 
     public Point(CoordinateReferenceSystem<P> crs) {
         super(crs);
@@ -36,8 +36,8 @@ public class Point<P extends Position<P>> extends Geometry<P> implements Simple 
         super(sequence);
     }
 
-    public Point(P position) {
-        this(new PackedPositionSequence<P>(position.getCoordinateReferenceSystem(), position.coords));
+    public Point(P position, CoordinateReferenceSystem<P> crs) {
+        this(new PackedPositionSequence<>(crs, position.coords));
     }
 
     public Point(Point<P> point) {

@@ -17,36 +17,27 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */
-abstract public class Position<P extends Position<P>> {
+abstract public class Position{
 
-    protected final CoordinateReferenceSystem<P> crs;
     protected final double[] coords;
 
-    public Position(CoordinateReferenceSystem<P> crs, double... coords) {
-        if (coords.length != 0 && crs.getCoordinateDimension() != coords.length) {
-            throw new IllegalArgumentException("Coordinate dimension doesn't correspond to array length.");
-        }
-        this.crs = crs;
+    public Position(double... coords) {
         if (coords.length == 0) {
             this.coords = new double[0];
             //Arrays.fill(this.coords, Double.NaN);
         } else {
-            double[] c = new double[crs.getCoordinateDimension()];
+            double[] c = new double[getCoordinateDimension()];
             System.arraycopy(coords, 0, c, 0, coords.length);
             this.coords = c;
         }
-    }
-
-    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return this.crs;
     }
 
     public double[] toArray(double[] dest) {
         if (isEmpty()) {
             return new double[0];
         }
-        if (dest == null || dest.length < this.crs.getCoordinateDimension()) {
-            dest = new double[crs.getCoordinateDimension()];
+        if (dest == null) {
+            dest = new double[getCoordinateDimension()];
         }
         System.arraycopy(this.coords, 0, dest, 0, this.coords.length);
         return dest;
@@ -76,11 +67,13 @@ abstract public class Position<P extends Position<P>> {
      * @throws IllegalArgumentException if the specified axis is not present in the {@code CoordinateReferenceSystem}
      *                                  of this instance
      */
-    public double getCoordinate(CoordinateSystemAxis axis) {
-        int idx = this.crs.getAxisIndex(axis);
+    public double getCoordinate(CoordinateSystemAxis axis, CoordinateReferenceSystem<?> crs) {
+        int idx = crs.getAxisIndex(axis);
         if (idx == -1) throw new IllegalArgumentException("Not an axis of this coordinate reference system.");
         return crs.getNormalizedOrder().normalizedToCrsDefined(coords)[idx];
     }
+
+    abstract public int getCoordinateDimension();
 
     @Override
     public boolean equals(Object o) {
@@ -90,16 +83,12 @@ abstract public class Position<P extends Position<P>> {
         Position position = (Position) o;
 
         if (!Arrays.equals(coords, position.toArray(null))) return false;
-        if (!crs.equals(position.getCoordinateReferenceSystem())) return false;
-
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = crs.hashCode();
-        result = 31 * result + Arrays.hashCode(coords);
-        return result;
+        return Arrays.hashCode(coords);
     }
 
     @Override

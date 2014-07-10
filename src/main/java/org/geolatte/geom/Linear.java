@@ -27,7 +27,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/27/14
  */
-public interface Linear<P extends Position<P>> {
+public interface Linear<P extends Position> {
 
     public  P getStartPosition();
 

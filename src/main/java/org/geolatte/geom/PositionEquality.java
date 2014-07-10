@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A Test for <code>Position</code> equality.
  *
@@ -40,7 +38,7 @@ public interface PositionEquality {
      * @param second second <code>Point</code>
      * @return true iff the first is equal to the second <code>Positoin</code>.
      */
-    public <P extends Position<P>> boolean equals(P first, P second);
+    public <P extends Position> boolean equals(P first, P second);
 
     /**
      * Tests whether the specified <code>Coordinates</code>s are equal in the base 2D-CoordinateReferenceSystem.
@@ -48,7 +46,7 @@ public interface PositionEquality {
      * @param second second <code>Point</code>
      * @return true iff the first is equal to the second <code>Position</code>.
      */
-    public <P extends Position<P>> boolean equals2D(P first, P second);
+    public <P extends Position> boolean equals2D(P first, P second);
 
 
     /**
@@ -56,13 +54,11 @@ public interface PositionEquality {
      *
      *
      * @param first the first coordinate array
-     * @param firstCrs the <code>CoordinateReferenceSystem</code> for the first coordinate array
      * @param second the second coordinate array
-     * @param secondCrs the <code>CoordinateReferenceSystem</code> for the second coordinate array
      * @return true iff the <code>coordinates</code>s are equal
      * @throws IllegalArgumentException when a NULL-argument is passed, or a coordinate array is
      * passed that is smaller than the coordinate dimensions of its corresponding Position Reference System.
      */
-    public <P extends Position<P>> boolean equals(double[] first, CoordinateReferenceSystem<P> firstCrs, double[] second, CoordinateReferenceSystem<P> secondCrs);
+    public <P extends Position> boolean equals(double[] first, double[] second);
 
 }

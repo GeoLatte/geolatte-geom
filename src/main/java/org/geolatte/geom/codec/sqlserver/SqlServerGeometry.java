@@ -119,7 +119,7 @@ public class SqlServerGeometry {
 		return result;
 	}
 
-	<P extends Position<P>> void copyCoordinate(int index, double[] coords, CoordinateReferenceSystem<P> crs) {
+	<P extends Position> void copyCoordinate(int index, double[] coords, CoordinateReferenceSystem<P> crs) {
 		coords[0] = points[2 * index];
 		coords[1] = points[2 * index + 1];
         int idx = 2;
@@ -216,18 +216,19 @@ public class SqlServerGeometry {
 		return shapes[index];
 	}
 
-	void setCoordinate(int index, PositionSequence<?> coordinate) {
-		points[2 * index] = coordinate.getPositionN(index).getCoordinate(0);
-		points[2 * index + 1] = coordinate.getPositionN( index ).getCoordinate(1);
-		if ( hasZValues() ) {
-            CoordinateSystemAxis verticalAxis = coordinate.getCoordinateReferenceSystem().getVerticalAxis();
-            zValues[index] = coordinate.getPositionN( index ).getCoordinate(verticalAxis);
-		}
-		if ( hasMValues() ) {
-            CoordinateSystemAxis mAxis = coordinate.getCoordinateReferenceSystem().getMeasureAxis();
-			mValues[index] = coordinate.getPositionN( index ).getCoordinate(mAxis);
-		}
-	}
+	void setCoordinate(int index, PositionSequence<?> positions) {
+        CoordinateReferenceSystem<? extends Position> crs = positions.getCoordinateReferenceSystem();
+        points[2 * index] = positions.getPositionN(index).getCoordinate(0);
+        points[2 * index + 1] = positions.getPositionN(index).getCoordinate(1);
+        if (hasZValues()) {
+            CoordinateSystemAxis verticalAxis = crs.getVerticalAxis();
+            zValues[index] = positions.getPositionN(index).getCoordinate(verticalAxis, crs);
+        }
+        if (hasMValues()) {
+            CoordinateSystemAxis mAxis = crs.getMeasureAxis();
+            mValues[index] = positions.getPositionN(index).getCoordinate(mAxis, crs);
+        }
+    }
 
 	boolean isEmpty() {
 		return this.numberOfPoints == 0;

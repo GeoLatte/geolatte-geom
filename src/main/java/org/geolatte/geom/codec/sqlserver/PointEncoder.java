@@ -44,7 +44,7 @@ class PointEncoder extends AbstractEncoder {
 	 * @return
 	 */
 	@Override
-	public <P extends Position<P>, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
+	public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 
 		SqlServerGeometry sqlServerGeom = new SqlServerGeometry();
 		int srid = geom.getSRID();

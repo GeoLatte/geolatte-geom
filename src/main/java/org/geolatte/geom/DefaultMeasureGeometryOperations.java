@@ -39,15 +39,15 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
 
     @Override
-    public <P extends Projected<P> & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
+    public <P extends P2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
         return locateBetween(geometry, mValue, mValue);
     }
 
     @Override
-    public <P extends Projected<P> & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
+    public <P extends P2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
         if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
-        if (Projected.class.isAssignableFrom(geometry.getPositionClass()) &&
+        if (P2D.class.isAssignableFrom(geometry.getPositionClass()) &&
                 Measured.class.isAssignableFrom(geometry.getPositionClass())) {
             MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
             geometry.accept((GeometryVisitor<P>) visitor);
@@ -60,7 +60,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends Projected<P> & Measured> double measureAt(final Geometry<P> geometry, final P pos) {
+    public <P extends P2D & Measured> double measureAt(final Geometry<P> geometry, final P pos) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
         if (geometry.isEmpty()) return Double.NaN;
         //TODO -- tolerance parameter into API
@@ -73,7 +73,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends Projected<P>, M extends Projected<M> & Measured> Geometry<M> measureOnLength(
+    public <P extends P2D, M extends P2D & Measured> Geometry<M> measureOnLength(
             final Geometry<P> geometry, final Class<M> positionTypeMarker, final boolean keepBeginMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
         if (positionTypeMarker == null)
@@ -97,7 +97,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends Position<P> & Measured> double minimumMeasure(Geometry<P> geometry) {
+    public <P extends Position & Measured> double minimumMeasure(Geometry<P> geometry) {
         return createGetExtrMeasureOp(geometry, true).execute();
     }
 
@@ -105,11 +105,11 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends Position<P> & Measured> double maximumMeasure(Geometry<P> geometry) {
+    public <P extends Position & Measured> double maximumMeasure(Geometry<P> geometry) {
         return createGetExtrMeasureOp(geometry, false).execute();
     }
 
-    private <P extends Position<P> & Measured> GeometryOperation<Double> createGetExtrMeasureOp(final Geometry<P> geometry, final boolean min) {
+    private <P extends Position & Measured> GeometryOperation<Double> createGetExtrMeasureOp(final Geometry<P> geometry, final boolean min) {
         return new GeometryOperation<Double>() {
 
             @Override
@@ -128,7 +128,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         };
     }
 
-    private static class InterpolatingVisitor<P extends Projected<P> & Measured> implements GeometryVisitor<P> {
+    private static class InterpolatingVisitor<P extends P2D & Measured> implements GeometryVisitor<P> {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
 
@@ -178,7 +178,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     }
 
-    private static class FindExtremumMeasureVisitor<P extends Position<P> & Measured> implements PositionVisitor<P> {
+    private static class FindExtremumMeasureVisitor<P extends Position & Measured> implements PositionVisitor<P> {
 
         final boolean findMinimum;
         double extremum;
@@ -201,7 +201,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     }
 
-    private static class OnLengthMeasureOp<M extends Projected<M> & Measured> implements GeometryOperation<Geometry<M>> {
+    private static class OnLengthMeasureOp<M extends P2D & Measured> implements GeometryOperation<Geometry<M>> {
         private double length = 0;
 
         final private Geometry<?> geometry;
@@ -236,7 +236,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         //TODO -- the measure() functions can probably be simplified
 
         @SuppressWarnings("unchecked")
-        private <T extends Position<T> & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
+        private <T extends P2D & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
             LineString<T>[] measuredParts = (LineString<T>[]) new LineString[geometry.getNumGeometries()];
             for (int part = 0; part < geometry.getNumGeometries(); part++) {
                 LineString<T> lineString = geometry.getGeometryN(part);
@@ -245,7 +245,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             return new MultiLineString<>(measuredParts);
         }
 
-        private <T extends Position<T> & Measured> LineString<T> measure(LineString<T> geometry) {
+        private <T extends P2D & Measured> LineString<T> measure(LineString<T> geometry) {
             CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
             PositionSequence originalPoints = geometry.getPositions();
             PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),

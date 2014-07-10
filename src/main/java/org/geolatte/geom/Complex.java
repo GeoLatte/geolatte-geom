@@ -25,7 +25,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/16/14
  */
-public interface Complex<P extends Position<P>, G extends Geometry<P>> extends Iterable<G> {
+public interface Complex<P extends Position, G extends Geometry<P>> extends Iterable<G> {
 
     public int getNumGeometries();
 

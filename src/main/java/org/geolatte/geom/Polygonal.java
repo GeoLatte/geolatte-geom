@@ -27,6 +27,6 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/27/14
  */
-public interface Polygonal<P extends Position<P>> {
+public interface Polygonal<P extends Position> {
 
 }

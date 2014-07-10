@@ -31,7 +31,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 10/19/12
  */
-public class CountingPositionSequenceBuilder<P extends Position<P>> implements PositionSequenceBuilder<P> {
+public class CountingPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
     final private PositionSequenceBuilder<P> delegate;
     private int num = 0;

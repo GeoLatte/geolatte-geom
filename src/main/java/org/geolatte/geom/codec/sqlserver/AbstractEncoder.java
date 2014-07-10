@@ -31,7 +31,7 @@ import java.util.List;
 
 abstract class AbstractEncoder implements Encoder {
 
-    public <P extends Position<P>, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
+    public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 		SqlServerGeometry nativeGeom = new SqlServerGeometry();
 		int srid = geom.getSRID();
 		nativeGeom.setSrid( srid < 0 ? 0 : srid );
@@ -88,7 +88,7 @@ abstract class AbstractEncoder implements Encoder {
 		}
 	}
 
-	protected <P extends Position<P>> void setCoordinate(SqlServerGeometry nativeGeom, int idx, PositionSequence<P> coordinate) {
+	protected <P extends Position> void setCoordinate(SqlServerGeometry nativeGeom, int idx, PositionSequence<P> coordinate) {
 		if ( !nativeGeom.hasZValues() && coordinate.getCoordinateReferenceSystem().hasVerticalAxis() )  {
 			nativeGeom.setHasZValues();
 			nativeGeom.allocateZValueArray();

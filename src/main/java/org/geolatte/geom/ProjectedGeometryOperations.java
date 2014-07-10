@@ -38,7 +38,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the <code>Geometry</code> to test for simplicity.
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code> is simple.
      */
-    <P extends Projected<P>> boolean isSimple(final Geometry<P> geometry);
+    <P extends P2D> boolean isSimple(final Geometry<P> geometry);
 
     /**
      * Creates an operation to calculate the boundary of the specified <code>Geometry</code>.
@@ -46,7 +46,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the boundary.
      * @return a <code>GeometryOperation</code> that calculates a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
-    <P extends Projected<P>> Geometry<P> boundary(final Geometry<P> geometry);
+    <P extends P2D> Geometry<P> boundary(final Geometry<P> geometry);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s intersect.
@@ -55,7 +55,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the intersection test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially intersect
      */
-    <P extends Projected<P>> boolean intersects(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> boolean intersects(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s touch.
@@ -64,7 +64,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the touch test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially touch
      */
-    <P extends Projected<P>> boolean touches(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> boolean touches(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s cross.
@@ -73,7 +73,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the cross test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially cross
      */
-    <P extends Projected<P>> boolean crosses(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> boolean crosses(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the first specified <code>Geometry</code> spatially
@@ -83,7 +83,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the containment test
      * @return a <code>GeometryOperation</code> that checks if the first specified <code>Geometry</code> spatially contains the second
      */
-    <P extends Projected<P>> boolean contains(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> boolean contains(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s overlap.
@@ -92,7 +92,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code> operand of the overlap test
      * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially overlap
      */
-    <P extends Projected<P>> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to check if the specified <code>Geometry</code>s are spatially related by testing
@@ -105,7 +105,7 @@ public interface ProjectedGeometryOperations {
      * @param matrix   the intersection pattern matrix
      * @return a <code>GeometryOperation</code> that checks if this instance intersects the specifed other <code>Geometry</code>
      */
-    <P extends Projected<P>> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
+    <P extends P2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
 
 
     /**
@@ -117,7 +117,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the shortest distance between the two specified <code>Geometries</code>
      */
-    <P extends Projected<P>> double distance(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> double distance(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate a <code>Geometry</code> that represents all points whose distance from the specified
@@ -132,7 +132,7 @@ public interface ProjectedGeometryOperations {
      * @return a <code>GeometryOperation</code> that calculates a 2D <code>Geometry</code> representing the
      * buffer of the specified <code>Geometry</code> with the specified distance.
      */
-    <P extends Projected<P>> Geometry<P> buffer(final Geometry<P> geometry, final double distance);
+    <P extends P2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance);
 
     /**
      * Returns an operation to calculate the convex hull of the specified <code>Geometry</code>.
@@ -140,7 +140,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the <code>Geometry</code> for which to calculate the convex hull.
      * @return a <code>GeometryOperation</code> that calculates the convex hull for the specified <code>Geometry</code>.
      */
-    <P extends Projected<P>> Geometry<P> convexHull(final Geometry<P> geometry);
+    <P extends P2D> Geometry<P> convexHull(final Geometry<P> geometry);
 
     /**
      * Returns an operation to calculate the point set intersection of the specified <code>Geometry</code>s.
@@ -149,7 +149,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set intersection between the two specified <code>Geometries</code>
      */
-    <P extends Projected<P>> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set union of the specified <code>Geometry</code>s.
@@ -158,7 +158,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set union between the two specified <code>Geometries</code>
      */
-    <P extends Projected<P>> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set difference of the specified <code>Geometry</code>s.
@@ -167,7 +167,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set difference between the two specified <code>Geometries</code>
      */
-    <P extends Projected<P>> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Returns an operation to calculate the point set symmetric difference of the specified <code>Geometry</code>s.
@@ -176,7 +176,7 @@ public interface ProjectedGeometryOperations {
      * @param other    the second <code>Geometry</code>
      * @return a <code>GeometryOperation</code> that calculates the point set symmetric difference between the two specified <code>Geometries</code>
      */
-    <P extends Projected<P>> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other);
+    <P extends P2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Creates an operation to determine the length of the specified {@code Geometry}.
@@ -184,7 +184,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the Geometry
      * @return the length of the specified Geometry
      */
-    <P extends Projected<P>, G extends Geometry<P> & Linear<P>> double length(final G geometry);
+    <P extends P2D, G extends Geometry<P> & Linear<P>> double length(final G geometry);
 
     /**
      * Creates an operation to determine the area of the specified {@code Geometry}.
@@ -192,7 +192,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the Geometry
      * @return the area of the specified Geometry
      */
-    <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
+    <P extends P2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
 
     /**
      * Creates an operation that calculates a centroid for the specified {@code Geometry}.
@@ -201,7 +201,7 @@ public interface ProjectedGeometryOperations {
      * @param <G>      Polygonal  Geometry
      * @return the centroid of the specified Geometry as a {@code Point}
      */
-    <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry);
+    <P extends P2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry);
 
 
 }

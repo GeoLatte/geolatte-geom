@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/4/14
  */
-public class CompoundCoordinateReferenceSystem<T extends Position<T>, B extends Position<B>> extends CoordinateReferenceSystem<T> {
+public class CompoundCoordinateReferenceSystem<T extends Position, B extends Position> extends CoordinateReferenceSystem<T> {
 
     private final CoordinateReferenceSystem<B> base;
 

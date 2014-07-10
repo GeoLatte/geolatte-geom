@@ -40,7 +40,7 @@ class LineStringEncoder extends AbstractEncoder {
 		int figureOffset = figures.size();
         int pointOffset = coordinates.getNumAdded();
         double[] c = new double[coordinates.getCoordinateReferenceSystem().getCoordinateDimension()];
-        for ( Position<?> pos : geom.getPositions() ) {
+        for ( Position pos : geom.getPositions() ) {
 			coordinates.add( pos.toArray(c) );
 		}
 		figures.add( new Figure( FigureAttribute.Stroke, pointOffset ) );

@@ -30,7 +30,7 @@ import java.util.Iterator;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public class LineSegments<P extends Position<P>> implements Iterable<LineSegment<P>> {
+public class LineSegments<P extends Position> implements Iterable<LineSegment<P>> {
 
     private final PositionSequence<P> positions;
 

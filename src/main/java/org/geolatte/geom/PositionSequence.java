@@ -32,7 +32,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public interface PositionSequence<P extends Position<P>> extends Iterable<P> {
+public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     PositionSequence<P> clone();
 

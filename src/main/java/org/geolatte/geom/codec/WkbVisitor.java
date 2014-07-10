@@ -27,7 +27,7 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-class WkbVisitor<P extends Position<P>> implements GeometryVisitor<P> {
+class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
 
     private final ByteBuffer output;

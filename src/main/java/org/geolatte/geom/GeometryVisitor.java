@@ -28,7 +28,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/22/11
  */
-public interface GeometryVisitor<P extends Position<P>> {
+public interface GeometryVisitor<P extends Position> {
 
     /**
      * Visits a <code>Point</code>

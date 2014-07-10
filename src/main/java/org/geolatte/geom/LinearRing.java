@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
  */
-public class LinearRing<P extends Position<P>> extends LineString<P> {
+public class LinearRing<P extends Position> extends LineString<P> {
 
     protected LinearRing(LineString<P> lineString) {
         super(lineString);

@@ -1,17 +1,15 @@
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A marker interface for Geocentric {@code Position}s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/6/14
  */
-public abstract class Geocentric<G extends Geocentric<G>> extends Position<G> {
+public abstract class Geocentric extends Position {
 
-    public Geocentric(CoordinateReferenceSystem<G> crs, double... coords) {
-        super(crs, coords);
+    public Geocentric(double x, double y, double z) {
+        super(x,y,z);
     }
 
     public double getX() {

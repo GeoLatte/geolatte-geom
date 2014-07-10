@@ -51,7 +51,7 @@ public interface WktDecoder {
      * @return the decoded {@code Geometry}
      * @throws WktDecodeException when the String is an invalid or unsupported WKT representation
      */
-    <P extends Position<P>> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs);
+    <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs);
 
 
 

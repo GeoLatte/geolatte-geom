@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentifiable {
+public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiable {
 
     private final static Map<Class<? extends Position>, Class<? extends Measured>> measuredVariants =
             new HashMap<Class<? extends Position>, Class<? extends Measured>>();
@@ -56,19 +56,19 @@ public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentif
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Position<T>, M extends Position<M> & Measured> Class<M> getMeasuredVariant(Class<T> positionTypeClass) {
+    public static <T extends Position, M extends Position & Measured> Class<M> getMeasuredVariant(Class<T> positionTypeClass) {
         if (Measured.class.isAssignableFrom(positionTypeClass)) return (Class<M>) positionTypeClass;
         return (Class<M>) measuredVariants.get(positionTypeClass);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Position<T>, V extends Position<V> & Vertical> Class<V> getVerticalVariant(Class<T> positionTypeClass) {
+    public static <T extends Position, V extends Position & Vertical> Class<V> getVerticalVariant(Class<T> positionTypeClass) {
         if (Vertical.class.isAssignableFrom(positionTypeClass)) return (Class<V>) positionTypeClass;
         return (Class<V>) verticalVariants.get(positionTypeClass);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Position<T>, M extends Position<M> & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
+    public static <T extends Position, M extends Position & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
             CoordinateReferenceSystem<T> crs, CoordinateSystemAxis measureAxis) {
 
         if (crs.hasMeasureAxis()) return (CoordinateReferenceSystem<M>) crs;
@@ -77,13 +77,13 @@ public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentif
         return (CoordinateReferenceSystem<M>) crs.addAxes(crs.getName() + "_M", (Class<M>) measuredClass, measureAxis);
     }
 
-    public static <T extends Position<T>, M extends Position<M> & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
+    public static <T extends Position, M extends Position & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
             CoordinateReferenceSystem<T> crs) {
         return getMeasuredVariant(crs, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Position<T>, V extends Position<V> & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
+    public static <T extends Position, V extends Position & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
             CoordinateReferenceSystem<T> crs, CoordinateSystemAxis verticalAxis) {
 
         if (crs.hasVerticalAxis()) return (CoordinateReferenceSystem<V>) crs;
@@ -95,7 +95,7 @@ public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentif
         return (CoordinateReferenceSystem<V>) crs.addAxes(crs.getName() + "_Z", (Class<V>) verticalClass, verticalAxis);
     }
 
-    public static <T extends Position<T>, V extends Position<V> & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
+    public static <T extends Position, V extends Position & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
             CoordinateReferenceSystem<T> crs) {
         return getVerticalVariant(crs, new CoordinateSystemAxis("V", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
     }
@@ -243,7 +243,7 @@ public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentif
      * @return
      */
     //TODO -- remove this with addMeasure, addVertical axes + use reflection to derive appropriate targetPositionType
-    public <Q extends Position<Q>> CompoundCoordinateReferenceSystem<Q, P> addAxes(String name, Class<Q> targetPositionType, CoordinateSystemAxis... axes) {
+    public <Q extends Position> CompoundCoordinateReferenceSystem<Q, P> addAxes(String name, Class<Q> targetPositionType, CoordinateSystemAxis... axes) {
         boolean hasMeasure = false;
         boolean hasVert = false;
 
@@ -282,12 +282,12 @@ public class CoordinateReferenceSystem<P extends Position<P>> extends CrsIdentif
         return new CompoundCoordinateReferenceSystem<Q, P>(name, this, targetPositionType, axes);
     }
 
-    public <M extends Position<M> & Measured> CompoundCoordinateReferenceSystem<M, P> addMeasureAxis(Unit unit) {
+    public <M extends Position & Measured> CompoundCoordinateReferenceSystem<M, P> addMeasureAxis(Unit unit) {
         Class<M> targetPType = CoordinateReferenceSystem.getMeasuredVariant(getPositionClass());
         return addAxes(getName() + " [+M]", targetPType, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, unit));
     }
 
-    public <V extends Position<V> & Vertical> CompoundCoordinateReferenceSystem<V, P> addVerticalAxis(Unit unit) {
+    public <V extends Position & Vertical> CompoundCoordinateReferenceSystem<V, P> addVerticalAxis(Unit unit) {
         Class<V> targetPType = CoordinateReferenceSystem.getVerticalVariant(getPositionClass());
         return addAxes(getName() + " [+Z]", targetPType, new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.UP, unit));
     }

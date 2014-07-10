@@ -35,7 +35,7 @@ import java.util.Iterator;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class GeometryCollection<P extends Position<P>, G extends Geometry<P>> extends Geometry<P> implements Complex<P,G> {
+public class GeometryCollection<P extends Position, G extends Geometry<P>> extends Geometry<P> implements Complex<P,G> {
 
     protected final Geometry<P>[] geometries;
 

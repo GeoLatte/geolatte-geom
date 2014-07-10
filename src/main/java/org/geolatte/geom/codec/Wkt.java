@@ -64,7 +64,7 @@ public class Wkt {
      * @param wkt the WKT string to decode
      * @return The decoded Geometry
      */
-    public static <P extends Position<P>> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs) {
+    public static <P extends Position> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs) {
         WktDecoder decoder = newDecoder();
         return decoder.decode(wkt,crs);
     }
@@ -133,9 +133,7 @@ public class Wkt {
         }
         try {
             return codecClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

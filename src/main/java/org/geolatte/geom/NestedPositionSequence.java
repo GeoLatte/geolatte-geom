@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class NestedPositionSequence<P extends Position<P>> extends AbstractPositionSequence<P> {
+class NestedPositionSequence<P extends Position> extends AbstractPositionSequence<P> {
 
     protected final PositionSequence<P>[] children;
     private final int size;
@@ -41,7 +41,7 @@ class NestedPositionSequence<P extends Position<P>> extends AbstractPositionSequ
         this.size = calculateSize();
     }
 
-    private static <C extends Position<C>> CoordinateReferenceSystem<C> extractCrs(PositionSequence<C>[] children) {
+    private static <C extends Position> CoordinateReferenceSystem<C> extractCrs(PositionSequence<C>[] children) {
 
         if (children == null) {
             throw new IllegalArgumentException("Null or empty children array not allowed.");

@@ -41,8 +41,8 @@ public class PositionSequenceBuilders {
      * @param crs the <code>CoordinateReferenceSystem</code> of the <code>Point</code>s.
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PointSequence</code> containing <code>num</code> <code>Position</code>s.
      */
-    public static <P extends Position<P>> PositionSequenceBuilder<P> fixedSized(int num, CoordinateReferenceSystem<P> crs){
-        return new FixedSizePositionSequenceBuilder<P>(num, crs);
+    public static <P extends Position> PositionSequenceBuilder<P> fixedSized(int num, CoordinateReferenceSystem<P> crs){
+        return new FixedSizePositionSequenceBuilder<>(num, crs);
     }
 
     /**
@@ -51,8 +51,8 @@ public class PositionSequenceBuilders {
      * @param crs the <code>CoordinateReferenceSystem</code> of the <code>Position</code>s.
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PositionSequence</code> for an arbitrary number of <code>Position</code>s.
      */
-    public static <P extends Position<P>> PositionSequenceBuilder<P> variableSized(CoordinateReferenceSystem<P> crs) {
-        return new VariableSizePositionSequenceBuilder<P>(crs);
+    public static <P extends Position> PositionSequenceBuilder<P> variableSized(CoordinateReferenceSystem<P> crs) {
+        return new VariableSizePositionSequenceBuilder<>(crs);
     }
 
 }

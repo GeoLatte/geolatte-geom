@@ -58,7 +58,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
 
     @Override
     @SuppressWarnings("unchecked")
-    public <P extends Position<P>> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> forceCrs) {
+    public <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> forceCrs) {
         if (wkt == null || wkt.isEmpty()) {
             throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
         }
@@ -154,7 +154,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             if (currentToken instanceof WktPointSequenceToken) {
                 PositionSequence<?> positionSequence = ((WktPointSequenceToken) currentToken).getPositions();
                 for (Position p : positionSequence) {
-                    points.add(new Point(p));
+                    points.add(new Point(p, baseCrs));
                 }
                 nextToken();
             }

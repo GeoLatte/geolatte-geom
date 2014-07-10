@@ -36,7 +36,7 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     @Override
-    public  <P extends Position<P>> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
+    public  <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, true));
         if (byteOrder != null) {
             output.setByteOrder(byteOrder);
@@ -46,15 +46,15 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         return output;
     }
 
-    protected <P extends Position<P>> void writeGeometry(Geometry<P> geom, ByteBuffer output) {
+    protected <P extends Position> void writeGeometry(Geometry<P> geom, ByteBuffer output) {
         geom.accept(newWkbVisitor(output, geom));
     }
 
-    protected <P extends Position<P>> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geometry) {
+    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geometry) {
         return new WkbVisitor<P>(output);
     }
 
-    protected <P extends Position<P>>  int calculateSize(Geometry<P> geom, boolean includeSrid) {
+    protected <P extends Position>  int calculateSize(Geometry<P> geom, boolean includeSrid) {
         int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
         if (geom.getSRID() > 0 && includeSrid) {
             size += 4;
@@ -74,14 +74,14 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         return size;
     }
 
-    abstract protected <P extends Position<P>> int sizeEmptyGeometry(Geometry<P> geometry);
+    abstract protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry);
 
-    private <P extends Position<P>> int getPointByteSize(Geometry<P> geom) {
+    private <P extends Position> int getPointByteSize(Geometry<P> geom) {
         return geom.getCoordinateDimension() * ByteBuffer.DOUBLE_SIZE;
     }
 
 
-    private <P extends Position<P>> int getPolygonSize(Polygon<P> geom) {
+    private <P extends Position> int getPolygonSize(Polygon<P> geom) {
         //to hold the number of linear rings
         int size = ByteBuffer.UINT_SIZE;
         //for each linear ring, a UINT holds the number of points
@@ -90,7 +90,7 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         return size;
     }
 
-    private <P extends Position<P>, G extends Geometry<P>> int sizeOfGeometryCollection(GeometryCollection<P,G> collection) {
+    private <P extends Position, G extends Geometry<P>> int sizeOfGeometryCollection(GeometryCollection<P,G> collection) {
         int size = ByteBuffer.UINT_SIZE;
         for (G g : collection) {
             size += calculateSize(g, false);

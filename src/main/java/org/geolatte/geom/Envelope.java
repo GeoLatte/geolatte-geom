@@ -12,8 +12,9 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *         <p/>
  *         <p>An empty Envelope has Double.NaN for min. and max. X and Y coordinates.</p>
  */
-public class Envelope<P extends Position<P>> {
+public class Envelope<P extends Position> {
 
+    private final CoordinateReferenceSystem<P> crs;
     private final P lowerLeft;
     private final P upperRight;
 
@@ -22,6 +23,7 @@ public class Envelope<P extends Position<P>> {
      * Creates an empty Envelop
      */
     public Envelope(CoordinateReferenceSystem<P> crs) {
+        this.crs = crs;
         lowerLeft = Positions.mkPosition(crs);
         upperRight = lowerLeft;
     }
@@ -32,11 +34,12 @@ public class Envelope<P extends Position<P>> {
      * @param upperRight the <code>Point</code> designating the upper-right coordinates
      *                   of the envelope.
      */
-    public Envelope(P lowerLeft, P upperRight) {
+    public Envelope(P lowerLeft, P upperRight, CoordinateReferenceSystem<P> crs) {
         if (lowerLeft == null || upperRight == null)
             throw new IllegalArgumentException("Envelope requires non-null Positions");
         this.lowerLeft = lowerLeft;
         this.upperRight = upperRight;
+        this.crs = crs;
     }
 
 
@@ -66,6 +69,7 @@ public class Envelope<P extends Position<P>> {
             minC2 = h;
         }
 
+        this.crs =  crs;
         this.lowerLeft = Positions.mkPosition(crs, new double[]{minC1, minC2});
         this.upperRight = Positions.mkPosition(crs, new double[]{maxC1, maxC2});
 
@@ -78,7 +82,7 @@ public class Envelope<P extends Position<P>> {
      * @return
      */
     public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return lowerLeft().getCoordinateReferenceSystem();
+        return this.crs;
     }
 
 
@@ -233,8 +237,8 @@ public class Envelope<P extends Position<P>> {
      * @throws IllegalArgumentException when the specified <code>Point</code> doesn't have the same coordinate reference system as this instance.
      */
     public boolean contains(P p) {
-        if (!this.getCoordinateReferenceSystem().equals(p.getCoordinateReferenceSystem()))
-            throw new IllegalArgumentException("Envelopes have different CRS.");
+        if (!p.getClass().equals(this.getCoordinateReferenceSystem().getPositionClass()))
+            throw new IllegalArgumentException("Position and envelope of different types");
         if (isEmpty()) return false;
         return getMinC0() <= p.getCoordinate(0) &&
                 getMaxC0() >= p.getCoordinate(0) &&
@@ -262,17 +266,21 @@ public class Envelope<P extends Position<P>> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Envelope)) return false;
-        Envelope that = (Envelope) o;
-        if (this.isEmpty() && that.isEmpty()) return true;
-        return this.lowerLeft.equals(that.lowerLeft()) &&
-                this.upperRight.equals(that.upperRight());
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Envelope envelope = (Envelope) o;
+
+        if (crs != null ? !crs.equals(envelope.crs) : envelope.crs != null) return false;
+        if (lowerLeft != null ? !lowerLeft.equals(envelope.lowerLeft) : envelope.lowerLeft != null) return false;
+        if (upperRight != null ? !upperRight.equals(envelope.upperRight) : envelope.upperRight != null) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = lowerLeft != null ? lowerLeft.hashCode() : 0;
+        int result = crs != null ? crs.hashCode() : 0;
+        result = 31 * result + (lowerLeft != null ? lowerLeft.hashCode() : 0);
         result = 31 * result + (upperRight != null ? upperRight.hashCode() : 0);
         return result;
     }

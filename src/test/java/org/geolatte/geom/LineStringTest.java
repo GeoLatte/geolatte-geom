@@ -80,13 +80,13 @@ public class LineStringTest {
 
     @Test
     public void testPointN() {
-        Assert.assertEquals(new P2D(crs, 0, 0), linestr2d.getPositionN(0));
-        assertEquals(new P3D(crsZ, 0, 0, 0), linestr3d.getPositionN(0));
-        assertEquals(new P3DM(crsZM, 0, 0, 0, 0), linestr3dm.getPositionN(0));
+        Assert.assertEquals(new P2D(0, 0), linestr2d.getPositionN(0));
+        assertEquals(new P3D(0, 0, 0), linestr3d.getPositionN(0));
+        assertEquals(new P3DM(0, 0, 0, 0), linestr3dm.getPositionN(0));
 
-        assertEquals(new P2D(crs, 2, -2), linestr2d.getPositionN(2));
-        assertEquals(new P3D(crsZ, 2, -2, 3), linestr3d.getPositionN(2));
-        assertEquals(new P3DM(crsZM, 2, -2, 3, 4), linestr3dm.getPositionN(2));
+        assertEquals(new P2D(2, -2), linestr2d.getPositionN(2));
+        assertEquals(new P3D(2, -2, 3), linestr3d.getPositionN(2));
+        assertEquals(new P3DM(2, -2, 3, 4), linestr3dm.getPositionN(2));
 
         try {
             linestr3dm.getPositionN(3);
@@ -98,9 +98,9 @@ public class LineStringTest {
 
     @Test
     public void testStartPoint() {
-        assertEquals(new P2D(crs, 0, 0), linestr2d.getStartPosition());
-        assertEquals(new P3D(crsZ, 0, 0, 0), linestr3d.getStartPosition());
-        assertEquals(new P3DM(crsZM, 0, 0, 0, 0), linestr3dm.getStartPosition());
+        assertEquals(new P2D(0, 0), linestr2d.getStartPosition());
+        assertEquals(new P3D(0, 0, 0), linestr3d.getStartPosition());
+        assertEquals(new P3DM(0, 0, 0, 0), linestr3dm.getStartPosition());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -110,9 +110,9 @@ public class LineStringTest {
 
     @Test
     public void testEndPoint() {
-        assertEquals(new P2D(crs, 2, -2), linestr2d.getEndPosition());
-        assertEquals(new P3D(crsZ, 2, -2, 3), linestr3d.getEndPosition());
-        assertEquals(new P3DM(crsZM, 2, -2, 3, 4), linestr3dm.getEndPosition());
+        assertEquals(new P2D(2, -2), linestr2d.getEndPosition());
+        assertEquals(new P3D(2, -2, 3), linestr3d.getEndPosition());
+        assertEquals(new P3DM(2, -2, 3, 4), linestr3dm.getEndPosition());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)

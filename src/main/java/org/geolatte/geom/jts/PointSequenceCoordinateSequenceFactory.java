@@ -60,7 +60,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     @SuppressWarnings("unchecked")
-    public <P extends Position<P>> PositionSequence<P> toPositionSequence(CoordinateSequence cs, CoordinateReferenceSystem<P> crs) {
+    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, CoordinateReferenceSystem<P> crs) {
         if (cs instanceof PositionSequence &&
                 ((PositionSequence) cs).getCoordinateReferenceSystem().equals(crs)) {
             return (PositionSequence<P>) cs;
@@ -99,7 +99,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         }
     }
 
-    private <P extends Position<P>> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateReferenceSystem<P> crs) {
+    private <P extends Position> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateReferenceSystem<P> crs) {
         PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(coordinates.length, crs);
         double[] ordinates = new double[crs.getCoordinateDimension()];
         for (Coordinate co : coordinates) {

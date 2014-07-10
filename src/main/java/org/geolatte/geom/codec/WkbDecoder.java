@@ -56,5 +56,5 @@ public interface WkbDecoder {
      * @return the represented <code>Geometry</code>
      * @throws WkbDecodeException if the specified ByteBuffer is an illegal or unsupported WKB representation
      */
-    <P extends Position<P>> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs);
+    <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs);
 }

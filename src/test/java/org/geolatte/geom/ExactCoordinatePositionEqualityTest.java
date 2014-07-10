@@ -40,18 +40,18 @@ public class ExactCoordinatePositionEqualityTest {
     CoordinateReferenceSystem<G3D> WGS84_Z = WGS84.addVerticalAxis(LengthUnit.METER);
     CoordinateReferenceSystem<G3DM> WGS84_ZM = WGS84_Z.addMeasureAxis(LengthUnit.METER);
 
-    G3DM pos1 = new G3DM(WGS84_ZM, 1d, 2d, 3d, 4d);
-    G2D pos1_2d = new G2D(WGS84, 1, 2);
-    G3DM pos2 = new G3DM(WGS84_ZM, 1, 2, 3, 4);
-    G3DM pos3 = new G3DM(WGS84_ZM, 4, 3, 2, 1);
-    G3DM pos4 = new G3DM(WGS84_ZM, 1, 2, 4, 3);
-    G3DM pos5 = new G3DM(WGS84_ZM, 1, 2, 3, 5);
-    G3DM pos6 = new G3DM(WGS84_ZM, 1, 2, 3, 5);
+    G3DM pos1 = new G3DM(1d, 2d, 3d, 4d);
+    G2D pos1_2d = new G2D(1, 2);
+    G3DM pos2 = new G3DM(1, 2, 3, 4);
+    G3DM pos3 = new G3DM(4, 3, 2, 1);
+    G3DM pos4 = new G3DM(1, 2, 4, 3);
+    G3DM pos5 = new G3DM(1, 2, 3, 5);
+    G3DM pos6 = new G3DM(1, 2, 3, 5);
 
 
     @Test
     public void testNullPositionsAreNotEqualUnlessBothNull() {
-        assertTrue(eq.equals(null, null));
+        assertTrue(eq.equals((P2D)null, null));
         assertFalse(eq.equals(pos1, null));
         assertFalse(eq.equals(null, pos1));
 
@@ -59,8 +59,8 @@ public class ExactCoordinatePositionEqualityTest {
 
     @Test
     public void testEmptyPositionAlwaysEqual() {
-        G2D empty1 = new G2D(WGS84);
-        G2D empty2 = new G2D(WGS84);
+        G2D empty1 = new G2D();
+        G2D empty2 = new G2D();
         assertTrue(eq.equals(empty1, empty2));
         assertFalse(eq.equals(empty1, pos1_2d));
     }

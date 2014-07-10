@@ -26,7 +26,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public class LineSegment<P extends Position<P>> {
+public class LineSegment<P extends Position> {
 
 
     private final P p0;

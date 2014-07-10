@@ -44,7 +44,7 @@ public class Vector {
      * @return an array of length 2, with first element being the squared distance of Point y to the linesegment,
      * and second element the projection factor
      */
-    public static <P extends Projected<P>> double[] pointToSegment2D(P p0, P p1, P y) {
+    public static <P extends P2D> double[] pointToSegment2D(P p0, P p1, P y) {
         //for algorithm, see "Geometric Tools for Computer Graphics", Ch. 6.
         P d = Vector.substract(p1, p0);
         P ymp0 = Vector.substract(y, p0);
@@ -67,7 +67,7 @@ public class Vector {
      * @param p1 second operand
      * @return the dot-product of p0 and p1
      */
-    public static <P extends Projected<P>> double dot(P p0, P p1) {
+    public static <P extends P2D> double dot(P p0, P p1) {
         return dot(p0, p1, false);
     }
 
@@ -82,7 +82,7 @@ public class Vector {
      * @param limit2D if true, the dot-product will be in 2D.
      * @return the dot-product of p0 and p1.
      */
-    public static <P extends Projected> double dot(P p0, P p1, boolean limit2D) {
+    public static <P extends P2D> double dot(P p0, P p1, boolean limit2D) {
         if (p0.isEmpty() || p1.isEmpty()) return Double.NaN;
         if (limit2D || !(p0 instanceof Vertical) || !(p1 instanceof Vertical)) {
             return p0.getX() * p1.getX() + p0.getY() * p1.getY();
@@ -102,13 +102,13 @@ public class Vector {
      * @param p1 second operand
      * @returns the sum of p0 and p1.
      */
-    public static <P extends Projected<P>> P add(P p0, P p1) {
-        int dim = p0.getCoordinateReferenceSystem().getCoordinateDimension();
+    public static <P extends P2D> P add(P p0, P p1) {
+        int dim = p0.getCoordinateDimension();
         double[] result = new double[dim];
         for (int i = 0; i < dim; i++) {
             result[i] = p0.getCoordinate(i) + p1.getCoordinate(i);
         }
-        return Positions.mkPosition(p0.getCoordinateReferenceSystem(), result);
+        return (P)Positions.mkPosition(p0.getClass(), result);
     }
 
     /**
@@ -120,13 +120,13 @@ public class Vector {
      * @param p1 second operand
      * @returns the Point x = p0 - p1.
      */
-    public static <P extends Projected<P>> P substract(P p0, P p1) {
-        int dim = p0.getCoordinateReferenceSystem().getCoordinateDimension();
+    public static <P extends P2D> P substract(P p0, P p1) {
+        int dim = p0.getCoordinateDimension();
         double[] result = new double[dim];
         for (int i = 0; i < dim; i++) {
             result[i] = p0.getCoordinate(i) - p1.getCoordinate(i);
         }
-        return Positions.mkPosition(p0.getCoordinateReferenceSystem(), result);
+        return (P)Positions.mkPosition(p0.getClass(), result);
     }
 
     /**
@@ -137,13 +137,13 @@ public class Vector {
      * @param p a vector represented by a point.
      * @return the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
      */
-    public static <P extends Projected<P>> P perp(P p) {
+    public static <P extends P2D> P perp(P p) {
         if (p == null || p.isEmpty()) return p;
         double[] crds = p.toArray(null);
         double h = crds[0];
         crds[0] = -crds[1];
         crds[1] = h;
-        return Positions.mkPosition(p.getCoordinateReferenceSystem(), crds);
+        return (P) Positions.mkPosition(p.getClass(), crds);
     }
 
 
@@ -159,7 +159,7 @@ public class Vector {
      * @param p1 second operand
      * @return the Perp dot of p0 and p1.
      */
-    public static <P extends Projected<P>> double perpDot(P p0, P p1) {
+    public static <P extends P2D> double perpDot(P p0, P p1) {
         if (p0 == null || p1 == null || p0.isEmpty() | p1.isEmpty()) {
             throw new IllegalArgumentException("Null or empty Point passed.");
         }

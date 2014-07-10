@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class LineString<P extends Position<P>> extends Geometry<P> implements Linear<P>, Simple {
+public class LineString<P extends Position> extends Geometry<P> implements Linear<P>, Simple {
 
     public LineString(CoordinateReferenceSystem<P> crs) {
         super(crs);

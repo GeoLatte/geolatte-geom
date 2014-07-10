@@ -38,7 +38,7 @@ import org.geolatte.geom.jts.JTS;
  */
 public class JTSGeometryOperations implements ProjectedGeometryOperations {
 
-    private <P extends Projected<P>> boolean envelopeIntersect(Geometry<P> geometry1, Geometry<P> geometry2) {
+    private <P extends P2D> boolean envelopeIntersect(Geometry<P> geometry1, Geometry<P> geometry2) {
         return (geometry1.getEnvelope().intersects(geometry2.getEnvelope()));
     }
 
@@ -48,7 +48,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
      *
      * @param geom
      */
-    private <P extends Projected<P>> void checkNotGeometryCollection(Geometry<P> geom) {
+    private <P extends P2D> void checkNotGeometryCollection(Geometry<P> geom) {
         if (GeometryCollection.class.equals(geom.getClass())) {
             throw new IllegalArgumentException("GeometryCollection is not allowed");
         }
@@ -61,19 +61,19 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean isSimple(final Geometry<P> geometry) {
+    public <P extends P2D> boolean isSimple(final Geometry<P> geometry) {
         return new IsSimpleOp(JTS.to(geometry)).isSimple();
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> boundary(final Geometry<P> geometry) {
+    public <P extends P2D> Geometry<P> boundary(final Geometry<P> geometry) {
         final BoundaryOp boundaryOp = new BoundaryOp(JTS.to(geometry));
         final CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
         return JTS.from(boundaryOp.getBoundary(), crs);
     }
 
     @Override
-    public <P extends Projected<P>> boolean intersects(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> boolean intersects(final Geometry<P> geometry, final Geometry<P> other) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
@@ -83,7 +83,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean touches(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> boolean touches(final Geometry<P> geometry, final Geometry<P> other) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
@@ -93,7 +93,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean crosses(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> boolean crosses(final Geometry<P> geometry, final Geometry<P> other) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
@@ -102,7 +102,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean contains(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> boolean contains(final Geometry<P> geometry, final Geometry<P> other) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
@@ -111,7 +111,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
@@ -120,7 +120,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix) {
+    public <P extends P2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);
         final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
@@ -129,26 +129,26 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
 
 
     @Override
-    public <P extends Projected<P>> double distance(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> double distance(final Geometry<P> geometry, final Geometry<P> other) {
         final DistanceOp op = new DistanceOp(JTS.to(geometry), JTS.to(other));
         return op.distance();
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
+    public <P extends P2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
         final BufferOp op = new BufferOp(JTS.to(geometry));
         return JTS.from(op.getResultGeometry(distance), geometry.getCoordinateReferenceSystem());
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> convexHull(final Geometry<P> geometry) {
+    public <P extends P2D> Geometry<P> convexHull(final Geometry<P> geometry) {
         final ConvexHull convexHull = new ConvexHull(JTS.to(geometry));
         return JTS.from(convexHull.getConvexHull(), geometry.getCoordinateReferenceSystem());
 
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other) {
         checkCompatibleCRS(geometry, other);
         if (geometry.isEmpty() || other.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
         checkNotGeometryCollection(geometry);
@@ -158,7 +158,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other) {
         checkCompatibleCRS(geometry, other);
         if (geometry.isEmpty()) return other;
         if (other.isEmpty()) return geometry;
@@ -170,7 +170,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
+    public <P extends P2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
         checkCompatibleCRS(geometry, other);
         if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
         if (other.isEmpty()) return geometry;
@@ -182,7 +182,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public  <P extends Projected<P>> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other) {
+    public  <P extends P2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other) {
                 checkCompatibleCRS(geometry, other);
                 if (geometry.isEmpty()) return other;
                 if (other.isEmpty()) return geometry;
@@ -193,20 +193,20 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
-    public <P extends Projected<P>, G extends Geometry<P> & Linear<P>> double length(final G geometry) {
+    public <P extends P2D, G extends Geometry<P> & Linear<P>> double length(final G geometry) {
                 return JTS.to(geometry).getLength();
 
     }
 
     @Override
-    public  <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> double area(final G geometry) {
+    public  <P extends P2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry) {
                 return JTS.to(geometry).getArea();
 
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public  <P extends Projected<P>, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {
+    public  <P extends P2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {
                 return (Point<P>) JTS.from(JTS.to(geometry).getCentroid());
 
     }

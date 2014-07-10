@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class FixedSizePositionSequenceBuilder<P extends Position<P>> extends AbstractPositionSequenceBuilder<P> {
+class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPositionSequenceBuilder<P> {
 
     private int index = 0;
     private final double[] coordinates;

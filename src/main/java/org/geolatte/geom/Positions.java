@@ -22,7 +22,6 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.NormalizedOrder;
 
 import java.util.Arrays;
 
@@ -41,62 +40,50 @@ public class Positions {
      * @param coordinates the coordinates of the position
      * @return the {@code Position} with the specified coordinates.
      */
-    private static <P extends Position<P>> Position<?> make(CoordinateReferenceSystem<P> crs, double... coordinates) {
-        if (crs.getPositionClass() == P2D.class) {
-            return coordinates.length == 0 ?
-                    new P2D(cast(crs, P2D.class)) :
-                    new P2D(cast(crs, P2D.class), coordinates[0], coordinates[1]);
-        } else if (crs.getPositionClass() == P3D.class) {
-            return coordinates.length == 0 ?
-                    new P3D(cast(crs, P3D.class)) :
-                    new P3D(cast(crs, P3D.class), coordinates[0], coordinates[1], coordinates[2]);
-        } else if (crs.getPositionClass() == P2DM.class) {
-            return coordinates.length == 0 ?
-                    new P2DM(cast(crs, P2DM.class)) :
-                    new P2DM(cast(crs, P2DM.class), coordinates[0], coordinates[1], coordinates[2]);
-        } else if (crs.getPositionClass() == P3DM.class) {
-            return coordinates.length == 0 ?
-                    new P3DM(cast(crs, P3DM.class)) :
-                    new P3DM(cast(crs, P3DM.class), coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
-        } else if (crs.getPositionClass() == G2D.class) {
-            return coordinates.length == 0 ?
-                    new G2D(cast(crs, G2D.class)) :
-                    new G2D(cast(crs, G2D.class), coordinates[0], coordinates[1]);
-        } else if (crs.getPositionClass() == G3D.class) {
-            return coordinates.length == 0 ?
-                    new G3D(cast(crs, G3D.class)) :
-                    new G3D(cast(crs, G3D.class), coordinates[0], coordinates[1], coordinates[2]);
-        } else if (crs.getPositionClass() == G2DM.class) {
-            return coordinates.length == 0 ?
-                    new G2DM(cast(crs, G2DM.class)) :
-                    new G2DM(cast(crs, G2DM.class), coordinates[0], coordinates[1], coordinates[2]);
-        } else if (crs.getPositionClass() == G3DM.class) {
-            return coordinates.length == 0 ?
-                    new G3DM(cast(crs, G3DM.class)) :
-                    new G3DM(cast(crs, G3DM.class), coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> P mkPosition(Class<P> pClass, double... coordinates) {
+        if (pClass == P2D.class) {
+            return (P) (coordinates.length == 0 ?
+                    new P2D() :
+                    new P2D(coordinates[0], coordinates[1]));
+        } else if (pClass == P3D.class) {
+            return (P)(coordinates.length == 0 ?
+                    new P3D() :
+                    new P3D(coordinates[0], coordinates[1], coordinates[2]));
+        } else if (pClass == P2DM.class) {
+            return (P)(coordinates.length == 0 ?
+                    new P2DM() :
+                    new P2DM(coordinates[0], coordinates[1], coordinates[2]));
+        } else if (pClass == P3DM.class) {
+            return (P)(coordinates.length == 0 ?
+                    new P3DM() :
+                    new P3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
+        } else if (pClass == G2D.class) {
+            return (P)( coordinates.length == 0 ?
+                    new G2D() :
+                    new G2D(coordinates[0], coordinates[1]));
+        } else if (pClass == G3D.class) {
+            return (P)(coordinates.length == 0 ?
+                    new G3D() :
+                    new G3D(coordinates[0], coordinates[1], coordinates[2]));
+        } else if (pClass == G2DM.class) {
+            return (P)(coordinates.length == 0 ?
+                    new G2DM() :
+                    new G2DM(coordinates[0], coordinates[1], coordinates[2]));
+        } else if (pClass == G3DM.class) {
+            return (P)(coordinates.length == 0 ?
+                    new G3DM() :
+                    new G3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
         }
         throw new UnsupportedOperationException(String.format("Position type %s unsupported",
-                crs.getPositionClass().getSimpleName()));
-    }
-
-    /**
-     * Factory method for {@code Position}s in the specified coordinate reference system.
-     * <p/>
-     * The order in the coordinates array corresponds to the axes in this
-     * {@code CoordinateReferenceSystem}
-     *
-     * @param coordinates the coordinates of the position
-     * @return the {@code Position} with the specified coordinates.
-     */
-    private static <P extends Position<P>> Position<?> makeCoordinatesInCrsOrder(CoordinateReferenceSystem<P> crs, double... coordinates) {
-        NormalizedOrder no = crs.getNormalizedOrder();
-        return make(crs, no.crsDefinedToNormalized(coordinates));
+                pClass.getSimpleName()));
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position<P>> P mkPosition(CoordinateReferenceSystem<P> crs, double... coordinates) {
-        return (P) make(crs, coordinates);
+    public static <P extends Position> P mkPosition(CoordinateReferenceSystem<P> crs, double... coordinates) {
+        return mkPosition(crs.getPositionClass(), coordinates);
     }
+
 
     /**
      * Copies the source positions to a new PointSequence.
@@ -109,7 +96,7 @@ public class Positions {
      * @param <P>
      * @return
      */
-    public static <Q extends Position<Q>, P extends Position<P>> PositionSequence<P> copy(final PositionSequence<Q> source, final CoordinateReferenceSystem<P> targetCrs) {
+    public static <Q extends Position, P extends Position> PositionSequence<P> copy(final PositionSequence<Q> source, final CoordinateReferenceSystem<P> targetCrs) {
         final PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(source.size(), targetCrs);
         if (source.isEmpty()) return builder.toPositionSequence();
         final double[] coords = new double[Math.max(source.getCoordinateDimension(), targetCrs.getCoordinateDimension())];
@@ -125,7 +112,7 @@ public class Positions {
     }
 
     @SuppressWarnings("unchecked")
-    private static <P extends Position<P>> CoordinateReferenceSystem<P> cast(CoordinateReferenceSystem crs, Class<P> tp) {
+    private static <P extends Position> CoordinateReferenceSystem<P> cast(CoordinateReferenceSystem crs, Class<P> tp) {
         return (CoordinateReferenceSystem<P>) crs;
     }
 }

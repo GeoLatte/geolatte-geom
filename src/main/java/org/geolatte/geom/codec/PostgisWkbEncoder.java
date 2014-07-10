@@ -39,16 +39,16 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
 
     //size of an empty geometry is the size of an emp
     @Override
-    protected <P extends Position<P>> int sizeEmptyGeometry(Geometry<P> geometry) {
+    protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
         return ByteBuffer.UINT_SIZE;
     }
 
 
-    protected <P extends Position<P>> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
+    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
         return new PostgisWkbVisitor<>(output);
     }
 
-    static private class PostgisWkbVisitor<P extends Position<P>> extends WkbVisitor<P> {
+    static private class PostgisWkbVisitor<P extends Position> extends WkbVisitor<P> {
 
         private boolean hasWrittenSrid = false;
 
