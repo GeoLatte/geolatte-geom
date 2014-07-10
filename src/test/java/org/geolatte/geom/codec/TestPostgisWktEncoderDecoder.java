@@ -22,6 +22,9 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
@@ -65,6 +68,91 @@ public class TestPostgisWktEncoderDecoder {
     }
 
     @Test
+    public void testForceCRS() {
+        String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
+        WktDecoder decoder = new PostgisWktDecoder();
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        Geometry<P2D> geometry = decoder.decode(wkt, crs);
+        assertEquals(geometry.getGeometryType(), GeometryType.LINE_STRING);
+        assertEquals(geometry.getCoordinateReferenceSystem(), crs);
+    }
+
+    @Test
+    public void testForceCRSWithMeasuredAxisWith2DWkt() {
+        String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
+        WktDecoder decoder = new PostgisWktDecoder();
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        CoordinateReferenceSystem<P2DM> crsWithM = CoordinateReferenceSystem.getMeasuredVariant(crs);
+
+        Geometry<P2DM> geometry = decoder.decode(wkt, crsWithM);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testForceCRSWithMeasuredAxisWith2DMWkt() {
+        String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
+        WktDecoder decoder = new PostgisWktDecoder();
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        CoordinateReferenceSystem<P2DM> crsWithM = CoordinateReferenceSystem.getMeasuredVariant(crs);
+
+        Geometry<P2DM> geometry = decoder.decode(wkt, crsWithM);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
+    }
+
+
+    @Test(expected = WktDecodeException.class)
+    public void testForceCRSWithMeasuredAxisButTargetBaseCRS() {
+        String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
+        WktDecoder decoder = new PostgisWktDecoder();
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        Geometry<P2D> geometry = decoder.decode(wkt, crs);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crs, geometry.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testFromWktCRS() {
+        String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        Geometry<P2D> geometry = Wkt.fromWkt(wkt, crs);
+        assertEquals(geometry.getGeometryType(), GeometryType.LINE_STRING);
+        assertEquals(geometry.getCoordinateReferenceSystem(), crs);
+    }
+
+    @Test
+    public void testFromWktCRSWithMeasuredAxisWith2DWkt() {
+        String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        CoordinateReferenceSystem<P2DM> crsWithM = CoordinateReferenceSystem.getMeasuredVariant(crs);
+        Geometry<P2DM> geometry = Wkt.fromWkt(wkt, crsWithM);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
+    }
+
+    @Test
+    public void testFromWktCRSWithMeasuredAxisWith2DMWkt() {
+        String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        CoordinateReferenceSystem<P2DM> crsWithM = CoordinateReferenceSystem.getMeasuredVariant(crs);
+
+        Geometry<P2DM> geometry = Wkt.fromWkt(wkt, crsWithM);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
+    }
+
+
+    @Test(expected = WktDecodeException.class)
+    public void testFromWktCRSWithMeasuredAxisButTargetBaseCRS() {
+        String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        Geometry<P2D> geometry = Wkt.fromWkt(wkt, crs);
+        assertEquals(GeometryType.LINE_STRING, geometry.getGeometryType());
+        assertEquals(crs, geometry.getCoordinateReferenceSystem());
+    }
+
+    @Test
     public void test_point_2d() {
         String wkt = testcases.getWKT(PostgisTestCases.POINT_2D);
         Geometry geom = decode(wkt);
@@ -73,9 +161,6 @@ public class TestPostgisWktEncoderDecoder {
         testEncoding(wkt, geom);
     }
 
-    private void testEncoding(String wkt, Geometry geom) {
-        assertEquals(wkt, Wkt.toWkt(geom));
-    }
 
     @Test
     public void test_point_3d() {
@@ -212,9 +297,9 @@ public class TestPostgisWktEncoderDecoder {
     }
 
     @Test
-    public void test_irregular_white_space(){
-        String wkt = testcases.getWKT(PostgisTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1) ;
-        LineString geom = (LineString)decode(wkt);
+    public void test_irregular_white_space() {
+        String wkt = testcases.getWKT(PostgisTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1);
+        LineString geom = (LineString) decode(wkt);
         assertNotNull(geom);
         String normalizedWkt = "LINESTRING(-29.261 66,-71.1074 -20.255)";
         assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_IRREGULAR_WHITE_SPACE_1), geom);
@@ -231,13 +316,13 @@ public class TestPostgisWktEncoderDecoder {
         assertTrue(eq.equals(testcases.getExpected(PostgisTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
     }
 
-    @Test(expected= WktDecodeException.class)
+    @Test(expected = WktDecodeException.class)
     public void test_invalid_point() {
         String wkt = testcases.getWKT(PostgisTestCases.INVALID_POINT);
         decode(wkt);
     }
 
-    @Test(expected= WktDecodeException.class)
+    @Test(expected = WktDecodeException.class)
     public void test_invalid_polygon() {
         String wkt = testcases.getWKT(PostgisTestCases.INVALID_POLYGON);
         decode(wkt);
@@ -253,6 +338,11 @@ public class TestPostgisWktEncoderDecoder {
 
     private Geometry decode(String wkt) {
         return Wkt.fromWkt(wkt);
+    }
+
+
+    private void testEncoding(String wkt, Geometry geom) {
+        assertEquals(wkt, Wkt.toWkt(geom));
     }
 
 

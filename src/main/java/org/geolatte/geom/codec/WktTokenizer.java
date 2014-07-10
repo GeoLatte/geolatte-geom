@@ -39,29 +39,41 @@ class WktTokenizer extends AbstractWktTokenizer {
 
     private boolean isMeasured = false;
     private final CoordinateReferenceSystem<?> baseCRS;
+    private final boolean forceToCRS;
+    private CoordinateReferenceSystem<?> targetCRS;
 
     /**
      * A Tokenizer for the specified WKT string
      *
-     * @param wkt                     the string to tokenize
-     * @param variant                 the list of words to recognize as separate variant
-     * @param baseCRS   the <code>CoordinateReferenceSystem</code> for the points in the WKT representation.
+     * @param wkt     the string to tokenize
+     * @param variant the list of words to recognize as separate variant
+     * @param baseCRS the <code>CoordinateReferenceSystem</code> for the points in the WKT representation.
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS) {
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS, boolean forceToCRS) {
         super(wkt, variant);
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
         if (baseCRS == null) {
             this.baseCRS = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+            this.forceToCRS = false;
         } else {
             this.baseCRS = baseCRS;
+            this.forceToCRS = forceToCRS;
         }
+
+    }
+
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS) {
+        this(wkt, variant, baseCRS, false);
     }
 
     @Override
     WktToken numericToken() {
-        CoordinateReferenceSystem<?> crs = countDimension();
+        CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem();
         int numPoints = countPoints();
+        //Note that the coords array can be larger than the number of coordinates available in the pointsequence
+        // e.g. when a composite CRS is passed in the decode function for a 2D WKT.
+        // this works because fastReadNumber returns 0 when attempting to read beyond a point delimiter
         double[] coords = new double[crs.getCoordinateDimension()];
         PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPoints, crs);
         for (int i = 0; i < numPoints; i++) {
@@ -115,7 +127,7 @@ class WktTokenizer extends AbstractWktTokenizer {
         double expSign = 1;
         if (c == 'e' || c == 'E') {
             c = wkt.charAt(++currentPos);
-            if (c == '-')  {
+            if (c == '-') {
                 expSign = -1;
                 c = wkt.charAt(++currentPos);
             }
@@ -139,14 +151,14 @@ class WktTokenizer extends AbstractWktTokenizer {
         return num;
     }
 
-    /**
-     * Determines the dimension by counting the number of coordinates in the current point,
-     * and taking into account if the tokenizer has already determined that the current Wkt geometery
-     * is measured or not.
-     *
-     * @return
-     */
-    private CoordinateReferenceSystem countDimension() {
+    private CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
+        if (targetCRS == null) {
+            targetCRS = determineTargetCRS();
+        }
+        return targetCRS;
+    }
+
+    private CoordinateReferenceSystem<?> determineTargetCRS() {
         int pos = currentPos;
         int num = 1;
         boolean inNumber = true;
@@ -174,8 +186,11 @@ class WktTokenizer extends AbstractWktTokenizer {
         if (needZ && !compound.hasVerticalAxis()) {
             compound = compound.addVerticalAxis(LengthUnit.METER);
         }
-        if(needM && !compound.hasMeasureAxis()) {
+        if (needM && !compound.hasMeasureAxis()) {
             compound = compound.addMeasureAxis(LengthUnit.METER);
+        }
+        if (forceToCRS && !compound.equals(crs)) {
+            throw new WktDecodeException("WKT inconsistent with specified Coordinate Reference System");
         }
         return compound;
     }
@@ -190,9 +205,6 @@ class WktTokenizer extends AbstractWktTokenizer {
         if (token instanceof WktGeometryToken) {
             this.isMeasured = isMeasured || ((WktGeometryToken) token).isMeasured();
         }
-//        if (token instanceof WktDimensionMarkerToken) {
-//            this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
-//        }
         return token;
     }
 

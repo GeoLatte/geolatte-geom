@@ -22,6 +22,8 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +64,11 @@ public class Wkt {
      * @param wkt the WKT string to decode
      * @return The decoded Geometry
      */
+    public static <P extends Position<P>> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs) {
+        WktDecoder decoder = newDecoder();
+        return decoder.decode(wkt,crs);
+    }
+
     public static Geometry<?> fromWkt(String wkt) {
         WktDecoder decoder = newDecoder();
         return decoder.decode(wkt);

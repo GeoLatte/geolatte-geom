@@ -57,12 +57,13 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <P extends Position<P>> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> forceCrs) {
         if (wkt == null || wkt.isEmpty()) {
             throw new WktDecodeException("Null or empty string cannot be decoded into a geometry");
         }
         prepare(wkt, forceCrs);
-        initializeTokenizer();
+        initializeTokenizer(forceCrs != null);
         return (Geometry<P>)decodeGeometry();
     }
 
@@ -73,24 +74,20 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
      * @param wkt the WKT representation
      */
     private void prepare(String wkt, CoordinateReferenceSystem<?> crs) {
-        if (crs != null) {
-            baseCrs = crs;
-            return;
-        }
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
             int srid = Integer.parseInt(matcher.group(1));
-            baseCrs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+            baseCrs = crs != null? crs : CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
                     CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
             wktString = wkt.substring(matcher.end());
         } else {
-            baseCrs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+            baseCrs = crs != null ? crs : CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
             wktString = wkt;
         }
     }
 
-    private void initializeTokenizer() {
-        setTokenizer(new WktTokenizer(wktString, getWktVariant(), baseCrs));
+    private void initializeTokenizer(boolean forceToCRS) {
+        setTokenizer(new WktTokenizer(wktString, getWktVariant(), baseCrs, forceToCRS));
         nextToken();
     }
 
