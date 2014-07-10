@@ -40,6 +40,8 @@ class MySqlWkbDecoder extends AbstractWkbDecoder {
     protected void prepare(ByteBuffer byteBuffer) {
         byteBuffer.setByteOrder(ByteOrder.NDR);
         int srid = byteBuffer.getInt();
+        // if a CRS is already specified, ignore this value
+        if (getCoordinateReferenceSystem() != null) return;
         CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
                 CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
         setCoordinateReferenceSystem(crs);

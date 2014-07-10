@@ -39,15 +39,15 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
 
     private CoordinateReferenceSystem<?> crs;
 
-    /**
-     * Decodes a Postgis WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
-     *
-     * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
-     * @return The <code>Geometry</code> that is encoded in the WKB.
-     */
+    //if a CRS is specified, is it consistent with the Wkb (in terms of presence of Vertical or Measure axes).
+    private boolean crsValidated;
+
+
     @Override
-    public Geometry<?> decode(ByteBuffer byteBuffer) {
-        this.crs = null;
+    public <P extends Position<P>> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        this.crs = crs;
+        // if a null crs is specified, then no validation is needed.
+        this.crsValidated = (crs == null);
         byteBuffer.rewind();
         try {
             prepare(byteBuffer);
@@ -57,6 +57,11 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         } catch (BufferAccessException e) {
             throw new WkbDecodeException(e);
         }
+    }
+
+    @Override
+    public Geometry<?> decode(ByteBuffer byteBuffer) {
+        return decode(byteBuffer, (CoordinateReferenceSystem<?>) null);
     }
 
     private Geometry<?> decodeGeometry(ByteBuffer byteBuffer) {
@@ -205,13 +210,21 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     }
 
     protected CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
-
         return crs;
     }
 
     protected void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
         this.crs = crs;
     }
+
+    protected boolean isCrsValidated() {
+        return crsValidated;
+    }
+
+    protected void setCrsValidated(boolean crsValidated) {
+        this.crsValidated = crsValidated;
+    }
+
 
     private void alignByteOrder(ByteBuffer byteBuffer) {
         byte orderByte = byteBuffer.get();

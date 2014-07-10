@@ -46,10 +46,20 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
 
     @Override
     protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
-        //don't override a CRS, once set.
-        if (getCoordinateReferenceSystem() != null) return;
+        //don't override a CRS, once set and validated.
+        CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem();
+        if (crs != null && isCrsValidated()) return;
 
-                CoordinateReferenceSystem < ?>crs;
+
+        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
+        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
+
+        // if set, just validate
+        if (crs != null) {
+            validateCrs(crs, hasM, hasZ);
+            return;
+        }
+
         if (hasSrid(typeCode)) {
             int srid = byteBuffer.getInt();
             crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
@@ -58,11 +68,7 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
         } else {
             crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         }
-        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
 
-        //TODO -- this creates a new CRS for each non-2D geometry!!
-        //TODO -- memoize compoundCrs methods
         if (hasZ) {
             crs = crs.addVerticalAxis(LengthUnit.METER);
         }
@@ -70,6 +76,15 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
             crs = crs.addMeasureAxis(LengthUnit.METER);
         }
         setCoordinateReferenceSystem(crs);
+    }
+
+    private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
+        if ( (hasM && !crs.hasMeasureAxis()) ||
+                (hasZ && !crs.hasVerticalAxis())) {
+            throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
+        } else {
+          setCrsValidated(true);
+        }
     }
 
     @Override

@@ -48,7 +48,8 @@ public interface WktDecoder {
      * @param wkt the WKT string to decode
      * @param crs the base coordinate reference system assumed for the wkt
      * @param <P> the Position type for the (base)
-     * @return
+     * @return the decoded {@code Geometry}
+     * @throws WktDecodeException when the String is an invalid or unsupported WKT representation
      */
     <P extends Position<P>> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs);
 
