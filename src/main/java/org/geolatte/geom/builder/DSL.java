@@ -56,8 +56,8 @@ public class DSL {
      * @param y y or northing
      * @return a projected 2D PosToken
      */
-    public static PosToken<P2D> p(double x, double y) {
-        return new PosToken<>(x, y);
+    public static P2D p(double x, double y) {
+        return new P2D(x, y);
     }
 
     /**
@@ -68,8 +68,8 @@ public class DSL {
      * @param z z or altitude
      * @return a projected 3D PosToken
      */
-    public static PosToken<P3D> p(double x, double y, double z) {
-        return new PosToken<>(x, y, z);
+    public static P3D p(double x, double y, double z) {
+        return new P3D(x, y, z);
     }
 
     /**
@@ -80,8 +80,8 @@ public class DSL {
      * @param m measure value
      * @return a projected 2DM PosToken
      */
-    public static PosToken<P2DM> pM(double x, double y, double m) {
-        return new PosToken<>(x, y, m);
+    public static P2DM pM(double x, double y, double m) {
+        return new P2DM(x, y, m);
     }
 
     /**
@@ -93,8 +93,8 @@ public class DSL {
      * @param m measure value
      * @return a projected 3DM PosToken
      */
-    public static PosToken<P3DM> p(double x, double y, double z, double m) {
-        return new PosToken<>(x, y, z, m);
+    public static P3DM p(double x, double y, double z, double m) {
+        return new P3DM(x, y, z, m);
     }
 
     /**
@@ -104,8 +104,8 @@ public class DSL {
      * @param lat latitude
      * @return a geographic 2D PosToken
      */
-    public static PosToken<G2D> g(double lon, double lat) {
-        return new PosToken<>(lon, lat);
+    public static G2D g(double lon, double lat) {
+        return new G2D(lon, lat);
     }
 
     /**
@@ -116,8 +116,8 @@ public class DSL {
      * @param alt altitude
      * @return a geographic 3D PosToken
      */
-    public static PosToken<G3D> g(double lon, double lat, double alt) {
-        return new PosToken<>(lon, lat, alt);
+    public static G3D g(double lon, double lat, double alt) {
+        return new G3D(lon, lat, alt);
     }
 
     /**
@@ -128,8 +128,8 @@ public class DSL {
      * @param m   measure value
      * @return a geographic 2DM PosToken
      */
-    public static PosToken<G2DM> gM(double lon, double lat, double m) {
-        return new PosToken<>(lon, lat, m);
+    public static G2DM gM(double lon, double lat, double m) {
+        return new G2DM(lon, lat, m);
     }
 
     /**
@@ -141,8 +141,8 @@ public class DSL {
      * @param m  measure value
      * @return a geographic 3DM PosToken
      */
-    public static PosToken<G3DM> g(double lon, double lat, double alt, double m) {
-        return new PosToken<>(lon, lat, alt, m);
+    public static G3DM g(double lon, double lat, double alt, double m) {
+        return new G3DM(lon, lat, alt, m);
     }
 
 
@@ -153,32 +153,31 @@ public class DSL {
     }
 */
 
-    public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, PosToken<P> p) {
-        P position = Positions.mkPosition(crs, p.coords);
-        return new Point<>(position, crs);
+    public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
+        return new Point<>(p, crs);
     }
 
-    public static <P extends Position> PointToken<P> point(PosToken<P> position) {
+    public static <P extends Position> PointToken<P> point(P position) {
         return new PointToken<>(position);
     }
 
     @SafeVarargs
-    public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, PosToken<P>... positions) {
+    public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, P... positions) {
         return new LineString<>(toSeq(crs, positions));
     }
 
     @SafeVarargs
-    public static <P extends Position> LineStringToken<P> linestring(PosToken<P>... positions) {
+    public static <P extends Position> LineStringToken<P> linestring(P... positions) {
         return new LineStringToken<>(positions);
     }
 
     @SafeVarargs
-    public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, PosToken<P>... positions) {
+    public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, P... positions) {
         return new LinearRing<>(toSeq(crs, positions));
     }
 
     @SafeVarargs
-    public static <P extends Position> LinearRingToken<P> ring(PosToken<P>... points) {
+    public static <P extends Position> LinearRingToken<P> ring(P... points) {
         return new LinearRingToken<>(points);
     }
 
@@ -307,22 +306,14 @@ public class DSL {
     }
 
     @SafeVarargs
-    static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, PosToken<P>... tokens) {
-        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(tokens.length, crs);
-        for (PosToken t : tokens) {
-            P pos = Positions.mkPosition(crs, t.coords);
+    static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, P... positions) {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, crs);
+        double[] coords = new double[crs.getCoordinateDimension()];
+        for (P t : positions) {
+            P pos = Positions.mkPosition(crs, t.toArray(coords));
             builder.add(pos);
         }
         return builder.toPositionSequence();
-    }
-
-
-    public static class PosToken<P extends Position> {
-        final double[] coords;
-
-        PosToken(double... coords) {
-            this.coords = coords;
-        }
     }
 
     public abstract static class GeometryToken<P extends Position> {
@@ -331,24 +322,23 @@ public class DSL {
     }
 
     public static class PointToken<P extends Position> extends GeometryToken<P> {
-        private PosToken<P> p;
+        private P p;
 
-        PointToken(PosToken<P> p) {
+        PointToken(P p) {
             this.p = p;
         }
 
         @Override
         Point<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            P position = Positions.mkPosition(crs, p.coords);
-            return new Point<>(position, crs);
+            return new Point<>(p, crs);
         }
     }
 
     public static class LineStringToken<P extends Position> extends GeometryToken<P> {
-        private PosToken<P>[] positions;
+        private P[] positions;
 
         @SafeVarargs
-        LineStringToken(PosToken<P>... positions) {
+        LineStringToken(P... positions) {
             this.positions = Arrays.copyOf(positions, positions.length);
         }
 
@@ -359,10 +349,10 @@ public class DSL {
     }
 
     public static class LinearRingToken<P extends Position> extends GeometryToken<P> {
-        private PosToken<P>[] positions;
+        private P[] positions;
 
         @SafeVarargs
-        LinearRingToken(PosToken<P>... positions) {
+        LinearRingToken(P... positions) {
             this.positions = Arrays.copyOf(positions, positions.length);
         }
 
