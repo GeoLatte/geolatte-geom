@@ -271,6 +271,7 @@ public class Envelope<P extends Position> {
         Envelope envelope = (Envelope) o;
 
         if (crs != null ? !crs.equals(envelope.crs) : envelope.crs != null) return false;
+        if (this.isEmpty() && envelope.isEmpty()) return true;
         if (lowerLeft != null ? !lowerLeft.equals(envelope.lowerLeft) : envelope.lowerLeft != null) return false;
         if (upperRight != null ? !upperRight.equals(envelope.upperRight) : envelope.upperRight != null) return false;
 
