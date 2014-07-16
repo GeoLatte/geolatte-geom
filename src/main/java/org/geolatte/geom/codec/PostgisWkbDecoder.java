@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 
 import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LengthUnit;
@@ -45,45 +46,39 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
 
 
     @Override
-    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
-        //don't override a CRS, once set and validated.
-        CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem();
-        if (crs != null && isCrsValidated()) return;
-
-
+    protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
         boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
         boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
 
         // if set, just validate
         if (crs != null) {
             validateCrs(crs, hasM, hasZ);
-            return;
+            return crs;
         }
 
+        CoordinateReferenceSystem crsDeclared;
         if (hasSrid(typeCode)) {
             int srid = byteBuffer.getInt();
-            crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+            crsDeclared = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
                     CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
 
         } else {
-            crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+            crsDeclared = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         }
 
         if (hasZ) {
-            crs = crs.addVerticalAxis(LengthUnit.METER);
+            crsDeclared = crsDeclared.addVerticalAxis(LengthUnit.METER);
         }
         if (hasM) {
-            crs = crs.addMeasureAxis(LengthUnit.METER);
+            crsDeclared = crsDeclared.addMeasureAxis(LengthUnit.METER);
         }
-        setCoordinateReferenceSystem(crs);
+        return crsDeclared;
     }
 
     private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
         if ( (hasM && !crs.hasMeasureAxis()) ||
                 (hasZ && !crs.hasVerticalAxis())) {
             throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
-        } else {
-          setCrsValidated(true);
         }
     }
 

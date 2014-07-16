@@ -249,7 +249,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
             PositionSequence originalPoints = geometry.getPositions();
             PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),
-                    geometry.getCoordinateReferenceSystem());
+                    geometry.getPositionClass());
             double[] coordinates = new double[geometry.getCoordinateDimension()];
             double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
             for (int i = 0; i < originalPoints.size(); i++) {
@@ -262,7 +262,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 prevCoordinates[0] = coordinates[0];
                 prevCoordinates[1] = coordinates[1];
             }
-            return new LineString<>(builder.toPositionSequence());
+            return new LineString<>(builder.toPositionSequence(), crs);
         }
 
 

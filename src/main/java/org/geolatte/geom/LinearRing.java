@@ -31,7 +31,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  */
 public class LinearRing<P extends Position> extends LineString<P> {
 
-    protected LinearRing(LineString<P> lineString) {
+    public LinearRing(LineString<P> lineString) {
         super(lineString);
         checkIsClosed();
     }
@@ -40,8 +40,8 @@ public class LinearRing<P extends Position> extends LineString<P> {
         super(crs);
     }
 
-    public LinearRing(PositionSequence<P> points) {
-        super(points);
+    public LinearRing(PositionSequence<P> points, CoordinateReferenceSystem<P> crs) {
+        super(points, crs);
         checkIsClosed();
     }
 

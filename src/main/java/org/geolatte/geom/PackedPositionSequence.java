@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -34,8 +32,8 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
     private final double[] coordinates;
 
 
-    PackedPositionSequence(CoordinateReferenceSystem<P> crs, double[] coordinates) {
-        super(crs);
+    PackedPositionSequence(PositionTypeDescriptor<P> descriptor, double[] coordinates) {
+        super(descriptor);
         if (coordinates == null) {
             this.coordinates = new double[0];
         } else {
@@ -101,7 +99,7 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
 
         PackedPositionSequence that = (PackedPositionSequence) o;
 
-        if (!getCoordinateReferenceSystem().equals(that.getCoordinateReferenceSystem())) return false;
+        if (!getPositionClass().equals(that.getPositionClass())) return false;
         return new PositionSequencePositionEquality().equals(this, that);
     }
 
@@ -109,7 +107,7 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
     @Override
     public int hashCode() {
         int result = Arrays.hashCode(coordinates);
-        result = 31 * result + getCoordinateReferenceSystem().hashCode();
+        result = 31 * result + getPositionClass().hashCode();
         return result;
     }
 

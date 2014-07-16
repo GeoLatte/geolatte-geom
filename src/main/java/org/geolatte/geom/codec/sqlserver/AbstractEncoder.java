@@ -89,7 +89,7 @@ abstract class AbstractEncoder implements Encoder {
 	}
 
 	protected <P extends Position> void setCoordinate(SqlServerGeometry nativeGeom, int idx, PositionSequence<P> coordinate) {
-		if ( !nativeGeom.hasZValues() && coordinate.getCoordinateReferenceSystem().hasVerticalAxis() )  {
+		if ( !nativeGeom.hasZValues() && coordinate.getPositionTypeDescriptor().hasVerticalComponent() )  {
 			nativeGeom.setHasZValues();
 			nativeGeom.allocateZValueArray();
 		}

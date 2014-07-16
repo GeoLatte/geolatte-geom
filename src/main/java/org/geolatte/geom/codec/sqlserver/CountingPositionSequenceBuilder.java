@@ -21,10 +21,7 @@
 
 package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.Position;
-import org.geolatte.geom.PositionSequence;
-import org.geolatte.geom.PositionSequenceBuilder;
-import org.geolatte.geom.PositionSequenceBuilders;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -34,24 +31,23 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 public class CountingPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
     final private PositionSequenceBuilder<P> delegate;
-    private int num = 0;
+    final private PositionTypeDescriptor<P> desc;
+    int num = 0;
 
     public CountingPositionSequenceBuilder(CoordinateReferenceSystem<P> crs) {
-        delegate = PositionSequenceBuilders.variableSized(crs);
+        desc = Positions.getDescriptor(crs.getPositionClass());
+        delegate = PositionSequenceBuilders.variableSized(crs.getPositionClass());
     }
 
     @Override
     public PositionSequenceBuilder<P> add(double... coordinates) {
+        num++;
         return delegate.add(coordinates);
     }
 
     public PositionSequenceBuilder<P> add(P position) {
+        num++;
         return delegate.add(position);
-    }
-
-    @Override
-    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return delegate.getCoordinateReferenceSystem();
     }
 
     @Override
@@ -62,5 +58,9 @@ public class CountingPositionSequenceBuilder<P extends Position> implements Posi
     //TODO -- this method should be moved to the top interface
     public int getNumAdded(){
         return num;
+    }
+
+    public int getCoordinateDimension() {
+        return desc.getCoordinateDimension();
     }
 }

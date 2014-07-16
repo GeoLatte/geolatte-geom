@@ -26,7 +26,7 @@ abstract public class Position{
             this.coords = new double[0];
             //Arrays.fill(this.coords, Double.NaN);
         } else {
-            double[] c = new double[getCoordinateDimension()];
+            double[] c = new double[getDescriptor().getCoordinateDimension()];
             System.arraycopy(coords, 0, c, 0, coords.length);
             this.coords = c;
         }
@@ -36,7 +36,7 @@ abstract public class Position{
         if (isEmpty()) {
             return new double[0];
         }
-        int dim = getCoordinateDimension();
+        int dim = getDescriptor().getCoordinateDimension();
         if (dest == null || dest.length < dim) {
             dest = new double[dim];
         }
@@ -74,7 +74,7 @@ abstract public class Position{
         return crs.getNormalizedOrder().normalizedToCrsDefined(coords)[idx];
     }
 
-    abstract public int getCoordinateDimension();
+    abstract public PositionTypeDescriptor<? extends Position> getDescriptor();
 
     @Override
     public boolean equals(Object o) {

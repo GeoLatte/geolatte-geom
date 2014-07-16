@@ -38,7 +38,7 @@ import java.nio.ByteOrder;
  *
  * @author Karel Maesen, Geovise BVBA.
  */
-public class SqlServerGeometry {
+public class SqlServerGeometry<P extends Position> {
 
 	public static final byte SUPPORTED_VERSION = 1;
 
@@ -50,7 +50,8 @@ public class SqlServerGeometry {
 
 	private ByteBuffer buffer;
 	private Integer srid;
-	private byte version;
+    private CoordinateReferenceSystem<P> crs;
+    private byte version;
 	private byte serializationPropertiesByte;
 	private int numberOfPoints;
 	private double[] points;
@@ -185,7 +186,7 @@ public class SqlServerGeometry {
 		return getShape( shpIdx ).openGisType;
 	}
 
-    CoordinateReferenceSystem<?> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
+    CoordinateReferenceSystem<P> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
         CoordinateReferenceSystem<P2D> defaultCrs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid, defaultCrs);
         if (hasZValues) {
@@ -194,12 +195,12 @@ public class SqlServerGeometry {
         if (hasMValues) {
             crs = crs.addMeasureAxis(LengthUnit.METER);
         }
-        return crs;
+        return (CoordinateReferenceSystem<P>)crs;
     }
 
-	PositionSequence coordinateRange(IndexRange range) {
-        CoordinateReferenceSystem<?> crs = getCRS(getSrid(), hasZValues(), hasMValues());
-        PositionSequenceBuilder psBuilder = PositionSequenceBuilders.fixedSized(range.end - range.start, crs);
+	PositionSequence<P> coordinateRange(IndexRange range) {
+        crs = getCRS(getSrid(), hasZValues(), hasMValues());
+        PositionSequenceBuilder<P> psBuilder = PositionSequenceBuilders.fixedSized(range.end - range.start, crs.getPositionClass());
         double[] coordinates = new double[crs.getCoordinateDimension()];
         for (int idx = range.start, i = 0; idx < range.end; idx++, i++) {
             copyCoordinate(idx, coordinates, crs);
@@ -217,16 +218,17 @@ public class SqlServerGeometry {
 	}
 
 	void setCoordinate(int index, PositionSequence<?> positions) {
-        CoordinateReferenceSystem<? extends Position> crs = positions.getCoordinateReferenceSystem();
+        PositionTypeDescriptor<? extends Position> descriptor = positions.getPositionTypeDescriptor();
         points[2 * index] = positions.getPositionN(index).getCoordinate(0);
         points[2 * index + 1] = positions.getPositionN(index).getCoordinate(1);
         if (hasZValues()) {
-            CoordinateSystemAxis verticalAxis = crs.getVerticalAxis();
-            zValues[index] = positions.getPositionN(index).getCoordinate(verticalAxis, crs);
+            //TODO ensure this conditions is satisfied
+            if (!descriptor.hasVerticalComponent()) throw new IllegalStateException();
+            zValues[index] = positions.getPositionN(index).getCoordinate(descriptor.getVerticalComponentIndex());
         }
         if (hasMValues()) {
-            CoordinateSystemAxis mAxis = crs.getMeasureAxis();
-            mValues[index] = positions.getPositionN(index).getCoordinate(mAxis, crs);
+            if (!descriptor.hasMeasureComponent()) throw new IllegalStateException();
+            mValues[index] = positions.getPositionN(index).getCoordinate(descriptor.getMeasureComponentIndex());
         }
     }
 
@@ -478,6 +480,10 @@ public class SqlServerGeometry {
 	int getNumFigures() {
 		return this.numberOfFigures;
 	}
+
+    CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
+        return this.crs;
+    }
 
 
 }

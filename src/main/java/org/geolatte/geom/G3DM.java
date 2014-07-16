@@ -6,6 +6,9 @@ package org.geolatte.geom;
  */
 public class G3DM extends G3D implements Measured {
 
+    public final static PositionTypeDescriptor<G3DM> descriptor = new PositionTypeDescriptor<>(G3DM.class,
+            4, 2, 3);
+
     public G3DM() {
         super();
     }
@@ -20,7 +23,8 @@ public class G3DM extends G3D implements Measured {
     }
 
     @Override
-    public int getCoordinateDimension() {
-        return 4;
+    public PositionTypeDescriptor<? extends G3DM> getDescriptor() {
+        return descriptor;
     }
+
 }

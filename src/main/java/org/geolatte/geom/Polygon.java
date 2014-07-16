@@ -70,8 +70,8 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
     @SuppressWarnings("unchecked")
-    public Polygon(PositionSequence<P> positionSequence) {
-        this(new LinearRing<P>(positionSequence));
+    public Polygon(PositionSequence<P> positionSequence, CoordinateReferenceSystem<P> crs) {
+        this(new LinearRing<P>(positionSequence, crs));
     }
 
     /**
@@ -84,7 +84,7 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      */
     @SafeVarargs
     public Polygon(LinearRing<P>... rings) {
-        super(nestPositionSequences(rings));
+        super(nestPositionSequences(rings), getCrs(rings));
         checkRings(rings);
         this.rings = Arrays.copyOf(rings, rings.length);
     }
@@ -110,7 +110,7 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      */
     public LinearRing<P> getExteriorRing() {
         return this.isEmpty() ?
-                new LinearRing<P>(getPositions()) :
+                new LinearRing<P>(getPositions(), getCoordinateReferenceSystem()) :
                 this.rings[0];
     }
 

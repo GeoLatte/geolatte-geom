@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 import java.util.Arrays;
 
 /**
@@ -34,9 +32,13 @@ class VariableSizePositionSequenceBuilder<P extends Position> extends AbstractPo
     private double[] coordinates;
     private int index = 0;
 
-    VariableSizePositionSequenceBuilder(CoordinateReferenceSystem<P> crs) {
-        super(crs);
-        this.coordinates = new double[crs.getCoordinateDimension() * 10];
+    VariableSizePositionSequenceBuilder(Class<P> clazz) {
+        this(Positions.getDescriptor(clazz));
+    }
+
+    VariableSizePositionSequenceBuilder(PositionTypeDescriptor<P> descriptor) {
+        super(descriptor);
+        this.coordinates = new double[descriptor.getCoordinateDimension() * 10];
     }
 
     @Override
@@ -47,12 +49,12 @@ class VariableSizePositionSequenceBuilder<P extends Position> extends AbstractPo
 
     private void ensureCapacity() {
         if (index < this.coordinates.length) return;
-        int newCapacity = (this.coordinates.length * 3 )/2 + 1;
+        int newCapacity = (this.coordinates.length * 3) / 2 + 1;
         this.coordinates = Arrays.copyOf(this.coordinates, newCapacity);
     }
 
     @Override
     public PositionSequence<P> toPositionSequence() {
-        return new PackedPositionSequence<P>(crs, Arrays.copyOf(coordinates, index));
+        return new PackedPositionSequence<P>(descriptor, Arrays.copyOf(coordinates, index));
     }
 }

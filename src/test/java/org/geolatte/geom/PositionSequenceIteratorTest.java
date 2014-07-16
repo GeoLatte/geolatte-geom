@@ -21,9 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,14 +32,11 @@ import static org.junit.Assert.fail;
  */
 public class PositionSequenceIteratorTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+    private static PositionTypeDescriptor<P2D> des2D = Positions.getDescriptor(P2D.class);
+    private static PositionTypeDescriptor<P3D> des3D = Positions.getDescriptor(P3D.class);
 
-
-    PositionSequence<P2D> sequence = new PackedPositionSequence<>(crs, new double[]{0,0, 1, 2, 3, 4});
-    PositionSequence<P2D> emptySequence = PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence();
+    PositionSequence<P2D> sequence = new PackedPositionSequence<>(des2D, new double[]{0, 0, 1, 2, 3, 4});
+    PositionSequence<P2D> emptySequence = PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence();
 
     PositionSequenceIterator<P2D> itSeq;
     PositionSequenceIterator<P2D> itEmpty;
@@ -57,7 +51,7 @@ public class PositionSequenceIteratorTest {
     @Test
     public void test_iteration() throws Exception {
         int i = 0;
-        while (itSeq.hasNext()){
+        while (itSeq.hasNext()) {
             P2D received = itSeq.next();
             assertEquals(sequence.getPositionN(i).getX(), received.getX(), Math.ulp(10d));
             assertEquals(sequence.getPositionN(i).getY(), received.getY(), Math.ulp(10d));
@@ -70,7 +64,7 @@ public class PositionSequenceIteratorTest {
     @Test
     public void test_iteration_over_empty_sequence() throws Exception {
         int i = 0;
-        while (itEmpty.hasNext()){
+        while (itEmpty.hasNext()) {
             itEmpty.next();
             i++;
         }
@@ -83,6 +77,7 @@ public class PositionSequenceIteratorTest {
         try {
             itSeq.remove();
             fail();
-        } catch (UnsupportedOperationException e){}
+        } catch (UnsupportedOperationException e) {
+        }
     }
 }

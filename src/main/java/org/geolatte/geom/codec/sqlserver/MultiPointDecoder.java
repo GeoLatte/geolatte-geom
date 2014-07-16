@@ -22,7 +22,7 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.MultiPoint;
-import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
 
 import java.util.List;
 
@@ -34,16 +34,16 @@ import static org.geolatte.geom.Geometries.mkMultiPoint;
  * @author Karel Maesen, Geovise BVBA
  */
 
-class MultiPointDecoder extends AbstractGeometryCollectionDecoder<Point<?>> {
+class MultiPointDecoder extends AbstractGeometryCollectionDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
 		return OpenGisType.MULTIPOINT;
 	}
 
-	@Override
-	protected MultiPoint<?> createGeometry(List<Point<?>> geometries, boolean hasM) {
-		return mkMultiPoint(geometries);
-	}
+    @Override
+    protected <P extends Position> MultiPoint<P> createGeometry(List geometries, SqlServerGeometry<P> nativeGeom) {
+        return mkMultiPoint(geometries);
+    }
 
 }

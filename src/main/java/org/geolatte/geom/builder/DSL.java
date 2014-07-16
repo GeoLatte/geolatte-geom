@@ -163,7 +163,7 @@ public class DSL {
 
     @SafeVarargs
     public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, P... positions) {
-        return new LineString<>(toSeq(crs, positions));
+        return new LineString<>(toSeq(crs, positions), crs);
     }
 
     @SafeVarargs
@@ -173,7 +173,7 @@ public class DSL {
 
     @SafeVarargs
     public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, P... positions) {
-        return new LinearRing<>(toSeq(crs, positions));
+        return new LinearRing<>(toSeq(crs, positions), crs);
     }
 
     @SafeVarargs
@@ -307,7 +307,7 @@ public class DSL {
 
     @SafeVarargs
     static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, P... positions) {
-        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, crs);
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, crs.getPositionClass());
         double[] coords = new double[crs.getCoordinateDimension()];
         for (P t : positions) {
             P pos = Positions.mkPosition(crs, t.toArray(coords));
@@ -344,7 +344,7 @@ public class DSL {
 
         @Override
         LineString<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            return new LineString<>(toSeq(crs, positions));
+            return new LineString<>(toSeq(crs, positions), crs);
         }
     }
 
@@ -358,7 +358,7 @@ public class DSL {
 
         @Override
         LinearRing<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            return new LinearRing<>(toSeq(crs, positions));
+            return new LinearRing<>(toSeq(crs, positions), crs);
         }
     }
 
@@ -385,6 +385,7 @@ public class DSL {
     public static class GeometryCollectionToken<P extends Position> extends GeometryToken<P> {
         private GeometryToken[] tokens;
 
+        @SafeVarargs
         GeometryCollectionToken(GeometryToken<P>... tokens) {
             this.tokens = Arrays.copyOf(tokens, tokens.length);
         }
@@ -405,6 +406,7 @@ public class DSL {
     public static class MultiPointToken<P extends Position> extends GeometryToken<P> {
         private PointToken[] tokens;
 
+        @SafeVarargs
         MultiPointToken(PointToken<P>... tokens) {
             this.tokens = Arrays.copyOf(tokens, tokens.length);
         }

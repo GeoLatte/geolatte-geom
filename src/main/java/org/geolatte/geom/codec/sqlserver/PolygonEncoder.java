@@ -71,7 +71,7 @@ class PolygonEncoder extends AbstractEncoder {
 	}
 
 	private void addPoints(LineString<?> ring, CountingPositionSequenceBuilder<?> coordinates) {
-        double[] c = new double[coordinates.getCoordinateReferenceSystem().getCoordinateDimension()];
+        double[] c = new double[coordinates.getCoordinateDimension()];
 		for ( Position p : ring.getPositions() ) {
 			coordinates.add( p.toArray(c) );
 		}

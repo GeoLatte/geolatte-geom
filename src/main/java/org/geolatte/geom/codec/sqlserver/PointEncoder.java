@@ -84,7 +84,7 @@ class PointEncoder extends AbstractEncoder {
 		}
 		int pntOffset = coordinates.getNumAdded();
 		int figureOffset = figures.size();
-        double[] c = new double[coordinates.getCoordinateReferenceSystem().getCoordinateDimension()];
+        double[] c = new double[coordinates.getCoordinateDimension()];
         coordinates.add( geom.getPositionN(0).toArray(c) );
 		Figure figure = new Figure( FigureAttribute.Stroke, pntOffset );
 		figures.add( figure );

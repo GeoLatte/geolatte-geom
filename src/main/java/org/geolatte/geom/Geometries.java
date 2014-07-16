@@ -35,38 +35,34 @@ import java.util.List;
  */
 public class Geometries {
 
-    public static <P extends Position> Point<P> mkPoint(PositionSequence<P> seq) {
-        return new Point<P>(seq);
-    }
-
     public static <P extends Position> Point<P> mkPoint(P pos, CoordinateReferenceSystem<P> crs) {
         return new Point<P>(pos, crs);
     }
 
-    public static <P extends Position> LineString<P> mkLineString(PositionSequence<P> seq) {
-        return new LineString<P>(seq);
+    public static <P extends Position> LineString<P> mkLineString(PositionSequence<P> seq, CoordinateReferenceSystem<P> crs) {
+        return new LineString<P>(seq, crs);
     }
 
-    public static <P extends Position> LinearRing<P> mkLinearRing(PositionSequence<P> seq) {
-        return new LinearRing<P>(seq);
+    public static <P extends Position> LinearRing<P> mkLinearRing(PositionSequence<P> seq, CoordinateReferenceSystem<P> crs) {
+        return new LinearRing<P>(seq, crs);
     }
 
     public static <P extends Position> Polygon<P> mkPolygon(LinearRing<P>... rings) {
         return new Polygon<P>(rings);
     }
 
-    public static Polygon<?> mkPolygon(List<LinearRing<?>> rings) {
-        LinearRing<?>[] ringArr = new LinearRing[rings.size()];
-        return new Polygon(rings.toArray(ringArr));
+    public static <P extends Position> Polygon<P> mkPolygon(List<LinearRing<P>> rings) {
+        LinearRing<P>[] ringArr = new LinearRing[rings.size()];
+        return new Polygon<>(rings.toArray(ringArr));
     }
 
     public static <P extends Position> GeometryCollection<P, Geometry<P>> mkGeometryCollection(Geometry<P>... geometries) {
         return new GeometryCollection<>(geometries);
     }
 
-    public static GeometryCollection<?, Geometry<?>> mkGeometryCollection(List<Geometry<?>> geometries) {
-        Geometry<?>[] geomArr= new Geometry[geometries.size()];
-        return new GeometryCollection(geometries.toArray(geomArr));
+    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkGeometryCollection(List<Geometry<P>> geometries) {
+        Geometry<P>[] geomArr= new Geometry[geometries.size()];
+        return new GeometryCollection<>(geometries.toArray(geomArr));
     }
 
 
@@ -74,14 +70,14 @@ public class Geometries {
         return new MultiPoint<P>(points);
     }
 
-    public static MultiPoint<?> mkMultiPoint(List<Point<?>> points) {
-        Point<?>[] pointArr = new Point[points.size()];
-        return new MultiPoint(points.toArray(pointArr));
+    public static <P extends Position> MultiPoint<P> mkMultiPoint(List<Point<P>> points) {
+        Point<P>[] pointArr = new Point[points.size()];
+        return new MultiPoint<>(points.toArray(pointArr));
     }
 
-    public static MultiLineString<?> mkMultiLineString(List<LineString<?>> lineStrings) {
-        LineString<?>[] lsArr = new LineString[lineStrings.size()];
-        return new MultiLineString(lineStrings.toArray(lsArr));
+    public static <P extends Position> MultiLineString<P> mkMultiLineString(List<LineString<P>> lineStrings) {
+        LineString<P>[] lsArr = new LineString[lineStrings.size()];
+        return new MultiLineString<>(lineStrings.toArray(lsArr));
     }
 
     public static <P extends Position> MultiLineString<P> mkMultiLineString(LineString<P>... linestrings) {
@@ -92,28 +88,30 @@ public class Geometries {
         return new MultiPolygon<>(polygons);
     }
 
-    public static MultiPolygon<?> mkMultiPolygon(List<Polygon<?>> polygons) {
-        Polygon<?>[] pArr = new Polygon[polygons.size()];
-        return new MultiPolygon(polygons.toArray(pArr));
+    public static <P extends Position> MultiPolygon<P> mkMultiPolygon(List<Polygon<P>> polygons) {
+        Polygon<P>[] pArr = new Polygon[polygons.size()];
+        return new MultiPolygon<>(polygons.toArray(pArr));
     }
 
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Simple> geometryClass, PositionSequence<P> positions) {
+    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Simple> geometryClass,
+                                                              PositionSequence<P> positions,
+                                                              CoordinateReferenceSystem<P> crs) {
 
         if (geometryClass == null) {
             throw new IllegalArgumentException("Null argument not allowed");
         }
         if (Point.class.isAssignableFrom(geometryClass)) {
-            return new Point<>(positions);
+            return new Point<>(positions, crs);
         }
 
         if (LinearRing.class.isAssignableFrom(geometryClass)) {
-            return new LinearRing<>(positions);
+            return new LinearRing<>(positions, crs);
         }
 
         if (LineString.class.isAssignableFrom(geometryClass)) {
-            return new LineString<>(positions);
+            return new LineString<>(positions, crs);
         }
 
         throw new IllegalStateException("Unknown Geometry class");

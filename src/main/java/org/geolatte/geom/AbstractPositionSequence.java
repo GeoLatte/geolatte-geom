@@ -23,7 +23,6 @@ package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.DimensionalCoordinate;
 
 /**
@@ -31,10 +30,10 @@ import org.geolatte.geom.jts.DimensionalCoordinate;
  */
 abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, CoordinateSequence {
 
-    private final CoordinateReferenceSystem<P> crs;
+    private final PositionTypeDescriptor<P> descriptor;
 
-    public AbstractPositionSequence(CoordinateReferenceSystem<P> crs) {
-        this.crs = crs;
+    public AbstractPositionSequence(PositionTypeDescriptor<P> descriptor) {
+        this.descriptor = descriptor;
     }
 
     private static com.vividsolutions.jts.geom.Coordinate[] toCoordinateArray(AbstractPositionSequence cseq) {
@@ -46,20 +45,21 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return coordinates;
     }
 
-    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return this.crs;
+    @Override
+    public PositionTypeDescriptor<P> getPositionTypeDescriptor() {
+        return this.descriptor;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
     public Class<P> getPositionClass() {
-        return crs.getPositionClass();
+        return (Class<P>)descriptor.getPositionClass();
     }
 
     @Override
     public P getPositionN(int index) {
         double[] co = new double[getCoordinateDimension()];
         getCoordinates(index, co);
-        return Positions.mkPosition(getCoordinateReferenceSystem(), co);
+        return Positions.mkPosition(getPositionClass(), co);
     }
 
     /*
@@ -69,8 +69,9 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return getCoordinateDimension();
     }
 
+    @Override
     public int getCoordinateDimension() {
-        return this.crs.getCoordinateDimension();
+        return this.descriptor.getCoordinateDimension();
     }
 
 //    protected int[] getNormalizedOrderMapping() {
@@ -109,9 +110,9 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         int idx = 0;
         co.x = c[idx++];
         co.y = c[idx++];
-        if (crs.hasVerticalAxis())
+        if (descriptor.hasVerticalComponent())
             co.z = c[idx++];
-        if (crs.hasMeasureAxis())
+        if (descriptor.hasMeasureComponent())
             co.m = c[idx];
         return co;
     }
@@ -153,11 +154,11 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
             case CoordinateSequence.Y:
                 return c[1];
             case CoordinateSequence.Z:
-                idx = crs.getNormalizedOrder().getNormalVertical();
-                return idx != -1 ? c[idx] : Double.NaN;
+                return descriptor.hasVerticalComponent() ?
+                        c[descriptor.getVerticalComponentIndex()] : Double.NaN;
             case CoordinateSequence.M:
-                idx = crs.getNormalizedOrder().getNormalMeasure();
-                return idx != -1 ? c[idx] : Double.NaN;
+                return descriptor.hasMeasureComponent()?
+                        c[descriptor.getMeasureComponentIndex()] : Double.NaN;
         }
         throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
     }

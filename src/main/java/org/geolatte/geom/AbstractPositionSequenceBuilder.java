@@ -21,33 +21,30 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
 abstract class AbstractPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
-    protected final CoordinateReferenceSystem<P> crs;
-    final double[] coords;
+    protected final PositionTypeDescriptor<P> descriptor;
+    protected final double[] coords;
 
-    public AbstractPositionSequenceBuilder(CoordinateReferenceSystem<P> crs) {
-        if (crs == null) throw new IllegalArgumentException("Require a non-null Coordinate reference system.");
-        this.crs = crs;
-        this.coords = new double [crs.getCoordinateDimension()];
+    public AbstractPositionSequenceBuilder(PositionTypeDescriptor<P> descriptor) {
+        if (descriptor == null) throw new IllegalArgumentException("Require a non-null Coordinate reference system.");
+        this.descriptor = descriptor;
+        this.coords = new double[descriptor.getCoordinateDimension()];
     }
 
     @Override
     public PositionSequenceBuilder<P> add(double... coordinates) {
-        if (coordinates.length != crs.getCoordinateDimension())
-            throw new IllegalArgumentException(String.format("Parameter must be array of length %d", crs.getCoordinateDimension()));
-        for (int i = 0; i < crs.getCoordinateDimension(); i++) {
+        if (coordinates.length != this.descriptor.getCoordinateDimension())
+            throw new IllegalArgumentException(String.format("Parameter must be array of length %d", descriptor.getCoordinateDimension()));
+        for (int i = 0; i < descriptor.getCoordinateDimension(); i++) {
             addCoordinate(coordinates[i]);
         }
         return this;
     }
-
 
     @Override
     public PositionSequenceBuilder<P> add(P pos) {
@@ -57,13 +54,6 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
         }
         return this;
     }
-
-
-    @Override
-    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return this.crs;
-    }
-
 
     protected abstract void addCoordinate(double val);
 }

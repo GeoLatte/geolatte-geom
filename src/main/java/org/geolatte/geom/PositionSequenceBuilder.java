@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A builder for <code>PositionSequence</code>s.
  *
@@ -46,13 +44,6 @@ public interface PositionSequenceBuilder<P extends Position> {
      * @return this instance
      */
     PositionSequenceBuilder<P> add(P position);
-
-    /**
-     * Returns the {@code CoordinateReferenceSystem}  of the {@code PositionSequence} being built
-     * @return the {@code CoordinateReferenceSystem}  of the {@code PositionSequence} being built
-     */
-    CoordinateReferenceSystem<P> getCoordinateReferenceSystem();
-
 
     /**
      * Returns the result of this builder.

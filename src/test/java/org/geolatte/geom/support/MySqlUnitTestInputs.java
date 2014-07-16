@@ -56,7 +56,7 @@ public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",
                 "0000000001020000000400000000000000000024400000000000002440000000000000344000000000000034400000000000004940000000000000494000000000000041400000000000004140",
-                new LineString<>(PositionSequenceBuilders.fixedSized(4, crs).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPositionSequence()));
+                new LineString<>(PositionSequenceBuilders.fixedSized(4, crs.getPositionClass()).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPositionSequence(), crs) );
 
         Polygon<P2D> polygon2D = polygon(
                 ring(crs, p(10, 10), p(20, 10), p(20, 20), p(20, 10), p(10, 10)),

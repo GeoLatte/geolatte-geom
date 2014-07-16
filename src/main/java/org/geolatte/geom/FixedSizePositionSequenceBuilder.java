@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A PositionSequenceBuilder for <code>PointSequence</code>s with known size.
  *
@@ -33,9 +31,13 @@ class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPosit
     private int index = 0;
     private final double[] coordinates;
 
-    FixedSizePositionSequenceBuilder(int capacity, CoordinateReferenceSystem<P> crs) {
-        super(crs);
-        this.coordinates = new double[capacity * crs.getCoordinateDimension()];
+    FixedSizePositionSequenceBuilder(int capacity, PositionTypeDescriptor<P> descriptor) {
+        super(descriptor);
+        this.coordinates = new double[capacity * descriptor.getCoordinateDimension()];
+    }
+
+    FixedSizePositionSequenceBuilder(int capacity, Class<P> clazz) {
+        this(capacity, Positions.getDescriptor(clazz));
     }
 
     protected void addCoordinate(double x) {
@@ -44,10 +46,10 @@ class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPosit
 
     @Override
     public PositionSequence<P> toPositionSequence() {
-        if( index != coordinates.length) {
+        if (index != coordinates.length) {
             throw new IllegalStateException("PointSequence not filled to capacity.");
         }
-        return new PackedPositionSequence<P>(this.crs, this.coordinates);
+        return new PackedPositionSequence<P>(descriptor, this.coordinates);
     }
 
 }

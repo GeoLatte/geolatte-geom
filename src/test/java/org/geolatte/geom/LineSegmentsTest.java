@@ -41,7 +41,7 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegments() {
-        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<>(3, crsZ);
+        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<>(3, P3D.class);
         builder.add(1, 1, 1);
         builder.add(2, 2, 2);
         builder.add(3, 3, 3);
@@ -58,7 +58,7 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<>(0, crs);
+        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<>(0, P2D.class);
         PositionSequence<P2D> sequence = builder.toPositionSequence();
         for (LineSegment<P2D> ls : new LineSegments<>(sequence)) {
             fail();

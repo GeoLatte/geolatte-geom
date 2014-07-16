@@ -21,10 +21,8 @@
 
 package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.LinearRing;
-import org.geolatte.geom.P2D;
-import org.geolatte.geom.Polygon;
-import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,21 +40,21 @@ class PolygonDecoder extends AbstractDecoder {
 		return OpenGisType.POLYGON;
 	}
 
-	protected Polygon<?> createNullGeometry() {
-        return new Polygon<P2D>();
+	protected <P extends Position>  Polygon<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
+        return new Polygon<>(crs);
     }
 
-	protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom) {
+	protected <P extends Position>  Polygon<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
 		return createGeometry( nativeGeom, 0 );
 	}
 
-	protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected <P extends Position> Polygon<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
 		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry();
+			return (Polygon<P>)createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
 		}
 		//polygons consist of one exterior ring figure, and several interior ones.
 		IndexRange figureRange = nativeGeom.getFiguresForShape( shapeIndex );
-		List<LinearRing<?>> rings = new ArrayList<>(figureRange.length());
+		List<LinearRing<P>> rings = new ArrayList<>(figureRange.length());
         //the rings should contain all inner rings from index 1 to index length - 1
         // index = 0 should be reserved for the shell.
 		for ( int figureIdx = figureRange.start, i = 1; figureIdx < figureRange.end; figureIdx++ ) {
@@ -71,9 +69,9 @@ class PolygonDecoder extends AbstractDecoder {
         return mkPolygon(rings);
 	}
 
-	private LinearRing<?> toLinearRing(SqlServerGeometry nativeGeom, IndexRange range) {
-        PositionSequence<?> positionSequence = nativeGeom.coordinateRange(range);
-        return mkLinearRing(positionSequence);
+	private <P extends Position> LinearRing<P> toLinearRing(SqlServerGeometry<P> nativeGeom, IndexRange range) {
+        PositionSequence<P> positionSequence = nativeGeom.coordinateRange(range);
+        return mkLinearRing(positionSequence, nativeGeom.getCoordinateReferenceSystem());
 	}
 
 }

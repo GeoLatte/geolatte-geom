@@ -23,9 +23,6 @@ package org.geolatte.geom;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,10 +37,11 @@ import static org.junit.Assert.*;
  */
 public class PackedPointSequenceTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+    private static PositionTypeDescriptor<P2D> des2D = Positions.getDescriptor(P2D.class);
+
+    private static PositionTypeDescriptor <P3D> des3D = Positions.getDescriptor(P3D.class);
+    private static PositionTypeDescriptor <P2DM> des2DM = Positions.getDescriptor(P2DM.class);
+    private static PositionTypeDescriptor <P3DM> des3DM = Positions.getDescriptor(P3DM.class);
 
     PackedPositionSequence<P2D> testSeq2D;
     PackedPositionSequence<P3D> testSeq3D;
@@ -54,30 +52,30 @@ public class PackedPointSequenceTest {
 
     @Before
     public void setUp() {
-        testSeq2D = new PackedPositionSequence<>(crs, new double[]{0, 0, 1, -1, 2, -2});
-        testSeq3D = new PackedPositionSequence<>(crsZ, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
-        testSeq2DM = new PackedPositionSequence<>(crsM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
-        testSeq3DM = new PackedPositionSequence<>(crsZM, new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3});
-        testEmpty = new PackedPositionSequence<>(crs, new double[0]);
+        testSeq2D = new PackedPositionSequence<>(des2D, new double[]{0, 0, 1, -1, 2, -2});
+        testSeq3D = new PackedPositionSequence<>(des3D, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
+        testSeq2DM = new PackedPositionSequence<>(des2DM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2});
+        testSeq3DM = new PackedPositionSequence<>(des3DM, new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3});
+        testEmpty = new PackedPositionSequence<>(des2D, new double[0]);
     }
 
 
     @Test
     public void testConstructorThrowsIllegalArgumentOnWrongNumberOfCoordinates() {
         try {
-            new PackedPositionSequence<P2D>(crs, new double[]{0, 0, 1, 1,3});
+            new PackedPositionSequence<P2D>(des2D, new double[]{0, 0, 1, 1, 3});
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPositionSequence<P3D>(crsZ, new double[]{0, 0, 0, 1, 1, 1, 1});
+            new PackedPositionSequence<P3D>(des3D, new double[]{0, 0, 0, 1, 1, 1, 1});
             fail();
         } catch (IllegalArgumentException e) {
         }
 
         try {
-            new PackedPositionSequence<P3D>(crsZ, new double[]{0, 0, 0, 1, 1, 1, 1, 1});
+            new PackedPositionSequence<P3D>(des3D, new double[]{0, 0, 0, 1, 1, 1, 1, 1});
             fail();
         } catch (IllegalArgumentException e) {
         }
@@ -365,12 +363,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testEquals() {
-        assertEquals(testSeq2D, new PackedPositionSequence<>(crs, new double[]{0, 0, 1, -1, 2, -2}));
-        assertEquals(testSeq3D, new PackedPositionSequence<>(crsZ, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
-        assertEquals(testSeq2DM, new PackedPositionSequence<>(crsM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
-        assertEquals(testSeq3DM, new PackedPositionSequence<>(crsZM,new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}));
+        assertEquals(testSeq2D, new PackedPositionSequence<>(des2D, new double[]{0, 0, 1, -1, 2, -2}));
+        assertEquals(testSeq3D, new PackedPositionSequence<>(des3D, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
+        assertEquals(testSeq2DM, new PackedPositionSequence<>(des2DM, new double[]{0, 0, 0, 1, -1, 1, 2, -2, 2}));
+        assertEquals(testSeq3DM, new PackedPositionSequence<>(des3DM, new double[]{0, 0, 0, 1, 1, -1, 1, 2, 2, -2, 2, 3}));
         assertFalse(testSeq2DM.equals(testSeq3D));
-        assertFalse(testSeq2D.equals(new PackedPositionSequence<>(crs, new double[]{0, 1, 1, -1, 2, -2})));
+        assertFalse(testSeq2D.equals(new PackedPositionSequence<>(des2D, new double[]{0, 1, 1, -1, 2, -2})));
 
     }
 

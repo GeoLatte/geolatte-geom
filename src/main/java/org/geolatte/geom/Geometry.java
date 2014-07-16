@@ -37,7 +37,9 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     private static GeometryEquality geomEq = new GeometryPointEquality();
 
-    protected final PositionSequence<P> positions;
+    private final PositionSequence<P> positions;
+    private final CoordinateReferenceSystem<P> crs;
+
 
     @SuppressWarnings("unchecked")
     public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
@@ -45,8 +47,8 @@ public abstract class Geometry<P extends Position> implements Serializable {
         if (crs.equals(geometry.getCoordinateReferenceSystem())) return (Geometry<Q>) geometry;
         if (geometry instanceof Simple) {
             Simple simple = (Simple) geometry;
-            PositionSequence<Q> positions = Positions.copy(geometry.getPositions(), crs);
-            return Geometries.mkGeometry(simple.getClass(), positions);
+            PositionSequence<Q> positions = Positions.copy(geometry.getPositions(), crs.getPositionClass());
+            return Geometries.mkGeometry(simple.getClass(), positions, crs);
         } else {
             Complex<?, ?> complex = (Complex<?, ?>) geometry;
             if (complex.getNumGeometries() == 0) {
@@ -67,11 +69,15 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * @param crs the CoordinateReferenceSystem to use
      */
     protected Geometry(CoordinateReferenceSystem<P> crs) {
-        this.positions = PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence();
+        if (crs == null) throw new IllegalArgumentException("Received null CRS argument");
+        this.crs = crs;
+        this.positions = PositionSequenceBuilders.fixedSized(0, crs.getPositionClass()).toPositionSequence();
     }
 
-    protected Geometry(PositionSequence<P> positions) {
+    protected Geometry(PositionSequence<P> positions, CoordinateReferenceSystem<P> crs) {
+        if (crs == null) throw new IllegalArgumentException("Received null CRS argument");
         if (positions == null) throw new IllegalArgumentException("Null Positions argument not allowd.");
+        this.crs = crs;
         this.positions = positions;
     }
 
@@ -97,6 +103,10 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return geometries[0].getCoordinateReferenceSystem();
     }
 
+    public PositionTypeDescriptor<P> getPositionTypeDescriptor() {
+        return getPositions().getPositionTypeDescriptor();
+    }
+
 
     /**
      * Returns the coordinate dimension of this <code>Geometry</code>
@@ -116,7 +126,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * @return
      */
     public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-        return getPositions().getCoordinateReferenceSystem();
+        return this.crs;
     }
 
     /**
@@ -150,7 +160,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     }
 
     public Class<P> getPositionClass() {
-        return getPositions().getCoordinateReferenceSystem().getPositionClass();
+        return getPositions().getPositionClass();
     }
 
     /**

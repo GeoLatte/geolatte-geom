@@ -37,21 +37,12 @@ import static org.geolatte.geom.Geometries.*;
  */
 abstract class AbstractWkbDecoder implements WkbDecoder {
 
-    private CoordinateReferenceSystem<?> crs;
-
-    //if a CRS is specified, is it consistent with the Wkb (in terms of presence of Vertical or Measure axes).
-    private boolean crsValidated;
-
-
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
-        this.crs = crs;
-        // if a null crs is specified, then no validation is needed.
-        this.crsValidated = (crs == null);
         byteBuffer.rewind();
         try {
             prepare(byteBuffer);
-            Geometry geom = decodeGeometry(byteBuffer);
+            Geometry<P> geom = decodeGeometry(byteBuffer, crs);
             byteBuffer.rewind();
             return geom;
         } catch (BufferAccessException e) {
@@ -64,124 +55,125 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return decode(byteBuffer, (CoordinateReferenceSystem<?>) null);
     }
 
-    private Geometry<?> decodeGeometry(ByteBuffer byteBuffer) {
+    private <P extends Position> Geometry<P> decodeGeometry(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         alignByteOrder(byteBuffer);
         int typeCode = readTypeCode(byteBuffer);
         WkbGeometryType wkbType = WkbGeometryType.parse((byte) typeCode);
-        readCrs(byteBuffer, typeCode);
+        crs = (CoordinateReferenceSystem<P>)readCrs(byteBuffer, typeCode, crs);
         switch (wkbType) {
             case POINT:
-                return decodePoint(byteBuffer);
+                return decodePoint(byteBuffer, crs);
             case LINE_STRING:
-                return decodeLineString(byteBuffer);
+                return decodeLineString(byteBuffer, crs);
             case POLYGON:
-                return decodePolygon(byteBuffer);
+                return decodePolygon(byteBuffer, crs);
             case GEOMETRY_COLLECTION:
-                return decodeGeometryCollection(byteBuffer);
+                return decodeGeometryCollection(byteBuffer, crs);
             case MULTI_POINT:
-                return decodeMultiPoint(byteBuffer);
+                return decodeMultiPoint(byteBuffer, crs);
             case MULTI_POLYGON:
-                return decodeMultiPolygon(byteBuffer);
+                return decodeMultiPolygon(byteBuffer, crs);
             case MULTI_LINE_STRING:
-                return decodeMultiLineString(byteBuffer);
+                return decodeMultiLineString(byteBuffer,crs );
         }
         throw new WkbDecodeException(String.format("WKBType %s is not supported.", wkbType));
     }
 
-    private MultiLineString<?> decodeMultiLineString(ByteBuffer byteBuffer) {
+    private <P extends Position> MultiLineString<P> decodeMultiLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiLineString<>(crs);
         }
-        List<LineString<?>> geometries = new ArrayList<>(numGeometries);
+        List<LineString<P>> geometries = new ArrayList<>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
-            geometries.add((LineString<?>) decodeGeometry(byteBuffer));
+            geometries.add((LineString<P>)decodeGeometry(byteBuffer, crs));
         }
         return mkMultiLineString(geometries);
     }
 
-    private MultiPoint<?> decodeMultiPoint(ByteBuffer byteBuffer) {
+    private <P extends Position> MultiPoint<P> decodeMultiPoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiPoint<>(crs);
         }
-        List<Point<?>> geometries = new ArrayList<>(numGeometries);
+        List<Point<P>> geometries = new ArrayList<>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
-            geometries.add((Point<?>) decodeGeometry(byteBuffer));
+            geometries.add((Point<P>) decodeGeometry(byteBuffer, crs));
         }
         return mkMultiPoint(geometries);
     }
 
-    private MultiPolygon<?> decodeMultiPolygon(ByteBuffer byteBuffer) {
+    private <P extends Position> MultiPolygon<P> decodeMultiPolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiPolygon<>(crs);
         }
-        List<Polygon<?>> geometries = new ArrayList<>(numGeometries);
+        List<Polygon<P>> geometries = new ArrayList<>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
-            geometries.add((Polygon<?>) decodeGeometry(byteBuffer));
+            geometries.add((Polygon<P>) decodeGeometry(byteBuffer, crs));
         }
         return mkMultiPolygon(geometries);
     }
 
-    private GeometryCollection<? extends Position, ? extends Geometry<?>> decodeGeometryCollection(ByteBuffer byteBuffer) {
+    private <P extends Position> GeometryCollection<P, Geometry<P>>
+    decodeGeometryCollection(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new GeometryCollection<>(crs);
         }
-        List<Geometry<?>> geometries = new ArrayList<>(numGeometries);
+        List<Geometry<P>> geometries = new ArrayList<>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
-            geometries.add(decodeGeometry(byteBuffer));
+            geometries.add(decodeGeometry(byteBuffer, crs));
         }
         return mkGeometryCollection(geometries);
     }
 
-    private Polygon<?> decodePolygon(ByteBuffer byteBuffer) {
+    private <P extends Position> Polygon<P> decodePolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numRings = byteBuffer.getInt();
-        List<LinearRing<?>> rings = readPolygonRings(numRings, byteBuffer);
+        List<LinearRing<P>> rings = readPolygonRings(numRings, byteBuffer, crs);
         return mkPolygon(rings);
     }
 
-    private LineString decodeLineString(ByteBuffer byteBuffer) {
+    private <P extends Position> LineString<P> decodeLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numPoints = byteBuffer.getInt();
-        PositionSequence<?> points = readPositions(numPoints, byteBuffer);
-        return new LineString<>(points);
+        PositionSequence<P> points = readPositions(numPoints, byteBuffer, crs);
+        return new LineString<>(points, crs);
     }
 
-    private Point<?> decodePoint(ByteBuffer byteBuffer) {
-        PositionSequence<?> points = readPositions(1, byteBuffer);
-        return new Point<>(points);
+    private <P extends Position>  Point<P> decodePoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        PositionSequence<P> points = readPositions(1, byteBuffer, crs);
+        return new Point<>(points, crs);
     }
 
-    private PositionSequence<?> readPositions(int numPos, ByteBuffer byteBuffer) {
-        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPos, crs);
+    private <P extends Position> PositionSequence<P> readPositions(int numPos, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        PositionSequenceBuilder<P> psBuilder = PositionSequenceBuilders.fixedSized(numPos, crs.getPositionClass());
         double[] coordinates = new double[crs.getCoordinateDimension()];
         for (int i = 0; i < numPos; i++) {
-            readPosition(byteBuffer, coordinates);
+            readPosition(byteBuffer, coordinates, crs);
             psBuilder.add(coordinates);
         }
         return psBuilder.toPositionSequence();
     }
 
-    private void readPosition(ByteBuffer byteBuffer, double[] coordinates) {
+    private <P extends Position> void readPosition(ByteBuffer byteBuffer, double[] coordinates, CoordinateReferenceSystem<P> crs) {
         for (int ci = 0; ci < crs.getCoordinateDimension(); ci++) {
             coordinates[ci] = byteBuffer.getDouble();
         }
     }
 
-    private List<LinearRing<?>> readPolygonRings(int numRings, ByteBuffer byteBuffer) {
-        List<LinearRing<?>> rings = new ArrayList<>(numRings);
+    private <P extends Position> List<LinearRing<P>> readPolygonRings(int numRings, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        List<LinearRing<P>> rings = new ArrayList<>(numRings);
         for (int i = 0; i < numRings; i++) {
-            rings.add(readRing(byteBuffer));
+            rings.add(readRing(byteBuffer, crs));
         }
         return rings;
     }
 
-    private LinearRing<?> readRing(ByteBuffer byteBuffer) {
+    private <P extends Position> LinearRing<P> readRing(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numPoints = byteBuffer.getInt();
-        PositionSequence<?> ps = readPositions(numPoints, byteBuffer);
+        PositionSequence<P> ps = readPositions(numPoints, byteBuffer, crs);
         try {
-            return new LinearRing<>(ps);
+            return new LinearRing<>(ps, crs);
         } catch (IllegalArgumentException e) {
             throw new WkbDecodeException(e);
         }
@@ -200,29 +192,14 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
      *
      * @param byteBuffer
      * @param typeCode
+     * @param crs
      */
-    protected abstract void readCrs(ByteBuffer byteBuffer, int typeCode);
+    protected abstract <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs);
 
     protected abstract boolean hasSrid(int typeCode);
 
     protected int readTypeCode(ByteBuffer byteBuffer) {
         return (int) byteBuffer.getUInt();
-    }
-
-    protected CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
-        return crs;
-    }
-
-    protected void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
-        this.crs = crs;
-    }
-
-    protected boolean isCrsValidated() {
-        return crsValidated;
-    }
-
-    protected void setCrsValidated(boolean crsValidated) {
-        this.crsValidated = crsValidated;
     }
 
 

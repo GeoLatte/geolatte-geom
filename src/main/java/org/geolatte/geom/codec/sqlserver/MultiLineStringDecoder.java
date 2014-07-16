@@ -21,25 +21,26 @@
 
 package org.geolatte.geom.codec.sqlserver;
 
-import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiLineString;
+import org.geolatte.geom.Position;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkMultiLineString;
 
 
-class MultiLineStringDecoder extends AbstractGeometryCollectionDecoder<LineString<?>> {
+class MultiLineStringDecoder extends AbstractGeometryCollectionDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
 		return OpenGisType.MULTILINESTRING;
 	}
 
+    @Override
+    protected <P extends Position> MultiLineString<P> createGeometry(List geometries, SqlServerGeometry<P> nativeGeom) {
+        return mkMultiLineString( geometries );
+    }
 
-	@Override
-	protected MultiLineString<?> createGeometry(List<LineString<?>> geometries, boolean hasM) {
-		return mkMultiLineString( (List<LineString<?>>) geometries );
-	}
+
 
 }

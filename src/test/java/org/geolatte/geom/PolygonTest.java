@@ -39,13 +39,13 @@ public class PolygonTest {
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
 
 
-    PositionSequence<P2D> shellPoints = variableSized(crs).add(0, 0).add(10, 0).add(10, 10).add( 0, 10).add( 0, 0).toPositionSequence();
-    PositionSequence<P2D> innerPoints = variableSized(crs).add(1, 1).add( 9, 1).add(9, 9).add(1, 9).add( 1, 1).toPositionSequence();
+    PositionSequence<P2D> shellPoints = variableSized(P2D.class).add(0, 0).add(10, 0).add(10, 10).add( 0, 10).add( 0, 0).toPositionSequence();
+    PositionSequence<P2D> innerPoints = variableSized(P2D.class).add(1, 1).add( 9, 1).add(9, 9).add(1, 9).add( 1, 1).toPositionSequence();
 
-    PositionSequence<P2D> shellPoints2 = variableSized(crs).add(0, 0).add(10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
-    PositionSequence<P2D> innerPoints2 = variableSized(crs).add(1, 1).add( 9, 1).add( 9, 9).add( 1, 9).add( 1, 1).toPositionSequence();
+    PositionSequence<P2D> shellPoints2 = variableSized(P2D.class).add(0, 0).add(10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
+    PositionSequence<P2D> innerPoints2 = variableSized(P2D.class).add(1, 1).add( 9, 1).add( 9, 9).add( 1, 9).add( 1, 1).toPositionSequence();
 
-    PositionSequence<P2D> shellPoints3 = variableSized(crs).add(1, 1).add(10, 0).add(10, 10).add(0, 10).add(1, 1).toPositionSequence();
+    PositionSequence<P2D> shellPoints3 = variableSized(P2D.class).add(1, 1).add(10, 0).add(10, 10).add(0, 10).add(1, 1).toPositionSequence();
 
 
     @Test
@@ -57,7 +57,7 @@ public class PolygonTest {
         } catch(IllegalArgumentException e){}
 
         try {
-            LinearRing<P2D> shell = new LinearRing<>(shellPoints);
+            LinearRing<P2D> shell = new LinearRing<>(shellPoints, crs);
             LinearRing<P2D> emptyInner = new LinearRing<>(crs);
             new Polygon<P2D>(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
@@ -66,15 +66,15 @@ public class PolygonTest {
 
     @Test
     public void testPolygonEquality() {
-        LinearRing<P2D> shell = new LinearRing<>(shellPoints);
-        LinearRing<P2D> inner = new LinearRing<>(innerPoints);
+        LinearRing<P2D> shell = new LinearRing<>(shellPoints, crs);
+        LinearRing<P2D> inner = new LinearRing<>(innerPoints, crs);
         Polygon<P2D> polygon1 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing<>(shellPoints2);
-        inner = new LinearRing<>(innerPoints2);
+        shell = new LinearRing<>(shellPoints2, crs);
+        inner = new LinearRing<>(innerPoints2, crs);
         Polygon<P2D> polygon2 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing(shellPoints3);
+        shell = new LinearRing(shellPoints3, crs);
         Polygon<P2D> polygon3 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
 

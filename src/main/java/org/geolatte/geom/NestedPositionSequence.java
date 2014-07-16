@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -36,28 +34,28 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
 
 
     NestedPositionSequence(PositionSequence<P>[] children) {
-        super(extractCrs(children));
+        super(extractDescriptor(children));
         this.children = children;
         this.size = calculateSize();
     }
 
-    private static <C extends Position> CoordinateReferenceSystem<C> extractCrs(PositionSequence<C>[] children) {
+    private static <C extends Position> PositionTypeDescriptor<C> extractDescriptor(PositionSequence<C>[] children) {
 
         if (children == null) {
             throw new IllegalArgumentException("Null or empty children array not allowed.");
         } else {
-            CoordinateReferenceSystem<C> crs = null;
+            PositionTypeDescriptor<C> descr = null;
             for (PositionSequence<C> seq : children) {
                 if (seq == null) {
                     throw new IllegalArgumentException("No null entries allowed in children array.");
                 } else {
-                    if (crs != null && !crs.equals(seq.getCoordinateReferenceSystem())) {
+                    if (descr != null && !descr.equals(seq.getPositionTypeDescriptor())) {
                         throw new IllegalArgumentException("All child sequences must have the same Coordinate Reference Systeml");
                     }
-                    crs = seq.getCoordinateReferenceSystem();
+                    descr = seq.getPositionTypeDescriptor();
                 }
             }
-            return crs;
+            return descr;
         }
     }
 

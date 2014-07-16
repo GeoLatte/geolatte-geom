@@ -37,10 +37,9 @@ import static org.junit.Assert.assertNotNull;
 public class MultiLineStringTest {
 
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-//    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
+    private static PositionTypeDescriptor<P2D> d2D = Positions.getDescriptor(crs.getPositionClass());
     private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-//    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
-//    private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+    private static PositionTypeDescriptor<P2DM> d2DM = Positions.getDescriptor(crsM.getPositionClass());
 
     private MultiLineString<P2DM> ml1;
     private MultiLineString<P2DM> ml2;
@@ -53,11 +52,11 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString<P2DM> ls1 = new LineString<>(new PackedPositionSequence<>(crsM, c1));
-    LineString<P2DM> ls2 = new LineString<>(new PackedPositionSequence<>(crsM, c2));
-    LineString<P2DM> ls3 = new LineString<>(new PackedPositionSequence<>(crsM,c3));
-    LineString<P2DM> lcs = new LineString<>(new PackedPositionSequence<>(crsM, cClosedSimple));
-    LineString<P2DM> lcns = new LineString<>(new PackedPositionSequence<>(crsM, cClosedNonSimple));
+    LineString<P2DM> ls1 = new LineString<>(new PackedPositionSequence<>(d2DM, c1), crsM);
+    LineString<P2DM> ls2 = new LineString<>(new PackedPositionSequence<>(d2DM, c2), crsM);
+    LineString<P2DM> ls3 = new LineString<>(new PackedPositionSequence<>(d2DM,c3), crsM);
+    LineString<P2DM> lcs = new LineString<>(new PackedPositionSequence<>(d2DM, cClosedSimple), crsM);
+    LineString<P2DM> lcns = new LineString<>(new PackedPositionSequence<>(d2DM, cClosedNonSimple), crsM);
 
 
     @Before

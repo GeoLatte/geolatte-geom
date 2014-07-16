@@ -32,16 +32,17 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
         super(crs);
     }
 
-    public Point(PositionSequence<P> sequence) {
-        super(sequence);
+    public Point(PositionSequence<P> sequence, CoordinateReferenceSystem<P> crs) {
+        super(sequence, crs);
     }
 
     public Point(P position, CoordinateReferenceSystem<P> crs) {
-        this(new PackedPositionSequence<>(crs, position.coords));
+        this(new PackedPositionSequence<P>(
+                Positions.getDescriptor(crs.getPositionClass()), position.coords), crs);
     }
 
     public Point(Point<P> point) {
-        this(point.getPositions());
+        this(point.getPositions(), point.getCoordinateReferenceSystem());
     }
 
     /**
@@ -50,7 +51,7 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
      * @return the <code>Position</code> of this <code>Point</code>.
      */
     public P getPosition() {
-        return positions.getPositionN(0) ;
+        return getPositions().getPositionN(0) ;
     }
 
     @Override

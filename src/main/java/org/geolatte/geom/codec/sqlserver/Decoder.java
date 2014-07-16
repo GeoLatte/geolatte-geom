@@ -23,6 +23,7 @@ package org.geolatte.geom.codec.sqlserver;
 
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 
 /**
  * Decodes native database objects to geometries of type T.
@@ -31,9 +32,9 @@ import org.geolatte.geom.Geometry;
  */
 public interface Decoder {
 
-	public Geometry<?> decode(SqlServerGeometry nativeGeom);
+	public <P extends Position> Geometry<P> decode(SqlServerGeometry<P> nativeGeom);
 
-	public boolean accepts(SqlServerGeometry nativeGeom);
+	public <P extends Position> boolean accepts(SqlServerGeometry<P> nativeGeom);
 
 	public boolean accepts(OpenGisType type);
 

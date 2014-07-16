@@ -21,7 +21,9 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A <code>WktToken</code> for point sequences in the input text.
@@ -29,17 +31,25 @@ import org.geolatte.geom.PositionSequence;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
-class WktPointSequenceToken implements WktToken {
+class WktPointSequenceToken<P extends Position> implements WktToken {
 
-    private final PositionSequence<?> positions;
+    private final PositionSequence<P> positions;
+    private final CoordinateReferenceSystem<P> crs;
 
-    public WktPointSequenceToken(PositionSequence<?> positions) {
+    public WktPointSequenceToken(PositionSequence<P> positions, CoordinateReferenceSystem<P> crs) {
         this.positions = positions;
+        this.crs = crs;
     }
 
-    public PositionSequence<?> getPositions() {
+    public PositionSequence<P> getPositions() {
         return this.positions;
     }
+
+    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
+            return this.crs;
+        }
+
+
 
     public String toString(){
         return positions.toString();

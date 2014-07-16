@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A <code>PositionSequence</code> that consists of a sequence of <code>Position</code>s.
  * <p/>
@@ -36,16 +34,9 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     PositionSequence<P> clone();
 
+    PositionTypeDescriptor<P> getPositionTypeDescriptor();
 
     Class<P> getPositionClass();
-
-     /**
-      * Returns the <code>CoordinateReferenceSystem</code> of this <code>PositionSequence</code>.
-      *
-      * @return the <code>CoordinateReferenceSystem</code> of this <code>PositionSequence</code>
-      */
-     CoordinateReferenceSystem<P> getCoordinateReferenceSystem();
-
 
     /**
      * Returns true iff this <code>PositionSequence</code> contains no <code>Position</code>s

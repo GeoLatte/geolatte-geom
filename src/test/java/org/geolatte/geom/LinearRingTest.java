@@ -36,19 +36,19 @@ public class LinearRingTest {
 
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
 
-    PositionSequence<P2D> validPoints = PositionSequenceBuilders.variableSized(crs)
-            .add(0, 0).add( 10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
+    PositionSequence<P2D> validPoints = PositionSequenceBuilders.variableSized(crs.getPositionClass())
+            .add(0, 0).add(10, 0).add(10, 10).add(0, 10).add(0, 0).toPositionSequence();
 
-    PositionSequence<P2D> tooFewPoints = PositionSequenceBuilders.variableSized(crs)
-                .add(0, 0).add( 10, 0).toPositionSequence();
+    PositionSequence<P2D> tooFewPoints = PositionSequenceBuilders.variableSized(crs.getPositionClass())
+            .add(0, 0).add(10, 0).toPositionSequence();
 
-    PositionSequence<P2D> notClosedPoints =  PositionSequenceBuilders.variableSized(crs)
-                .add(0, 0).add( 10, 0).add(10, 10).add(0, 10).toPositionSequence();
+    PositionSequence<P2D> notClosedPoints = PositionSequenceBuilders.variableSized(crs.getPositionClass())
+            .add(0, 0).add(10, 0).add(10, 10).add(0, 10).toPositionSequence();
 
 
     @Test
     public void testValidLinearRing() {
-        LinearRing<P2D> valid = new LinearRing<>(validPoints);
+        LinearRing<P2D> valid = new LinearRing<>(validPoints, crs);
         assertNotNull(valid);
         assertFalse(valid.isEmpty());
         assertEquals(crs, valid.getCoordinateReferenceSystem());
@@ -58,7 +58,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingShouldHaveAtLeast4Points() {
         try {
-            new LinearRing<>(tooFewPoints);
+            new LinearRing<>(tooFewPoints, crs);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
@@ -67,7 +67,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringShouldHaveAtLeast4Points() {
         try {
-            LineString<P2D> l = new LineString<>(tooFewPoints);
+            LineString<P2D> l = new LineString<>(tooFewPoints, crs);
             new LinearRing<>(l);
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
@@ -77,7 +77,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingMustBeClosed() {
         try {
-            new LinearRing<>(notClosedPoints);
+            new LinearRing<>(notClosedPoints, crs);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {
         }
@@ -86,7 +86,7 @@ public class LinearRingTest {
     @Test
     public void testLinearRingFromLineStringMustBeClosed() {
         try {
-            LineString<P2D> l = new LineString<>(notClosedPoints);
+            LineString<P2D> l = new LineString<>(notClosedPoints, crs);
             new LinearRing<>(l);
             fail("Non-empty linearRing should be closed.");
         } catch (IllegalArgumentException e) {

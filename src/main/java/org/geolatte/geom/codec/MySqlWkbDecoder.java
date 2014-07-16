@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 
@@ -32,25 +33,29 @@ import org.geolatte.geom.crs.CrsRegistry;
  */
 class MySqlWkbDecoder extends AbstractWkbDecoder {
 
+    private int srid;
+
+
     /**
      * Read the first four bytes: this contains the SRID
+     *
      * @param byteBuffer
      */
     @Override
     protected void prepare(ByteBuffer byteBuffer) {
         byteBuffer.setByteOrder(ByteOrder.NDR);
-        int srid = byteBuffer.getInt();
-        // if a CRS is already specified, ignore this value
-        if (getCoordinateReferenceSystem() != null) return;
-        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
-                CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
-        setCoordinateReferenceSystem(crs);
+        srid = byteBuffer.getInt();
+
     }
 
 
     @Override
-    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
-        //is already done in prepare() method
+    protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
+        // if a CRS is already specified, ignore this value
+        if (crs != null) return crs;
+        CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
+                CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+        return (CoordinateReferenceSystem<P>)crsDeclared;
     }
 
     @Override

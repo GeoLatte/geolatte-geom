@@ -6,6 +6,9 @@ package org.geolatte.geom;
  */
 public class P3D extends P2D implements Vertical {
 
+    public final static PositionTypeDescriptor<P3D> descriptor = new PositionTypeDescriptor<>(P3D.class,
+            3, 2, -1);
+
     public P3D() {
         super();
     }
@@ -24,8 +27,7 @@ public class P3D extends P2D implements Vertical {
     }
 
     @Override
-    public int getCoordinateDimension() {
-        return 3;
+    public PositionTypeDescriptor<? extends P3D> getDescriptor() {
+        return descriptor;
     }
-
 }

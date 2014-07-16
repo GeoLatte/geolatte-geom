@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A factory for <code>PositionSequenceBuilder</code>s.
  *
@@ -33,26 +31,27 @@ public class PositionSequenceBuilders {
 
     /**
      * Creates a <code>PositionSequenceBuilder</code> of fixed size.
-     *
+     * <p/>
      * <p>The returned <code>PositionSequenceBuilder</code> expects that exactly <code>num</code> will be
      * added to it.</p>
      *
-     * @param num the number of <code>Point</code>s that will be added to the returned builder.
-     * @param crs the <code>CoordinateReferenceSystem</code> of the <code>Point</code>s.
+     * @param num     the number of <code>Position</code>s that will be added to the returned builder.
+     * @param posType the class of {@code Position}
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PointSequence</code> containing <code>num</code> <code>Position</code>s.
      */
-    public static <P extends Position> PositionSequenceBuilder<P> fixedSized(int num, CoordinateReferenceSystem<P> crs){
-        return new FixedSizePositionSequenceBuilder<>(num, crs);
+    public static <P extends Position> PositionSequenceBuilder<P> fixedSized(int num, Class<P> posType) {
+        return new FixedSizePositionSequenceBuilder<>(num, Positions.getDescriptor(posType));
     }
 
     /**
      * Creates a <code>PositionSequenceBuilder</code> of variable size.
      *
-     * @param crs the <code>CoordinateReferenceSystem</code> of the <code>Position</code>s.
+     * @param posType the class of {@code Position}
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PositionSequence</code> for an arbitrary number of <code>Position</code>s.
      */
-    public static <P extends Position> PositionSequenceBuilder<P> variableSized(CoordinateReferenceSystem<P> crs) {
-        return new VariableSizePositionSequenceBuilder<>(crs);
+    public static <P extends Position> PositionSequenceBuilder<P> variableSized(Class<P> posType) {
+        return new VariableSizePositionSequenceBuilder<>(Positions.getDescriptor(posType));
+
     }
 
 }

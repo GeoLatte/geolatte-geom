@@ -75,13 +75,13 @@ class WktTokenizer extends AbstractWktTokenizer {
         // e.g. when a composite CRS is passed in the decode function for a 2D WKT.
         // this works because fastReadNumber returns 0 when attempting to read beyond a point delimiter
         double[] coords = new double[crs.getCoordinateDimension()];
-        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPoints, crs);
+        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPoints, crs.getPositionClass());
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);
             skipPointDelimiter();
         }
-        return new WktPointSequenceToken(psBuilder.toPositionSequence());
+        return new WktPointSequenceToken(psBuilder.toPositionSequence(), getCoordinateReferenceSystem());
     }
 
     private void readPoint(double[] coords) {

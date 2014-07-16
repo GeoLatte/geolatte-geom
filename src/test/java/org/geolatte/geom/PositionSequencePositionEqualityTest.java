@@ -21,9 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -35,34 +32,29 @@ import static org.junit.Assert.assertTrue;
  */
 public class PositionSequencePositionEqualityTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
 
-
-    PositionSequence<P3DM> ps1 = PositionSequenceBuilders.fixedSized(3, crsZM)
+    PositionSequence<P3DM> ps1 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPositionSequence();
 
-    PositionSequence<P2D> ps1_2D = PositionSequenceBuilders.fixedSized(3, crs)
+    PositionSequence<P2D> ps1_2D = PositionSequenceBuilders.fixedSized(3, P2D.class)
             .add(1, 2)
             .add(2, 3)
             .add(3, 4).toPositionSequence();
 
 
-    PositionSequence<P3DM> ps2 = PositionSequenceBuilders.fixedSized(3, crsZM)
+    PositionSequence<P3DM> ps2 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPositionSequence();
 
-    PositionSequence<P3DM> ps3 = PositionSequenceBuilders.fixedSized(3, crsZM)
+    PositionSequence<P3DM> ps3 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
             .add(1, 2, 4, 5)
             .add(2, 3, 3, 2)
             .add(3, 4, 5, 2).toPositionSequence();
 
-    PositionSequence<P3DM> ps4 = PositionSequenceBuilders.fixedSized(3, crsZM)
+    PositionSequence<P3DM> ps4 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
             .add(2, 2, 4, 5)
             .add(2, 4, 3, 2)
             .add(3, 4, 5, 2).toPositionSequence();
@@ -81,11 +73,11 @@ public class PositionSequencePositionEqualityTest {
     @Test
     public void testEmptyPointSequencesAreEqual() {
         assertTrue(eq.equals(
-                PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence(),
-                PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence()));
+                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence(),
+                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence()));
 
         assertFalse(eq.equals(
-                PositionSequenceBuilders.fixedSized(0, crs).toPositionSequence(),
+                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence(),
                 ps1_2D));
     }
 

@@ -90,7 +90,7 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
 
     @Override
     public void visit(LineString<P> lineString) {
-        currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getCoordinateReferenceSystem());
+        currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getPositionClass());
         P lastAddedPoint = null;
         LineSegments<P> segments = new LineSegments<P>(lineString.getPositions());
         for (LineSegment<P> segment : segments) {
@@ -142,7 +142,7 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
     private void startNewPointSequenceIfNotEmpty() {
         if (!sequenceIsEmpty) {
             positionSequences.add(currentBuilder.toPositionSequence());
-            currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getCoordinateReferenceSystem());
+            currentBuilder = PositionSequenceBuilders.variableSized(this.geometry.getPositionClass());
             sequenceIsEmpty = true;
         }
     }
@@ -204,14 +204,14 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
             Point<P>[] pnts = (Point<P>[])new Point[number0Dimensional];
             int i = 0;
             for (PositionSequence<P> ps : positionSequences) {
-                pnts[i++] = new Point<P>(ps);
+                pnts[i++] = new Point<P>(ps, this.geometry.getCoordinateReferenceSystem());
             }
             return new MultiPoint<P>(pnts);
         }
 
         if (number0Dimensional == 1 && number1Dimensional == 0) {
             return new MultiPoint<P>(
-                    new Point[]{new Point<P>(positionSequences.get(0))}
+                    new Point[]{new Point<P>(positionSequences.get(0), this.geometry.getCoordinateReferenceSystem())}
             );
         }
 
@@ -219,7 +219,7 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
             LineString<P>[] lineStrings = (LineString<P>[])new LineString[number1Dimensional];
             int i = 0;
             for (PositionSequence ps : positionSequences) {
-                lineStrings[i++] = new LineString<P>(ps);
+                lineStrings[i++] = new LineString<P>(ps, this.geometry.getCoordinateReferenceSystem());
             }
             return new MultiLineString<P>(lineStrings);
         }
@@ -229,9 +229,9 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
             int i = 0;
             for (PositionSequence<P> ps : positionSequences) {
                 if (ps.size() == 1) {
-                    geometries[i++] = new Point<P>(ps);
+                    geometries[i++] = new Point<P>(ps, this.geometry.getCoordinateReferenceSystem());
                 } else {
-                    geometries[i++] = new LineString<P>(ps);
+                    geometries[i++] = new LineString<P>(ps, this.geometry.getCoordinateReferenceSystem());
                 }
             }
             return new GeometryCollection<P, Geometry<P>>(geometries);

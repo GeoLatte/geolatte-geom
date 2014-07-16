@@ -264,10 +264,10 @@ public class JTS {
         }
         org.geolatte.geom.LinearRing<P>[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
         org.geolatte.geom.LineString<P> extRing = from(jtsGeometry.getExteriorRing(), crs);
-        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPositions());
+        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPositions(), extRing.getCoordinateReferenceSystem());
         for (int i = 1; i < rings.length; i++) {
             org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crs);
-            rings[i] = new org.geolatte.geom.LinearRing(intRing.getPositions());
+            rings[i] = new org.geolatte.geom.LinearRing(intRing);
         }
         return new org.geolatte.geom.Polygon(rings);
     }
@@ -305,7 +305,7 @@ public class JTS {
      */
     private static  <P extends Position> org.geolatte.geom.LineString<P> from(LineString jtsLineString,  CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return new org.geolatte.geom.LineString<P>(pscsFactory.toPositionSequence(cs, crs));
+        return new org.geolatte.geom.LineString<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass()), crs);
 
     }
 
@@ -328,7 +328,7 @@ public class JTS {
      */
     private static <P extends Position> org.geolatte.geom.Point<P> from(com.vividsolutions.jts.geom.Point jtsPoint, CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs));
+        return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass()), crs);
     }
 
     ///

@@ -41,7 +41,7 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
      * @param base
      */
     protected LineString(LineString<P> base) {
-        super(base.getPositions());
+        super(base.getPositions(), base.getCoordinateReferenceSystem());
     }
 
     /**
@@ -51,8 +51,8 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
      * @param positions the {@code PositionSequence} that determines this geometry
      * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size < 2
      */
-    public LineString(PositionSequence<P> positions) {
-        super(positions);
+    public LineString(PositionSequence<P> positions, CoordinateReferenceSystem<P> crs) {
+        super(positions, crs);
         if (positions.size() != 0 && positions.size() < 2) {
             throw new IllegalArgumentException("Require at least two points for a linestring");
         }

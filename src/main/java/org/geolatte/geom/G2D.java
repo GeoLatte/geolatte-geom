@@ -6,6 +6,9 @@ package org.geolatte.geom;
  */
 public class G2D extends Position {
 
+    public final static PositionTypeDescriptor<G2D> descriptor = new PositionTypeDescriptor<>(G2D.class,
+            2, -1, -1);
+
     public G2D() {
         super();
     }
@@ -18,16 +21,16 @@ public class G2D extends Position {
         super(coords);
     }
 
-    @Override
-    public int getCoordinateDimension() {
-        return 2;
-    }
-
     public double getLon() {
         return getCoordinate(0);
     }
 
     public double getLat() {
         return getCoordinate(1);
+    }
+
+    @Override
+    public PositionTypeDescriptor<? extends G2D> getDescriptor() {
+        return descriptor;
     }
 }

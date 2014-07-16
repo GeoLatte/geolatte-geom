@@ -22,23 +22,23 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.MultiPolygon;
-import org.geolatte.geom.Polygon;
+import org.geolatte.geom.Position;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkMultiPolygon;
 
-class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder<Polygon<?>> {
+class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
 		return OpenGisType.MULTIPOLYGON;
 	}
 
-	@Override
-	protected MultiPolygon<?> createGeometry(List<Polygon<?>> geometries, boolean hasM) {
-		return mkMultiPolygon( geometries );
-	}
+    @Override
+    protected <P extends Position> MultiPolygon<P> createGeometry(List geometries, SqlServerGeometry<P> nativeGeom) {
+        return mkMultiPolygon( geometries );
+    }
 
 
 }

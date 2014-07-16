@@ -114,25 +114,25 @@ public class MeasuredTestCases {
 
 
     MeasuredTestCases() {
-        PositionSequenceBuilder<P2D> psBuilder = PositionSequenceBuilders.fixedSized(4, crs);
+        PositionSequenceBuilder<P2D> psBuilder = PositionSequenceBuilders.fixedSized(4, P2D.class);
         psBuilder.add(0, 0)
                 .add(1, 0)
                 .add(1, 1)
                 .add(2, 1);
-        lineString2d = new LineString<>(psBuilder.toPositionSequence());
+        lineString2d = new LineString<>(psBuilder.toPositionSequence(), crs);
 
-        psBuilder = PositionSequenceBuilders.fixedSized(3, crs);
+        psBuilder = PositionSequenceBuilders.fixedSized(3, P2D.class);
         psBuilder.add(3, 1).add(4, 1).add(5, 1);
-        LineString<P2D> test2DLine2 = new LineString<>(psBuilder.toPositionSequence());
+        LineString<P2D> test2DLine2 = new LineString<>(psBuilder.toPositionSequence(), crs);
         multiLineString2D = new MultiLineString<>(lineString2d, test2DLine2);
 
 
-        PositionSequenceBuilder<P3DM> psBuilder3DM = PositionSequenceBuilders.fixedSized(4, crsZM);
+        PositionSequenceBuilder<P3DM> psBuilder3DM = PositionSequenceBuilders.fixedSized(4, P3DM.class);
         psBuilder3DM.add(0, 0, 2, 5)
                 .add(1, 0, 3, 10)
                 .add(1, 1, 4, 20)
                 .add(2, 1, 5, 30);
-        lineString3DM = new LineString<>(psBuilder3DM.toPositionSequence());
+        lineString3DM = new LineString<>(psBuilder3DM.toPositionSequence(),crsZM);
 
         measuredMultiPoint = new MultiPoint<>(
                 point(crsM, pM(0, 0, 1)),
@@ -140,13 +140,13 @@ public class MeasuredTestCases {
         );
 
 
-        psBuilder = PositionSequenceBuilders.fixedSized(5, crs);
+        psBuilder = PositionSequenceBuilders.fixedSized(5, P2D.class);
         psBuilder.add(0, 0)
                 .add(1, 0)
                 .add(1, 1)
                 .add(0, 1)
                 .add(0, 0);
-        linearRing = new LineString(psBuilder.toPositionSequence());
+        linearRing = new LineString(psBuilder.toPositionSequence(), crs);
 
 
         emptyLineString = new LineString<>(crs);

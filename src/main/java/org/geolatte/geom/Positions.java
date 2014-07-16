@@ -47,31 +47,31 @@ public class Positions {
                     new P2D() :
                     new P2D(coordinates[0], coordinates[1]));
         } else if (pClass == P3D.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new P3D() :
                     new P3D(coordinates[0], coordinates[1], coordinates[2]));
         } else if (pClass == P2DM.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new P2DM() :
                     new P2DM(coordinates[0], coordinates[1], coordinates[2]));
         } else if (pClass == P3DM.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new P3DM() :
                     new P3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
         } else if (pClass == G2D.class) {
-            return (P)( coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new G2D() :
                     new G2D(coordinates[0], coordinates[1]));
         } else if (pClass == G3D.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new G3D() :
                     new G3D(coordinates[0], coordinates[1], coordinates[2]));
         } else if (pClass == G2DM.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new G2DM() :
                     new G2DM(coordinates[0], coordinates[1], coordinates[2]));
         } else if (pClass == G3DM.class) {
-            return (P)(coordinates.length == 0 ?
+            return (P) (coordinates.length == 0 ?
                     new G3DM() :
                     new G3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
         }
@@ -84,6 +84,39 @@ public class Positions {
         return mkPosition(crs.getPositionClass(), coordinates);
     }
 
+    public static <P extends Position> PositionTypeDescriptor<P> getDescriptor(Class<P> targetPosClass) {
+
+        if (P2D.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) P2D.descriptor;
+        }
+        if (P3D.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) P3D.descriptor;
+        }
+        if (P2DM.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) P2DM.descriptor;
+        }
+        if (P3DM.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) P3DM.descriptor;
+        }
+        if (G2D.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) G2D.descriptor;
+        }
+        if (G3D.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) G3D.descriptor;
+        }
+        if (G2DM.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) G2DM.descriptor;
+        }
+        if (G3DM.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) G3DM.descriptor;
+        }
+        if (Geocentric.class.equals(targetPosClass)) {
+            return (PositionTypeDescriptor<P>) Geocentric.descriptor;
+        }
+
+        throw new IllegalStateException("Unknow position type.");
+
+    }
 
     /**
      * Copies the source positions to a new PointSequence.
@@ -92,14 +125,16 @@ public class Positions {
      * dimensions then the source, NaN coordinate values are created.</p>
      *
      * @param source
-     * @param targetCrs
+     * @param targetPosClass target type of {@Code Position}
      * @param <P>
      * @return
      */
-    public static <Q extends Position, P extends Position> PositionSequence<P> copy(final PositionSequence<Q> source, final CoordinateReferenceSystem<P> targetCrs) {
-        final PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(source.size(), targetCrs);
+    public static <Q extends Position, P extends Position> PositionSequence<P> copy(final PositionSequence<Q> source,
+                                                                                    final Class<P> targetPosClass) {
+        final PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(source.size(), targetPosClass);
         if (source.isEmpty()) return builder.toPositionSequence();
-        final double[] coords = new double[Math.max(source.getCoordinateDimension(), targetCrs.getCoordinateDimension())];
+        PositionTypeDescriptor descriptor = getDescriptor(targetPosClass);
+        final double[] coords = new double[Math.max(source.getCoordinateDimension(), descriptor.getCoordinateDimension())];
         Arrays.fill(coords, Double.NaN);
         PositionVisitor<Q> visitor = new PositionVisitor<Q>() {
             public void visit(Q position) {
@@ -110,6 +145,7 @@ public class Positions {
         source.accept(visitor);
         return builder.toPositionSequence();
     }
+
 
     @SuppressWarnings("unchecked")
     private static <P extends Position> CoordinateReferenceSystem<P> cast(CoordinateReferenceSystem crs, Class<P> tp) {

@@ -23,8 +23,9 @@ package org.geolatte.geom.codec.sqlserver;
 
 
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
-import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA.
@@ -38,27 +39,27 @@ class PointDecoder extends AbstractDecoder {
 		return OpenGisType.POINT;
 	}
 
-	protected Point<?> createNullGeometry() {
-		return new Point<>(CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+	protected <P extends Position> Point<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
+		return new Point<>(crs);
 	}
 
-	protected Point<?> createGeometry(SqlServerGeometry nativeGeom) {
+    protected <P extends Position> Point<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
 		return createPoint( nativeGeom, 0 );
 	}
 
 	@Override
-	protected Point<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected <P extends Position>  Point<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
 		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry();
+			return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
 		}
 		int figureOffset = nativeGeom.getFiguresForShape( shapeIndex ).start;
 		int pntOffset = nativeGeom.getPointsForFigure( figureOffset ).start;
 		return createPoint( nativeGeom, pntOffset );
 	}
 
-	private Point<?> createPoint(SqlServerGeometry nativeGeom, int pntOffset) {
-        PositionSequence<?> positionSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
-        return new Point<>(positionSequence);
+	private <P extends Position> Point<P> createPoint(SqlServerGeometry<P> nativeGeom, int pntOffset) {
+        PositionSequence<P> positionSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
+        return new Point<>(positionSequence, nativeGeom.getCoordinateReferenceSystem());
     }
 
 

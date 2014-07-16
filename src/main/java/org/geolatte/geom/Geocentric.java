@@ -8,8 +8,15 @@ package org.geolatte.geom;
  */
 public abstract class Geocentric extends Position {
 
+    public final static PositionTypeDescriptor<Geocentric> descriptor = new PositionTypeDescriptor<>(Geocentric.class,
+            3, 2, -1);
+
+    public Geocentric() {
+        super();
+    }
+
     public Geocentric(double x, double y, double z) {
-        super(x,y,z);
+        super(x, y, z);
     }
 
     public double getX() {
@@ -22,5 +29,10 @@ public abstract class Geocentric extends Position {
 
     public double getZ() {
         return getCoordinate(2);
+    }
+
+    @Override
+    public PositionTypeDescriptor<? extends Geocentric> getDescriptor() {
+        return descriptor;
     }
 }

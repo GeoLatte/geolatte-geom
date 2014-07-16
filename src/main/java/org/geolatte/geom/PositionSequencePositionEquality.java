@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * A {@link  PositionSequenceEquality} implementation that considers two <code>PositionSequence</code>s
  * equal if and only if both contain the same positions in the same order. Whether two <code>Positions</code>s
@@ -56,8 +54,7 @@ public class PositionSequencePositionEquality implements PositionSequenceEqualit
     }
 
     private <P extends Position> boolean testPointSequenceEquality(PositionSequence<P> first, PositionSequence<P> second) {
-        CoordinateReferenceSystem crs1 = first.getCoordinateReferenceSystem();
-        CoordinateReferenceSystem crs2 = second.getCoordinateReferenceSystem();
+        if (!first.getPositionClass().equals(second.getPositionClass())) return false;
         double[] c1 = new double[first.getCoordinateDimension()];
         double[] c2 = new double[second.getCoordinateDimension()];
         for (int idx = 0; idx < first.size(); idx++) {
