@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
@@ -139,9 +140,9 @@ public class TestDefaultMeasureGeometryOperations {
         assertTrue(Double.isNaN(m));
     }
 
-    @Test
-    public void testGetMeasureOpReturnsNaNWhenPointNotOnMeasuredGeometry() {
-        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create2D(5, 5)).execute();
+    @Test(expected=IllegalArgumentException.class)
+    public void testGetMeasureOpThrowsIllegalArgumentExceptionNWhenPointNotOnMeasuredGeometry() {
+        double m = measureOps.createGetMeasureOp(tc.measuredLineString2D, Points.create2D(5, 5), 0.0000001).execute();
         assertTrue(Double.isNaN(m));
     }
 
@@ -156,8 +157,12 @@ public class TestDefaultMeasureGeometryOperations {
         double m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create2D(4.5, 1)).execute();
         assertEquals(4.5, m, Math.ulp(10));
 
-        m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create2D(2.5, 1)).execute();
-        assertTrue(Double.isNaN(m));
+        try {
+            m = measureOps.createGetMeasureOp(tc.measuredMultiLineString2D, Points.create2D(2.5, 1), Math.ulp(100)).execute();
+            fail();
+        }catch(IllegalArgumentException e){
+            // OK
+        }
 
     }
 
@@ -173,5 +178,21 @@ public class TestDefaultMeasureGeometryOperations {
         assertEquals(2d, m, Math.ulp(10));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void bugPointsOutsideTolerance() {
+        Point searchPnt = (Point)Wkt.fromWkt("SRID=31370;POINT(206157.430115 194008.55010999998)");
+        Geometry weg = Wkt.fromWkt("SRID=31370;MULTILINESTRINGM((205522.61387500167 194764.36987499893 54.015,206238.09399999678 193925.8597499989 55.117))");
+        double m = measureOps.createGetMeasureOp(weg, searchPnt, Math.ulp(100)).execute();
+        assertFalse(Double.isNaN(m));
+
+    }
+
+    @Test
+    public void bugPointsWithinTolerance() {
+        Point searchPnt = (Point)Wkt.fromWkt("SRID=31370;POINT(206157.430115 194008.55010999998)");
+        Geometry weg = Wkt.fromWkt("SRID=31370;MULTILINESTRINGM((205522.61387500167 194764.36987499893 54.015,206238.09399999678 193925.8597499989 55.117))");
+        double m = measureOps.createGetMeasureOp(weg, searchPnt, 25).execute();
+        assertFalse(Double.isNaN(m));
+    }
 
 }

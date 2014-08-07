@@ -32,11 +32,24 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a <code>GeometryOperation</code> to calculate the measure value
      * at the specified point
-     * @param geometry a linear <code>Geometry</code>
+     * @param geometry a measured <code>Geometry</code>
      * @param point a <code>Point</code> on the geometry
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
     public GeometryOperation<Double> createGetMeasureOp(Geometry geometry, Point point);
+
+    /**
+     * Creates a <code>GeometryOperation</code> to calculate the measure value, given that the points fall within
+     * a specified distance from the linestring
+     * at the specified point
+     * @param geometry a measured <code>Geometry</code>
+     * @param point a <code>Point</code> on the geometry
+     * @param tolerance the maximum allowed distance between geometry and point
+     * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
+     * @throws IllegalArgumentException when point is not within tolerance of geometry
+     */
+    public GeometryOperation<Double> createGetMeasureOp(Geometry geometry, Point point, double tolerance);
+
 
     /**
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
