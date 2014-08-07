@@ -166,10 +166,16 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 Point p0 = segment.getStartPoint();
                 Point p1 = segment.getEndPoint();
                 double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPoint);
-                double d = Math.sqrt(dAndR[0]);
+                double d = Math.sqrt(Math.abs(dAndR[0])); //TODO -- Math.abs() should not be necessary. Check pointToSegment2D()
                 if (d <= distToSearchPoint ) {
                     double r = dAndR[1];
-                    mValue = p0.getM() + r * (p1.getM() - p0.getM());
+                    if (r <= 0) {
+                        mValue = p0.getM();
+                    } else if (r >= 1) {
+                        mValue = p1.getM();
+                    } else {
+                        mValue = p0.getM() + r * (p1.getM() - p0.getM());
+                    }
                     distToSearchPoint = d;
                 }
 
