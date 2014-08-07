@@ -51,13 +51,17 @@ public class Vector {
         double t = Vector.dot(d, ymp0, true);
         double dd = Vector.dot(d, d);
         if (t <= 0) {
+            // p0 is closest to y
             return new double[]{Vector.dot(ymp0, ymp0), t / dd};
         }
         if (t >= dd) {
+            //p1 is closest to y
             P ymp1 = Vector.substract(y, p1);
             return new double[]{Vector.dot(ymp1, ymp1), t / dd};
         }
-        return new double[]{Vector.dot(ymp0, ymp0) - (t * t / dd), t / dd};
+        //we return the abs value: due to rounding errors the formula may return very small negative numbers.
+        double dist = Math.abs(Vector.dot(ymp0, ymp0) - (t * t / dd));
+        return new double[]{dist, t / dd};
     }
 
     /**
