@@ -35,25 +35,35 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.d2D);
 
+    @Override
+    public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point, final double tolerance) {
+        return measureOp(geometry, point, tolerance, true);
+    }
+
     /**
      * @inheritDoc
      */
     @Override
     public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point) {
+        return measureOp(geometry, point, 0.0d, false);
+    }
+
+    private GeometryOperation<Double> measureOp(final Geometry geometry, final Point point, final double tolerance,
+                                                final boolean testTolerance){
         if (geometry == null || point == null) throw new IllegalArgumentException("Parameters must not be NULL");
         return new GeometryOperation<Double>(){
             @Override
             public Double execute() {
                 if(geometry.isEmpty() || point.isEmpty()) return Double.NaN;
-                //TODO -- tolerance parameter into API
-                InterpolatingVisitor visitor = new InterpolatingVisitor(point, Math.ulp(100));
+                InterpolatingVisitor visitor = new InterpolatingVisitor(point, tolerance, testTolerance);
                 geometry.accept(visitor);
                 return visitor.m();
             }
         };
     }
 
-     /**
+
+    /**
      * @inheritDoc
      */
     @Override
@@ -116,25 +126,36 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
     private static class InterpolatingVisitor implements GeometryVisitor {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
+        public static final String OUTSIDE_TOL_MSG = "Search point not within tolerance: distance to geometry is %f > %f";
 
         final Point searchPoint;
         final double tolerance;
+        final boolean testTolerance;
         double mValue = Double.NaN;
+        double distToSearchPoint = Double.MAX_VALUE;
 
-        InterpolatingVisitor(Point pnt, double tolerance){
+
+        InterpolatingVisitor(Point pnt, double tolerance, boolean testTolerance){
             if (pnt == null) throw new IllegalArgumentException("Null point is not allowed.");
             searchPoint = pnt;
             this.tolerance = Math.abs(tolerance);
+            this.testTolerance = testTolerance;
         }
 
         double m(){
-            return mValue;
+            if (!testTolerance || (testTolerance && distToSearchPoint <= tolerance)) {
+                return mValue;
+            }
+            throw new IllegalArgumentException(String.format(OUTSIDE_TOL_MSG, distToSearchPoint, tolerance));
         }
 
         @Override
         public void visit(Point point) {
-            if ( pntEq.equals(searchPoint, point)) {
+            // Note that this is also used when visiting MultiPoints
+            double dts = searchPoint.distance(point);
+            if (dts <= distToSearchPoint) {
                 mValue = point.getM();
+                distToSearchPoint = dts;
             }
         }
 
@@ -145,10 +166,13 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 Point p0 = segment.getStartPoint();
                 Point p1 = segment.getEndPoint();
                 double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPoint);
-                if (dAndR[0] < this.tolerance*this.tolerance){
+                double d = Math.sqrt(dAndR[0]);
+                if (d <= distToSearchPoint ) {
                     double r = dAndR[1];
-                    mValue = p0.getM() + r*(p1.getM() - p0.getM());
+                    mValue = p0.getM() + r * (p1.getM() - p0.getM());
+                    distToSearchPoint = d;
                 }
+
             }
         }
 
@@ -159,6 +183,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
         @Override
         public void visit(GeometryCollection collection) {
+
         }
 
         @Override
