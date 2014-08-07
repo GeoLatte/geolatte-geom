@@ -32,6 +32,8 @@ package org.geolatte.geom;
 */
 public interface ProjectedGeometryOperations {
 
+    public final ProjectedGeometryOperations Impl = new JTSGeometryOperations();
+
     /**
      * Creates an operation to test the simplicity of the specified <code>Geometry</code>.
      *

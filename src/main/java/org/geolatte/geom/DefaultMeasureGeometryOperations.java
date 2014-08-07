@@ -37,7 +37,6 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     private final static PositionEquality pntEq = new ExactPositionEquality();
 
-
     @Override
     public <P extends P2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
         return locateBetween(geometry, mValue, mValue);
@@ -60,11 +59,11 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends P2D & Measured> double measureAt(final Geometry<P> geometry, final P pos) {
+    public <P extends P2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
         if (geometry.isEmpty()) return Double.NaN;
         //TODO -- tolerance parameter into API
-        InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, Math.ulp(100));
+        InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, tolerance);
         geometry.accept(visitor);
         return visitor.m();
     }
@@ -131,25 +130,34 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
     private static class InterpolatingVisitor<P extends P2D & Measured> implements GeometryVisitor<P> {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
+        public static final String OUTSIDE_TOL_MSG = "Search point not within tolerance: distance to geometry is %f > %f";
 
-        final P searchPoint;
+        final P searchPosition;
         final double tolerance;
         double mValue = Double.NaN;
+        double distToSearchPoint = Double.MAX_VALUE;
 
         InterpolatingVisitor(P pnt, double tolerance) {
             if (pnt == null) throw new IllegalArgumentException("Null point is not allowed.");
-            searchPoint = pnt;
+            searchPosition = pnt;
             this.tolerance = Math.abs(tolerance);
         }
 
         double m() {
-            return mValue;
+            if (distToSearchPoint <= tolerance) {
+                return mValue;
+            }
+            throw new IllegalArgumentException(String.format(OUTSIDE_TOL_MSG, distToSearchPoint, tolerance));
         }
 
         @Override
         public void visit(Point<P> point) {
-            if (pntEq.equals2D(searchPoint, point.getPosition())) {
+            // Note that this is also used when visiting MultiPoints
+            P pos = point.getPosition();
+            double dts = Math.hypot(pos.getX() - searchPosition.getX(), pos.getY() - searchPosition.getY());
+            if (dts <= distToSearchPoint) {
                 mValue = point.getPosition().getM();
+                distToSearchPoint = dts;
             }
         }
 
@@ -159,10 +167,18 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             for (LineSegment<P> segment : lineSegments) {
                 P p0 = segment.getStartPosition();
                 P p1 = segment.getEndPosition();
-                double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPoint);
-                if (dAndR[0] < this.tolerance * this.tolerance) {
+                double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPosition);
+                double d = Math.sqrt(dAndR[0]);
+                if (d <= distToSearchPoint ) {
                     double r = dAndR[1];
-                    mValue = p0.getM() + r * (p1.getM() - p0.getM());
+                    if (r <= 0) {
+                        mValue = p0.getM();
+                    } else if (r >= 1) {
+                        mValue = p1.getM();
+                    } else {
+                        mValue = p0.getM() + r * (p1.getM() - p0.getM());
+                    }
+                    distToSearchPoint = d;
                 }
             }
         }

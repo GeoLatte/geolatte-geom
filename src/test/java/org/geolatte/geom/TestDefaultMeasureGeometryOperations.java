@@ -135,53 +135,53 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateGetMeasureOpThrowsExceptionOnNullGeometry() {
-        measureOps.measureAt((Geometry<P2DM>) null, new P2DM(1, 2, 0));
+        measureOps.measureAt((Geometry<P2DM>) null, new P2DM(1, 2, 0), 1);
 
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateGetMeasureOpThrowsExceptionOnNullPosition() {
-        measureOps.measureAt(tc.measuredLineString2D, null);
+        measureOps.measureAt(tc.measuredLineString2D, null, 1);
 
     }
 
     @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
-        double m = measureOps.measureAt(new LineString<>(crsM), new P2DM(1, 2, 0));
+        double m = measureOps.measureAt(new LineString<>(crsM), new P2DM(1, 2, 0), 0.1);
         assertTrue(Double.isNaN(m));
     }
 
-    @Test
-    public void testGetMeasureOpReturnsNaNWhenPointNotOnMeasuredGeometry() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(5, 5, 0));
-        assertTrue(Double.isNaN(m));
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetMeasureThrowsExceptionWhenPointNotOnMeasuredGeometry() {
+        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(5, 5, 0), 0.001);
     }
 
     @Test
     public void testGetMeasureOpOnRegularLine() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(1.5, 1, 0));
+        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(1.5, 1, 0), 0.001);
         assertEquals(2.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiLine() {
-        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(4.5, 1, 0));
+        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(4.5, 1, 0), 0.001);
         assertEquals(4.5, m, Math.ulp(10));
 
-        m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(2.5, 1, 0));
-        assertTrue(Double.isNaN(m));
-
+        try {
+            m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(2.5, 1, 0), 0.001);
+            fail();
+        } catch(IllegalArgumentException e) {}
     }
 
     @Test
     public void testGetMeasureOpOnRegularLinearRing() {
-        double m = measureOps.measureAt(tc.measuredLinearRing, new P2DM(0, 0.5, 0));
+        double m = measureOps.measureAt(tc.measuredLinearRing, new P2DM(0, 0.5, 0), 0.001);
         assertEquals(3.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiPoint() {
-        double m = measureOps.measureAt(tc.measuredMultiPoint, new P2DM(1, 2, 0));
+        double m = measureOps.measureAt(tc.measuredMultiPoint, new P2DM(1, 2, 0), 0.001);
         assertEquals(2d, m, Math.ulp(10));
     }
 

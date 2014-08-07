@@ -64,10 +64,11 @@ public interface MeasureGeometryOperations {
      * at the specified point
      *
      * @param geometry a linear <code>Geometry</code>
-     * @param pos      a <code>Position</code> on the geometry
+     * @param pos      a <code>Position</code> within tolerance of the geometry
+     * @param tolerance the maximum value allowed for distance between pos and geometry.
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
-    public <P extends P2D & Measured> double measureAt(Geometry<P> geometry, P pos);
+    public <P extends P2D & Measured> double measureAt(Geometry<P> geometry, P pos, double tolerance);
 
     /**
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
