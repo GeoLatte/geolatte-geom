@@ -1,6 +1,8 @@
 package org.geolatte.geom;
 
 /**
+ * A geographic {@code Position} with a measure value.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */

@@ -4,9 +4,9 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * An envelope or bounding box implementation.
- * <p/>
- * <p>An <code>Envelope</code> is characterised by the minimum and maximum x and y coordinates. An <code>Envelope</code>
- * is empty if the set of enclosed points is empty. </p>
+ *
+ * <p>An <code>Envelope</code> is characterised by a lower-left and an upper-right coordinate.</p>
+ * <p>An <code>Envelope</code> is empty if the set of enclosed points is empty. </p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  *         <p/>

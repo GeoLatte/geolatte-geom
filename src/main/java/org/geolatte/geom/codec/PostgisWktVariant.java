@@ -54,14 +54,14 @@ class PostgisWktVariant extends WktVariant {
         add(GeometryType.LINE_STRING, false, "LINESTRING");
         add(GeometryType.POLYGON, false, "POLYGON");
         add(GeometryType.POLYGON, true, "POLYGONM");
-        add(GeometryType.MULTI_POINT, true, "MULTIPOINTM");
-        add(GeometryType.MULTI_POINT, false, "MULTIPOINT");
-        add(GeometryType.MULTI_LINE_STRING, false, "MULTILINESTRING");
-        add(GeometryType.MULTI_LINE_STRING, true, "MULTILINESTRINGM");
-        add(GeometryType.MULTI_POLYGON, false, "MULTIPOLYGON");
-        add(GeometryType.MULTI_POLYGON, true, "MULTIPOLYGONM");
-        add(GeometryType.GEOMETRY_COLLECTION, false, "GEOMETRYCOLLECTION");
-        add(GeometryType.GEOMETRY_COLLECTION, true, "GEOMETRYCOLLECTIONM");
+        add(GeometryType.MULTIPOINT, true, "MULTIPOINTM");
+        add(GeometryType.MULTIPOINT, false, "MULTIPOINT");
+        add(GeometryType.MULTILINESTRING, false, "MULTILINESTRING");
+        add(GeometryType.MULTILINESTRING, true, "MULTILINESTRINGM");
+        add(GeometryType.MULTIPOLYGON, false, "MULTIPOLYGON");
+        add(GeometryType.MULTIPOLYGON, true, "MULTIPOLYGONM");
+        add(GeometryType.GEOMETRYCOLLECTION, false, "GEOMETRYCOLLECTION");
+        add(GeometryType.GEOMETRYCOLLECTION, true, "GEOMETRYCOLLECTIONM");
         //create an unmodifiable set of all pattern tokens
         Set<WktKeywordToken> allTokens = new HashSet<WktKeywordToken>();
         allTokens.addAll(GEOMETRIES);
@@ -100,7 +100,7 @@ class PostgisWktVariant extends WktVariant {
         //TODO Need better handling for difference WKT/Geometry types. See comment above .
         return token.getType() == geometry.getGeometryType() ||
                 (token.getType().equals(GeometryType.LINE_STRING) &&
-                geometry.getGeometryType().equals(GeometryType.LINEAR_RING));
+                geometry.getGeometryType().equals(GeometryType.LINEARRING));
     }
 
     /**

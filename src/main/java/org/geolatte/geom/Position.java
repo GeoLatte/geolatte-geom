@@ -6,13 +6,20 @@ import org.geolatte.geom.crs.CoordinateSystemAxis;
 import java.util.Arrays;
 
 /**
- * Represents a position in the {@code CoordinateReferenceSystem}
- * <p/>
- * A {@code Position} is represented by an array of coordinates and a {@code CoordinateReferenceSystem}.
- * <p/>
- * There must be at least two coordinates. The order of coordinates must follow x, y, z, measure order (easting,
+ * Represents a position in a coordinate system.
+ *
+ * <p>A {@code Position} is represented by an array of coordinates. There must be at least two coordinates.</p>
+ *
+ * <p>The order of coordinates must follow the order: x, y, z, measure (easting,
  * northing, altitude, measure) for coordinates in a projected coordinate reference system, or
  * longitude, latitude, altitude, measure for coordinates in a geographic coordinate reference system).
+ *
+ * *<p> Usually the first coordinate value (X or Lon) increases along an EAST axis direction, and the second (Y or Lat)
+ * along an NORTH axis direction. In some projected coordinate systems, such as those used in South-Africa,
+ * the orientation is WEST for the first and SOUTH for the second coordinate value. To be sure of the interpretation
+ * of the first and second coordinate, you can inspect the {@code CoordinateReferenceSystem} used with the
+ * {@code Position}.
+ *</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
@@ -21,7 +28,11 @@ abstract public class Position{
 
     protected final double[] coords;
 
-    public Position(double... coords) {
+    /**
+     * Constructs an instance with the specified coordinates
+     * @param coords
+     */
+    protected Position(double... coords) {
         if (coords.length == 0) {
             this.coords = new double[0];
             //Arrays.fill(this.coords, Double.NaN);
@@ -32,6 +43,14 @@ abstract public class Position{
         }
     }
 
+    /**
+     * Copies the coordinates of this {@code Position} in the specified Array, in normal order.
+     *
+     * <p>If the array is null or smaller than the coordinate dimension, then a new Array instance will be created.</p>
+     *
+     * @param dest the recipient of the coordinates of this instance (if large enough)
+     * @return an array (possibly the same instance as specified by dest) holding the coordinates of this {@code Position}
+     */
     public double[] toArray(double[] dest) {
         if (isEmpty()) {
             return new double[0];
@@ -50,11 +69,11 @@ abstract public class Position{
 
     /**
      * Returns the coordinate at the specified index
-     * <p/>
-     * Note that the index here refers to the coordinates ordered in a normalized order (
      *
-     * @param idx
-     * @return
+     * <p>Note that the index here refers to the coordinates ordered in a normalized order.</p>
+     *
+     * @param idx the index of the coordinate (0-based)
+     * @return the coordinate value at the specified index.
      */
     public double getCoordinate(int idx) {
         return isEmpty() ? Double.NaN : this.coords[idx];
@@ -74,6 +93,11 @@ abstract public class Position{
         return crs.getNormalizedOrder().normalizedToCrsDefined(coords)[idx];
     }
 
+    /**
+     * Returns the {@link PositionTypeDescriptor} for this instance
+     *
+     * @return the {@code PositionTypeDescriptor} for this instance
+     */
     abstract public PositionTypeDescriptor<? extends Position> getDescriptor();
 
     @Override

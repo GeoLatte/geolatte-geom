@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
+ * A {@code GeometryCollection} of {@code Point}s.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class MultiPoint<P extends Position> extends GeometryCollection<P, Point<P>> {
@@ -50,7 +52,7 @@ public class MultiPoint<P extends Position> extends GeometryCollection<P, Point<
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_POINT;
+        return GeometryType.MULTIPOINT;
     }
 
 

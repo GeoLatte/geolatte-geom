@@ -295,13 +295,13 @@ public class DslTest {
 //                        linestring(c(1, 2), c(2, 3)))
 //        );
 //        assertEquals(4, gc.getNumGeometries());
-//        assertEquals(GeometryType.GEOMETRY_COLLECTION, gc.getGeometryN(3).getGeometryType());
+//        assertEquals(GeometryType.GEOMETRYCOLLECTION, gc.getGeometryN(3).getGeometryType());
 //    }
 
     @Test
     public void testValidMultiPoint() {
         MultiPoint mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
-        assertEquals(GeometryType.MULTI_POINT, mp.getGeometryType());
+        assertEquals(GeometryType.MULTIPOINT, mp.getGeometryType());
         assertEquals(2, mp.getNumGeometries());
         assertEquals(4326, mp.getSRID());
         assertEquals(4, mp.getCoordinateDimension());
@@ -320,7 +320,7 @@ public class DslTest {
                 multipoint(point(WGS84, g(1, 2))),
                 point(WGS84, g(3, 4))
         );
-        assertEquals(GeometryType.MULTI_POINT, geometryCollection.getGeometryN(0).getGeometryType());
+        assertEquals(GeometryType.MULTIPOINT, geometryCollection.getGeometryN(0).getGeometryType());
     }
 
     @Test
@@ -328,7 +328,7 @@ public class DslTest {
         MultiLineString mls = multilinestring(
                 linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
                 linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0)));
-        assertEquals(GeometryType.MULTI_LINE_STRING, mls.getGeometryType());
+        assertEquals(GeometryType.MULTILINESTRING, mls.getGeometryType());
         assertEquals(2, mls.getNumGeometries());
         assertEquals(4326, mls.getSRID());
         assertEquals(3, mls.getCoordinateDimension());
@@ -355,7 +355,7 @@ public class DslTest {
                 ),
                 linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0))
         );
-        assertEquals(GeometryType.MULTI_LINE_STRING, geometryCollection.getGeometryN(0).getGeometryType());
+        assertEquals(GeometryType.MULTILINESTRING, geometryCollection.getGeometryN(0).getGeometryType());
     }
 
     @Test
@@ -364,7 +364,7 @@ public class DslTest {
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
                 polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
-        assertEquals(GeometryType.MULTI_POLYGON, mp.getGeometryType());
+        assertEquals(GeometryType.MULTIPOLYGON, mp.getGeometryType());
         assertEquals(2, mp.getNumGeometries());
         assertEquals(4326, mp.getSRID());
         assertEquals(2, mp.getCoordinateDimension());
@@ -394,7 +394,7 @@ public class DslTest {
                         ),
                         polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                 );
-        assertEquals(GeometryType.MULTI_POLYGON, geometryCollection.getGeometryN(0).getGeometryType());
+        assertEquals(GeometryType.MULTIPOLYGON, geometryCollection.getGeometryN(0).getGeometryType());
     }
 
     @Test

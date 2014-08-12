@@ -1,6 +1,8 @@
 package org.geolatte.geom;
 
 /**
+ * A {@code Position} in a geographic coordinate reference system.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */

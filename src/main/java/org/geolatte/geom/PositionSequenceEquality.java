@@ -36,7 +36,7 @@ public interface PositionSequenceEquality {
      *
      * @param first
      * @param second
-     * @return
+     * @return true if two <code>PositionSequence</code>s are equal, false otherwise.
      */
     public <P extends Position> boolean equals(PositionSequence<P> first, PositionSequence<P> second);
 

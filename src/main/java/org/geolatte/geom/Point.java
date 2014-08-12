@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
+ * A 0-dimensional {@code Geometry}.
+ * 
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class Point<P extends Position> extends Geometry<P> implements Simple {

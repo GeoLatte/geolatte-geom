@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
+ * A {@code GeometryCollection} of {@code LineString}s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
@@ -63,7 +65,7 @@ public class MultiLineString<P extends Position> extends GeometryCollection<P, L
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_LINE_STRING;
+        return GeometryType.MULTILINESTRING;
     }
 
     @Override

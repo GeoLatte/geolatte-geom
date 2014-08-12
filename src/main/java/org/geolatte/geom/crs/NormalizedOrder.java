@@ -26,8 +26,8 @@ package org.geolatte.geom.crs;
  * the normalized order. The normalized order is:
  *
  * <ul>
- * <li>EAST or SOUTH</li>
- * <li>NORTH or WEST</li>
+ * <li>EAST or WEST</li>
+ * <li>NORTH or SOUTH</li>
  * <li>UP or DOWN (if present)</li>
  * <li>OTHER or UNKNOWN (if present)</li>
  * </ul>
@@ -35,6 +35,7 @@ package org.geolatte.geom.crs;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/3/14
  */
+@Deprecated()
 public class NormalizedOrder {
 
     // maps normalized
@@ -75,27 +76,6 @@ public class NormalizedOrder {
             }
         }
     }
-
-
-
-//TODO where to move the R copy(P, rcs) method?
-//    /**
-//     * Creates a copy of the specified source {@code Position} to a {@code Position} in the target reference system.
-//     *
-//     * Source coordinate values are copied to corresponding normalized position in the returned {@code Position}. If there
-//     * are no corresponding source coordinate values, Double.NaN is substituted; if there are not destination corresponding
-//     * coordinates the source coordinates are ignored.
-//     *
-//     * This method does not check if the source and target Position types are in any sens compatible.
-//     *
-//     * @param src the source {@code Position}
-//     * @param destCrs the {@code CoordinateReferenceSystem} of the return {@code Position}
-//     * @param <R> the {@code Position} subtype of the return value
-//     * @return a {@code Position}
-//     */
-//   public <R extends Position<R>> R copy(P src, CoordinateReferenceSystem<R> destCrs) {
-//
-//   }
 
    public double[] crsDefinedToNormalized(double... coords) {
        return mapped(crs2normalized, coords);
@@ -148,11 +128,11 @@ public class NormalizedOrder {
        CoordinateSystemAxis axis = cs.getAxis(idx);
        switch (axis.getAxisDirection()) {
            case EAST:
-           case SOUTH:
+           case WEST:
            case GeocentricX:
                return 0;
            case NORTH:
-           case WEST:
+           case SOUTH:
            case GeocentricY:
                return 1;
            case UP:

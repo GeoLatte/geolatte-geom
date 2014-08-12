@@ -47,7 +47,7 @@ public class LinearRing<P extends Position> extends LineString<P> {
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.LINEAR_RING;
+        return GeometryType.LINEARRING;
     }
 
     private void checkIsClosed(){

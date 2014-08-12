@@ -78,7 +78,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         if (positionTypeMarker == null)
             throw new IllegalArgumentException("PositionTypeMarker parameter must not be NULL");
         if (geometry.getGeometryType() != GeometryType.LINE_STRING
-                && geometry.getGeometryType() != GeometryType.MULTI_LINE_STRING) {
+                && geometry.getGeometryType() != GeometryType.MULTILINESTRING) {
             throw new IllegalArgumentException("Geometry parameter must be of type LineString or MultiLineString");
         }
         final CoordinateReferenceSystem<P> sourceCRS = geometry.getCoordinateReferenceSystem();

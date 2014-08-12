@@ -68,7 +68,7 @@ public class MultiPointTest {
 
     @Test
     public void testGetGeometryType() throws Exception {
-        Assert.assertEquals(GeometryType.MULTI_POINT, pnt1.getGeometryType());
+        Assert.assertEquals(GeometryType.MULTIPOINT, pnt1.getGeometryType());
 
     }
 

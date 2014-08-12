@@ -26,6 +26,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import java.util.Arrays;
 
 /**
+ * Factory methods for creating Positions.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/3/14
  */
@@ -119,15 +121,15 @@ public class Positions {
     }
 
     /**
-     * Copies the source positions to a new PointSequence.
+     * Copies the source positions to a new PositionSequence.
      * <p/>
      * <P>The coordinates are taken as-is. If the target coordinate reference systems has a larger coordinate
      * dimensions then the source, NaN coordinate values are created.</p>
      *
      * @param source
-     * @param targetPosClass target type of {@Code Position}
+     * @param targetPosClass target type of {@code Position}
      * @param <P>
-     * @return
+     * @return a copy of the source positions
      */
     public static <Q extends Position, P extends Position> PositionSequence<P> copy(final PositionSequence<Q> source,
                                                                                     final Class<P> targetPosClass) {

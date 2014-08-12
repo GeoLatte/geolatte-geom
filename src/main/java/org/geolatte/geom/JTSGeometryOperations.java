@@ -33,6 +33,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
 /**
+ * An implementation of {@code ProjectedGeometryOperations} that delegates to the corresponding JTS operations.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */

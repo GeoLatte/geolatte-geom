@@ -22,6 +22,12 @@
 package org.geolatte.geom;
 
 /**
+ * Metadata for a subclass of {@code Position}.
+ *
+ * <p>A {@code PositionTypeDescriptor} enables client-code to interrogate a {@code Position} and determine its
+ * properties.
+ * </p>
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 7/16/14
  */

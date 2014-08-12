@@ -24,7 +24,7 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
- * A <code>GeometryCollection</code> that contains only <code>Polygon</code>s.
+ * A {@code GeometryCollection} of {@code Polygon}s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/20/11
@@ -52,7 +52,7 @@ public class MultiPolygon<P extends Position> extends GeometryCollection<P, Poly
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_POLYGON;
+        return GeometryType.MULTIPOLYGON;
     }
 
 }

@@ -123,7 +123,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     /**
      * Returns the coordinate reference system of this <code>Geometry</code>
      *
-     * @return
+     * @return the coordinate reference system of this <code>Geometry</code>
      */
     public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
         return this.crs;
@@ -135,7 +135,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * <p>A SRID is usually interpreted as meaning the EPSG-code for the coordinate reference system. In this
      * implementation, this is not enforced.</p>
      *
-     * @return
+     * @return the numeric identifier of the coordinate reference system of this <code>Geometry</code>.
      */
     public int getSRID() {
         return getCoordinateReferenceSystem().getCrsId().getCode();
@@ -144,16 +144,16 @@ public abstract class Geometry<P extends Position> implements Serializable {
     /**
      * Tests whether this <code>Geometry</code> corresponds to the empty set.
      *
-     * @return
+     * @return true if this <code>Geometry</code> corresponds to the empty set, false otherwise.
      */
     public boolean isEmpty() {
         return this.getPositions().isEmpty();
     }
 
     /**
-     * Returns the number of points in the <code>PointSequence</code> of this <code>Geometry</code>.
+     * Returns the number of positions in the <code>PositionSequence</code> of this <code>Geometry</code>.
      *
-     * @return
+     * @return the number of positions in the <code>PositionSequence</code> of this <code>Geometry</code>.
      */
     public int getNumPositions() {
         return getPositions().size();
@@ -164,10 +164,10 @@ public abstract class Geometry<P extends Position> implements Serializable {
     }
 
     /**
-     * Returns the position at the specified index in the <code>PointSequence</code> of this <code>Geometry</code>.
+     * Returns the position at the specified index in the <code>PositionSequence</code> of this <code>Geometry</code>.
      *
-     * @param index the position in the <code>PointSequence</code> (first point is at index 0).
-     * @return
+     * @param index the position in the <code>PositionSequence</code> (first point is at index 0).
+     * @return the position at the specified index in the <code>PositionSequence</code> of this <code>Geometry</code>.
      */
     public P getPositionN(int index) {
         if (index >= getPositions().size()) {
@@ -181,7 +181,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     /**
      * Returns the <code>PositionSequence</code> of this instance
      *
-     * @return
+     * @return the <code>PositionSequence</code> of this instance
      */
     public PositionSequence<P> getPositions() {
         return this.positions;
@@ -227,7 +227,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     /**
      * Returns the Well-Known Text (WKT) representation of this <code>Geometry</code>.
      *
-     * @return
+     * @return the Well-Known Text (WKT) representation of this <code>Geometry</code>.
      */
     public String toString() {
         return Wkt.toWkt(this);
@@ -237,7 +237,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * Returns the topological dimension of this instance. In non-homogenous collections, this will return the largest
      * topological dimension of the contained <code>Geometries</code>.
      *
-     * @return
+     * @return the topological dimension of this instance
      */
     public abstract int getDimension();
 

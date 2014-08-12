@@ -98,7 +98,7 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.GEOMETRY_COLLECTION;
+        return GeometryType.GEOMETRYCOLLECTION;
     }
 
     /**

@@ -104,13 +104,13 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
                 return decodeLineStringText(crs);
             case POLYGON:
                 return decodePolygonText(crs);
-            case GEOMETRY_COLLECTION:
+            case GEOMETRYCOLLECTION:
                 return decodeGeometryCollection(crs);
-            case MULTI_POINT:
+            case MULTIPOINT:
                 return decodeMultiPoint(crs);
-            case MULTI_LINE_STRING:
+            case MULTILINESTRING:
                 return decodeMultiLineString(crs);
-            case MULTI_POLYGON:
+            case MULTIPOLYGON:
                 return decodeMultiPolygon(crs);
         }
         throw new WktDecodeException("Unsupported geometry type in Wkt: " + type);

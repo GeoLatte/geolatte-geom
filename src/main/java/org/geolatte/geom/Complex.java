@@ -22,13 +22,25 @@
 package org.geolatte.geom;
 
 /**
+ * Interface for {@code Geometry}s that are composed of {@code Geometry}s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/16/14
  */
 public interface Complex<P extends Position, G extends Geometry<P>> extends Iterable<G> {
 
+    /**
+     * Returns the number of constituent {@code Geometry}s
+     *
+     * @return the number of constituent {@code Geometry}s
+     */
     public int getNumGeometries();
 
+    /**
+     * Returns the {@code Class} of which all constituent {@code Geometry}s are instances.
+     *
+     * @return the {@code Class} of which all constituent {@code Geometry}s are instances.
+     */
     public Class<? extends Geometry> getComponentType();
 
 }

@@ -119,7 +119,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.GEOM_COLL_2D_POINTS);
         GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
+        assertEquals(GeometryType.GEOMETRYCOLLECTION, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.GEOM_COLL_2D_POINTS), geom);
         testEncoding(byteBuffer, geom);
     }
@@ -129,7 +129,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_GEOM_COLL);
         GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.GEOMETRY_COLLECTION, geom.getGeometryType());
+        assertEquals(GeometryType.GEOMETRYCOLLECTION, geom.getGeometryType());
         assertTrue(geom.isEmpty());
         assertEquals(testcases.getExpected(PostgisTestCases.EMPTY_GEOM_COLL), geom);
         testEncoding(byteBuffer, geom);
@@ -140,7 +140,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOINT_2D);
         MultiPoint geom = (MultiPoint) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.MULTI_POINT, geom.getGeometryType());
+        assertEquals(GeometryType.MULTIPOINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOINT_2D), geom);
         testEncoding(byteBuffer, geom);
     }
@@ -150,7 +150,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOINT_2D_WITH_SRID);
         MultiPoint geom = (MultiPoint) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.MULTI_POINT, geom.getGeometryType());
+        assertEquals(GeometryType.MULTIPOINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOINT_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         testEncoding(byteBuffer, geom);
@@ -161,7 +161,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTILINESTRING_2D);
         MultiLineString geom = (MultiLineString) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
+        assertEquals(GeometryType.MULTILINESTRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D), geom);
 
         testEncoding(byteBuffer, geom);
@@ -173,7 +173,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID);
         MultiLineString<?> geom = (MultiLineString<?>) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.MULTI_LINE_STRING, geom.getGeometryType());
+        assertEquals(GeometryType.MULTILINESTRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTILINESTRING_2D_WITH_SRID), geom);
         assertEquals(4326, geom.getSRID());
         for (Geometry<?> part : geom) {
@@ -187,7 +187,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.MULTIPOLYGON_2D);
         MultiPolygon geom = (MultiPolygon) decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.MULTI_POLYGON, geom.getGeometryType());
+        assertEquals(GeometryType.MULTIPOLYGON, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.MULTIPOLYGON_2D), geom);
         testEncoding(byteBuffer, geom);
     }

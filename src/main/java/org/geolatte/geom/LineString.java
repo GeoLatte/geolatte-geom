@@ -23,6 +23,8 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import java.util.Iterator;
+
 /**
  * A LineString is a 1-dimensional <code>Geometry</code> consisting of the <code>LineSegment</code>s defined by
  * consecutive pairs of <code>Point</code>s of a <code>PointSequence</code>.
@@ -113,4 +115,14 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
     }
+
+    /**
+     * Returns the {@code LineSegments} that define this instance.
+     *
+     * @return an Iterable of this instance's {@code LineSegment}s
+     */
+    Iterable<LineSegment<P>> lineSegments() {
+        return new LineSegments<P>(getPositions());
+    }
+
 }

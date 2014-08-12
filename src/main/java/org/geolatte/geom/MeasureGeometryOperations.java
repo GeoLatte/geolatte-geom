@@ -34,7 +34,7 @@ public interface MeasureGeometryOperations {
      * inclusively.
      * <p/>
      * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
+     * <p>The semantics implemented here are specified by SFA 1.2.1, section 6.1.2.6.</p>
      *
      * @param geometry     the geometry on which to perform the calculation
      * @param startMeasure the start of the specified range of M-coordinate values
@@ -49,7 +49,7 @@ public interface MeasureGeometryOperations {
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
      * <p/>
      * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
-     * <p>The semantics implemented here are specified by SFA 1.2.1, § 6.1.2.6.</p>
+     * <p>The semantics implemented here are specified by SFA 1.2.1, section 6.1.2.6.</p>
      *
      * @param geometry the geometry on which to perform the calculation
      * @param mValue   the specified M-coordinate value

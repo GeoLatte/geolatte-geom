@@ -151,7 +151,7 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      *
      * <p>The boundaries are returned in order, with the first element being the exterior boundary.</p>
      *
-     * @return
+     * @return an <code>Iterator</code> over the boundaries of this <code>Polygon</code>.
      */
     public Iterator<LinearRing<P>> iterator() {
         return new Iterator<LinearRing<P>>() {

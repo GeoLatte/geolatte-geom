@@ -104,7 +104,7 @@ public class Vector {
      *
      * @param p0 first operand
      * @param p1 second operand
-     * @returns the sum of p0 and p1.
+     * @return the sum of p0 and p1.
      */
     public static <P extends P2D> P add(P p0, P p1) {
         int dim = p0.getDescriptor().getCoordinateDimension();
@@ -122,7 +122,7 @@ public class Vector {
      *
      * @param p0 first operand
      * @param p1 second operand
-     * @returns the Point x = p0 - p1.
+     * @return the Point x = p0 - p1.
      */
     public static <P extends P2D> P substract(P p0, P p1) {
         int dim = p0.getDescriptor().getCoordinateDimension();

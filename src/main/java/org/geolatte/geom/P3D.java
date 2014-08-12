@@ -1,6 +1,8 @@
 package org.geolatte.geom;
 
 /**
+ * A projected {@code Position} having an altitude.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */

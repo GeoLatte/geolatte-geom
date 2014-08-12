@@ -100,7 +100,7 @@ class PostgisWktEncoder implements WktEncoder {
         switch (type) {
             case POINT:
             case LINE_STRING:
-            case LINEAR_RING:
+            case LINEARRING:
                 addPointList(geometry.getPositions());
                 break;
             case POLYGON:
@@ -108,14 +108,14 @@ class PostgisWktEncoder implements WktEncoder {
                 addLinearRings((Polygon<P>) geometry);
                 addEndList();
                 break;
-            case GEOMETRY_COLLECTION:
+            case GEOMETRYCOLLECTION:
                 addStartList();
                 addGeometries((GeometryCollection<P, ?>) geometry, true);
                 addEndList();
                 break;
-            case MULTI_POINT:
-            case MULTI_LINE_STRING:
-            case MULTI_POLYGON:
+            case MULTIPOINT:
+            case MULTILINESTRING:
+            case MULTIPOLYGON:
                 addStartList();
                 addGeometries((GeometryCollection<P, ?>) geometry, false);
                 addEndList();

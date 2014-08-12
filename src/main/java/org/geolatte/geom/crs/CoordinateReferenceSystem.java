@@ -162,6 +162,8 @@ public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiab
         return coordinateSystem.getAxis(idx);
     }
 
+    //TODO -- Add methods to inspect the coordinate system in the
+
     /**
      * Returns the index of the specified axis in this {@code CoordinateReferenceSystem}, or
      * -1 if it is not an axis of this system.
