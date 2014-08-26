@@ -14,7 +14,7 @@ interoperable with JTS but offers the following additional features:
 * geodetic operations (length, distance and area calculations)
 
 
-# Redesign 0.12 => 0.13
+# Redesign van 0.x naar 1.0
 
 This version is a complete redesign. The redesign is aimed at:
 * increasing the level of type-safety in the API;
@@ -43,30 +43,16 @@ such axis into account.
 
 ## Positions
 
-A Position is essentially a tuple of coordinates associated with a Coordinate Reference System such that the tuple specifies
-a position in the system.
+A Position is essentially a tuple of coordinates which together with a Coordinate Reference System specify
+a position in that Coordinate Reference System.
 
 In previous versions, Points played the role of Positions. The concept of a Position, distinguished from
- a Point, was introduced to be able to encode the commonality and differences between positions in the different types of
- Coordinate Reference System as a class-hierarchy without having to do this for all Geometry (sub)classes. Designing this
- as a class-hierarchy improves type-safety.
+a Point, was introduced to have different types of Positions, each corresponding to a type of
+Coordinate Reference System. 
 
 In this new model, a Geometry is conceptually a set of Positions (all associated with the same Coordinate Reference System).
 The set is determined by one or more sequences of Positions and a type enum value (GeometryType) that determine how the
 sequence(s) determine the Geometry (e.g. for LineString it is by linear interpolation between the consecutive positions).
-
-Technically a Position is modeled as an abstract generic class with a self-reflexive type bound. It's signature is:
-
-    abstract public class Position<P extends Position<P>>
-
-This design was inspired by the design of Enum in the java standard library. As explained by Angelica Langer, it is "is a
-generic type that can only be instantiated for its subtypes, and those subtypes will inherit some useful methods, some
-of which take subtype specific arguments (or otherwise depend on the subtype)"
-(see: http://www.angelikalanger.com/GenericsFAQ/FAQSections/TypeParameters.html#How%20do%20I%20decrypt%20Enum?).
-
-The "subtype specific arguments" in the case of the Position class is the CoordinateReferenceSystem<P> constructor argument.
-Coordinate Reference Systems and Positions are mutually dependent. This dependency is expressed by the Position-bounded type
-argument in the CoordinateReferenceSystem class.
 
 ## De-emphasizing the Simple Features Specification (SFS)
 
@@ -83,15 +69,9 @@ Because of these misgivings, we will de-emphasize SFS compliance.
 ## Open issues
 
 The design is not yet finished. Here are some open issues that require further attention:
-* Can the Position class-hierarchy be simplified?
-* The DSL is nice and simple, but looses the type-safety we introduced with the Position class-hierarchy. In Scala this
-is easy to remedy (e.g. by providing implicit conversion between Tuples and Positions). What is the best way in Java?
-Introducing p2D(), g2D(), etc. functions and generically-typed PosTokens?
 * Is the API for composing Coordinate Reference System sufficiently clear?
 * How to handle empty Geometries, and Positions?
 * How to handle cases where the Coordinate Reference System is not known?
-* Should we not drop all complex operations from the Geometry API, and only make these available as GeometryOperations?
-Then we can provide GeometryOperation Factories that are specific for the type of coordinate space (2D, Measured, Geographic vs. Projected).
 
 
 
