@@ -56,14 +56,16 @@ sequence(s) determine the Geometry (e.g. for LineString it is by linear interpol
 
 ## De-emphasizing the Simple Features Specification (SFS)
 
-This library started as an attempt to have a JTS-interoperable library that is (like JTS) SFS-compliant, but has a more
-modern design and better support for geometries not in the 2-dimensional plane. It is for me no longer obvious what the
-advantage of SFS compliance are. With open source, more expressive languages the advantage of standardisation on the API level
-are becoming less-and-less obvious. The only advantages to the SFS model (or it's more complicated cousing SQL/MM-Part 3)
+This library started as an attempt to have a JTS-interoperable library that is SFS-compliant, but has a more
+modern design and better support for geometries not in the 2-dimensional projected plane. As design progressed, it became 
+no longer obvious what the advantage of SFS compliance are. 
+
+With open source and more expressive languages, the advantage of standardisation on the API level
+are becoming less-and-less obvious. The only advantages to the SFS model (or it's more complicated cousin SQL/MM-Part 3)
 that I can see are a familiar Geometry model and a precise specification of topological relations. These advantages are
 offset by the disadvantages of a bias to 2D planar coordinate systems, and a (by current tastes)  problematic API design.
-Should complex operations really be part of the Geometry interface? What with alternative algorithm implementations?
-
+(Should complex operations really be part of the Geometry interface? What with alternative algorithm implementations?)
+ 
 Because of these misgivings, we will de-emphasize SFS compliance.
 
 ## Open issues
