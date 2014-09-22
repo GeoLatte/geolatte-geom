@@ -1,7 +1,7 @@
 package org.geolatte.geom;
 
 /**
- * A marker interface for Geocentric {@code Position}s.
+ * A {@code Position} in a Geocentric Coordinate Reference System.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/6/14

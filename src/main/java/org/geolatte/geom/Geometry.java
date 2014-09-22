@@ -41,6 +41,16 @@ public abstract class Geometry<P extends Position> implements Serializable {
     private final CoordinateReferenceSystem<P> crs;
 
 
+    /**
+     * Creates a new {@code Geometry} with the positions from the specified geometry and having the specified
+     * {@code CoordinateReferenceSystem}
+     *
+     * @param geometry source {@code Geometry} that supplies the {@code Position}s for the returned {@code Geometry}
+     * @param crs the {@code CoordinateReferenceSystem} for the returned {@code Geometry}
+     * @param <Q> the {@code Position} type for the returned Geometry
+     * @return a {@code Geometry} with the positions of the specified geometry and having
+     * the specified {@code CoordinateReferenceSystem}
+     */
     @SuppressWarnings("unchecked")
     public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
         if (crs == null || geometry == null) return (Geometry<Q>) geometry;

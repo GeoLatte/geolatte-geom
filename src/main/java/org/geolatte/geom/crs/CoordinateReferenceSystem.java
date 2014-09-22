@@ -138,7 +138,7 @@ public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiab
     /**
      * Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
      *
-     * @return
+     * @return Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
      */
     public CoordinateSystem getCoordinateSystem() {
         return coordinateSystem;
@@ -167,11 +167,18 @@ public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiab
     /**
      * Returns the index of the specified axis in this {@code CoordinateReferenceSystem}, or
      * -1 if it is not an axis of this system.
+     *
+     * @param axis the axis to look up
+     * @return the index of the specified axis in this {@code CoordinateReferenceSystem}
      */
     public int getAxisIndex(CoordinateSystemAxis axis) {
         return getCoordinateSystem().getAxisIndex(axis);
     }
 
+    /**
+     * Returns the vertical axis of this instance, or null if there is none
+     * @return the vertical axis of this instance
+     */
     public CoordinateSystemAxis getVerticalAxis() {
         return getCoordinateSystem().getVerticalAxis();
     }

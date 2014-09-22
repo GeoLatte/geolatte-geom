@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A <code>PositionSequence</code> that consists of a sequence of <code>Position</code>s.
+ * A <code>PositionSequence</code> is an ordered sequence of <code>Position</code>s.
  * <p/>
  * <p>A <code>PositionSequence</code> is typically used to store the <code>Position</code>s (vertices) that define a
  * curve (a 1-dimensional geometric primitive), with the subtype of the curve specifying the form of interpolation between

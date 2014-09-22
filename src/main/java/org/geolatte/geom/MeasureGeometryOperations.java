@@ -30,6 +30,12 @@ package org.geolatte.geom;
 public interface MeasureGeometryOperations {
 
     /**
+     * Default implementation of this interface
+     */
+    public final MeasureGeometryOperations Default = new DefaultMeasureGeometryOperations();
+
+
+    /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified range of M-coordinate value
      * inclusively.
      * <p/>
@@ -87,7 +93,7 @@ public interface MeasureGeometryOperations {
             Geometry<P> geometry, Class<M> positionTypeMarker, boolean keepBeginMeasure);
 
     /**
-     * Creates a {@code GeometryOperation} that returns the minimum measure value of the points
+     * Creates a {@code GeometryOperation} that returns the minimum measure value of the {@code Position}s
      * of the specified Geometry.
      * <p/>
      * If the geometry is empty, this method returns Double.NaN
@@ -99,7 +105,7 @@ public interface MeasureGeometryOperations {
     public <P extends Position & Measured> double minimumMeasure(Geometry<P> geometry);
 
     /**
-     * Creates a {@code GeometryOperation} that returns the maximum measure value of the points
+     * Creates a {@code GeometryOperation} that returns the maximum measure value of the {@code Position}s
      * of the specified Geometry.
      * <p/>
      * If the geometry is empty, this method returns Double.NaN

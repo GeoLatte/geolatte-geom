@@ -24,7 +24,7 @@ package org.geolatte.geom;
 /**
  * A builder for <code>PositionSequence</code>s.
  *
- * <p>PositionSequence</p>s are built by adding points in sequence.
+ * <p>{@code PositionSequences} are built by adding points in order.</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */

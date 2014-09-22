@@ -59,12 +59,5 @@ public interface GeometryVisitor<P extends Position> {
      * @param collection
      */
     public <G extends Geometry<P>> void visit(GeometryCollection<P,G> collection);
-//
-//    /**
-//     * Visits a <code>PolyHedralSurface</code>.
-//     *
-//     * @param surface
-//     */
-//    public void visit(PolyHedralSurface<P> surface);
 
 }

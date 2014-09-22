@@ -167,7 +167,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             for (LineSegment<P> segment : lineSegments) {
                 P p0 = segment.getStartPosition();
                 P p1 = segment.getEndPosition();
-                double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPosition);
+                double[] dAndR = Vector.positionToSegment2D(p0, p1, searchPosition);
                 double d = Math.sqrt(dAndR[0]);
                 if (d <= distToSearchPoint ) {
                     double r = dAndR[1];

@@ -284,7 +284,7 @@ public class MortonCode<P extends P2D> {
      *
      * @param interleaved the morton code as a long
      * @param level       the level of the morton code
-     * @return
+     * @return  a String representation of the MortonCode
      */
     private String toRadix4String(long interleaved, int level) {
         char[] cbuf = new char[level];

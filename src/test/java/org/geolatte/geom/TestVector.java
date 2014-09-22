@@ -81,32 +81,32 @@ public class TestVector {
         P2D p0 = new P2D(0, 0);
         P2D p1 = new P2D(2, 1);
         P2D y = new P2D(1, 0.5);
-        double[] received = pointToSegment2D(p0, p1, y);
+        double[] received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0.5, received[1], Math.ulp(100));
 
         y = new P2D(0, 0);
-        received = pointToSegment2D(p0, p1, y);
+        received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0, received[1], Math.ulp(100));
 
         y = new P2D(2, 1);
-        received = pointToSegment2D(p0, p1, y);
+        received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 1.0d, received[1], Math.ulp(100));
 
         y = new P2D(-2, -1);
-        received = pointToSegment2D(p0, p1, y);
+        received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 5d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", -1.0d, received[1], Math.ulp(100));
 
         y = new P2D(4, 2);
-        received = pointToSegment2D(p0, p1, y);
+        received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 5d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 2.0d, received[1], Math.ulp(100));
 
         y = new P2D(1, 1);
-        received = pointToSegment2D(p0, p1, y);
+        received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.2d * 0.2d + 0.4d * 0.4d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0.6d, received[1], Math.ulp(100));
     }

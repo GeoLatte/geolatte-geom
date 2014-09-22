@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * A Factory for {@code Geometry}s
  * <p/>
- * <p>This Factory allows the creation of generic Geometries with wildcard parameterized P types</p>
+ * <p>This Factory allows the creation of generic Geometries with wildcard parametrized P types</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/15/14

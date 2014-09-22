@@ -29,7 +29,24 @@ import java.util.Arrays;
 
 /**
  * Contains a Domain Specific Language for constructing Geometries.
- * <p/>
+ * <p>
+ * The DSL has methods for creating {@code Position}s, {@code Geometry}s and {@code GeometryTokens}.
+ * </p>
+ * <p>
+ * The methods for creating {@code Position}s are:
+ * </p>
+ * <ul>
+ *     <li>g(lon, lat), g(lon,lat,alt), gM(lon,lat, measure), and g(lon,lat,alt, measure) for resp. {@code G2D}, {@code G3D}, {@code G2DM} and
+ *     {@code G3DM} {@code Position} instances</li>
+ *     <li>p(x,y), p(x,y,z), pM(x,y,measure), p(x,y,z,m) for resp. {@code P2D}, {@code P3D}, {@code P2DM} and {@code P3DM} {@code Position} instances</li>
+ * </ul>
+ * <p>
+ * The methods for creating geometries are named for the geometry the create.
+ * </p>
+ * <p>
+ * {@code GeometryToken}s are intermediate representations that are handy when creating a {@code Geometry} that is composed of {@code Geometry}s. It allows the
+ * DSL user to specify the coordinate reference system only once.
+ * </p>
  * Usage example:
  * <pre>
  * {@code
@@ -38,6 +55,7 @@ import java.util.Arrays;
  *
  *
  * public Polygon createPolygon() {
+ *     CoordinateReferenceSystem crs = ...
  *     return polygon(crs, ring(p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0)));
  * }
  *
@@ -48,6 +66,10 @@ import java.util.Arrays;
  *         creation-date: 11/10/12
  */
 public class DSL {
+
+    private DSL(){
+        //do nothing.
+    }
 
     /**
      * Creates a projected 2D position token.
@@ -146,39 +168,76 @@ public class DSL {
     }
 
 
-/* == REMOVED because not type-safe
-    public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, double... coords) {
-        P position = Positions.mkPosition(crs, coords);
-        return new Point<>(position);
-    }
-*/
-
+    /**
+     * Creates a {@code Point}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code Point}
+     * @param p the {@code Position} for the {@code Point}
+     * @param <P> the {@code Position} type
+     * @return a {@code Point} having the specified {@code Position} and {@code CoordinateReferenceSystem}
+     */
     public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
         return new Point<>(p, crs);
     }
 
+    /**
+     * Creates a {@code PointToken}
+     * @param position the {@code Position} for the {@code PointToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code PointToken} having the specified {@code Position}
+     */
     public static <P extends Position> PointToken<P> point(P position) {
         return new PointToken<>(position);
     }
 
+    /**
+     * Creates a {@code LineString}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code LineString}
+     * @param positions the {@code Position}s for the {@code LineString}
+     * @param <P> the {@code Position} type
+     * @return a {@code LineString} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
+     */
     @SafeVarargs
     public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, P... positions) {
         return new LineString<>(toSeq(crs, positions), crs);
     }
 
+    /**
+     * Creates a {@code LineStringToken}
+     *
+     * @param positions the {@code Position}s for the {@code LineStringToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code LineStringToken} having the specified {@code Position}s
+     */
     @SafeVarargs
     public static <P extends Position> LineStringToken<P> linestring(P... positions) {
         return new LineStringToken<>(positions);
     }
 
+    /**
+     * Creates a {@code LinearRing}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code LinearRing}
+     * @param positions the {@code Position}s for the {@code LinearRing}
+     * @param <P> the {@code Position} type
+     * @return a {@code LinearRing} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
+     */
     @SafeVarargs
     public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, P... positions) {
         return new LinearRing<>(toSeq(crs, positions), crs);
     }
 
+    /**
+     * Creates a {@code LinearRingToken}
+     *
+     * @param positions the {@code Position}s for the {@code LinearRingToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code LinearRingToken} having the specified {@code Position}s
+     */
     @SafeVarargs
-    public static <P extends Position> LinearRingToken<P> ring(P... points) {
-        return new LinearRingToken<>(points);
+    public static <P extends Position> LinearRingToken<P> ring(P... positions) {
+        return new LinearRingToken<>(positions);
     }
 
     @SuppressWarnings("unchecked")
@@ -189,11 +248,26 @@ public class DSL {
         return (G[]) allGeometries;
     }
 
+    /**
+     * Creates a {@code GeometryCollection} from the specified {@code Geometry}s.
+     * @param geometry the first constituent {@code Geometry}
+     * @param geometries the rest of the constituent {@code Geometry}s
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s.
+     */
     @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
         return new GeometryCollection<>(combine(Geometry.class, geometry, geometries));
     }
 
+    /**
+     * Creates a {@code GeometryCollection} from the specified {@code GeometryToken}s and {@code CoordinateReferenceSystem}.
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code GeometryCollection}
+     * @param tokens the {@code GeometryTokens} for the constituent {@code Geometry}s of the returned {@code GeometryCollection}
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s and {@code CoordinateReferenceSystem}
+     */
     @SuppressWarnings("unchecked")
     @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
@@ -206,17 +280,40 @@ public class DSL {
         return new GeometryCollection<>(parts);
     }
 
+    /**
+     * Creates a {@code GeometryCollectionToken} of the specified {@code GeometryToken}s
+     *
+     * @param tokens the {@code GeometryToken}s that represent the constituent {@code Geometry}s of the returned {@code GeometryCollection}
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollectionToken} of the specified constituent {@code GeometryToken}s
+     */
     @SafeVarargs
     public static <P extends Position> GeometryCollectionToken<P> geometrycollection(GeometryToken<P>... tokens) {
         return new GeometryCollectionToken<>(tokens);
     }
 
+    /**
+     * Creates a {@code Polygon} from the specified outer ring (or hull) and inner rings (if any)
+     *
+     * @param hull the outer ring of the returned {@code Polygon}
+     * @param rings the inner rings of the returned {@code Polygon}
+     * @param <P> the {@code Position} type
+     * @return the {@code Polygon} defined by the specified outer and inner rings.
+     */
     @SafeVarargs
     public static <P extends Position> Polygon<P> polygon(LinearRing<P> hull, LinearRing<P>... rings) {
         LinearRing<P>[] combined = combine(LinearRing.class, hull, rings);
         return new Polygon<>(combined);
     }
 
+    /**
+     * Creates a {@code Polygon} from the specified ring tokens and {@code CoordinateReferenceSystem}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the returned {@code Polygon}
+     * @param tokens the {@code GeometryTokens} representing (in order) the outer and any inner rings
+     * @param <P> the {@code Position} type
+     * @return the {@code Polygon} defined by the specified coordinate reference system and ring tokens
+     */
     @SuppressWarnings("unchecked")
     @SafeVarargs
     public static <P extends Position> Polygon<P> polygon(CoordinateReferenceSystem<P> crs, LinearRingToken<P>... tokens) {

@@ -32,19 +32,19 @@ public class Vector {
 
 
     /**
-     * Returns the squared distance and projectionfactor of the point y
-     * on the linesegment defined by points p0 and p1
+     * Returns the squared distance and projectionfactor of the position y
+     * on the linesegment defined by positions p0 and p1
      * <p>The projection factor is the value for t that determines the projection
      * of y on the line p0 + t*(p1-p0).
      * </p>
      *
-     * @param p0 the start point of the line segment
-     * @param p1 the end point of the line segment
-     * @param y  the point to project onto the linesegment
-     * @return an array of length 2, with first element being the squared distance of Point y to the linesegment,
+     * @param p0 the start position of the line segment
+     * @param p1 the end position of the line segment
+     * @param y  the position to project onto the linesegment
+     * @return an array of length 2, with first element being the squared distance of Position y to the linesegment,
      * and second element the projection factor
      */
-    public static <P extends P2D> double[] pointToSegment2D(P p0, P p1, P y) {
+    public static <P extends P2D> double[] positionToSegment2D(P p0, P p1, P y) {
         //for algorithm, see "Geometric Tools for Computer Graphics", Ch. 6.
         P d = Vector.substract(p1, p0);
         P ymp0 = Vector.substract(y, p0);
@@ -65,7 +65,7 @@ public class Vector {
     }
 
     /**
-     * Returns the dot-product of the specified <code>Point</code>s
+     * Returns the dot-product of the specified <code>Position</code>s
      *
      * @param p0 first operand
      * @param p1 second operand
@@ -76,7 +76,7 @@ public class Vector {
     }
 
     /**
-     * Returns the dot-product of the specified <code>Point</code>s
+     * Returns the dot-product of the specified <code>Position</code>s
      * <p/>
      * <p>If limit2D is set to true, Z-coordinates will be ignored so that the product is calculated in 2D.</p>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
@@ -98,7 +98,7 @@ public class Vector {
     }
 
     /**
-     * Adds two <code>Point</code>s.
+     * Adds two <code>Position</code>s.
      * <p/>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
@@ -116,13 +116,13 @@ public class Vector {
     }
 
     /**
-     * Subtracts two <code>Point</code>s.
+     * Subtracts two <code>Position</code>s.
      * <p/>
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
      * @param p0 first operand
      * @param p1 second operand
-     * @return the Point x = p0 - p1.
+     * @return the Position x = p0 - p1.
      */
     public static <P extends P2D> P substract(P p0, P p1) {
         int dim = p0.getDescriptor().getCoordinateDimension();
@@ -138,7 +138,7 @@ public class Vector {
      * <p>The application of this operator on a vector <code>P</code> returns the vector perpendicular at 90 deg. counterclockwise
      * from <code>P</code> in the 2D (X/Y) plane.</p>
      *
-     * @param p a vector represented by a point.
+     * @param p a vector represented by a Position.
      * @return the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
      */
     public static <P extends P2D> P perp(P p) {
@@ -152,7 +152,7 @@ public class Vector {
 
 
     /**
-     * Applies the perp dot-operation on the specified <code>Point</code>s
+     * Applies the perp dot-operation on the specified <code>Position</code>s
      * <p/>
      * <p>The perp dot operation on vectors <code>P</code>, <code>Q</code> is defined as
      * <code>dot(perp(P),Q)</code>.</p>
@@ -165,7 +165,7 @@ public class Vector {
      */
     public static <P extends P2D> double perpDot(P p0, P p1) {
         if (p0 == null || p1 == null || p0.isEmpty() | p1.isEmpty()) {
-            throw new IllegalArgumentException("Null or empty Point passed.");
+            throw new IllegalArgumentException("Null or empty Position passed.");
         }
         return -p0.getY() * p1.getX() + p0.getX() * p1.getY();
 
