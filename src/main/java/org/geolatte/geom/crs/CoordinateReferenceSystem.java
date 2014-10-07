@@ -79,7 +79,7 @@ public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiab
 
     public static <T extends Position, M extends Position & Measured> CoordinateReferenceSystem<M> getMeasuredVariant(
             CoordinateReferenceSystem<T> crs) {
-        return getMeasuredVariant(crs, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
+        return getMeasuredVariant(crs, new CoordinateSystemAxis("M", CoordinateSystemAxisDirection.OTHER, Unit.METER));
     }
 
     @SuppressWarnings("unchecked")
@@ -97,7 +97,7 @@ public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiab
 
     public static <T extends Position, V extends Position & Vertical> CoordinateReferenceSystem<V> getVerticalVariant(
             CoordinateReferenceSystem<T> crs) {
-        return getVerticalVariant(crs, new CoordinateSystemAxis("V", CoordinateSystemAxisDirection.OTHER, LengthUnit.METER));
+        return getVerticalVariant(crs, new CoordinateSystemAxis("V", CoordinateSystemAxisDirection.OTHER, Unit.METER));
     }
 
     private final CoordinateSystem coordinateSystem;

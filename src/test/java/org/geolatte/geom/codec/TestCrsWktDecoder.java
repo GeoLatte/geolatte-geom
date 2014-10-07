@@ -76,11 +76,11 @@ public class TestCrsWktDecoder {
         //verify the angular units
         assertTrue(geoCRS.getUnit().isAngular());
         assertEquals(0.01745329251994328, geoCRS.getUnit().getConversionFactor(), Math.ulp(1));
-        assertEquals(LengthUnit.DEGREE,geoCRS.getUnit());
+        assertEquals(Unit.DEGREE,geoCRS.getUnit());
 
         //verify the Axis
-        assertEquals(new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, LengthUnit.DEGREE), geoCRS.getAxis(0));
-        assertEquals(new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, LengthUnit.DEGREE), geoCRS.getAxis(1));
+        assertEquals(new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, Unit.DEGREE), geoCRS.getAxis(0));
+        assertEquals(new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE), geoCRS.getAxis(1));
 
         //verify the srid code
         assertEquals(4326, geoCRS.getCrsId().getCode());
@@ -103,8 +103,8 @@ public class TestCrsWktDecoder {
         assertEquals(-1, ellipsoid.getCrsId().getCode());
 
         //verify the Axis
-        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, LengthUnit.DEGREE), geoCRS.getAxis(0));
-        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, LengthUnit.DEGREE), geoCRS.getAxis(1));
+        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.DEGREE), geoCRS.getAxis(0));
+        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE), geoCRS.getAxis(1));
 
         assertEquals(4326, geoCRS.getCrsId().getCode());
 
@@ -143,8 +143,8 @@ public class TestCrsWktDecoder {
         assertEquals(31370, projCRS.getCrsId().getCode());
 
         //check the axes
-        assertEquals(new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, LengthUnit.METER) , projCRS.getCoordinateSystem().getAxis(0));
-        assertEquals(new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, LengthUnit.METER) , projCRS.getCoordinateSystem().getAxis(1));
+        assertEquals(new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER) , projCRS.getCoordinateSystem().getAxis(0));
+        assertEquals(new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER) , projCRS.getCoordinateSystem().getAxis(1));
 
     }
 
@@ -153,8 +153,8 @@ public class TestCrsWktDecoder {
         CrsWktDecoder decoder = new CrsWktDecoder();
         ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3031, 3031);
         assertNotNull(system);
-        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, LengthUnit.METER) , system.getCoordinateSystem().getAxis(0));
-        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, LengthUnit.METER) , system.getCoordinateSystem().getAxis(1));
+        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.METER) , system.getCoordinateSystem().getAxis(0));
+        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.METER) , system.getCoordinateSystem().getAxis(1));
     }
 
 

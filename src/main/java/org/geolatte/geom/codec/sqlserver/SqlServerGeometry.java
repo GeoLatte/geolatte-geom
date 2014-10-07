@@ -23,9 +23,8 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateSystemAxis;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -190,10 +189,10 @@ public class SqlServerGeometry<P extends Position> {
         CoordinateReferenceSystem<P2D> defaultCrs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
         CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid, defaultCrs);
         if (hasZValues) {
-            crs = crs.addVerticalAxis(LengthUnit.METER);
+            crs = crs.addVerticalAxis(Unit.METER);
         }
         if (hasMValues) {
-            crs = crs.addMeasureAxis(LengthUnit.METER);
+            crs = crs.addMeasureAxis(Unit.METER);
         }
         return (CoordinateReferenceSystem<P>)crs;
     }

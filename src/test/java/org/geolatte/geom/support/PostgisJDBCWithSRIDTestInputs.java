@@ -24,7 +24,7 @@ package org.geolatte.geom.support;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -33,9 +33,9 @@ import org.geolatte.geom.crs.LengthUnit;
 public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
     private static CoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(Unit.METER);
+    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(Unit.METER);
+    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(Unit.METER);
 
     public PostgisJDBCWithSRIDTestInputs() {
         PostgisJDBCUnitTestInputs base = new PostgisJDBCUnitTestInputs();

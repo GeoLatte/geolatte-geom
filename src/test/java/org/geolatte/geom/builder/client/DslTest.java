@@ -26,7 +26,7 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -43,9 +43,9 @@ public class DslTest {
 
     static private double DELTA = 0.00000001;
     static private GeographicCoordinateReferenceSystem WGS84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    static private CoordinateReferenceSystem<G3D> WGS84_Z = WGS84.addVerticalAxis(LengthUnit.METER);
-    static private CoordinateReferenceSystem<G2DM> WGS84_M = WGS84.addMeasureAxis(LengthUnit.METER);
-    static private CoordinateReferenceSystem<G3DM> WGS84_ZM = WGS84_Z.addMeasureAxis(LengthUnit.METER);
+    static private CoordinateReferenceSystem<G3D> WGS84_Z = WGS84.addVerticalAxis(Unit.METER);
+    static private CoordinateReferenceSystem<G2DM> WGS84_M = WGS84.addMeasureAxis(Unit.METER);
+    static private CoordinateReferenceSystem<G3DM> WGS84_ZM = WGS84_Z.addMeasureAxis(Unit.METER);
 
 
     @Test

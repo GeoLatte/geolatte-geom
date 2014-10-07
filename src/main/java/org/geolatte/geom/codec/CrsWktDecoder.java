@@ -105,8 +105,8 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         matchesElementSeparator();
         PrimeMeridian primem = decodePrimem();
         matchesElementSeparator();
-        LengthUnit lengthUnit = decodeUnit(LengthUnit.Type.ANGULAR);
-        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(lengthUnit, GeographicCoordinateReferenceSystem.class);
+        Unit unit = decodeUnit(Unit.Type.ANGULAR);
+        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, GeographicCoordinateReferenceSystem.class);
         CrsId cr = decodeOptionalAuthority(srid);
         matchesCloseList();
         GeographicCoordinateReferenceSystem system = new GeographicCoordinateReferenceSystem(cr, crsName, twinAxes);
@@ -125,21 +125,21 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         matchesElementSeparator();
         GeographicCoordinateReferenceSystem geogcs = decodeGeographicCrs();
         matchesElementSeparator();
-        LengthUnit lengthUnit;
+        Unit unit;
         Projection projection;
         List<CrsParameter> parameters;
         // spatial_reference.sql contains both variants of ProjCRS Wkt
         if (currentToken == CrsWktVariant.UNIT) {
-            lengthUnit = decodeUnit(LengthUnit.Type.LINEAR);
+            unit = decodeUnit(Unit.Type.LINEAR);
             projection = decodeProjection();
             parameters = decodeOptionalParameters();
         } else {
             projection = decodeProjection();
             parameters = decodeOptionalParameters();
-            lengthUnit = decodeUnit(LengthUnit.Type.LINEAR);
+            unit = decodeUnit(Unit.Type.LINEAR);
         }
         CrsId crsId = decodeOptionalAuthority(srid);
-        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(lengthUnit, ProjectedCoordinateReferenceSystem.class);
+        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
         return new ProjectedCoordinateReferenceSystem(crsId, crsName, geogcs, projection, parameters, twinAxes);
     }
 
@@ -177,39 +177,39 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         return new Projection(crsId, name);
     }
 
-    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] decodeOptionalTwinAxis(LengthUnit lengthUnit, Class<T> crsClass) {
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] decodeOptionalTwinAxis(Unit unit, Class<T> crsClass) {
         matchesElementSeparator();
         if (currentToken != CrsWktVariant.AXIS) {
-            return defaultCRS(lengthUnit, crsClass);
+            return defaultCRS(unit, crsClass);
         }
         CoordinateSystemAxis[] twinAxes = new CoordinateSystemAxis[2];
-        twinAxes[0] = decodeAxis(lengthUnit);
+        twinAxes[0] = decodeAxis(unit);
         matchesElementSeparator();
-        twinAxes[1] = decodeAxis(lengthUnit);
+        twinAxes[1] = decodeAxis(unit);
         return twinAxes;
     }
 
-    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] defaultCRS(LengthUnit lengthUnit, Class<T> crsClass) {
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] defaultCRS(Unit unit, Class<T> crsClass) {
 
         if (GeographicCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, lengthUnit),
-                    new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, lengthUnit)
+                    new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, unit),
+                    new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, unit)
             };
         }
 
         if (ProjectedCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, lengthUnit),
-                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, lengthUnit)
+                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, unit),
+                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)
             };
         }
 
         if (GeocentricCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.GeocentricX, lengthUnit),
-                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.GeocentricY, lengthUnit),
-                    new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, lengthUnit)
+                    new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.GeocentricX, unit),
+                    new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.GeocentricY, unit),
+                    new CoordinateSystemAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, unit)
             };
         }
 
@@ -217,7 +217,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
 
     }
 
-    private CoordinateSystemAxis decodeAxis(LengthUnit lengthUnit) {
+    private CoordinateSystemAxis decodeAxis(Unit unit) {
         if (currentToken != CrsWktVariant.AXIS) {
             throw new WktDecodeException("Expected AXIS keyword, found " + currentToken.toString());
         }
@@ -226,10 +226,10 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         CoordinateSystemAxisDirection direction = CoordinateSystemAxisDirection.valueOf(currentToken.toString());
         nextToken();
         matchesCloseList();
-        return new CoordinateSystemAxis(name, direction, lengthUnit);
+        return new CoordinateSystemAxis(name, direction, unit);
     }
 
-    private LengthUnit decodeUnit(LengthUnit.Type type) {
+    private Unit decodeUnit(Unit.Type type) {
         if (currentToken != CrsWktVariant.UNIT) {
             throw new WktDecodeException("Expected UNIT keyword, found " + currentToken.toString());
         }
@@ -239,7 +239,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         matchesElementSeparator();
         CrsId crsId = decodeOptionalAuthority(CrsId.UNDEFINED.getCode());
         matchesCloseList();
-        return new LengthUnit(crsId, name, type, cf);
+        return new Unit(crsId, name, type, cf);
     }
 
     private PrimeMeridian decodePrimem() {

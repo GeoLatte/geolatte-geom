@@ -26,7 +26,7 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
@@ -67,10 +67,10 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
         }
 
         if (hasZ) {
-            crsDeclared = crsDeclared.addVerticalAxis(LengthUnit.METER);
+            crsDeclared = crsDeclared.addVerticalAxis(Unit.METER);
         }
         if (hasM) {
-            crsDeclared = crsDeclared.addMeasureAxis(LengthUnit.METER);
+            crsDeclared = crsDeclared.addMeasureAxis(Unit.METER);
         }
         return crsDeclared;
     }

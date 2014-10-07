@@ -24,7 +24,7 @@ package org.geolatte.geom.support;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 
 import static org.geolatte.geom.builder.DSL.*;
 
@@ -34,14 +34,14 @@ import static org.geolatte.geom.builder.DSL.*;
 public class PostgisTestCases extends WktWkbCodecTestBase {
 
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
+    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
 
     private static CoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(LengthUnit.METER);
-    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(Unit.METER);
+    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(Unit.METER);
+    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(Unit.METER);
 
     public static final Integer POINT_2D = 0;
     public static final Integer POINT_3D = 1;

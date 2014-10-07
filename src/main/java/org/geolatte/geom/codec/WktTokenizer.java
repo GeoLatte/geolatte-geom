@@ -25,7 +25,7 @@ import org.geolatte.geom.PositionSequenceBuilder;
 import org.geolatte.geom.PositionSequenceBuilders;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 
 /**
  * A tokenizer for WKT representations.
@@ -184,10 +184,10 @@ class WktTokenizer extends AbstractWktTokenizer {
     private CoordinateReferenceSystem<?> ensureZM(CoordinateReferenceSystem<?> crs, boolean needZ, boolean needM) {
         CoordinateReferenceSystem<?> compound = crs;
         if (needZ && !compound.hasVerticalAxis()) {
-            compound = compound.addVerticalAxis(LengthUnit.METER);
+            compound = compound.addVerticalAxis(Unit.METER);
         }
         if (needM && !compound.hasMeasureAxis()) {
-            compound = compound.addMeasureAxis(LengthUnit.METER);
+            compound = compound.addMeasureAxis(Unit.METER);
         }
         if (forceToCRS && !compound.equals(crs)) {
             throw new WktDecodeException("WKT inconsistent with specified Coordinate Reference System");

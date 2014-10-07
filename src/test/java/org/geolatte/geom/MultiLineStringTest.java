@@ -23,7 +23,7 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LengthUnit;
+import org.geolatte.geom.crs.Unit;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class MultiLineStringTest {
 
     private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
     private static PositionTypeDescriptor<P2D> d2D = Positions.getDescriptor(crs.getPositionClass());
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
+    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
     private static PositionTypeDescriptor<P2DM> d2DM = Positions.getDescriptor(crsM.getPositionClass());
 
     private MultiLineString<P2DM> ml1;

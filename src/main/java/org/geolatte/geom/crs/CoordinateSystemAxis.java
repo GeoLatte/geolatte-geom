@@ -34,19 +34,19 @@ public class CoordinateSystemAxis {
     private final Unit unit;
 
     public static CoordinateSystemAxis mkLonAxis() {
-        return new CoordinateSystemAxis("Longitude", CoordinateSystemAxisDirection.EAST, LengthUnit.DEGREE);
+        return new CoordinateSystemAxis("Longitude", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
     }
 
     public static CoordinateSystemAxis mkLatAxis() {
-        return new CoordinateSystemAxis("Latitude", CoordinateSystemAxisDirection.NORTH, LengthUnit.DEGREE);
+        return new CoordinateSystemAxis("Latitude", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
     }
 
     public static CoordinateSystemAxis mkXAxis() {
-        return new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, LengthUnit.METER);
+        return new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER);
     }
 
     public static CoordinateSystemAxis mkYAxis() {
-        return new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, LengthUnit.METER);
+        return new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER);
     }
 
 

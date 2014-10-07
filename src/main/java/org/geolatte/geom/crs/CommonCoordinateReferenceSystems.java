@@ -39,7 +39,7 @@ public class CommonCoordinateReferenceSystems {
      * @param unit the length unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem} with the specified length units
      */
-    public static CoordinateReferenceSystem<P2D> mkGenericProjected(LengthUnit unit) {
+    public static CoordinateReferenceSystem<P2D> mkGenericProjected(Unit unit) {
         return new CoordinateReferenceSystem<P2D>(CrsId.UNDEFINED, "Generic 2D Projected", P2D.class,
                 new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, unit),
                 new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)
@@ -54,7 +54,7 @@ public class CommonCoordinateReferenceSystems {
      * @param unit the length unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem}
      */
-    public static CoordinateReferenceSystem<G2D> mkGenericGeographic(LengthUnit unit) {
+    public static CoordinateReferenceSystem<G2D> mkGenericGeographic(Unit unit) {
         return new CoordinateReferenceSystem<G2D>(CrsId.UNDEFINED, "Generic 2D Projected", G2D.class,
                 new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, unit),
                 new CoordinateSystemAxis("Lon", CoordinateSystemAxisDirection.EAST, unit)
@@ -64,22 +64,22 @@ public class CommonCoordinateReferenceSystems {
     /**
      * A generic projected 2D {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CoordinateReferenceSystem<P2D> PROJECTED_2D_METER = CommonCoordinateReferenceSystems.mkGenericProjected(LengthUnit.METER);
+    final public static CoordinateReferenceSystem<P2D> PROJECTED_2D_METER = CommonCoordinateReferenceSystems.mkGenericProjected(Unit.METER);
 
     /**
      * A generic projected 2DM {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CoordinateReferenceSystem<P2DM> PROJECTED_2DM_METER = PROJECTED_2D_METER.addMeasureAxis(LengthUnit.METER);
+    final public static CoordinateReferenceSystem<P2DM> PROJECTED_2DM_METER = PROJECTED_2D_METER.addMeasureAxis(Unit.METER);
 
     /**
      * A generic projected 3D {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CoordinateReferenceSystem<P3D> PROJECTED_3D_METER = PROJECTED_2D_METER.addVerticalAxis(LengthUnit.METER);
+    final public static CoordinateReferenceSystem<P3D> PROJECTED_3D_METER = PROJECTED_2D_METER.addVerticalAxis(Unit.METER);
 
     /**
      * A generic projected 3DM {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CoordinateReferenceSystem<P3DM> PROJECTED_3DM_METER = PROJECTED_3D_METER.addMeasureAxis(LengthUnit.METER);
+    final public static CoordinateReferenceSystem<P3DM> PROJECTED_3DM_METER = PROJECTED_3D_METER.addMeasureAxis(Unit.METER);
 
     /**
      * The WGS 84 {@code GeographicCoordinateReferenceSystem}
