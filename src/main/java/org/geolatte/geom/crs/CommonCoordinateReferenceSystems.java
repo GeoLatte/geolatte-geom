@@ -24,11 +24,21 @@ package org.geolatte.geom.crs;
 import org.geolatte.geom.*;
 
 /**
+ * Common coordinate reference systems.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/31/14
  */
 public class CommonCoordinateReferenceSystems {
 
+    /**
+     * Creates a generic projected coordinate reference system using the specified units of length for coordinates.
+     *
+     * A generic system is one without a precisely defined Coordinate Reference System
+     *
+     * @param unit the length unit to use for the planar coordinates.
+     * @return a {@code CoordinateReferenceSystem} with the specified length units
+     */
     public static CoordinateReferenceSystem<P2D> mkGenericProjected(LengthUnit unit) {
         return new CoordinateReferenceSystem<P2D>(CrsId.UNDEFINED, "Generic 2D Projected", P2D.class,
                 new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, unit),
@@ -36,6 +46,14 @@ public class CommonCoordinateReferenceSystems {
         );
     }
 
+    /**
+     * Creates a generic geographic coordinate reference system using the specified units of length for coordinates.
+     *
+     * A generic system is one without a precisely defined Coordinate Reference System
+     *
+     * @param unit the length unit to use for the planar coordinates.
+     * @return a {@code CoordinateReferenceSystem}
+     */
     public static CoordinateReferenceSystem<G2D> mkGenericGeographic(LengthUnit unit) {
         return new CoordinateReferenceSystem<G2D>(CrsId.UNDEFINED, "Generic 2D Projected", G2D.class,
                 new CoordinateSystemAxis("Lat", CoordinateSystemAxisDirection.NORTH, unit),
@@ -43,11 +61,29 @@ public class CommonCoordinateReferenceSystems {
         );
     }
 
+    /**
+     * A generic projected 2D {@code CoordinateReferenceSystem} with meter coordinates
+     */
     final public static CoordinateReferenceSystem<P2D> PROJECTED_2D_METER = CommonCoordinateReferenceSystems.mkGenericProjected(LengthUnit.METER);
+
+    /**
+     * A generic projected 2DM {@code CoordinateReferenceSystem} with meter coordinates
+     */
     final public static CoordinateReferenceSystem<P2DM> PROJECTED_2DM_METER = PROJECTED_2D_METER.addMeasureAxis(LengthUnit.METER);
+
+    /**
+     * A generic projected 3D {@code CoordinateReferenceSystem} with meter coordinates
+     */
     final public static CoordinateReferenceSystem<P3D> PROJECTED_3D_METER = PROJECTED_2D_METER.addVerticalAxis(LengthUnit.METER);
+
+    /**
+     * A generic projected 3DM {@code CoordinateReferenceSystem} with meter coordinates
+     */
     final public static CoordinateReferenceSystem<P3DM> PROJECTED_3DM_METER = PROJECTED_3D_METER.addMeasureAxis(LengthUnit.METER);
 
-    public static CoordinateReferenceSystem<G2D> WGS84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+    /**
+     * The WGS 84 {@code GeographicCoordinateReferenceSystem}
+     */
+    public static GeographicCoordinateReferenceSystem WGS84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 
 }
