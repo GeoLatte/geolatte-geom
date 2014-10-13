@@ -21,11 +21,7 @@ public class TestWktDecodingIdempotent {
         String originalWkt = "SRID=31370;POINT(68878.8400879 169038.177124)";
         assertEquals(originalWkt, Wkt.toWkt(original));
 
-
-        Geometry geomFromOriginalWkt = Wkt.fromWkt(originalWkt);
-
-        assertEquals(original,geomFromOriginalWkt);
+        // geom to wkb to geom zou stabiel moeten blijven
+        assertEquals(Wkt.fromWkt(Wkt.toWkt(original)),original);
     }
-
-
 }
