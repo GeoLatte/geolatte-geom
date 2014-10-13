@@ -13,13 +13,14 @@ import java.util.Arrays;
  * <p>The order of coordinates must follow the order: x, y, z, measure (easting,
  * northing, altitude, measure) for coordinates in a projected coordinate reference system, or
  * longitude, latitude, altitude, measure for coordinates in a geographic coordinate reference system).
+ * </p>
  *
- * *<p> Usually the first coordinate value (X or Lon) increases along an EAST axis direction, and the second (Y or Lat)
+ * <p> Usually the first coordinate value (X or Lon) increases along an EAST axis direction, and the second (Y or Lat)
  * along an NORTH axis direction. In some projected coordinate systems, such as those used in South-Africa,
  * the orientation is WEST for the first and SOUTH for the second coordinate value. To be sure of the interpretation
  * of the first and second coordinate, you can inspect the {@code CoordinateReferenceSystem} used with the
  * {@code Position}.
- *</p>
+ * </p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14

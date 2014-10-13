@@ -36,7 +36,7 @@ public class CommonCoordinateReferenceSystems {
      *
      * A generic system is one without a precisely defined Coordinate Reference System
      *
-     * @param unit the length unit to use for the planar coordinates.
+     * @param unit the unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem} with the specified length units
      */
     public static CoordinateReferenceSystem<P2D> mkGenericProjected(Unit unit) {
@@ -51,7 +51,7 @@ public class CommonCoordinateReferenceSystems {
      *
      * A generic system is one without a precisely defined Coordinate Reference System
      *
-     * @param unit the length unit to use for the planar coordinates.
+     * @param unit the unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem}
      */
     public static CoordinateReferenceSystem<G2D> mkGenericGeographic(Unit unit) {

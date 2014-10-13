@@ -5,8 +5,8 @@ import org.geolatte.geom.*;
 import java.util.Arrays;
 
 /**
- * A compound {@code CoordinateReferenceSystem} that is constructed by adding additional CoordinateSystemAxes
- * to
+ * A compound {@code CoordinateReferenceSystem} that is constructed by adding additional CoordinateSystemAxes to a
+ * base coordinate reference system (either a Geographic, Geocentric or Projected Coordinate Reference System).
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/4/14

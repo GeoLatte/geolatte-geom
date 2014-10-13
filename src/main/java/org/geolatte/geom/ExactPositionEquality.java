@@ -23,7 +23,7 @@ package org.geolatte.geom;
 
 /**
  * A {@link PositionEquality} implementation that considers two <code>Position</code>s to be equal if and only if
- * the have the same coordinates. Optionally, the coordinates considered in the test can be limited to specified
+ * the have the same coordinates.
  * dimensions.
  *
  * @author Karel Maesen, Geovise BVBA

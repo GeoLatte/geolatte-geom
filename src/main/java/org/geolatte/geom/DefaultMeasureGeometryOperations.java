@@ -62,7 +62,6 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
     public <P extends P2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
         if (geometry.isEmpty()) return Double.NaN;
-        //TODO -- tolerance parameter into API
         InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, tolerance);
         geometry.accept(visitor);
         return visitor.m();

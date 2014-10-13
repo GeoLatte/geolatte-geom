@@ -22,7 +22,7 @@
 package org.geolatte.geom;
 
 /**
- * A test for equality on <code>Geometry</code>s.
+ * A test for equality of <code>Geometry</code>s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/13/12

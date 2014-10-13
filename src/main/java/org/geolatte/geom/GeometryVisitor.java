@@ -24,6 +24,7 @@ package org.geolatte.geom;
 /**
  * A visitor for <code>Geometry</code>s.
  *
+ * @see org.geolatte.geom.Geometry#accept(GeometryVisitor)
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/22/11

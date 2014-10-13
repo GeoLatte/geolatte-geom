@@ -28,21 +28,42 @@ import java.util.List;
 /**
  * A Factory for {@code Geometry}s
  * <p/>
- * <p>This Factory allows the creation of generic Geometries with wildcard parametrized P types</p>
+ * <p>This Factory allows generically creating Geometries</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/15/14
  */
 public class Geometries {
 
+    /**
+     * Creates a {@code Point} from a Position and coordinate reference system
+     * @param pos the position for the created {@code Point}
+     * @param crs the coordinate reference system for the created {@code Point}
+     * @param <P> the type of {@code Position}
+     * @return a {@code Point} with the specified position and coordinate reference system
+     */
     public static <P extends Position> Point<P> mkPoint(P pos, CoordinateReferenceSystem<P> crs) {
         return new Point<P>(pos, crs);
     }
 
+    /**
+     * Creates a {@code LineString} from a {@code PositionSequence} and coordinate reference system
+     * @param seq the {@code PositionSequence} for the created {@code LineString}
+     * @param crs the coordinate reference system for the created {@code LineString}
+     * @param <P> the type of {@code Position}
+     * @return a {@code LineString} with the specified positions and coordinate reference system
+     */
     public static <P extends Position> LineString<P> mkLineString(PositionSequence<P> seq, CoordinateReferenceSystem<P> crs) {
         return new LineString<P>(seq, crs);
     }
 
+    /**
+     * Creates a {@code LinearRing} from a {@code PositionSequence} and coordinate reference system
+     * @param seq the {@code PositionSequence} for the created {@code LinearRing}
+     * @param crs the coordinate reference system for the created {@code LinearRing}
+     * @param <P> the type of {@code Position}
+     * @return a {@code LinearRing} with the specified positions and coordinate reference system
+     */
     public static <P extends Position> LinearRing<P> mkLinearRing(PositionSequence<P> seq, CoordinateReferenceSystem<P> crs) {
         return new LinearRing<P>(seq, crs);
     }

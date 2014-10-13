@@ -22,15 +22,25 @@
 package org.geolatte.geom;
 
 /**
- * An interface for linear {@code Geometry}s ({@code LineString}s and {@code MultiLineString}s).
+ * An interface for linear {@code Geometry}s
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/27/14
  */
 public interface Linear<P extends Position> {
 
+    /**
+     * Returns the start position of the linear {@code Geometry}
+     *
+     * @return the start position of the linear {@code Geometry}
+     */
     public  P getStartPosition();
 
+    /**
+     * Returns the end position of the linear {@code Geometry}
+     *
+     * @return the end position of the linear {@code Geometry}
+     */
     public P getEndPosition();
 
 }

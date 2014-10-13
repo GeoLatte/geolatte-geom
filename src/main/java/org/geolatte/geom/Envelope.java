@@ -131,6 +131,7 @@ public class Envelope<P extends Position> {
         return builder.toString();
     }
 
+    //TODO get rid of minCx/maxCX public methods
     public double getMinC0() {
         return lowerLeft.getCoordinate(0);
     }
