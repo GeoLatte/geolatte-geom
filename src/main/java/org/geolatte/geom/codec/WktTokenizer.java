@@ -98,6 +98,7 @@ class WktTokenizer extends AbstractWktTokenizer {
      */
     protected double fastReadNumber() {
         skipWhitespace();
+        int startPos = currentPos;
         char c = wkt.charAt(currentPos);
         double sign = 1.0d;
         //read the sign
@@ -105,30 +106,37 @@ class WktTokenizer extends AbstractWktTokenizer {
             sign = -1.0d;
             c = wkt.charAt(++currentPos);
         }
-        //read the integer part
-        double d = 0.0d;
-        while (Character.isDigit(c)) {
-            d = 10 * d + (c - '0');
-            c = wkt.charAt(++currentPos);
-        }
-        //read the decimal part
-        if (c == '.') {
-            c = wkt.charAt(++currentPos);
-            double divisor = 10d;
-            while (Character.isDigit(c)) {
-                double f = (c - '0');
-                d += f / divisor;
-                divisor *= 10d;
-                c = wkt.charAt(++currentPos);
+
+        //read the number and put it in form <long>E<long>
+        long s = 0l;
+        boolean decPntSeen = false;
+        long decPos = -1;
+        while (true) {
+            if (Character.isDigit(c)) {
+                s = 10 * s + (c - '0');
+            } else if (c == '.' ) {
+                if (decPntSeen) {
+                    throw new WktDecodeException("Invalid number format at position " + currentPos);
+                }
+                decPntSeen = true;
+            } else {
+                break;
             }
+            if (decPntSeen) {
+                decPos++;
+            }
+            c = wkt.charAt(++currentPos);
         }
+
+
+
         //read the exponent (scientific notation)
-        double exp = 0;
-        double expSign = 1;
+        long exp = 0l;
+        long expSign = 1l;
         if (c == 'e' || c == 'E') {
             c = wkt.charAt(++currentPos);
-            if (c == '-') {
-                expSign = -1;
+            if (c == '-')  {
+                expSign = -1l;
                 c = wkt.charAt(++currentPos);
             }
             while (Character.isDigit(c)) {
@@ -136,7 +144,9 @@ class WktTokenizer extends AbstractWktTokenizer {
                 c = wkt.charAt(++currentPos);
             }
         }
-        return sign * d * Math.pow(10, expSign * exp);
+        long p =  decPos >= 0 ? expSign * exp - decPos : expSign * exp;
+        int endPos = currentPos;
+        return toDouble(sign, s, p, startPos, endPos);
     }
 
 
@@ -207,5 +217,42 @@ class WktTokenizer extends AbstractWktTokenizer {
         }
         return token;
     }
+
+    /**
+     * Converts the decimal number representation into a double
+     *
+     * This routine tries to apply the "Fast path" to get a really fast conversion, if applicable. If not, it
+     * delegates to the more expensive Double.parseDouble() StdLib conversion.
+     *
+     * See: http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
+     * and Handbook of Floating-Point Arithmetic, p. 47-8 (Muller e.a)
+     *
+     * @param sign the sign of the number
+     * @param s the decimal mantissa or significand as a long
+     * @param p the exponent as a long
+     * @param startPos the start position in the Wkt for the parsed number
+     * @param endPos the end position in the wkt for the parsed number
+     * @return
+     */
+    protected double toDouble(double sign, long s, long p, int startPos, int endPos) {
+        //check if the Fast-path is applicable.
+        // we also test for negative s values to account for overrun/underrun conditions in the calling fastNumber procedure
+        if (s == 0) {
+            return 0.0d;
+        } else if (s > 0 && s <= S_MAX && Math.abs(p) <= P_MAX) {
+            if (p == 0l) {
+                return sign * s;
+            } else if (p < 0) {
+                return sign * (s / Math.pow(10,-p));
+            } else {
+                return sign * (s * Math.pow(10,p));
+            }
+        } else {
+            return Double.parseDouble(wkt.subSequence(startPos, endPos).toString());
+        }
+    }
+
+    private static long S_MAX = 9007199254740991L;
+    private static long P_MAX = 22l;
 
 }

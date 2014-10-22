@@ -173,6 +173,84 @@ public class TestWktTokenizer {
     }
 
 
+    @Test
+    public void testWktTokenizerToDoubleSampleValues(){
+        WktTokenizer tokens = null;
+        String[] strings = {
+                "12.345 ",
+                "123456.1234 ",
+                "123456789.12345 ",
+                "1.23456 ",
+                "0.123456 ",
+                "0.00123456 "
+
+            };
+        for (String s : strings) {
+            tokens = new WktTokenizer(s, words, crs);
+            assertTrue(Double.valueOf(s) == tokens.fastReadNumber());
+        }
+
+    }
+
+
+    @Test
+    public void testWktTokenizerToDoubleRandomValues(){
+        WktTokenizer tokens = null;
+        for (int i = 0; i < 10000; i++) {
+            double m = Math.random()*1000;
+            int e = (int)(-20 + Math.random()*20);
+
+
+
+            String testValue = Double.valueOf(m) + "E" + e;
+            String wkt = testValue + " ";
+            tokens = new WktTokenizer(wkt, words, crs);
+
+            double rec = tokens.fastReadNumber();
+            assertTrue("Expected == " + testValue  + ", received == " + Double.toString(rec), Double.valueOf(testValue) == rec);
+
+        }
+
+    }
+
+    @Test
+    public void testWktTokenizerToDoubleOnValueLargerThanMaxValue(){
+        WktTokenizer tokens = null;
+        String wkt = "1.7976931348623157E309 ";
+        tokens = new WktTokenizer(wkt, words, crs);
+
+        double v = tokens.fastReadNumber();
+        assertTrue(Double.isInfinite(v));
+
+
+    }
+
+    @Test
+    public void testWktTokenizerToDoubleOnValueLargerThanMinValue(){
+        WktTokenizer tokens = null;
+        String wkt = "4.8E-326 ";
+        tokens = new WktTokenizer(wkt, words, crs);
+
+        double v = tokens.fastReadNumber();
+        assertTrue(v == Double.valueOf(wkt));
+
+
+    }
+
+
+    @Test
+    public void testWktTokenizerOnVeryLongDigitalExpansion(){
+        WktTokenizer tokens = null;
+        String wkt = "489823441.12345678912334432212345543211345654332211133455068345928456727 ";
+        tokens = new WktTokenizer(wkt, words, crs);
+
+        double v = tokens.fastReadNumber();
+        assertTrue(v == Double.valueOf(wkt));
+
+
+    }
+
+
 }
 
 
