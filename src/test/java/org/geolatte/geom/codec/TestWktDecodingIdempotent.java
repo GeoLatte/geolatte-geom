@@ -1,17 +1,28 @@
 package org.geolatte.geom.codec;
 
+
 import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.PointSequenceBuilders;
 import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
+import sun.misc.FloatingDecimal;
+
 import static org.junit.Assert.*;
 
 /**
  *
  */
 public class TestWktDecodingIdempotent {
+
+    @Test
+    public void testFastNumberReader(){
+        WktTokenizer tokenizer = new WktTokenizer("169038.177124  ", new PostgisWktVariant(), CrsId.valueOf(31370));
+        double v = tokenizer.fastReadNumber();
+        assertEquals("169038.177124", String.valueOf(v));
+
+    }
 
     @Test
     public void testWktConversionShouldBeIdempotent() {
