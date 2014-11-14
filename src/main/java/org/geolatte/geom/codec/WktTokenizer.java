@@ -194,7 +194,7 @@ class WktTokenizer extends AbstractWktTokenizer {
     private CoordinateReferenceSystem<?> ensureZM(CoordinateReferenceSystem<?> crs, boolean needZ, boolean needM) {
         CoordinateReferenceSystem<?> compound = crs;
         if (needZ && !compound.hasVerticalAxis()) {
-            compound = compound.addVerticalAxis(Unit.METER);
+            compound = crs.addVerticalAxis(Unit.METER);
         }
         if (needM && !compound.hasMeasureAxis()) {
             compound = compound.addMeasureAxis(Unit.METER);

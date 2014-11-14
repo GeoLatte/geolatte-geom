@@ -25,6 +25,8 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+//TODO -- do we need crs in this class? Does it need to have type params?
+
 /**
  * A <code>WktToken</code> for point sequences in the input text.
  *

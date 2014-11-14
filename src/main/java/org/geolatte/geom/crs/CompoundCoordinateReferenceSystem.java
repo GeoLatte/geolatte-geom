@@ -8,9 +8,13 @@ import java.util.Arrays;
  * A compound {@code CoordinateReferenceSystem} that is constructed by adding additional CoordinateSystemAxes to a
  * base coordinate reference system (either a Geographic, Geocentric or Projected Coordinate Reference System).
  *
+ * @param <T> Position type of the compound coordinate reference system
+ * @param <B> Position type of the base coordinate reference system
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/4/14
  */
+
 public class CompoundCoordinateReferenceSystem<T extends Position, B extends Position> extends CoordinateReferenceSystem<T> {
 
     private final CoordinateReferenceSystem<B> base;
