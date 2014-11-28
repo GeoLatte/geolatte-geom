@@ -34,28 +34,28 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
 
 
     NestedPositionSequence(PositionSequence<P>[] children) {
-        super(extractDescriptor(children));
+        super(extractFactory(children));
         this.children = children;
         this.size = calculateSize();
     }
 
-    private static <C extends Position> PositionTypeDescriptor<C> extractDescriptor(PositionSequence<C>[] children) {
+    private static <C extends Position> PositionFactory<C> extractFactory(PositionSequence<C>[] children) {
 
         if (children == null) {
             throw new IllegalArgumentException("Null or empty children array not allowed.");
         } else {
-            PositionTypeDescriptor<C> descr = null;
+            PositionFactory<C> factory = null;
             for (PositionSequence<C> seq : children) {
                 if (seq == null) {
                     throw new IllegalArgumentException("No null entries allowed in children array.");
                 } else {
-                    if (descr != null && !descr.equals(seq.getPositionTypeDescriptor())) {
+                    if (factory != null && !factory.equals(seq.getPositionFactory())) {
                         throw new IllegalArgumentException("All child sequences must have the same Coordinate Reference Systeml");
                     }
-                    descr = seq.getPositionTypeDescriptor();
+                    factory = seq.getPositionFactory();
                 }
             }
-            return descr;
+            return factory;
         }
     }
 

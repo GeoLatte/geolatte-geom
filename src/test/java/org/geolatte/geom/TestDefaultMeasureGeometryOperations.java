@@ -30,8 +30,9 @@ import org.junit.Test;
 import static org.geolatte.geom.builder.DSL.linestring;
 import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 import static org.junit.Assert.*;
-
+import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -39,10 +40,6 @@ import static org.junit.Assert.*;
  */
 public class TestDefaultMeasureGeometryOperations {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
 
 
     DefaultMeasureGeometryOperations measureOps = new DefaultMeasureGeometryOperations();
@@ -102,11 +99,11 @@ public class TestDefaultMeasureGeometryOperations {
     @Test
     public void testCreateMeasureOnLengthOpPreserves3D() {
         assertEquals("MeasureOnLenthOp does not preserve 3D status: ",
-                tc.lineString2d.getCoordinateReferenceSystem().hasVerticalAxis(),
-                tc.measuredLineString2D.getCoordinateReferenceSystem().hasVerticalAxis());
+                hasVerticalAxis(tc.lineString2d.getCoordinateReferenceSystem()),
+                hasVerticalAxis(tc.measuredLineString2D.getCoordinateReferenceSystem()));
         assertEquals("MeasureOnLenthOp does not preserve 3D status: ",
-                tc.lineString3DM.getCoordinateReferenceSystem().hasVerticalAxis(),
-                tc.measuredLineString3DM.getCoordinateReferenceSystem().hasVerticalAxis());
+                hasVerticalAxis(tc.lineString3DM.getCoordinateReferenceSystem()),
+                hasVerticalAxis(tc.measuredLineString3DM.getCoordinateReferenceSystem()));
     }
 
     @Test
@@ -125,7 +122,7 @@ public class TestDefaultMeasureGeometryOperations {
         for (int i = 0; i < expected.getNumPositions(); i++) {
             assertEquals("MeasureOnLenthOp does not preserve X-coordinate:", expected.getPositionN(i).getX(), received.getPositionN(i).getX(), Math.ulp(10));
             assertEquals("MeasureOnLenthOp does not preserve Y-coordinate:", expected.getPositionN(i).getY(), received.getPositionN(i).getY(), Math.ulp(10));
-            if (expected.getCoordinateReferenceSystem().hasVerticalAxis()) {
+            if (hasVerticalAxis(expected.getCoordinateReferenceSystem())) {
                 assertEquals("MeasureOnLenthOp does not preserve Z-coordinate:",
                         ((Vertical) expected.getPositionN(i)).getAltitude(),
                         ((Vertical) received.getPositionN(i)).getAltitude(), Math.ulp(10));
@@ -147,7 +144,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
-        double m = measureOps.measureAt(new LineString<>(crsM), new P2DM(1, 2, 0), 0.1);
+        double m = measureOps.measureAt(new LineString<P2DM>(crsM), new P2DM(1, 2, 0), 0.1);
         assertTrue(Double.isNaN(m));
     }
 
@@ -212,6 +209,6 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetMinimumMeasureOpOnNull() {
-        double m = measureOps.minimumMeasure(null);
+        double m = measureOps.minimumMeasure((LineString<P2DM>)null);
     }
 }

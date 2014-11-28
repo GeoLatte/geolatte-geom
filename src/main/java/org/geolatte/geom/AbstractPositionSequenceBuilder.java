@@ -27,20 +27,20 @@ package org.geolatte.geom;
  */
 abstract class AbstractPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
-    protected final PositionTypeDescriptor<P> descriptor;
+    protected final PositionFactory<P> factory;
     protected final double[] coords;
 
-    public AbstractPositionSequenceBuilder(PositionTypeDescriptor<P> descriptor) {
-        if (descriptor == null) throw new IllegalArgumentException("Require a non-null Coordinate reference system.");
-        this.descriptor = descriptor;
-        this.coords = new double[descriptor.getCoordinateDimension()];
+    public AbstractPositionSequenceBuilder(PositionFactory<P> factory) {
+        if (factory == null) throw new IllegalArgumentException("Require a non-null Coordinate reference system.");
+        this.factory = factory;
+        this.coords = new double[factory.getCoordinateDimension()];
     }
 
     @Override
     public PositionSequenceBuilder<P> add(double... coordinates) {
-        if (coordinates.length != this.descriptor.getCoordinateDimension())
-            throw new IllegalArgumentException(String.format("Parameter must be array of length %d", descriptor.getCoordinateDimension()));
-        for (int i = 0; i < descriptor.getCoordinateDimension(); i++) {
+        if (coordinates.length != this.factory.getCoordinateDimension())
+            throw new IllegalArgumentException(String.format("Parameter must be array of length %d", factory.getCoordinateDimension()));
+        for (int i = 0; i < factory.getCoordinateDimension(); i++) {
             addCoordinate(coordinates[i]);
         }
         return this;

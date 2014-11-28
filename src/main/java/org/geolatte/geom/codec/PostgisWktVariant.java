@@ -27,6 +27,9 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.*;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+
 /**
  * Punctuation and keywords for Postgis EWKT/WKT representations.
  *
@@ -123,7 +126,7 @@ class PostgisWktVariant extends WktVariant {
             return !candidate.isMeasured();
         }
         CoordinateReferenceSystem<?> crs = geometry.getCoordinateReferenceSystem();
-        if (crs.hasMeasureAxis() && !crs.hasVerticalAxis()) {
+        if (hasMeasureAxis(crs) && ! hasVerticalAxis(crs)) {
             return candidate.isMeasured();
         } else {
             return !candidate.isMeasured();

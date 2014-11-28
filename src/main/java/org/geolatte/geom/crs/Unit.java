@@ -25,27 +25,17 @@ package org.geolatte.geom.crs;
  * Describes the units of a <code>CoordinateSystemAxis</code>.
  *
  */
-public class Unit extends CrsIdentifiable {
-
-    /**
-     * Type of <code>LengthUnit</code>: Linear or Angular.
-     */
-    public static enum Type {
-        LINEAR,
-        ANGULAR
-    }
-
+abstract public class Unit extends CrsIdentifiable {
 
 
     //common units
-    public final static Unit DEGREE = new Unit(new CrsId("EPSG",9122), "degree", Type.ANGULAR, 0.01745329251994328);
-    public final static Unit RADIAN = new Unit(new CrsId("EPSG", 9101), "radian", Type.ANGULAR, 1);
-    public final static Unit METER = new Unit(new CrsId("EPSG", 9001), "metre", Type.LINEAR, 1);
+    public final static AngularUnit DEGREE = new AngularUnit(new CrsId("EPSG",9122), "degree", 0.01745329251994328);
+    public final static AngularUnit RADIAN = new AngularUnit(new CrsId("EPSG", 9101), "radian", 1);
+    public final static LinearUnit METER = new LinearUnit(new CrsId("EPSG", 9001), "metre", 1);
 
     //this is used when the units can't be determined.
-    public final static Unit UNKNOWN = new Unit(CrsId.UNDEFINED, "unknown", Type.LINEAR, 1);
-
-    private final Type type;
+    public final static LinearUnit UNKNOWN_LINEAR = new LinearUnit(CrsId.UNDEFINED, "unknown", 1);
+    public final static AngularUnit UNKNOWN_Angular = new AngularUnit(CrsId.UNDEFINED, "unknown", 1);
 
     private final double conversionFactor;
 
@@ -54,25 +44,19 @@ public class Unit extends CrsIdentifiable {
      *
      * @param crsId
      * @param name
-     * @param type
      * @param conversionFactor
      */
-    public Unit(CrsId crsId, String name, Type type, double conversionFactor) {
+    public Unit(CrsId crsId, String name, double conversionFactor) {
         super(crsId, name);
-        this.type = type;
         this.conversionFactor = conversionFactor;
     }
 
     /**
-     * Returns the fundamental unit for this type of <code>LengthUnit</code>.
+     * Returns the fundamental unit for this type of <code>Unit</code>.
      *
-     * @param type the type of <code>Unit</code>
      * @return Meter for linear, Radian for angular units.
      */
-    public Unit getFundamentalUnit(Type type) {
-        if (type == Type.ANGULAR) return RADIAN;
-        return METER;
-    }
+    public abstract Unit getFundamentalUnit();
 
     /**
      * Returns the conversion factor: the scalar value that converts a value of this <code>Unit</code> to the fundamental unit
@@ -89,9 +73,7 @@ public class Unit extends CrsIdentifiable {
      *
      * @return
      */
-    public boolean isAngular() {
-        return this.type == Type.ANGULAR;
-    }
+    public abstract boolean isAngular();
 
     @Override
     public boolean equals(Object o) {
@@ -102,18 +84,15 @@ public class Unit extends CrsIdentifiable {
         Unit unit = (Unit) o;
 
         if (Double.compare(unit.conversionFactor, conversionFactor) != 0) return false;
-        if (type != unit.type) return false;
 
         return true;
     }
-
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
         long temp;
-        result = 31 * result + (type != null ? type.hashCode() : 0);
-        temp = conversionFactor != +0.0d ? Double.doubleToLongBits(conversionFactor) : 0L;
+        temp = Double.doubleToLongBits(conversionFactor);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
@@ -122,7 +101,6 @@ public class Unit extends CrsIdentifiable {
     public String toString() {
         return "Unit{" +
                 "SRID=" + getCrsId().toString() +
-                "type=" + type +
                 ", conversionFactor=" + conversionFactor +
                 '}';
     }

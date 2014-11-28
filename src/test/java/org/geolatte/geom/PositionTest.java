@@ -1,9 +1,6 @@
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateSystemAxis;
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
+import org.geolatte.geom.crs.*;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -15,9 +12,9 @@ public class PositionTest {
 
     @Test
     public void testGetCoordinateDimension() {
-        CoordinateReferenceSystem<G2D> crs = new GeographicCoordinateReferenceSystem(CrsId.valueOf("EPSG", 1),
+        CoordinateReferenceSystem<G2D> crs = new Geographic2DCoordinateReferenceSystem(CrsId.valueOf("EPSG", 1),
                 "test",
-                CoordinateSystemAxis.mkLatAxis(), CoordinateSystemAxis.mkLonAxis());
+                new EllipsoidalCoordinateSystem2D(CoordinateSystemAxis.mkLatAxis(), CoordinateSystemAxis.mkLonAxis()));
 
         G2D pos = new G2D(5, 50);
         double testLon = pos.getCoordinate(CoordinateSystemAxis.mkLonAxis(), crs);

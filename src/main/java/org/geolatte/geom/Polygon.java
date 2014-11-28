@@ -82,7 +82,6 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      * @throws IllegalArgumentException when the specified <code>PositionSequence</code> does not form a
      *                                  <code>LinearRing</code> (i.e., is empty or not closed).
      */
-    @SafeVarargs
     public Polygon(LinearRing<P>... rings) {
         super(nestPositionSequences(rings), getCrs(rings));
         checkRings(rings);

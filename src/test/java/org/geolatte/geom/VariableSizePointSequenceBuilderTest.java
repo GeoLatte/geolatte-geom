@@ -21,26 +21,19 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
 public class VariableSizePointSequenceBuilderTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
 
     @Test
     public void test() throws Exception {
-        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<>(P2D.class);
+        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<P2D>(P2D.class);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
@@ -53,7 +46,7 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<>(P2D.class);
+        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<P2D>(P2D.class);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());

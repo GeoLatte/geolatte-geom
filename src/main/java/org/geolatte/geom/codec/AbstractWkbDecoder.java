@@ -82,9 +82,9 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     private <P extends Position> MultiLineString<P> decodeMultiLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
-            return new MultiLineString<>(crs);
+            return new MultiLineString<P>(crs);
         }
-        List<LineString<P>> geometries = new ArrayList<>(numGeometries);
+        List<LineString<P>> geometries = new ArrayList<LineString<P>>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
             geometries.add((LineString<P>)decodeGeometry(byteBuffer, crs));
         }
@@ -94,9 +94,9 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     private <P extends Position> MultiPoint<P> decodeMultiPoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
-            return new MultiPoint<>(crs);
+            return new MultiPoint<P>(crs);
         }
-        List<Point<P>> geometries = new ArrayList<>(numGeometries);
+        List<Point<P>> geometries = new ArrayList<Point<P>>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
             geometries.add((Point<P>) decodeGeometry(byteBuffer, crs));
         }
@@ -106,9 +106,9 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     private <P extends Position> MultiPolygon<P> decodeMultiPolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
-            return new MultiPolygon<>(crs);
+            return new MultiPolygon<P>(crs);
         }
-        List<Polygon<P>> geometries = new ArrayList<>(numGeometries);
+        List<Polygon<P>> geometries = new ArrayList<Polygon<P>>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
             geometries.add((Polygon<P>) decodeGeometry(byteBuffer, crs));
         }
@@ -119,9 +119,9 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     decodeGeometryCollection(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
-            return new GeometryCollection<>(crs);
+            return new GeometryCollection<P, Geometry<P>>(crs);
         }
-        List<Geometry<P>> geometries = new ArrayList<>(numGeometries);
+        List<Geometry<P>> geometries = new ArrayList<Geometry<P>>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {
             geometries.add(decodeGeometry(byteBuffer, crs));
         }
@@ -137,12 +137,12 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     private <P extends Position> LineString<P> decodeLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numPoints = byteBuffer.getInt();
         PositionSequence<P> points = readPositions(numPoints, byteBuffer, crs);
-        return new LineString<>(points, crs);
+        return new LineString<P>(points, crs);
     }
 
     private <P extends Position>  Point<P> decodePoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         PositionSequence<P> points = readPositions(1, byteBuffer, crs);
-        return new Point<>(points, crs);
+        return new Point<P>(points, crs);
     }
 
     private <P extends Position> PositionSequence<P> readPositions(int numPos, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
@@ -162,7 +162,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     }
 
     private <P extends Position> List<LinearRing<P>> readPolygonRings(int numRings, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
-        List<LinearRing<P>> rings = new ArrayList<>(numRings);
+        List<LinearRing<P>> rings = new ArrayList<LinearRing<P>>(numRings);
         for (int i = 0; i < numRings; i++) {
             rings.add(readRing(byteBuffer, crs));
         }
@@ -173,7 +173,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         int numPoints = byteBuffer.getInt();
         PositionSequence<P> ps = readPositions(numPoints, byteBuffer, crs);
         try {
-            return new LinearRing<>(ps, crs);
+            return new LinearRing<P>(ps, crs);
         } catch (IllegalArgumentException e) {
             throw new WkbDecodeException(e);
         }

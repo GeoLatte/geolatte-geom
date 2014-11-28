@@ -26,6 +26,7 @@ import org.geolatte.geom.P2D;
 import org.geolatte.geom.P2DM;
 import org.geolatte.geom.P3D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ import static org.junit.Assert.*;
  */
 public class TestWktTokenizer {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
 
     private WktVariant words = new PostgisWktVariant();

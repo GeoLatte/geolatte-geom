@@ -45,7 +45,7 @@ class GeometryCollectionEncoder extends AbstractEncoder {
 	}
 
 	@Override
-	protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
+	protected  <P extends Position> void encode(Geometry<P> geom, int parentShapeIndex, CountingPositionSequenceBuilder<P> coordinates, List<Figure> figures, List<Shape> shapes) {
 		if ( geom.isEmpty() ) {
 			shapes.add( new Shape( parentShapeIndex, -1, this.openGisType ) );
 			return;

@@ -40,11 +40,11 @@ public class MortonContextTest {
 
     P2D p0 = new P2D(0, 0);
     P2D p1 = new P2D(10, 10);
-    Envelope<P2D> envelope = new Envelope<>(p0, p1, crs);
+    Envelope<P2D> envelope = new Envelope<P2D>(p0, p1, crs);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentIfLevelExceedsLimit() {
-        new MortonContext<>(envelope, 32);
+        new MortonContext<P2D>(envelope, 32);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -57,7 +57,7 @@ public class MortonContextTest {
      */
     @Test
     public void testProperties() {
-        MortonContext<P2D> context = new MortonContext<>(envelope, 3);
+        MortonContext<P2D> context = new MortonContext<P2D>(envelope, 3);
 
         Assert.assertEquals(p0.getX(), context.getMinX());
         Assert.assertEquals(p0.getY(), context.getMinY());

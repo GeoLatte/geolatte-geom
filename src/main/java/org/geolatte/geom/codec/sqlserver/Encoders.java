@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class Encoders {
 
-	final private static List<Encoder> ENCODERS = new ArrayList<>();
+	final private static List<Encoder> ENCODERS = new ArrayList<Encoder>();
 
 
 	static {

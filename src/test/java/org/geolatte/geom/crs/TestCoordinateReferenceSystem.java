@@ -35,9 +35,10 @@ public class TestCoordinateReferenceSystem {
     //test Equality
     @Test
     public void testEquality() {
-        GeographicCoordinateReferenceSystem crs1 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-        GeographicCoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), crs1.getName(), crs1.getCoordinateSystem().getAxes());
+        Geographic2DCoordinateReferenceSystem crs1 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+        CoordinateSystemAxis[] axes = crs1.getCoordinateSystem().getAxes();
+        Geographic2DCoordinateReferenceSystem crs2 = new Geographic2DCoordinateReferenceSystem(
+                CrsId.parse("4326"), crs1.getName(), new EllipsoidalCoordinateSystem2D((EllipsoidalAxis)axes[0], (EllipsoidalAxis)axes[1]));
         crs2.setDatum(crs1.getDatum());
         crs2.setPrimeMeridian(crs1.getPrimeMeridian());
         assertEquals(crs1, crs2);
@@ -47,14 +48,13 @@ public class TestCoordinateReferenceSystem {
     //test Equality
     @Test
     public void testInEquality(){
-        CoordinateReferenceSystem crs1 = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326, null);
-        CoordinateReferenceSystem crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), "Other name",crs1.getCoordinateSystem().getAxes());
+        Geographic2DCoordinateReferenceSystem crs1 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+        CoordinateSystemAxis[] axes = crs1.getCoordinateSystem().getAxes();
+        Geographic2DCoordinateReferenceSystem crs2 = new Geographic2DCoordinateReferenceSystem(
+                CrsId.parse("4326"), "Other name",new EllipsoidalCoordinateSystem2D((EllipsoidalAxis)axes[0], (EllipsoidalAxis)axes[1]));
+        crs2.setDatum(crs1.getDatum());
         assertNotSame(crs1, crs2);
-        crs2 = new GeographicCoordinateReferenceSystem(
-                CrsId.parse("4326"), crs1.getName(), crs1.getCoordinateSystem().getAxes()[1],
-                crs1.getCoordinateSystem().getAxes()[0]);
-        assertNotSame(crs1, crs2);
+
     }
 
 

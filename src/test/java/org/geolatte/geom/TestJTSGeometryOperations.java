@@ -22,6 +22,7 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Test;
@@ -35,11 +36,8 @@ import static org.junit.Assert.*;
  */
 public class TestJTSGeometryOperations {
     
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
     private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-//       private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(LengthUnit.METER);
-//       private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(LengthUnit.METER);
-//       private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(LengthUnit.METER);
 
     JTSGeometryOperations ops = new JTSGeometryOperations();
 
@@ -166,9 +164,9 @@ public class TestJTSGeometryOperations {
         Polygon<P2D> pg2 = polygon(ring(crs, p(0, 3), p(0, 6), p(5, 6), p(5, 3), p(0, 3)));
         Polygon<P2D> expected = polygon(ring(crs, p(5, 3), p(5, 0), p(0, 0), p(0, 3), p(5, 3)));
         assertEquals(expected, ops.difference(pg1, pg2));
-        assertEquals(pg1, ops.difference(pg1, new Polygon<>(crs)));
+        assertEquals(pg1, ops.difference(pg1, new Polygon<P2D>(crs)));
         assertEquals(new GeometryCollection<P2D, Geometry<P2D>>(crs),
-                ops.difference(new Polygon<>(crs), pg2));
+                ops.difference(new Polygon<P2D>(crs), pg2));
     }
 
     @Test
@@ -179,8 +177,8 @@ public class TestJTSGeometryOperations {
         Polygon<P2D> expected2 = polygon(ring(crs, p(6, 6), p(0, 6), p(0, 8), p(6, 8), p(6, 6)));
         MultiPolygon expected = new MultiPolygon(new Polygon[]{expected1, expected2});
         assertEquals(expected, ops.symmetricDifference(pg1, pg2));
-        assertEquals(pg1, ops.symmetricDifference(pg1, new Polygon<>(crs)));
-        assertEquals(pg2, ops.symmetricDifference(new Polygon<>(crs), pg2));
+        assertEquals(pg1, ops.symmetricDifference(pg1, new Polygon<P2D>(crs)));
+        assertEquals(pg2, ops.symmetricDifference(new Polygon<P2D>(crs), pg2));
     }
  
 

@@ -30,10 +30,10 @@ import org.geolatte.geom.jts.DimensionalCoordinate;
  */
 abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, CoordinateSequence {
 
-    private final PositionTypeDescriptor<P> descriptor;
+    private final PositionFactory<P> factory;
 
-    public AbstractPositionSequence(PositionTypeDescriptor<P> descriptor) {
-        this.descriptor = descriptor;
+    public AbstractPositionSequence(PositionFactory<P> factory) {
+        this.factory = factory;
     }
 
     private static com.vividsolutions.jts.geom.Coordinate[] toCoordinateArray(AbstractPositionSequence cseq) {
@@ -45,21 +45,22 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return coordinates;
     }
 
-    @Override
-    public PositionTypeDescriptor<P> getPositionTypeDescriptor() {
-        return this.descriptor;
-    }
 
     @SuppressWarnings("unchecked")
     public Class<P> getPositionClass() {
-        return (Class<P>)descriptor.getPositionClass();
+        return factory.forClass();
+    }
+
+    @Override
+    public PositionFactory<P> getPositionFactory() {
+        return factory;
     }
 
     @Override
     public P getPositionN(int index) {
         double[] co = new double[getCoordinateDimension()];
         getCoordinates(index, co);
-        return Positions.mkPosition(getPositionClass(), co);
+        return factory.mkPosition(co);
     }
 
     /*
@@ -71,7 +72,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
 
     @Override
     public int getCoordinateDimension() {
-        return this.descriptor.getCoordinateDimension();
+        return this.factory.getCoordinateDimension();
     }
 
 //    protected int[] getNormalizedOrderMapping() {
@@ -110,9 +111,9 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         int idx = 0;
         co.x = c[idx++];
         co.y = c[idx++];
-        if (descriptor.hasVerticalComponent())
+        if (factory.hasZComponent())
             co.z = c[idx++];
-        if (descriptor.hasMeasureComponent())
+        if (factory.hasMComponent())
             co.m = c[idx];
         return co;
     }
@@ -147,18 +148,18 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     public double getOrdinate(int i, int ordinateIndex) {
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(i, c);
-        int idx;
+        int idx = 0;
         switch (ordinateIndex) {
             case CoordinateSequence.X:
                 return c[0];
             case CoordinateSequence.Y:
                 return c[1];
             case CoordinateSequence.Z:
-                return descriptor.hasVerticalComponent() ?
-                        c[descriptor.getVerticalComponentIndex()] : Double.NaN;
+                return factory.hasZComponent() ?
+                        c[2] : Double.NaN;
             case CoordinateSequence.M:
-                return descriptor.hasMeasureComponent()?
-                        c[descriptor.getMeasureComponentIndex()] : Double.NaN;
+                return factory.hasMComponent()?
+                        c[factory.getMComponentIndex()] : Double.NaN;
         }
         throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
     }
@@ -176,7 +177,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
 
     @Override
     public Envelope expandEnvelope(Envelope envelope) {
-        EnvelopeExpander<P> expander = new EnvelopeExpander<>(envelope);
+        EnvelopeExpander<P> expander = new EnvelopeExpander<P>(envelope);
         this.accept(expander);
         return expander.result();
     }

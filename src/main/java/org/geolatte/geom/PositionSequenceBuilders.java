@@ -40,7 +40,7 @@ public class PositionSequenceBuilders {
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PointSequence</code> containing <code>num</code> <code>Position</code>s.
      */
     public static <P extends Position> PositionSequenceBuilder<P> fixedSized(int num, Class<P> posType) {
-        return new FixedSizePositionSequenceBuilder<>(num, Positions.getDescriptor(posType));
+        return new FixedSizePositionSequenceBuilder<P>(num, Positions.getFactoryFor(posType));
     }
 
     /**
@@ -50,7 +50,7 @@ public class PositionSequenceBuilders {
      * @return a <code>PositionSequenceBuilder</code> that builds a <code>PositionSequence</code> for an arbitrary number of <code>Position</code>s.
      */
     public static <P extends Position> PositionSequenceBuilder<P> variableSized(Class<P> posType) {
-        return new VariableSizePositionSequenceBuilder<>(Positions.getDescriptor(posType));
+        return new VariableSizePositionSequenceBuilder<P>(Positions.getFactoryFor(posType));
 
     }
 

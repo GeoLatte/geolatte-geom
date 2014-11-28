@@ -27,41 +27,62 @@ package org.geolatte.geom.crs;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
-public class CoordinateSystemAxis {
+abstract public class CoordinateSystemAxis {
 
     private final String axisName;
     private final CoordinateSystemAxisDirection coordinateSystemAxisDirection;
     private final Unit unit;
+    private final int normalOrder;
 
-    public static CoordinateSystemAxis mkLonAxis() {
-        return new CoordinateSystemAxis("Longitude", CoordinateSystemAxisDirection.EAST, Unit.DEGREE);
+    public static GeodeticLongitudeCSAxis mkLonAxis() {
+        return new GeodeticLongitudeCSAxis("Longitude", Unit.DEGREE);
     }
 
-    public static CoordinateSystemAxis mkLatAxis() {
-        return new CoordinateSystemAxis("Latitude", CoordinateSystemAxisDirection.NORTH, Unit.DEGREE);
+    public static GeodeticLatitudeCSAxis mkLatAxis() {
+        return new GeodeticLatitudeCSAxis("Latitude", Unit.DEGREE);
     }
 
-    public static CoordinateSystemAxis mkXAxis() {
-        return new CoordinateSystemAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER);
+    public static StraightLineAxis mkXAxis() {
+        return new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER);
     }
 
-    public static CoordinateSystemAxis mkYAxis() {
-        return new CoordinateSystemAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER);
+    public static StraightLineAxis mkYAxis() {
+        return new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER);
+    }
+
+    public static StraightLineAxis mkZAxis() {
+        return new StraightLineAxis("Z", CoordinateSystemAxisDirection.UP, Unit.METER);
     }
 
 
     /**
-     * Creates an instance.
+     * Creates an instance
      *
      * @param axisName                      the name for this axis
      * @param coordinateSystemAxisDirection the direction for this axis
      * @param unit                          the unit of this axis
      */
-    public CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Unit unit) {
+    CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, Unit unit) {
         this.axisName = axisName;
         this.coordinateSystemAxisDirection = coordinateSystemAxisDirection;
         this.unit = unit;
+        this.normalOrder = coordinateSystemAxisDirection.getDefaultNormalOrder();
     }
+
+    /**
+     * Creates an instance with
+     *
+     * @param axisName                      the name for this axis
+     * @param coordinateSystemAxisDirection the direction for this axis
+     * @param unit                          the unit of this axis
+     */
+    CoordinateSystemAxis(String axisName, CoordinateSystemAxisDirection coordinateSystemAxisDirection, int normalOrder, Unit unit) {
+        this.axisName = axisName;
+        this.coordinateSystemAxisDirection = coordinateSystemAxisDirection;
+        this.unit = unit;
+        this.normalOrder = normalOrder;
+    }
+
 
     /**
      * Returns the name of this axis.
@@ -80,25 +101,28 @@ public class CoordinateSystemAxis {
         return unit;
     }
 
-    public boolean isMeasureAxis() {
-        return getAxisDirection().isMeasureAxisDirection();
-    }
-
-    public boolean isVerticalAxis() {
-        return getAxisDirection().isVerticalAxisDirection();
+    /**
+     * Indicates the position for the Axis in the normalized order of axes.
+     *
+     * <p>The coordinates of {@code Position}s in a specific {@code CoordinateSystem} needs to respect this invariant:
+     * if the axes are sorted according to their normalOrder property, then this gives the order in which the corresponding
+     * coordinate elements are stored in the position.</p>
+     */
+    public int getNormalOrder() {
+        return normalOrder;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof CoordinateSystemAxis)) return false;
+        if (o == null || o.getClass() != getClass()) return false;
 
         CoordinateSystemAxis that = (CoordinateSystemAxis) o;
 
         if (axisName != null ? !axisName.equals(that.axisName) : that.axisName != null) return false;
         if (coordinateSystemAxisDirection != that.coordinateSystemAxisDirection) return false;
+        if (normalOrder != that.normalOrder) return false;
         return !(unit != null ? !unit.equals(that.unit) : that.unit != null);
-
     }
 
     @Override

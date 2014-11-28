@@ -35,10 +35,10 @@ public class testCrsRegistry {
 
     @Test
     public void testCRSFromEPSGCode(){
-        CoordinateReferenceSystem crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(4326, null);
+        CoordinateReferenceSystem crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(4326, null);
         assertNotNull(crs);
         assertEquals(4326,crs.getCrsId().getCode());
-        assertTrue(crs instanceof GeographicCoordinateReferenceSystem);
+        assertTrue(crs instanceof Geographic2DCoordinateReferenceSystem);
         assertEquals("WGS 84", crs.getName());
         crs.getCoordinateSystem();
         assertEquals("Lon",crs.getCoordinateSystem().getAxis(0).getAxisName());

@@ -23,19 +23,17 @@ package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 10/13/12
  */
 public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
-    private static CoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(Unit.METER);
 
     public PostgisJDBCWithSRIDTestInputs() {
         PostgisJDBCUnitTestInputs base = new PostgisJDBCUnitTestInputs();
@@ -54,14 +52,14 @@ public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
         CoordinateReferenceSystem<?> crs = null;
         CoordinateReferenceSystem<?> srcCrs = geom.getCoordinateReferenceSystem();
 
-        if (srcCrs.hasVerticalAxis() &&  srcCrs.hasMeasureAxis()) {
-            crs = wgs84_ZM;
-        } else if (srcCrs.hasVerticalAxis()) {
-            crs = wgs84_Z;
-        } else if (srcCrs.hasMeasureAxis()) {
-            crs = wgs84_M;
+        if (hasVerticalAxis(srcCrs) &&  hasMeasureAxis(srcCrs)) {
+            crs = WGS84_ZM;
+        } else if (hasVerticalAxis(srcCrs)) {
+            crs = WGS84_Z;
+        } else if (hasMeasureAxis(srcCrs)) {
+            crs = WGS84_M;
         } else {
-            crs = wgs84;
+            crs = WGS84;
         }
         return Geometry.forceToCrs(base.getExpected(testCase), crs);
 

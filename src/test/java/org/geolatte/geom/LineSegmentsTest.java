@@ -29,26 +29,24 @@ import org.junit.Test;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import static org.geolatte.geom.CrsMock.*;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
 public class LineSegmentsTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-
     @Test
     public void testLineSegments() {
-        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<>(3, P3D.class);
+        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<P3D>(3, P3D.class);
         builder.add(1, 1, 1);
         builder.add(2, 2, 2);
         builder.add(3, 3, 3);
         PositionSequence<P3D> sequence = builder.toPositionSequence();
         int cnt = 0;
         double startX = 1.0d;
-        for (LineSegment<P3D> ls : new LineSegments<>(sequence)) {
+        for (LineSegment<P3D> ls : new LineSegments<P3D>(sequence)) {
             assertEquals(startX, ls.getStartPosition().getX(), Math.ulp(1.0d));
             startX = ls.getEndPosition().getX();
             cnt++;
@@ -58,9 +56,9 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<>(0, P2D.class);
+        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<P2D>(0, P2D.class);
         PositionSequence<P2D> sequence = builder.toPositionSequence();
-        for (LineSegment<P2D> ls : new LineSegments<>(sequence)) {
+        for (LineSegment<P2D> ls : new LineSegments<P2D>(sequence)) {
             fail();
         }
     }

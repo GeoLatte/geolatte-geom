@@ -22,6 +22,7 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ import static org.junit.Assert.*;
  */
 public class PolygonTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
 
     PositionSequence<P2D> shellPoints = variableSized(P2D.class).add(0, 0).add(10, 0).add(10, 10).add( 0, 10).add( 0, 0).toPositionSequence();
@@ -57,8 +58,8 @@ public class PolygonTest {
         } catch(IllegalArgumentException e){}
 
         try {
-            LinearRing<P2D> shell = new LinearRing<>(shellPoints, crs);
-            LinearRing<P2D> emptyInner = new LinearRing<>(crs);
+            LinearRing<P2D> shell = new LinearRing<P2D>(shellPoints, crs);
+            LinearRing<P2D> emptyInner = new LinearRing<P2D>(crs);
             new Polygon<P2D>(new LinearRing[]{shell, emptyInner});
             fail("Polygon with empty inner ring should throw IllegalArgumentException.");
         } catch(IllegalArgumentException e){}
@@ -66,12 +67,12 @@ public class PolygonTest {
 
     @Test
     public void testPolygonEquality() {
-        LinearRing<P2D> shell = new LinearRing<>(shellPoints, crs);
-        LinearRing<P2D> inner = new LinearRing<>(innerPoints, crs);
+        LinearRing<P2D> shell = new LinearRing<P2D>(shellPoints, crs);
+        LinearRing<P2D> inner = new LinearRing<P2D>(innerPoints, crs);
         Polygon<P2D> polygon1 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
-        shell = new LinearRing<>(shellPoints2, crs);
-        inner = new LinearRing<>(innerPoints2, crs);
+        shell = new LinearRing<P2D>(shellPoints2, crs);
+        inner = new LinearRing<P2D>(innerPoints2, crs);
         Polygon<P2D> polygon2 = new Polygon<P2D>(new LinearRing[]{shell, inner});
 
         shell = new LinearRing(shellPoints3, crs);

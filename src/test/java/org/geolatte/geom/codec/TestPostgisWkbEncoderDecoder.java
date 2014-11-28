@@ -22,7 +22,9 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.Unit;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
@@ -220,7 +222,7 @@ public class TestPostgisWkbEncoderDecoder {
 
     @Test
     public void test_empty_point() {
-        Geometry<G2D> g = new Point<>(CrsRegistry.getUndefinedGeographicCoordinateReferenceSystem());
+        Geometry<G2D> g = new Point<G2D>(CoordinateReferenceSystems.mkGeographic(Unit.DEGREE));
         ByteBuffer buf = Wkb.toWkb(g);
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT);
         Geometry geom = decode(byteBuffer);

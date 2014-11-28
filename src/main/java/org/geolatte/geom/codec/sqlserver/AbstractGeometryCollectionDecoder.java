@@ -48,7 +48,7 @@ abstract class AbstractGeometryCollectionDecoder extends AbstractDecoder {
     @Override
     protected <P extends Position> Geometry<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
         int startChildIdx = shapeIndex + 1;
-        List<Geometry<P>> geometries = new ArrayList<>(nativeGeom.getNumShapes());
+        List<Geometry<P>> geometries = new ArrayList<Geometry<P>>(nativeGeom.getNumShapes());
         for (int childIdx = startChildIdx; childIdx < nativeGeom.getNumShapes(); childIdx++) {
             if (!nativeGeom.isParentShapeOf(shapeIndex, childIdx)) {
                 continue;

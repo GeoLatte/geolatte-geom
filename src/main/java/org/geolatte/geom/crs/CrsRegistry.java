@@ -98,6 +98,8 @@ public class CrsRegistry {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid, tokens[2], e.getMessage()));
         } catch (InconsistentCoordinateSystemException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
+        } catch (RuntimeException e) {
+            LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
         }
 
     }
@@ -109,15 +111,17 @@ public class CrsRegistry {
      * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
      * no such system is registered.
      */
-    public static CoordinateReferenceSystem<?> getCoordinateRefenceSystemForEPSG(int epsgCode, CoordinateReferenceSystem<?> fallback) {
+    public static CoordinateReferenceSystem<?> getCoordinateReferenceSystemForEPSG(int epsgCode,
+                                                                                   CoordinateReferenceSystem<?>
+                                                                                           fallback) {
         CoordinateReferenceSystem<?> crs = crsMap.get(epsgCode);
         return crs != null ? crs : fallback;
     }
 
-    public static GeographicCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
+    public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
         if (crs.getPositionClass().equals(G2D.class)) {
-            return (GeographicCoordinateReferenceSystem) crs;
+            return (Geographic2DCoordinateReferenceSystem) crs;
         }
         throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
     }
@@ -129,16 +133,6 @@ public class CrsRegistry {
         }
         throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
     }
-
-    public static CoordinateReferenceSystem<G2D> getUndefinedGeographicCoordinateReferenceSystem() {
-        return new GeographicCoordinateReferenceSystem(CrsId.UNDEFINED, "UNDEFINED",
-                mkLonAxis(), mkLatAxis());
-    }
-
-    public static CoordinateReferenceSystem<P2D> getUndefinedProjectedCoordinateReferenceSystem() {
-        return new CoordinateReferenceSystem<>(CrsId.UNDEFINED, "UNDEFINED", P2D.class, mkXAxis(), mkYAxis());
-    }
-
 
 
     /**

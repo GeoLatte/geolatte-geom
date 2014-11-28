@@ -28,17 +28,13 @@ import org.geolatte.geom.crs.Unit;
 
 import static org.geolatte.geom.builder.DSL.pM;
 import static org.geolatte.geom.builder.DSL.point;
-
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/11/12
  */
 public class MeasuredTestCases {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
 
     DefaultMeasureGeometryOperations measureOps = new DefaultMeasureGeometryOperations();
 
@@ -66,7 +62,7 @@ public class MeasuredTestCases {
     MultiPoint<P2DM> expectedForD0B = (MultiPoint<P2DM>) Wkt.fromWkt("multipointm((1 0 4), (1 2 2), (3 1 4), (9 5 3))");
 
     Point<P2DM> caseD0C = (Point<P2DM>) Wkt.fromWkt("pointm(7 6 7)");
-    Point<P2DM> expectedForD0C = new Point<>(crsM);
+    Point<P2DM> expectedForD0C = new Point<P2DM>(crsM);
 
     Point<P2DM> caseD0D = (Point<P2DM>) Wkt.fromWkt("pointm(7 6 7)");
     MultiPoint<P2DM> expectedForD0D = (MultiPoint<P2DM>) Wkt.fromWkt("multipointm((7 6 7))");
@@ -92,7 +88,7 @@ public class MeasuredTestCases {
     MultiLineString<P2DM> expectedForD1F = (MultiLineString<P2DM>) Wkt.fromWkt("multilinestringm((1 1 1, 2 2 2, 3 3 3))");
 
     MultiLineString<P2DM> caseD1G = (MultiLineString<P2DM>) Wkt.fromWkt("multilinestringm((1 0 0, 1 1 1, 1 2 2, 3 1 3), (4 5 3, 5 3 4, 9 5 5, 7 6 6))");
-    Point<P2DM> expectedForD1G = new Point<>(crsM);
+    Point<P2DM> expectedForD1G = new Point<P2DM>(crsM);
 
     //Additional 1-Dimensional test cases
     LineString<P2DM> caseLS1 = (LineString<P2DM>) Wkt.fromWkt("linestringm(0 0 0, 1 0 1, 2 0 2, 3 0 3)");
@@ -119,12 +115,12 @@ public class MeasuredTestCases {
                 .add(1, 0)
                 .add(1, 1)
                 .add(2, 1);
-        lineString2d = new LineString<>(psBuilder.toPositionSequence(), crs);
+        lineString2d = new LineString<P2D>(psBuilder.toPositionSequence(), crs);
 
         psBuilder = PositionSequenceBuilders.fixedSized(3, P2D.class);
         psBuilder.add(3, 1).add(4, 1).add(5, 1);
-        LineString<P2D> test2DLine2 = new LineString<>(psBuilder.toPositionSequence(), crs);
-        multiLineString2D = new MultiLineString<>(lineString2d, test2DLine2);
+        LineString<P2D> test2DLine2 = new LineString<P2D>(psBuilder.toPositionSequence(), crs);
+        multiLineString2D = new MultiLineString<P2D>(lineString2d, test2DLine2);
 
 
         PositionSequenceBuilder<P3DM> psBuilder3DM = PositionSequenceBuilders.fixedSized(4, P3DM.class);
@@ -132,9 +128,9 @@ public class MeasuredTestCases {
                 .add(1, 0, 3, 10)
                 .add(1, 1, 4, 20)
                 .add(2, 1, 5, 30);
-        lineString3DM = new LineString<>(psBuilder3DM.toPositionSequence(),crsZM);
+        lineString3DM = new LineString<P3DM>(psBuilder3DM.toPositionSequence(),crsZM);
 
-        measuredMultiPoint = new MultiPoint<>(
+        measuredMultiPoint = new MultiPoint<P2DM>(
                 point(crsM, pM(0, 0, 1)),
                 point(crsM, pM(1, 2, 2))
         );
@@ -149,7 +145,7 @@ public class MeasuredTestCases {
         linearRing = new LineString(psBuilder.toPositionSequence(), crs);
 
 
-        emptyLineString = new LineString<>(crs);
+        emptyLineString = new LineString<P2D>(crs);
 
         //measured lines
 

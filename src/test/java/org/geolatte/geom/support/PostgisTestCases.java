@@ -22,26 +22,16 @@
 package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 
 import static org.geolatte.geom.builder.DSL.*;
+
+import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PostgisTestCases extends WktWkbCodecTestBase {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
-
-    private static CoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(Unit.METER);
 
     public static final Integer POINT_2D = 0;
     public static final Integer POINT_3D = 1;
@@ -84,7 +74,7 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(POINT_WITH_SRID,
                 "SRID=4326;POINT(1 2 3 4)",
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
-                point(wgs84_ZM, g(1, 2, 3, 4)));
+                point(WGS84_ZM, g(1, 2, 3, 4)));
 
 
 
@@ -129,8 +119,8 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
                 multipoint( pnt1, pnt2));
 
-        Point<G2D> gpnt1 = point(wgs84, g(1, 2));
-        Point<G2D> gpnt2 = point(wgs84, g(3, 4));
+        Point<G2D> gpnt1 = point(WGS84, g(1, 2));
+        Point<G2D> gpnt2 = point(WGS84, g(3, 4));
         addCase(MULTIPOINT_2D_WITH_SRID,
                 "SRID=4326;MULTIPOINT((1 2),(3 4))",
                 "0104000020E6100000020000000101000000000000000000F03F0000000000000040010100000000000000000008400000000000001040",
@@ -147,7 +137,7 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(MULTILINESTRING_2D_WITH_SRID,
                 "SRID=4326;MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "0105000020E610000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
-                , multilinestring( linestring (wgs84 ,g(1, 2),g(2, 3),g(4, 5) ), linestring(wgs84 ,g(6, 7),g(8, 9) )));
+                , multilinestring( linestring (WGS84 ,g(1, 2),g(2, 3),g(4, 5) ), linestring(WGS84 ,g(6, 7),g(8, 9) )));
 
 
 
@@ -175,7 +165,7 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(INVALID_POINT,
                 "POINT(10,12)",
                 "01010000807DC39425AD4",
-                new Point<>(crs));
+                new Point<P2D>(crs));
 
         addCase(INVALID_POLYGON,
                 "POLYGON((0 0,1 0,1 1,0 1))",

@@ -177,7 +177,7 @@ public class DSL {
      * @return a {@code Point} having the specified {@code Position} and {@code CoordinateReferenceSystem}
      */
     public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
-        return new Point<>(p, crs);
+        return new Point<P>(p, crs);
     }
 
     /**
@@ -187,7 +187,7 @@ public class DSL {
      * @return a {@code PointToken} having the specified {@code Position}
      */
     public static <P extends Position> PointToken<P> point(P position) {
-        return new PointToken<>(position);
+        return new PointToken<P>(position);
     }
 
     /**
@@ -198,9 +198,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return a {@code LineString} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
      */
-    @SafeVarargs
     public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, P... positions) {
-        return new LineString<>(toSeq(crs, positions), crs);
+        return new LineString<P>(toSeq(crs, positions), crs);
     }
 
     /**
@@ -210,9 +209,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return a {@code LineStringToken} having the specified {@code Position}s
      */
-    @SafeVarargs
     public static <P extends Position> LineStringToken<P> linestring(P... positions) {
-        return new LineStringToken<>(positions);
+        return new LineStringToken<P>(positions);
     }
 
     /**
@@ -223,9 +221,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return a {@code LinearRing} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
      */
-    @SafeVarargs
     public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, P... positions) {
-        return new LinearRing<>(toSeq(crs, positions), crs);
+        return new LinearRing<P>(toSeq(crs, positions), crs);
     }
 
     /**
@@ -235,13 +232,12 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return a {@code LinearRingToken} having the specified {@code Position}s
      */
-    @SafeVarargs
     public static <P extends Position> LinearRingToken<P> ring(P... positions) {
-        return new LinearRingToken<>(positions);
+        return new LinearRingToken<P>(positions);
     }
 
     @SuppressWarnings("unchecked")
-    private static <P extends Position, G extends Geometry<P>> G[] combine(Class<? super G> resultType, G geometry, G... geometries) {
+    private static <P extends Position, G extends Geometry<P>> G[] combine(Class<G> resultType, G geometry, G... geometries) {
         Object[] allGeometries = (Object[]) Array.newInstance(resultType, geometries.length + 1);
         allGeometries[0] = geometry;
         System.arraycopy(geometries, 0, allGeometries, 1, geometries.length);
@@ -255,9 +251,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s.
      */
-    @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
-        return new GeometryCollection<>(combine(Geometry.class, geometry, geometries));
+        return new GeometryCollection<P, Geometry<P>>(combine(Geometry.class, geometry, geometries));
     }
 
     /**
@@ -269,15 +264,14 @@ public class DSL {
      * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s and {@code CoordinateReferenceSystem}
      */
     @SuppressWarnings("unchecked")
-    @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
-        if (tokens.length == 0) return new GeometryCollection<>(crs);
+        if (tokens.length == 0) return new GeometryCollection<P, Geometry<P>>(crs);
         Geometry<P>[] parts = new Geometry[tokens.length];
         int idx = 0;
         for (GeometryToken t : tokens) {
             parts[idx++] = t.toGeometry(crs);
         }
-        return new GeometryCollection<>(parts);
+        return new GeometryCollection<P, Geometry<P>>(parts);
     }
 
     /**
@@ -287,9 +281,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return the {@code GeometryCollectionToken} of the specified constituent {@code GeometryToken}s
      */
-    @SafeVarargs
     public static <P extends Position> GeometryCollectionToken<P> geometrycollection(GeometryToken<P>... tokens) {
-        return new GeometryCollectionToken<>(tokens);
+        return new GeometryCollectionToken<P>(tokens);
     }
 
     /**
@@ -300,10 +293,10 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return the {@code Polygon} defined by the specified outer and inner rings.
      */
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     public static <P extends Position> Polygon<P> polygon(LinearRing<P> hull, LinearRing<P>... rings) {
         LinearRing<P>[] combined = combine(LinearRing.class, hull, rings);
-        return new Polygon<>(combined);
+        return new Polygon<P>(combined);
     }
 
     /**
@@ -315,95 +308,87 @@ public class DSL {
      * @return the {@code Polygon} defined by the specified coordinate reference system and ring tokens
      */
     @SuppressWarnings("unchecked")
-    @SafeVarargs
     public static <P extends Position> Polygon<P> polygon(CoordinateReferenceSystem<P> crs, LinearRingToken<P>... tokens) {
         if (tokens.length == 0) {
-            return new Polygon<>(crs);
+            return new Polygon<P>(crs);
         }
         LinearRing<P>[] rings = new LinearRing[tokens.length];
         int idx = 0;
         for (LinearRingToken t : tokens) {
             rings[idx++] = t.toGeometry(crs);
         }
-        return new Polygon<>(rings);
+        return new Polygon<P>(rings);
     }
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> PolygonToken<P> polygon(LinearRingToken<P>... tokens) {
-        return new PolygonToken<>(tokens);
+        return new PolygonToken<P>(tokens);
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiPoint<P> multipoint(Point<P> point, Point<P>... points) {
-        return new MultiPoint<>(combine(Point.class, point, points));
+        return new MultiPoint<P>(combine(Point.class, point, points));
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiPointToken<P> multipoint(PointToken<P>... tokens) {
-        return new MultiPointToken<>(tokens);
+        return new MultiPointToken<P>(tokens);
     }
 
     @SuppressWarnings("unchecked")
-    @SafeVarargs
     public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, PointToken<P>... tokens) {
 
-        if (tokens.length == 0) return new MultiPoint<>(crs);
+        if (tokens.length == 0) return new MultiPoint<P>(crs);
 
         Point<P>[] points = new Point[tokens.length];
         int idx = 0;
         for (PointToken t : tokens) {
             points[idx++] = t.toGeometry(crs);
         }
-        return new MultiPoint<>(points);
+        return new MultiPoint<P>(points);
 
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiLineString<P> multilinestring(LineString<P> linestring, LineString<P>... linestrings) {
-        return new MultiLineString<>(combine(LineString.class, linestring, linestrings));
+        return new MultiLineString<P>(combine(LineString.class, linestring, linestrings));
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiLineStringToken<P> multilinestring(LineStringToken<P>... tokens) {
-        return new MultiLineStringToken<>(tokens);
+        return new MultiLineStringToken<P>(tokens);
     }
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> MultiLineString<P> multilinestring(CoordinateReferenceSystem<P> crs, LineStringToken<P>... tokens) {
-        if (tokens.length == 0) return new MultiLineString<>(crs);
+        if (tokens.length == 0) return new MultiLineString<P>(crs);
         LineString<P>[] linestrings = new LineString[tokens.length];
         int idx = 0;
         for (LineStringToken t : tokens) {
             linestrings[idx++] = t.toGeometry(crs);
         }
-        return new MultiLineString<>(linestrings);
+        return new MultiLineString<P>(linestrings);
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiPolygon<P> multipolygon(Polygon<P> polygon, Polygon<P>... polygons) {
-        return new MultiPolygon<>(combine(Polygon.class, polygon, polygons));
+        return new MultiPolygon<P>(combine(Polygon.class, polygon, polygons));
     }
 
-    @SafeVarargs
     public static <P extends Position> MultiPolygonToken<P> multipolygon(PolygonToken<P>... tokens) {
-        return new MultiPolygonToken<>(tokens);
+        return new MultiPolygonToken<P>(tokens);
     }
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> MultiPolygon<P> multipolygon(CoordinateReferenceSystem<P> crs, PolygonToken<P>... tokens) {
 
-        if (tokens.length == 0) return new MultiPolygon<>(crs);
+        if (tokens.length == 0) return new MultiPolygon<P>(crs);
         Polygon<P>[] polygons = new Polygon[tokens.length];
         int idx = 0;
         for (PolygonToken t : tokens) {
             polygons[idx++] = t.toGeometry(crs);
         }
-        return new MultiPolygon<>(polygons);
+        return new MultiPolygon<P>(polygons);
 
     }
 
-    @SafeVarargs
-    static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, P... positions) {
+
+    static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, P[] positions) {
         PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, crs.getPositionClass());
         double[] coords = new double[crs.getCoordinateDimension()];
         for (P t : positions) {
@@ -427,35 +412,35 @@ public class DSL {
 
         @Override
         Point<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            return new Point<>(p, crs);
+            return new Point<P>(p, crs);
         }
     }
 
     public static class LineStringToken<P extends Position> extends GeometryToken<P> {
         private P[] positions;
 
-        @SafeVarargs
+
         LineStringToken(P... positions) {
             this.positions = Arrays.copyOf(positions, positions.length);
         }
 
         @Override
         LineString<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            return new LineString<>(toSeq(crs, positions), crs);
+            return new LineString<P>(toSeq(crs, positions), crs);
         }
     }
 
     public static class LinearRingToken<P extends Position> extends GeometryToken<P> {
         private P[] positions;
 
-        @SafeVarargs
+
         LinearRingToken(P... positions) {
             this.positions = Arrays.copyOf(positions, positions.length);
         }
 
         @Override
         LinearRing<P> toGeometry(CoordinateReferenceSystem<P> crs) {
-            return new LinearRing<>(toSeq(crs, positions), crs);
+            return new LinearRing<P>(toSeq(crs, positions), crs);
         }
     }
 
@@ -482,7 +467,7 @@ public class DSL {
     public static class GeometryCollectionToken<P extends Position> extends GeometryToken<P> {
         private GeometryToken[] tokens;
 
-        @SafeVarargs
+
         GeometryCollectionToken(GeometryToken<P>... tokens) {
             this.tokens = Arrays.copyOf(tokens, tokens.length);
         }
@@ -495,7 +480,7 @@ public class DSL {
             for (int i = 0; i < tokens.length; i++) {
                 parts[i] = tokens[i].toGeometry(crs);
             }
-            return new GeometryCollection<>(parts);
+            return new GeometryCollection<P, Geometry<P>>(parts);
         }
 
     }
@@ -503,7 +488,6 @@ public class DSL {
     public static class MultiPointToken<P extends Position> extends GeometryToken<P> {
         private PointToken[] tokens;
 
-        @SafeVarargs
         MultiPointToken(PointToken<P>... tokens) {
             this.tokens = Arrays.copyOf(tokens, tokens.length);
         }
@@ -516,7 +500,7 @@ public class DSL {
             for (int i = 0; i < tokens.length; i++) {
                 parts[i] = tokens[i].toGeometry(crs);
             }
-            return new MultiPoint<>(parts);
+            return new MultiPoint<P>(parts);
         }
 
     }
@@ -537,7 +521,7 @@ public class DSL {
             for (int i = 0; i < tokens.length; i++) {
                 parts[i] = tokens[i].toGeometry(crs);
             }
-            return new MultiLineString<>(parts);
+            return new MultiLineString<P>(parts);
         }
 
     }
@@ -557,7 +541,7 @@ public class DSL {
             for (int i = 0; i < tokens.length; i++) {
                 parts[i] = tokens[i].toGeometry(crs);
             }
-            return new MultiPolygon<>(parts);
+            return new MultiPolygon<P>(parts);
         }
 
     }

@@ -41,7 +41,7 @@ class PolygonDecoder extends AbstractDecoder {
 	}
 
 	protected <P extends Position>  Polygon<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
-        return new Polygon<>(crs);
+        return new Polygon<P>(crs);
     }
 
 	protected <P extends Position>  Polygon<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
@@ -54,7 +54,7 @@ class PolygonDecoder extends AbstractDecoder {
 		}
 		//polygons consist of one exterior ring figure, and several interior ones.
 		IndexRange figureRange = nativeGeom.getFiguresForShape( shapeIndex );
-		List<LinearRing<P>> rings = new ArrayList<>(figureRange.length());
+		List<LinearRing<P>> rings = new ArrayList<LinearRing<P>>(figureRange.length());
         //the rings should contain all inner rings from index 1 to index length - 1
         // index = 0 should be reserved for the shell.
 		for ( int figureIdx = figureRange.start, i = 1; figureIdx < figureRange.end; figureIdx++ ) {

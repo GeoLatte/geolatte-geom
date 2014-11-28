@@ -36,7 +36,7 @@ public class MultiPolygon<P extends Position> extends GeometryCollection<P, Poly
      *
      * @param polygons the element <code>Polygon</code>s for the constructed <code>MultiPolygon</code>
      */
-    @SafeVarargs
+//    @SafeVarargs
     public MultiPolygon(Polygon<P>... polygons) {
         super(polygons);
     }

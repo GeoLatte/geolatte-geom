@@ -8,8 +8,6 @@ package org.geolatte.geom;
  */
 public class G2D extends Position {
 
-    public final static PositionTypeDescriptor<G2D> descriptor = new PositionTypeDescriptor<>(G2D.class,
-            2, -1, -1);
 
     /**
      * Constructs an empty instance
@@ -55,7 +53,8 @@ public class G2D extends Position {
     }
 
     @Override
-    public PositionTypeDescriptor<? extends G2D> getDescriptor() {
-        return descriptor;
+    public int getCoordinateDimension() {
+        return 2;
     }
+
 }

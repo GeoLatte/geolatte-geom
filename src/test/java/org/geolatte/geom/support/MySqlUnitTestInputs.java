@@ -23,6 +23,7 @@ package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 
 import static org.geolatte.geom.builder.DSL.*;
@@ -33,7 +34,7 @@ import static org.geolatte.geom.builder.DSL.*;
  */
 public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
 
     public MySqlUnitTestInputs() {
@@ -50,13 +51,13 @@ public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
         addCase(5, //-- broken format
                 "MULTIPOINT(11 12, 20 20)",
                 "00000000010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint<>(point(crs, p(11, 12)), point(crs, p(20, 20))),
+                new MultiPoint<P2D>(point(crs, p(11, 12)), point(crs, p(20, 20))),
                 false);
 
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",
                 "0000000001020000000400000000000000000024400000000000002440000000000000344000000000000034400000000000004940000000000000494000000000000041400000000000004140",
-                new LineString<>(PositionSequenceBuilders.fixedSized(4, crs.getPositionClass()).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPositionSequence(), crs) );
+                new LineString<P2D>(PositionSequenceBuilders.fixedSized(4, crs.getPositionClass()).add(10, 10).add(20, 20).add(50, 50).add(34, 34).toPositionSequence(), crs) );
 
         Polygon<P2D> polygon2D = polygon(
                 ring(crs, p(10, 10), p(20, 10), p(20, 20), p(20, 10), p(10, 10)),
@@ -72,7 +73,7 @@ public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
         addCase(21,
                 "MULTIPOLYGON(((10 10,20 10,20 20,20 10,10 10),(5 5,5 6,6 6,6 5,5 5)),((10 10,20 10,20 20,20 10,10 10),(5 5,5 6,6 6,6 5,5 5)))",
                 "00000000010600000002000000010300000002000000050000000000000000002440000000000000244000000000000034400000000000002440000000000000344000000000000034400000000000003440000000000000244000000000000024400000000000002440050000000000000000001440000000000000144000000000000014400000000000001840000000000000184000000000000018400000000000001840000000000000144000000000000014400000000000001440010300000002000000050000000000000000002440000000000000244000000000000034400000000000002440000000000000344000000000000034400000000000003440000000000000244000000000000024400000000000002440050000000000000000001440000000000000144000000000000014400000000000001840000000000000184000000000000018400000000000001840000000000000144000000000000014400000000000001440",
-                new MultiPolygon<>(polygon2D, polygon2D));
+                new MultiPolygon<P2D>(polygon2D, polygon2D));
 
 
         addCase(25,

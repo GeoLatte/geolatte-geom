@@ -34,9 +34,9 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     PositionSequence<P> clone();
 
-    PositionTypeDescriptor<P> getPositionTypeDescriptor();
-
     Class<P> getPositionClass();
+
+    PositionFactory<P> getPositionFactory();
 
     /**
      * Returns true iff this <code>PositionSequence</code> contains no <code>Position</code>s

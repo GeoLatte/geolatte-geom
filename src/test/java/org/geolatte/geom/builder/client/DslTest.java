@@ -25,16 +25,19 @@ import org.apache.commons.collections.CollectionUtils;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
+import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
 import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
 import static org.geolatte.geom.builder.DSL.*;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/10/12
@@ -42,10 +45,6 @@ import static org.junit.Assert.assertTrue;
 public class DslTest {
 
     static private double DELTA = 0.00000001;
-    static private GeographicCoordinateReferenceSystem WGS84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    static private CoordinateReferenceSystem<G3D> WGS84_Z = WGS84.addVerticalAxis(Unit.METER);
-    static private CoordinateReferenceSystem<G2DM> WGS84_M = WGS84.addMeasureAxis(Unit.METER);
-    static private CoordinateReferenceSystem<G3DM> WGS84_ZM = WGS84_Z.addMeasureAxis(Unit.METER);
 
 
     @Test
@@ -56,7 +55,7 @@ public class DslTest {
         assertEquals(2, ls.getCoordinateDimension());
         assertEquals(WGS84, ls.getCoordinateReferenceSystem());
 
-        ArrayList<G2D> points = new ArrayList<>();
+        ArrayList<G2D> points = new ArrayList<G2D>();
         CollectionUtils.addAll(points, ls.getPositions().iterator());
         assertEquals(points.get(0).getLon(), 0, DELTA);
         assertEquals(points.get(0).getLat(), 0, DELTA);
@@ -81,9 +80,9 @@ public class DslTest {
     public void testLinearRing3D() {
 
         LinearRing lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0), g(0, 0, 0));
-        assertTrue(lr.getCoordinateReferenceSystem().hasVerticalAxis());
+        assertTrue(hasVerticalAxis(lr.getCoordinateReferenceSystem()));
 
-        ArrayList<G3D> points = new ArrayList<>();
+        ArrayList<G3D> points = new ArrayList<G3D>();
         CollectionUtils.addAll(points, lr.getPositions().iterator());
         assertEquals(points.get(0).getLon(), 0, DELTA);
         assertEquals(points.get(0).getLat(), 0, DELTA);
@@ -147,7 +146,7 @@ public class DslTest {
     public void testValidPolygon2DM() {
         Polygon p = polygon(ring(WGS84_M, gM(0, 0, 2), gM(0, 1, 3), gM(1, 1, 4), gM(1, 0, 3), gM(0, 0, 2)));
         assertEquals(0, p.getNumInteriorRing());
-        assertTrue(p.getCoordinateReferenceSystem().hasMeasureAxis());
+        assertTrue(hasMeasureAxis(p.getCoordinateReferenceSystem()));
         assertEquals(4326, p.getSRID());
 
         double[] coords = new double[3];
@@ -237,25 +236,25 @@ public class DslTest {
     @Test
     public void testvalidPoint2D() {
         Point pnt = point(WGS84, g(1, 2));
-        assertEquals(pnt, new Point<>(new G2D(1, 2), WGS84));
+        assertEquals(pnt, new Point<G2D>(new G2D(1, 2), WGS84));
     }
 
     @Test
     public void testvalidPoint3D() {
         Point pnt = point(WGS84_Z, g(1, 2, 3));
-        assertEquals(pnt, new Point<>(new G3D(1, 2, 3), WGS84_Z));
+        assertEquals(pnt, new Point<G3D>(new G3D(1, 2, 3), WGS84_Z));
     }
 
     @Test
     public void testvalidPoint2DM() {
         Point pnt = point(WGS84_M, gM(1, 2, 3));
-        assertEquals(pnt, new Point<>(new G2DM(1, 2, 3), WGS84_M));
+        assertEquals(pnt, new Point<G2DM>(new G2DM(1, 2, 3), WGS84_M));
     }
 
     @Test
     public void testvalidPoint3DM() {
         Point pnt = point(WGS84_ZM, g(1, 2, 3, 4));
-        assertEquals(pnt, new Point<>(new G3DM(1, 2, 3, 4), WGS84_ZM));
+        assertEquals(pnt, new Point<G3DM>(new G3DM(1, 2, 3, 4), WGS84_ZM));
     }
 
     @Test

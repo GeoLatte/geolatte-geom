@@ -27,6 +27,9 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
  * <p/>
@@ -45,7 +48,7 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
 
 
     protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
-        return new PostgisWkbVisitor<>(output);
+        return new PostgisWkbVisitor<P>(output);
     }
 
     static private class PostgisWkbVisitor<P extends Position> extends WkbVisitor<P> {
@@ -63,10 +66,10 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
             if (hasSrid && !hasWrittenSrid) {
                 typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
             }
-            if (crs.hasMeasureAxis()) {
+            if (hasMeasureAxis(crs)) {
                 typeCode |= PostgisWkbTypeMasks.M_FLAG;
             }
-            if (crs.hasVerticalAxis()) {
+            if (hasVerticalAxis(crs)) {
                 typeCode |= PostgisWkbTypeMasks.Z_FLAG;
             }
             output.putUInt(typeCode);

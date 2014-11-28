@@ -36,7 +36,7 @@ public class MultiPoint<P extends Position> extends GeometryCollection<P, Point<
      *
      * @param points the element <code>Point</code>s for the constructed <code>MultiPoint</code>
      */
-    @SafeVarargs
+//    @SafeVarargs
     public MultiPoint(Point<P>... points) {
         super(points);
     }

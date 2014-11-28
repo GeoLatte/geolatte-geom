@@ -21,25 +21,18 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class LineStringTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
 
     double[] coordinates = new double[]{
             0, 0, 0, 0,
@@ -153,25 +146,25 @@ public class LineStringTest {
     @Test
        public void testCreateEnvelopeOp() {
            LineString<P2D> lineString = linestring(crs, p(-1, 3), p(2, 5), p(10, -8), p(9, -1));
-           assertEquals(new Envelope<>(-1, -8, 10, 5, crs), lineString.getEnvelope());
+           assertEquals(new Envelope<P2D>(-1, -8, 10, 5, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnlyNegative() {
            LineString<P2D> lineString = linestring(crs, p(-101, -97), p(-98, -95), p(-90, -108), p(-91, -101));
-           assertEquals(new Envelope<>(-101, -108, -90, -95, crs), lineString.getEnvelope());
+           assertEquals(new Envelope<P2D>(-101, -108, -90, -95, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnlyPositive() {
            LineString<P2D> lineString = linestring(crs, p(99, 103), p(102, 105), p(110, 92), p(109, 99));
-           assertEquals(new Envelope<>(99, 92, 110, 105, crs), lineString.getEnvelope());
+           assertEquals(new Envelope<P2D>(99, 92, 110, 105, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnEmpty() {
-           LineString<P2D> lineString = new LineString<>(crs);
-           assertEquals(new Envelope<>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
+           LineString<P2D> lineString = new LineString<P2D>(crs);
+           assertEquals(new Envelope<P2D>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
        }
 
 }

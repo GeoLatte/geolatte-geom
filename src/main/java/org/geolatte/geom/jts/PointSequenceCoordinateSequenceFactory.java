@@ -26,10 +26,11 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateSystem;
 
 import java.util.Arrays;
 
-import static org.geolatte.geom.crs.CommonCoordinateReferenceSystems.*;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
  * A <code>CoordinateSequenceFactory</code> that creates <code>PointSequences</code> (which extend
@@ -43,7 +44,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
         CoordinateReferenceSystem<?> crs = determineCRS(coordinates);
-        return fromCoordinateArray(coordinates, crs.getPositionClass());
+        return fromCoordinateArray(coordinates, crs);
     }
 
     @Override
@@ -57,21 +58,20 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     @SuppressWarnings("unchecked")
-    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType) {
+    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType, CoordinateReferenceSystem<P> crs) {
         if (cs instanceof PositionSequence &&
                 ((PositionSequence) cs).getPositionClass().equals(posType)) {
             return (PositionSequence<P>) cs;
         }
-        PositionTypeDescriptor<?> desc = Positions.getDescriptor(posType);
 
         Coordinate c = new Coordinate();
-        double[] psc = new double[desc.getCoordinateDimension()];
+        double[] psc = new double[crs.getCoordinateDimension()];
         Arrays.fill(psc, Double.NaN);
         PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(cs.size(), posType);
         for (int i = 0; i < cs.size(); i++) {
             psc[0] = cs.getOrdinate(i, 0);
             psc[1] = cs.getOrdinate(i, 1);
-            if(desc.hasVerticalComponent()) {
+            if(hasVerticalAxis(crs)) {
                 psc[2] = cs.getOrdinate(i, 2);
             }
             builder.add(psc);
@@ -97,25 +97,27 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         }
     }
 
-    private <P extends Position> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, Class<P> posType) {
-        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(coordinates.length, posType);
-        PositionTypeDescriptor<P> descriptor = Positions.getDescriptor(posType);
-        double[] ordinates = new double[descriptor.getCoordinateDimension()];
+    private <P extends Position> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateReferenceSystem<P> crs) {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(coordinates.length, crs.getPositionClass());
+
+        double[] ordinates = new double[crs.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
-            copy(co, ordinates, descriptor);
+            copy(co, ordinates, crs);
             builder.add(ordinates);
         }
         return (CoordinateSequence) builder.toPositionSequence();
     }
 
-    private <P extends Position> void copy(Coordinate co, double[] ordinates, PositionTypeDescriptor<P> desc) {
+    private <P extends Position> void copy(Coordinate co, double[] ordinates, CoordinateReferenceSystem<P> crs) {
         ordinates[0] = co.x;
         ordinates[1] = co.y;
-        if (desc.hasVerticalComponent()){
-            ordinates[desc.getVerticalComponentIndex()] = co.z;
+        boolean hasVerticalAxis = hasVerticalAxis(crs);
+        if (hasVerticalAxis){
+            ordinates[2] = co.z;
         }
-        if (desc.hasMeasureComponent()) {
-            ordinates[desc.getMeasureComponentIndex()] = (co instanceof DimensionalCoordinate) ?
+        if (hasMeasureAxis(crs)) {
+            int idxM = hasVerticalAxis ? 3 : 2;
+            ordinates[idxM] = (co instanceof DimensionalCoordinate) ?
                     ((DimensionalCoordinate) co).m : Double.NaN;
         }
     }

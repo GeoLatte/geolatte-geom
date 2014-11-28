@@ -21,13 +21,11 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -36,9 +34,6 @@ import static org.junit.Assert.assertTrue;
 public class ExactCoordinatePositionEqualityTest {
 
     PositionEquality eq = new ExactPositionEquality();
-    CoordinateReferenceSystem<G2D> WGS84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    CoordinateReferenceSystem<G3D> WGS84_Z = WGS84.addVerticalAxis(Unit.METER);
-    CoordinateReferenceSystem<G3DM> WGS84_ZM = WGS84_Z.addMeasureAxis(Unit.METER);
 
     G3DM pos1 = new G3DM(1d, 2d, 3d, 4d);
     G2D pos1_2d = new G2D(1, 2);

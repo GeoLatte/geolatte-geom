@@ -23,22 +23,17 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
-
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PointTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
     private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
 //    PositionSequence seq2D = new PackedPositionSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
@@ -50,7 +45,7 @@ public class PointTest {
     Point<P3D> point3D =  point(crsZ, p(1,2,-3));
     Point<P2DM> point2DM = point(crsM, pM(1, 2, 3));
     Point<P3DM> point3DM = point(crsZM, p(1, 2, 3, 4));
-    Point<P2D> emptyPoint = new Point<>(crs);
+    Point<P2D> emptyPoint = new Point<P2D>(crs);
 
     @Test
     public void testGetX() throws Exception {
@@ -115,7 +110,7 @@ public class PointTest {
 
     @Test
     public void testEmptyPointsAreAlwaysEqual(){
-        Point<P2D> empty = new Point<>(crs);
+        Point<P2D> empty = new Point<P2D>(crs);
         assertTrue(empty.equals(emptyPoint));
     }
 
@@ -150,10 +145,10 @@ public class PointTest {
 
     @Test
     public void testEqualsAndHashCodeOnEmptyPoints(){
-        Point<P2D> empty1 = new Point<>(crs);
-        Point<P2D> empty2 = new Point<>(crs);
+        Point<P2D> empty1 = new Point<P2D>(crs);
+        Point<P2D> empty2 = new Point<P2D>(crs);
         assertEquals(empty1, empty2);
-        Point<P2D> empty3 = new Point<>(crs);
+        Point<P2D> empty3 = new Point<P2D>(crs);
         assertEquals(empty1, empty3);
     }
 }

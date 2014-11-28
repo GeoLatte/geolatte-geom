@@ -22,6 +22,11 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.Unit;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * Default implementation of {@link MeasureGeometryOperations}.
@@ -81,14 +86,19 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             throw new IllegalArgumentException("Geometry parameter must be of type LineString or MultiLineString");
         }
         final CoordinateReferenceSystem<P> sourceCRS = geometry.getCoordinateReferenceSystem();
-        final CoordinateReferenceSystem<M> measuredVariant = CoordinateReferenceSystem.getMeasuredVariant(sourceCRS);
+
+        final CoordinateReferenceSystem<M> measuredVariant = !hasMeasureAxis(sourceCRS) ?
+                (CoordinateReferenceSystem<M>) addLinearSystem(sourceCRS, Unit.METER) :
+                (CoordinateReferenceSystem<M>)sourceCRS;
+
+
         if (!measuredVariant.getPositionClass().equals(positionTypeMarker)) {
             throw new IllegalArgumentException(String.format(
                     "Inconsistent types: measured CRS has position type %s,  but positionTypeMarker is %s.",
                     measuredVariant.getPositionClass().getName(),
                     positionTypeMarker.getName()));
         }
-        return new OnLengthMeasureOp<>(geometry, measuredVariant, keepBeginMeasure).execute();
+        return new OnLengthMeasureOp<M>(geometry, measuredVariant, keepBeginMeasure).execute();
     }
 
     /**
@@ -257,7 +267,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 LineString<T> lineString = geometry.getGeometryN(part);
                 measuredParts[part] = measure(lineString);
             }
-            return new MultiLineString<>(measuredParts);
+            return new MultiLineString<T>(measuredParts);
         }
 
         private <T extends P2D & Measured> LineString<T> measure(LineString<T> geometry) {
@@ -265,6 +275,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             PositionSequence originalPoints = geometry.getPositions();
             PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),
                     geometry.getPositionClass());
+            int mIdx = hasVerticalAxis(crs) ? 3 :2;
             double[] coordinates = new double[geometry.getCoordinateDimension()];
             double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
             for (int i = 0; i < originalPoints.size(); i++) {
@@ -272,12 +283,13 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                 if (i > 0) {
                     length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
                 }
-                coordinates[crs.getNormalizedOrder().getNormalMeasure()] = length;
+                coordinates[mIdx] = length;
                 builder.add(coordinates);
                 prevCoordinates[0] = coordinates[0];
                 prevCoordinates[1] = coordinates[1];
+
             }
-            return new LineString<>(builder.toPositionSequence(), crs);
+            return new LineString<T>(builder.toPositionSequence(), crs);
         }
 
 

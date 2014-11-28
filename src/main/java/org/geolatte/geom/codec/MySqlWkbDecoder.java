@@ -25,6 +25,7 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 
 /**
@@ -53,8 +54,7 @@ class MySqlWkbDecoder extends AbstractWkbDecoder {
     protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
         // if a CRS is already specified, ignore this value
         if (crs != null) return crs;
-        CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
-                CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+        CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
         return (CoordinateReferenceSystem<P>)crsDeclared;
     }
 

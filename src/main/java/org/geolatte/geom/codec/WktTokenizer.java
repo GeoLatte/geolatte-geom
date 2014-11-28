@@ -24,8 +24,11 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.PositionSequenceBuilder;
 import org.geolatte.geom.PositionSequenceBuilders;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Unit;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
  * A tokenizer for WKT representations.
@@ -54,7 +57,7 @@ class WktTokenizer extends AbstractWktTokenizer {
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
         if (baseCRS == null) {
-            this.baseCRS = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+            this.baseCRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
             this.forceToCRS = false;
         } else {
             this.baseCRS = baseCRS;
@@ -193,11 +196,11 @@ class WktTokenizer extends AbstractWktTokenizer {
 
     private CoordinateReferenceSystem<?> ensureZM(CoordinateReferenceSystem<?> crs, boolean needZ, boolean needM) {
         CoordinateReferenceSystem<?> compound = crs;
-        if (needZ && !compound.hasVerticalAxis()) {
-            compound = crs.addVerticalAxis(Unit.METER);
+        if (needZ && ! hasVerticalAxis(compound)) {
+            compound = addVerticalSystem(compound, Unit.METER);
         }
-        if (needM && !compound.hasMeasureAxis()) {
-            compound = compound.addMeasureAxis(Unit.METER);
+        if (needM && ! hasMeasureAxis(compound)) {
+            compound = addLinearSystem(compound, Unit.METER);
         }
         if (forceToCRS && !compound.equals(crs)) {
             throw new WktDecodeException("WKT inconsistent with specified Coordinate Reference System");

@@ -29,7 +29,7 @@ package org.geolatte.geom.crs;
  * <li>EAST or WEST</li>
  * <li>NORTH or SOUTH</li>
  * <li>UP or DOWN (if present)</li>
- * <li>OTHER or UNKNOWN (if present)</li>
+ * <li>OTHER or UNKNOWN_LINEAR (if present)</li>
  * </ul>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -52,13 +52,13 @@ public class NormalizedOrder {
         int numOther = 2;
         int nv = -1;
         int nm = -1;
-        if (cs.getVerticalAxis() != null) {
-            nv = 2;
-            numOther = 3;
-        }
-        if (cs.getMeasureAxes().length > 0 ) {
-            nm = numOther;
-        }
+//        if (cs.getVerticalAxis() != null) {
+//            nv = 2;
+//            numOther = 3;
+//        }
+//        if (cs.getMeasureAxes().length > 0 ) {
+//            nm = numOther;
+//        }
         normalVertical = nv;
         normalMeasure = nm;
         for (int idx = 0; idx < cs.getCoordinateDimension(); idx++) {

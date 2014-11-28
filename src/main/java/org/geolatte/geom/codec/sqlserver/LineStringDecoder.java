@@ -35,7 +35,7 @@ class LineStringDecoder extends AbstractDecoder {
 	}
 
 	protected <P extends Position> LineString<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
-		return new LineString<>(crs);
+		return new LineString<P>(crs);
 	}
 
 	protected <P extends Position>  LineString<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
@@ -55,6 +55,6 @@ class LineStringDecoder extends AbstractDecoder {
 	protected <P extends Position>  LineString<P> createLineString(SqlServerGeometry<P> nativeGeom, IndexRange pntIndexRange) {
 		PositionSequence<P> coordinates = nativeGeom.coordinateRange( pntIndexRange );
         CoordinateReferenceSystem<P> coordinateReferenceSystem = nativeGeom.getCoordinateReferenceSystem();
-        return new LineString<>(coordinates, coordinateReferenceSystem);
+        return new LineString<P>(coordinates, coordinateReferenceSystem);
     }
 }

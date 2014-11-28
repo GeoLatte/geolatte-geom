@@ -4,6 +4,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateSystemAxis;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Represents a position in a coordinate system.
@@ -38,7 +39,7 @@ abstract public class Position{
             this.coords = new double[0];
             //Arrays.fill(this.coords, Double.NaN);
         } else {
-            double[] c = new double[getDescriptor().getCoordinateDimension()];
+            double[] c = new double[getCoordinateDimension()];
             System.arraycopy(coords, 0, c, 0, coords.length);
             this.coords = c;
         }
@@ -56,13 +57,16 @@ abstract public class Position{
         if (isEmpty()) {
             return new double[0];
         }
-        int dim = getDescriptor().getCoordinateDimension();
+        int dim = getCoordinateDimension();
         if (dest == null || dest.length < dim) {
             dest = new double[dim];
         }
         System.arraycopy(this.coords, 0, dest, 0, dim);
         return dest;
     }
+
+
+    public abstract int getCoordinateDimension();
 
     public boolean isEmpty() {
         return this.coords.length == 0;
@@ -91,15 +95,8 @@ abstract public class Position{
     public double getCoordinate(CoordinateSystemAxis axis, CoordinateReferenceSystem<?> crs) {
         int idx = crs.getAxisIndex(axis);
         if (idx == -1) throw new IllegalArgumentException("Not an axis of this coordinate reference system.");
-        return crs.getNormalizedOrder().normalizedToCrsDefined(coords)[idx];
+        return getCoordinate(axis.getNormalOrder());
     }
-
-    /**
-     * Returns the {@link PositionTypeDescriptor} for this instance
-     *
-     * @return the {@code PositionTypeDescriptor} for this instance
-     */
-    abstract public PositionTypeDescriptor<? extends Position> getDescriptor();
 
     @Override
     public boolean equals(Object o) {

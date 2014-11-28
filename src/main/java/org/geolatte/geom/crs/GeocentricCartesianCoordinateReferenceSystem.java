@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.Geocentric;
+import org.geolatte.geom.P3D;
 
 /**
  * A geo-centric <code>CoordinateReferenceSystem</code>.
@@ -35,18 +35,18 @@ import org.geolatte.geom.Geocentric;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/5/11
  */
-public class GeocentricCoordinateReferenceSystem extends CoordinateReferenceSystem<Geocentric>  {
+public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<P3D>  {
 
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.
      *
      * @param crsId the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
      * @param name  the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes  the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @param crs  the 3D-coordinate system for this
      * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
-    public GeocentricCoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
-        super(crsId, name, Geocentric.class, axes);
+    public GeocentricCartesianCoordinateReferenceSystem(CrsId crsId, String name, CartesianCoordinateSystem3D crs) {
+        super(crsId, name, crs);
     }
 
     //TODO -- finalize implementation (now postponed because not available in postgis refsys file)

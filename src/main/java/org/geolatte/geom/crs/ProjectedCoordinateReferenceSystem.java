@@ -38,10 +38,10 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem<P2D> {
+public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<P2D> {
 
     private final Projection projection;
-    private final GeographicCoordinateReferenceSystem geoCRS;
+    private final Geographic2DCoordinateReferenceSystem geoCRS;
     private final List<CrsParameter> parameters;
 
     /**
@@ -53,13 +53,12 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
      * @param geoCRS     the <code>GeographicCoordinateReferenceSystem</code> for this projection
      * @param projection the map projection method
      * @param parameters the projection parameters for the projection method
-     * @param axes       the {@link CoordinateSystemAxis CoordinateSystemAxes} of the cartesian coordinate system for
-     *                   this <code>ProjectedCoordinateReferenceSystem</code>,
+     * @param crs        the 2D cartesian coordinate system for this coordinate reference system
      */
-    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
-                                              CoordinateSystemAxis... axes) {
-        super(crsId, name, P2D.class, axes);
+                                              CartesianCoordinateSystem2D crs) {
+        super(crsId, name, crs);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
@@ -80,7 +79,7 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
      *
      * @return
      */
-    public GeographicCoordinateReferenceSystem getGeographicCoordinateSystem() {
+    public Geographic2DCoordinateReferenceSystem getGeographicCoordinateSystem() {
         return geoCRS;
     }
 

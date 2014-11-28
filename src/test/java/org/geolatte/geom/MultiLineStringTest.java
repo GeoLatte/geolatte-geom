@@ -30,16 +30,16 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
 public class MultiLineStringTest {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static PositionTypeDescriptor<P2D> d2D = Positions.getDescriptor(crs.getPositionClass());
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static PositionTypeDescriptor<P2DM> d2DM = Positions.getDescriptor(crsM.getPositionClass());
+
+    private static PositionFactory<P2D> d2D = Positions.getFactoryFor(crs.getPositionClass());
+    private static PositionFactory<P2DM> d2DM = Positions.getFactoryFor(crsM.getPositionClass());
 
     private MultiLineString<P2DM> ml1;
     private MultiLineString<P2DM> ml2;
@@ -52,20 +52,20 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString<P2DM> ls1 = new LineString<>(new PackedPositionSequence<>(d2DM, c1), crsM);
-    LineString<P2DM> ls2 = new LineString<>(new PackedPositionSequence<>(d2DM, c2), crsM);
-    LineString<P2DM> ls3 = new LineString<>(new PackedPositionSequence<>(d2DM,c3), crsM);
-    LineString<P2DM> lcs = new LineString<>(new PackedPositionSequence<>(d2DM, cClosedSimple), crsM);
-    LineString<P2DM> lcns = new LineString<>(new PackedPositionSequence<>(d2DM, cClosedNonSimple), crsM);
+    LineString<P2DM> ls1 = new LineString<P2DM>(new PackedPositionSequence<P2DM>(d2DM, c1), crsM);
+    LineString<P2DM> ls2 = new LineString<P2DM>(new PackedPositionSequence<P2DM>(d2DM, c2), crsM);
+    LineString<P2DM> ls3 = new LineString<P2DM>(new PackedPositionSequence<P2DM>(d2DM,c3), crsM);
+    LineString<P2DM> lcs = new LineString<P2DM>(new PackedPositionSequence<P2DM>(d2DM, cClosedSimple), crsM);
+    LineString<P2DM> lcns = new LineString<P2DM>(new PackedPositionSequence<P2DM>(d2DM, cClosedNonSimple), crsM);
 
 
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() {
-        ml1 = new MultiLineString<>(ls1, ls2);
-        ml2 = new MultiLineString<>(ls2, ls3);
+        ml1 = new MultiLineString<P2DM>(ls1, ls2);
+        ml2 = new MultiLineString<P2DM>(ls2, ls3);
         empty = new MultiLineString(crs);
-        closedSimple = new MultiLineString<>(lcs);
+        closedSimple = new MultiLineString<P2DM>(lcs);
         MultiLineString closedNonSimple = new MultiLineString(lcs,lcns);
     }
 

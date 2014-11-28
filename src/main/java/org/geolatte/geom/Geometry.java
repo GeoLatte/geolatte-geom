@@ -113,11 +113,6 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return geometries[0].getCoordinateReferenceSystem();
     }
 
-    public PositionTypeDescriptor<P> getPositionTypeDescriptor() {
-        return getPositions().getPositionTypeDescriptor();
-    }
-
-
     /**
      * Returns the coordinate dimension of this <code>Geometry</code>
      * <p/>
@@ -212,7 +207,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * @return the {@code Envelope} of this instance.
      */
     public Envelope<P> getEnvelope() {
-        if (isEmpty()) return new Envelope<>(getCoordinateReferenceSystem());
+        if (isEmpty()) return new Envelope<P>(getCoordinateReferenceSystem());
         PositionSequence<P> positions = getPositions();
         EnvelopeVisitor<P> visitor = new EnvelopeVisitor<P>(getCoordinateReferenceSystem());
         positions.accept(visitor);

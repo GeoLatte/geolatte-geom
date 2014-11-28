@@ -23,11 +23,15 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Unit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * A <code>SqlServerGeometry</code> represents the native SQL Server database object.
@@ -124,11 +128,11 @@ public class SqlServerGeometry<P extends Position> {
 		coords[1] = points[2 * index + 1];
         int idx = 2;
 		if ( hasZValues() ) {
-			assert ( crs.hasVerticalAxis() );
+			assert ( hasVerticalAxis(crs) );
 			coords[idx++] = zValues[index];
 		}
 		if ( hasMValues() ) {
-			assert ( crs.hasMeasureAxis() );
+			assert ( CoordinateReferenceSystems.hasMeasureAxis(crs) );
 			coords[idx] = mValues[index];
 		}
 	}
@@ -186,13 +190,13 @@ public class SqlServerGeometry<P extends Position> {
 	}
 
     CoordinateReferenceSystem<P> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
-        CoordinateReferenceSystem<P2D> defaultCrs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateRefenceSystemForEPSG(srid, defaultCrs);
+        CoordinateReferenceSystem<P2D> defaultCrs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, defaultCrs);
         if (hasZValues) {
-            crs = crs.addVerticalAxis(Unit.METER);
+            crs = CoordinateReferenceSystems.addVerticalSystem(crs, Unit.METER);
         }
         if (hasMValues) {
-            crs = crs.addMeasureAxis(Unit.METER);
+            crs = CoordinateReferenceSystems.addLinearSystem(crs, Unit.METER);
         }
         return (CoordinateReferenceSystem<P>)crs;
     }
@@ -217,17 +221,17 @@ public class SqlServerGeometry<P extends Position> {
 	}
 
 	void setCoordinate(int index, PositionSequence<?> positions) {
-        PositionTypeDescriptor<? extends Position> descriptor = positions.getPositionTypeDescriptor();
         points[2 * index] = positions.getPositionN(index).getCoordinate(0);
         points[2 * index + 1] = positions.getPositionN(index).getCoordinate(1);
         if (hasZValues()) {
             //TODO ensure this conditions is satisfied
-            if (!descriptor.hasVerticalComponent()) throw new IllegalStateException();
-            zValues[index] = positions.getPositionN(index).getCoordinate(descriptor.getVerticalComponentIndex());
+            if (!hasVerticalAxis(crs)) throw new IllegalStateException();
+            zValues[index] = positions.getPositionN(index).getCoordinate(2);
         }
         if (hasMValues()) {
-            if (!descriptor.hasMeasureComponent()) throw new IllegalStateException();
-            mValues[index] = positions.getPositionN(index).getCoordinate(descriptor.getMeasureComponentIndex());
+            if (!hasMeasureAxis(crs)) throw new IllegalStateException();
+			int idx = hasZValues() ? 3 : 2;
+            mValues[index] = positions.getPositionN(index).getCoordinate(idx);
         }
     }
 

@@ -33,10 +33,10 @@ class VariableSizePositionSequenceBuilder<P extends Position> extends AbstractPo
     private int index = 0;
 
     VariableSizePositionSequenceBuilder(Class<P> clazz) {
-        this(Positions.getDescriptor(clazz));
+        this(Positions.getFactoryFor(clazz));
     }
 
-    VariableSizePositionSequenceBuilder(PositionTypeDescriptor<P> descriptor) {
+    VariableSizePositionSequenceBuilder(PositionFactory<P> descriptor) {
         super(descriptor);
         this.coordinates = new double[descriptor.getCoordinateDimension() * 10];
     }
@@ -55,6 +55,6 @@ class VariableSizePositionSequenceBuilder<P extends Position> extends AbstractPo
 
     @Override
     public PositionSequence<P> toPositionSequence() {
-        return new PackedPositionSequence<P>(descriptor, Arrays.copyOf(coordinates, index));
+        return new PackedPositionSequence<P>(factory, Arrays.copyOf(coordinates, index));
     }
 }

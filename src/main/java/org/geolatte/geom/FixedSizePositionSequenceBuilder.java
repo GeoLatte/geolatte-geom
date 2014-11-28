@@ -31,13 +31,13 @@ class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPosit
     private int index = 0;
     private final double[] coordinates;
 
-    FixedSizePositionSequenceBuilder(int capacity, PositionTypeDescriptor<P> descriptor) {
-        super(descriptor);
-        this.coordinates = new double[capacity * descriptor.getCoordinateDimension()];
+    FixedSizePositionSequenceBuilder(int capacity, PositionFactory<P> factory) {
+        super(factory);
+        this.coordinates = new double[capacity * factory.getCoordinateDimension()];
     }
 
     FixedSizePositionSequenceBuilder(int capacity, Class<P> clazz) {
-        this(capacity, Positions.getDescriptor(clazz));
+        this(capacity, Positions.getFactoryFor(clazz));
     }
 
     protected void addCoordinate(double x) {
@@ -49,7 +49,7 @@ class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPosit
         if (index != coordinates.length) {
             throw new IllegalStateException("PointSequence not filled to capacity.");
         }
-        return new PackedPositionSequence<P>(descriptor, this.coordinates);
+        return new PackedPositionSequence<P>(factory, this.coordinates);
     }
 
 }

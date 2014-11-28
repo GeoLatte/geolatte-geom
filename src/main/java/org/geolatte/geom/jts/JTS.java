@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CommonCoordinateReferenceSystems;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
@@ -124,8 +124,8 @@ public class JTS {
             throw new IllegalArgumentException("Null object passed.");
         }
         return from(jtsGeometry,
-                CrsRegistry.getCoordinateRefenceSystemForEPSG(jtsGeometry.getSRID(),
-                        CommonCoordinateReferenceSystems.PROJECTED_3D_METER));
+                CrsRegistry.getCoordinateReferenceSystemForEPSG(jtsGeometry.getSRID(), CoordinateReferenceSystems
+                        .PROJECTED_3D_METER));
     }
 
     /**
@@ -202,7 +202,7 @@ public class JTS {
             throw new IllegalArgumentException("Null object passed.");
         }
         return new org.geolatte.geom.Envelope<P2D>(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
-                jtsEnvelope.getMaxY(), CommonCoordinateReferenceSystems.PROJECTED_2D_METER);
+                jtsEnvelope.getMaxY(), CoordinateReferenceSystems.PROJECTED_2D_METER);
     }
 
     /**
@@ -246,7 +246,7 @@ public class JTS {
      */
     @SuppressWarnings("unchecked")
     private static <P extends Position> org.geolatte.geom.MultiPolygon<P> from(MultiPolygon jtsGeometry, CoordinateReferenceSystem<P> crs) {
-        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiPolygon<>(crs);
+        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiPolygon<P>(crs);
         org.geolatte.geom.Polygon<P>[] polygons = (org.geolatte.geom.Polygon<P>[]) new org.geolatte.geom.Polygon[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
             polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crs);
@@ -278,7 +278,7 @@ public class JTS {
     @SuppressWarnings("unchecked")
     private static <P extends Position> org.geolatte.geom.MultiLineString<P> from(MultiLineString jtsGeometry,
                                                                                      CoordinateReferenceSystem<P> crs) {
-        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiLineString<>(crs);
+        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiLineString<P>(crs);
         org.geolatte.geom.LineString<P>[] linestrings = new org.geolatte.geom.LineString[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < linestrings.length; i++) {
             linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), crs);
@@ -292,7 +292,7 @@ public class JTS {
     @SuppressWarnings("unchecked")
     private static  <P extends Position> org.geolatte.geom.GeometryCollection<P,org.geolatte.geom.Geometry<P>> from(
             GeometryCollection jtsGeometry,  CoordinateReferenceSystem<P> crs) {
-        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.GeometryCollection<>(crs);
+        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>(crs);
         org.geolatte.geom.Geometry<P>[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
             geoms[i] = from(jtsGeometry.getGeometryN(i), crs);
@@ -305,7 +305,7 @@ public class JTS {
      */
     private static  <P extends Position> org.geolatte.geom.LineString<P> from(LineString jtsLineString,  CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return new org.geolatte.geom.LineString<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass()), crs);
+        return new org.geolatte.geom.LineString<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs), crs);
 
     }
 
@@ -328,7 +328,7 @@ public class JTS {
      */
     private static <P extends Position> org.geolatte.geom.Point<P> from(com.vividsolutions.jts.geom.Point jtsPoint, CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass()), crs);
+        return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs), crs);
     }
 
     ///

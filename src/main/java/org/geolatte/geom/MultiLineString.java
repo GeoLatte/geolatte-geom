@@ -37,7 +37,7 @@ public class MultiLineString<P extends Position> extends GeometryCollection<P, L
      *
      * @param lineStrings the element <code>LineString</code>s for the constructed <code>MultiLineString</code>
      */
-    @SafeVarargs
+//    @SafeVarargs
     public MultiLineString(LineString<P>... lineStrings) {
         super(lineStrings);
     }

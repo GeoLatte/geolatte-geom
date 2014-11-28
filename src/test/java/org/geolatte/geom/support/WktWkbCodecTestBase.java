@@ -11,7 +11,7 @@ import java.util.Set;
  * Base class for specifying Wkt/Wkb test cases
  */
 abstract public class WktWkbCodecTestBase {
-    public final Map<Integer, CodecTestInput> testCases = new HashMap<>();
+    public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
 
     public WktWkbCodecTestBase() {
     }

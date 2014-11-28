@@ -31,12 +31,12 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 public class CountingPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
     final private PositionSequenceBuilder<P> delegate;
-    final private PositionTypeDescriptor<P> desc;
+    final private int dim;
     int num = 0;
 
     public CountingPositionSequenceBuilder(CoordinateReferenceSystem<P> crs) {
-        desc = Positions.getDescriptor(crs.getPositionClass());
         delegate = PositionSequenceBuilders.variableSized(crs.getPositionClass());
+        dim = crs.getCoordinateDimension();
     }
 
     @Override
@@ -61,6 +61,6 @@ public class CountingPositionSequenceBuilder<P extends Position> implements Posi
     }
 
     public int getCoordinateDimension() {
-        return desc.getCoordinateDimension();
+        return dim;
     }
 }

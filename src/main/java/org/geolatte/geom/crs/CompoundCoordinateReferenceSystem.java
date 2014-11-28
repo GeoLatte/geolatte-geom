@@ -3,33 +3,49 @@ package org.geolatte.geom.crs;
 import org.geolatte.geom.*;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A compound {@code CoordinateReferenceSystem} that is constructed by adding additional CoordinateSystemAxes to a
  * base coordinate reference system (either a Geographic, Geocentric or Projected Coordinate Reference System).
  *
- * @param <T> Position type of the compound coordinate reference system
- * @param <B> Position type of the base coordinate reference system
- *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 3/4/14
  */
+public class CompoundCoordinateReferenceSystem<P extends Position> extends CoordinateReferenceSystem<P> {
 
-public class CompoundCoordinateReferenceSystem<T extends Position, B extends Position> extends CoordinateReferenceSystem<T> {
+    private final List<SingleCoordinateReferenceSystem<?>> components;
 
-    private final CoordinateReferenceSystem<B> base;
 
-    protected CompoundCoordinateReferenceSystem(String name, CoordinateReferenceSystem<B> base, Class<T> positionType, CoordinateSystemAxis... additional) {
-        super(base.getCrsId(), name, positionType, combineAxes(base.getCoordinateSystem().getAxes(), additional));
-        this.base = base;
-
+    protected CompoundCoordinateReferenceSystem(String name, SingleCoordinateReferenceSystem<?>... components) {
+        //TODO this is problematic: combineCS() result needs to be cast to make CompoundCRS into a CRS<P>!
+        super(components[0].getCrsId(), name, (CoordinateSystem<P>) combineCS(components));
+        this.components = Arrays.asList(components);
     }
 
-    private static CoordinateSystemAxis[] combineAxes(CoordinateSystemAxis[] base, CoordinateSystemAxis[] additional) {
-        CoordinateSystemAxis[] result = new CoordinateSystemAxis[base.length + additional.length];
-        System.arraycopy(base, 0, result, 0, base.length);
-        System.arraycopy(additional, 0, result, base.length, additional.length);
-        return result;
+    //TODO -- can we simplify here?
+    private static CoordinateSystem<?> combineCS(SingleCoordinateReferenceSystem<?>[] components) {
+        if (components == null || components.length == 0)
+            throw new IllegalArgumentException("Too few arguments, or null arguments");
+        CoordinateSystem<?> coordinateSystem = null;
+        for (SingleCoordinateReferenceSystem<?> component : components) {
+            if (coordinateSystem == null) {
+                coordinateSystem = component.getCoordinateSystem();
+            } else {
+                if ( component.getCoordinateSystem() instanceof OneDimensionCoordinateSystem) {
+                    coordinateSystem = coordinateSystem.merge((OneDimensionCoordinateSystem<?>) component.getCoordinateSystem());
+
+                } else {
+                    throw new UnsupportedOperationException("Can't merge specified coordinate systems");
+                }
+            }
+        }
+        return coordinateSystem;
+    }
+
+    public List<SingleCoordinateReferenceSystem<?>> getComponents() {
+        return Collections.unmodifiableList(components);
     }
 
     @Override
@@ -37,30 +53,5 @@ public class CompoundCoordinateReferenceSystem<T extends Position, B extends Pos
         return true;
     }
 
-    @Override
-    public CoordinateReferenceSystem<B> getBaseCoordinateReferenceSystem() {
-        return this.base;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        CompoundCoordinateReferenceSystem that = (CompoundCoordinateReferenceSystem) o;
-
-        if (getIndexVerticalAxis() != that.getIndexVerticalAxis()) return false;
-        if (!base.equals(that.base)) return false;
-        if (!Arrays.equals(getMeasureAxes(), that.getMeasureAxes())) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + base.hashCode();
-        return result;
-    }
 }

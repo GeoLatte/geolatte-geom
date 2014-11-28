@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 
 import java.util.ArrayList;
@@ -77,11 +78,10 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         Matcher matcher = SRID_RE.matcher(wkt);
         if (matcher.find()) {
             int srid = Integer.parseInt(matcher.group(1));
-            this.crs = crs != null? crs : CrsRegistry.getCoordinateRefenceSystemForEPSG(srid,
-                    CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem());
+            this.crs = crs != null? crs : CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
             wktString = wkt.substring(matcher.end());
         } else {
-            this.crs = crs != null ? crs : CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
+            this.crs = crs != null ? crs : CoordinateReferenceSystems.PROJECTED_2D_METER;
             wktString = wkt;
         }
     }
@@ -118,7 +118,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
 
     private <P extends Position> MultiPolygon<P> decodeMultiPolygon(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
-            List<Polygon<P>> polygons = new ArrayList<>();
+            List<Polygon<P>> polygons = new ArrayList<Polygon<P>>();
             while (!matchesCloseList()) {
                 polygons.add(decodePolygonText(crs));
                 matchesElementSeparator();
@@ -126,14 +126,14 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkMultiPolygon(polygons);
         }
         if (matchesEmptyToken()) {
-            return new MultiPolygon<>(crs);
+            return new MultiPolygon<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
     private <P extends Position> Geometry<P> decodeMultiLineString(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
-            List<LineString<P>> lineStrings = new ArrayList<>();
+            List<LineString<P>> lineStrings = new ArrayList<LineString<P>>();
             while (!matchesCloseList()) {
                 lineStrings.add(decodeLineStringText(crs));
                 matchesElementSeparator();
@@ -141,21 +141,21 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkMultiLineString(lineStrings);
         }
         if (matchesEmptyToken()) {
-            return new MultiLineString<>(crs);
+            return new MultiLineString<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
     private <P extends Position> Geometry<P> decodeMultiPoint(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
-            List<Point<P>> points = new ArrayList<>();
+            List<Point<P>> points = new ArrayList<Point<P>>();
             //this handles the case of the non-compliant MultiPoints in Postgis (e.g.
             // MULTIPOINT(10 10, 12 13) rather than MULTIPOINT((10 20), (30 40))
             if (currentToken instanceof WktPointSequenceToken) {
                 PositionSequence<P> positionSequence = ((WktPointSequenceToken<P>) currentToken).getPositions();
                 CoordinateReferenceSystem<P> tcrs = ((WktPointSequenceToken<P>) currentToken).getCoordinateReferenceSystem();
                 for (P p : positionSequence) {
-                    points.add(new Point<>(p, tcrs));
+                    points.add(new Point<P>(p, tcrs));
                 }
                 nextToken();
             }
@@ -166,14 +166,14 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkMultiPoint(points);
         }
         if (matchesEmptyToken()) {
-            return new MultiPoint<>(crs);
+            return new MultiPoint<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
     private <P extends Position> GeometryCollection<P, Geometry<P>> decodeGeometryCollection(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
-            List<Geometry<P>> geometries = new ArrayList<>();
+            List<Geometry<P>> geometries = new ArrayList<Geometry<P>>();
             while (!matchesCloseList()) {
                 geometries.add(decodeGeometry(crs));
                 matchesElementSeparator();
@@ -181,14 +181,14 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkGeometryCollection(geometries);
         }
         if (matchesEmptyToken()) {
-            return new GeometryCollection<>(crs);
+            return new GeometryCollection<P, Geometry<P>>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
     private <P extends Position> Polygon<P> decodePolygonText(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
-            List<LinearRing<P>> rings = new ArrayList<>();
+            List<LinearRing<P>> rings = new ArrayList<LinearRing<P>>();
             while (!matchesCloseList()) {
                 LinearRing<P> ring = decodeLinearRingText(crs);
                 rings.add(ring);
@@ -197,7 +197,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkPolygon(rings);
         }
         if (matchesEmptyToken()) {
-            return new Polygon<>(crs);
+            return new Polygon<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
@@ -205,7 +205,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
     private <P extends Position> LinearRing<P> decodeLinearRingText(CoordinateReferenceSystem<P> crs) {
         try {
             WktPointSequenceToken<P> token = decodePointSequence(crs);
-            return new LinearRing<>(token.getPositions(), token.getCoordinateReferenceSystem());
+            return new LinearRing<P>(token.getPositions(), token.getCoordinateReferenceSystem());
         } catch (IllegalArgumentException ex) {
             throw new WktDecodeException(ex.getMessage());
         }
@@ -216,10 +216,10 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         if (token != null) {
             PositionSequence<P> positionSequence = token.getPositions();
             CoordinateReferenceSystem<P> tcrs = token.getCoordinateReferenceSystem();
-            return new LineString<>(positionSequence, tcrs);
+            return new LineString<P>(positionSequence, tcrs);
         }
         if (matchesEmptyToken()) {
-            return new LineString<>(crs);
+            return new LineString<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
@@ -229,10 +229,10 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         if (token != null) {
             PositionSequence<P> positionSequence = token.getPositions();
             CoordinateReferenceSystem<P> tcrs = token.getCoordinateReferenceSystem();
-            return new Point<>(positionSequence, tcrs);
+            return new Point<P>(positionSequence, tcrs);
         }
         if (matchesEmptyToken()) {
-            return new Point<>(crs);
+            return new Point<P>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }

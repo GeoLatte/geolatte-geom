@@ -22,11 +22,10 @@
 package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 
 import static org.geolatte.geom.builder.DSL.*;
+
+import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -34,11 +33,6 @@ import static org.geolatte.geom.builder.DSL.*;
  */
 
 public class PostgisJDBCUnitTestInputs extends WktWkbCodecTestBase {
-
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
 
     public PostgisJDBCUnitTestInputs() {
 
@@ -65,46 +59,46 @@ public class PostgisJDBCUnitTestInputs extends WktWkbCodecTestBase {
         addCase(5, //-- broken format
                 "MULTIPOINT(11 12, 20 20)",
                 "010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint<>(point(crs, p(11, 12)), point(crs, p(20, 20))),
+                new MultiPoint<P2D>(point(crs, p(11, 12)), point(crs, p(20, 20))),
                 false);
 
         addCase(6,
                 "MULTIPOINT(11 12 13, 20 20 20)",
                 "0104000080020000000101000080000000000000264000000000000028400000000000002A400101000080000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsZ, p(11, 12, 13)), point(crsZ, p(20, 20, 20))),
+                new MultiPoint<P3D>(point(crsZ, p(11, 12, 13)), point(crsZ, p(20, 20, 20))),
                 false);
 
         addCase(7,
                 "MULTIPOINTM(11 12 13, 20 20 20)",
                 "0104000040020000000101000040000000000000264000000000000028400000000000002A400101000040000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsM, pM(11, 12, 13)), point(crsM, pM(20, 20, 20))),
+                new MultiPoint<P2DM>(point(crsM, pM(11, 12, 13)), point(crsM, pM(20, 20, 20))),
                 false);
 
         addCase(8,
                 "MULTIPOINT(11 12 13 14,20 20 20 20)",
                 "01040000C00200000001010000C0000000000000264000000000000028400000000000002A400000000000002C4001010000C00000000000003440000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsZM, p(11, 12, 13, 14)), point(crsZM, p(20, 20, 20, 20))),
+                new MultiPoint<P3DM>(point(crsZM, p(11, 12, 13, 14)), point(crsZM, p(20, 20, 20, 20))),
                 false);
 
         addCase(9,
                 "MULTIPOINT((11 12),(20 20))",
                 "010400000002000000010100000000000000000026400000000000002840010100000000000000000034400000000000003440",
-                new MultiPoint<>(point(crs, p(11, 12)), point(crs, p(20, 20))));
+                new MultiPoint<P2D>(point(crs, p(11, 12)), point(crs, p(20, 20))));
 
         addCase(10,
                 "MULTIPOINT((11 12 13),(20 20 20))",
                 "0104000080020000000101000080000000000000264000000000000028400000000000002A400101000080000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsZ, p(11, 12, 13)), point(crsZ, p(20, 20, 20))));
+                new MultiPoint<P3D>(point(crsZ, p(11, 12, 13)), point(crsZ, p(20, 20, 20))));
 
         addCase(11,
                 "MULTIPOINTM((11 12 13),(20 20 20))",
                 "0104000040020000000101000040000000000000264000000000000028400000000000002A400101000040000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsM, pM(11, 12, 13)), point(crsM, pM(20, 20, 20))));
+                new MultiPoint<P2DM>(point(crsM, pM(11, 12, 13)), point(crsM, pM(20, 20, 20))));
 
         addCase(12,
                 "MULTIPOINT((11 12 13 14),(20 20 20 20))",
                 "01040000C00200000001010000C0000000000000264000000000000028400000000000002A400000000000002C4001010000C00000000000003440000000000000344000000000000034400000000000003440",
-                new MultiPoint<>(point(crsZM, p(11, 12, 13, 14)), point(crsZM, p(20, 20, 20, 20))));
+                new MultiPoint<P3DM>(point(crsZM, p(11, 12, 13, 14)), point(crsZM, p(20, 20, 20, 20))));
 
         addCase(13,
                 "LINESTRING(10 10,20 20,50 50,34 34)",

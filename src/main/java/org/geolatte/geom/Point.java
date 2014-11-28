@@ -40,7 +40,7 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
 
     public Point(P position, CoordinateReferenceSystem<P> crs) {
         this(new PackedPositionSequence<P>(
-                Positions.getDescriptor(crs.getPositionClass()), position.coords), crs);
+                Positions.getFactoryFor(crs.getPositionClass()), position.coords), crs);
     }
 
     public Point(Point<P> point) {

@@ -23,15 +23,34 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
- * Factory methods for creating Positions.
+ * Factories for creating Positions.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/3/14
  */
 public class Positions {
+
+
+    public static List<PositionFactory<?>> registeredFactories;
+
+
+    static {
+        registeredFactories = Arrays.asList(
+            new CanMakeG2D(),
+                new CanMakeG2DM(),
+                new CanMakeG3D(),
+                new CanMakeG3DM(),
+                new CanMakeP2D(),
+                new CanMakeP2DM(),
+                new CanMakeP3D(),
+                new CanMakeP3DM()
+        );
+    }
 
     /**
      * Factory method for {@code Position}s in the reference system.
@@ -44,41 +63,8 @@ public class Positions {
      */
     @SuppressWarnings("unchecked")
     public static <P extends Position> P mkPosition(Class<P> pClass, double... coordinates) {
-        if (pClass == P2D.class) {
-            return (P) (coordinates.length == 0 ?
-                    new P2D() :
-                    new P2D(coordinates[0], coordinates[1]));
-        } else if (pClass == P3D.class) {
-            return (P) (coordinates.length == 0 ?
-                    new P3D() :
-                    new P3D(coordinates[0], coordinates[1], coordinates[2]));
-        } else if (pClass == P2DM.class) {
-            return (P) (coordinates.length == 0 ?
-                    new P2DM() :
-                    new P2DM(coordinates[0], coordinates[1], coordinates[2]));
-        } else if (pClass == P3DM.class) {
-            return (P) (coordinates.length == 0 ?
-                    new P3DM() :
-                    new P3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
-        } else if (pClass == G2D.class) {
-            return (P) (coordinates.length == 0 ?
-                    new G2D() :
-                    new G2D(coordinates[0], coordinates[1]));
-        } else if (pClass == G3D.class) {
-            return (P) (coordinates.length == 0 ?
-                    new G3D() :
-                    new G3D(coordinates[0], coordinates[1], coordinates[2]));
-        } else if (pClass == G2DM.class) {
-            return (P) (coordinates.length == 0 ?
-                    new G2DM() :
-                    new G2DM(coordinates[0], coordinates[1], coordinates[2]));
-        } else if (pClass == G3DM.class) {
-            return (P) (coordinates.length == 0 ?
-                    new G3DM() :
-                    new G3DM(coordinates[0], coordinates[1], coordinates[2], coordinates[3]));
-        }
-        throw new UnsupportedOperationException(String.format("Position type %s unsupported",
-                pClass.getSimpleName()));
+        PositionFactory<P> factory = getFactoryFor(pClass);
+        return factory.mkPosition(coordinates);
     }
 
     @SuppressWarnings("unchecked")
@@ -86,38 +72,14 @@ public class Positions {
         return mkPosition(crs.getPositionClass(), coordinates);
     }
 
-    public static <P extends Position> PositionTypeDescriptor<P> getDescriptor(Class<P> targetPosClass) {
-
-        if (P2D.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) P2D.descriptor;
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> PositionFactory<P> getFactoryFor(Class<P> pClass) {
+        for (PositionFactory<?> pFact : registeredFactories) {
+            if (pFact.forClass().equals(pClass)) {
+                return (PositionFactory<P>) pFact;
+            }
         }
-        if (P3D.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) P3D.descriptor;
-        }
-        if (P2DM.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) P2DM.descriptor;
-        }
-        if (P3DM.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) P3DM.descriptor;
-        }
-        if (G2D.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) G2D.descriptor;
-        }
-        if (G3D.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) G3D.descriptor;
-        }
-        if (G2DM.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) G2DM.descriptor;
-        }
-        if (G3DM.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) G3DM.descriptor;
-        }
-        if (Geocentric.class.equals(targetPosClass)) {
-            return (PositionTypeDescriptor<P>) Geocentric.descriptor;
-        }
-
-        throw new IllegalStateException("Unknow position type.");
-
+        throw new UnsupportedOperationException(String.format("Position type %s unsupported", pClass.getSimpleName()));
     }
 
     /**
@@ -133,10 +95,11 @@ public class Positions {
      */
     public static <Q extends Position, P extends Position> PositionSequence<P> copy(final PositionSequence<Q> source,
                                                                                     final Class<P> targetPosClass) {
+        PositionFactory<P> factory = Positions.getFactoryFor(targetPosClass);
         final PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(source.size(), targetPosClass);
         if (source.isEmpty()) return builder.toPositionSequence();
-        PositionTypeDescriptor descriptor = getDescriptor(targetPosClass);
-        final double[] coords = new double[Math.max(source.getCoordinateDimension(), descriptor.getCoordinateDimension())];
+
+        final double[] coords = new double[Math.max(source.getCoordinateDimension(), factory.getCoordinateDimension())];
         Arrays.fill(coords, Double.NaN);
         PositionVisitor<Q> visitor = new PositionVisitor<Q>() {
             public void visit(Q position) {
@@ -148,9 +111,273 @@ public class Positions {
         return builder.toPositionSequence();
     }
 
+    //Factories
+    public static class CanMakeP2D implements PositionFactory<P2D>{
 
-    @SuppressWarnings("unchecked")
-    private static <P extends Position> CoordinateReferenceSystem<P> cast(CoordinateReferenceSystem crs, Class<P> tp) {
-        return (CoordinateReferenceSystem<P>) crs;
+        @Override
+        public Class<P2D> forClass() {
+            return P2D.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 2;
+        }
+
+        @Override
+        public P2D mkPosition(double... coordinates) {
+            return (coordinates.length == 0 ? new P2D() : new P2D(coordinates[0], coordinates[1]));
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return false;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return false;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return -1;
+        }
     }
+
+    public static class CanMakeP2DM implements PositionFactory<P2DM> {
+
+        @Override
+        public Class<P2DM> forClass() {
+            return P2DM.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 3;
+        }
+
+        @Override
+        public P2DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new P2DM() : new P2DM(coordinates[0], coordinates[1], coordinates[2]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return false;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return true;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return 2;
+        }
+    }
+
+    public static class CanMakeP3D implements PositionFactory<P3D> {
+
+        @Override
+        public Class<P3D> forClass() {
+            return P3D.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 3;
+        }
+
+        @Override
+        public P3D mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new P3D() : new P3D(coordinates[0], coordinates[1], coordinates[2]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return true;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return false;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return -1;
+        }
+    }
+
+    public static class CanMakeP3DM implements PositionFactory<P3DM> {
+
+        @Override
+        public Class<P3DM> forClass() {
+            return P3DM.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 4;
+        }
+
+        @Override
+        public P3DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new P3DM() : new P3DM(coordinates[0], coordinates[1], coordinates[2],
+                    coordinates[3]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return true;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return true;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return 3;
+        }
+    }
+
+    //Factories
+    public static class CanMakeG2D implements PositionFactory<G2D>{
+
+        @Override
+        public Class<G2D> forClass() {
+            return G2D.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 2;
+        }
+
+        @Override
+        public G2D mkPosition(double... coordinates) {
+            return (coordinates.length == 0 ? new G2D() : new G2D(coordinates[0], coordinates[1]));
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return false;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return false;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return -1;
+        }
+    }
+
+    public static class CanMakeG2DM implements PositionFactory<G2DM> {
+
+        @Override
+        public Class<G2DM> forClass() {
+            return G2DM.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 3;
+        }
+
+        @Override
+        public G2DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new G2DM() : new G2DM(coordinates[0], coordinates[1], coordinates[2]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return false;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return true;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return 2;
+        }
+    }
+
+    public static class CanMakeG3D implements PositionFactory<G3D> {
+
+        @Override
+        public Class<G3D> forClass() {
+            return G3D.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 3;
+        }
+
+        @Override
+        public G3D mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new G3D() : new G3D(coordinates[0], coordinates[1], coordinates[2]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return true;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return false;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return -1;
+        }
+    }
+
+    public static class CanMakeG3DM implements PositionFactory<G3DM> {
+
+        @Override
+        public Class<G3DM> forClass() {
+            return G3DM.class;
+        }
+
+        @Override
+        public int getCoordinateDimension() {
+            return 4;
+        }
+
+        @Override
+        public G3DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new G3DM() : new G3DM(coordinates[0], coordinates[1], coordinates[2],
+                    coordinates[3]);
+        }
+
+        @Override
+        public boolean hasZComponent() {
+            return true;
+        }
+
+        @Override
+        public boolean hasMComponent() {
+            return true;
+        }
+
+        @Override
+        public int getMComponentIndex() {
+            return 3;
+        }
+    }
+
+
 }

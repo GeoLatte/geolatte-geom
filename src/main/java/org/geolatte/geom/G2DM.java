@@ -8,8 +8,6 @@ package org.geolatte.geom;
  */
 public class G2DM extends G2D implements Measured {
 
-    public final static PositionTypeDescriptor<G2DM> descriptor = new PositionTypeDescriptor<>(G2DM.class,
-            3, -1, 2);
 
     public G2DM() {
         super();
@@ -25,7 +23,7 @@ public class G2DM extends G2D implements Measured {
     }
 
     @Override
-    public PositionTypeDescriptor<? extends G2DM> getDescriptor() {
-        return descriptor;
+    public int getCoordinateDimension() {
+        return 3;
     }
 }

@@ -29,7 +29,7 @@ import java.util.List;
 class LineStringEncoder extends AbstractEncoder {
 
 	@Override
-	protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
+	protected  <P extends Position>  void encode(Geometry<P> geom, int parentShapeIndex, CountingPositionSequenceBuilder<P> coordinates, List<Figure> figures, List<Shape> shapes) {
 		if ( !( geom instanceof LineString ) ) {
 			throw new IllegalArgumentException( "Require LineString geometry" );
 		}
@@ -48,7 +48,7 @@ class LineStringEncoder extends AbstractEncoder {
 	}
 
 	@Override
-	protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
+	protected  <P extends Position> void encodePoints(SqlServerGeometry<P> nativeGeom, PositionSequence<P> coordinates) {
 		super.encodePoints( nativeGeom, coordinates );
 		if ( coordinates.size() == 2 ) {
 			nativeGeom.setIsSingleLineSegment();

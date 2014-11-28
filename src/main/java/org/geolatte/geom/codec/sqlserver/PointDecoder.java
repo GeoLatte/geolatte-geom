@@ -40,7 +40,7 @@ class PointDecoder extends AbstractDecoder {
 	}
 
 	protected <P extends Position> Point<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
-		return new Point<>(crs);
+		return new Point<P>(crs);
 	}
 
     protected <P extends Position> Point<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
@@ -59,7 +59,7 @@ class PointDecoder extends AbstractDecoder {
 
 	private <P extends Position> Point<P> createPoint(SqlServerGeometry<P> nativeGeom, int pntOffset) {
         PositionSequence<P> positionSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
-        return new Point<>(positionSequence, nativeGeom.getCoordinateReferenceSystem());
+        return new Point<P>(positionSequence, nativeGeom.getCoordinateReferenceSystem());
     }
 
 

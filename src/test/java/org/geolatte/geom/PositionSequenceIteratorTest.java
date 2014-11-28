@@ -32,10 +32,10 @@ import static org.junit.Assert.fail;
  */
 public class PositionSequenceIteratorTest {
 
-    private static PositionTypeDescriptor<P2D> des2D = Positions.getDescriptor(P2D.class);
-    private static PositionTypeDescriptor<P3D> des3D = Positions.getDescriptor(P3D.class);
+    private static PositionFactory<P2D> des2D = Positions.getFactoryFor(P2D.class);
+    private static PositionFactory<P3D> des3D = Positions.getFactoryFor(P3D.class);
 
-    PositionSequence<P2D> sequence = new PackedPositionSequence<>(des2D, new double[]{0, 0, 1, 2, 3, 4});
+    PositionSequence<P2D> sequence = new PackedPositionSequence<P2D>(des2D, new double[]{0, 0, 1, 2, 3, 4});
     PositionSequence<P2D> emptySequence = PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence();
 
     PositionSequenceIterator<P2D> itSeq;
@@ -44,8 +44,8 @@ public class PositionSequenceIteratorTest {
 
     @Before
     public void setUp() throws Exception {
-        itSeq = new PositionSequenceIterator<>(sequence);
-        itEmpty = new PositionSequenceIterator<>(emptySequence);
+        itSeq = new PositionSequenceIterator<P2D>(sequence);
+        itEmpty = new PositionSequenceIterator<P2D>(emptySequence);
     }
 
     @Test

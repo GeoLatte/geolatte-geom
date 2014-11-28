@@ -23,7 +23,7 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
+import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,13 +41,13 @@ public class MultiPointTest {
 
     MultiPoint<G2D> pnt1;
     MultiPoint<G2D> pnt2;
-    GeographicCoordinateReferenceSystem wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+    Geographic2DCoordinateReferenceSystem wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 
     @Before
     public void setUp(){
 
-        this.pnt1 = new MultiPoint<>(createPointsAllDifferent(5, wgs84));
-        this.pnt2 = new MultiPoint<>(createPointsNotAllDifferent(5, wgs84));
+        this.pnt1 = new MultiPoint<G2D>(createPointsAllDifferent(5, wgs84));
+        this.pnt2 = new MultiPoint<G2D>(createPointsNotAllDifferent(5, wgs84));
     }
 
     @Test

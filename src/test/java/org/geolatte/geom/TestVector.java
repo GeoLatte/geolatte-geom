@@ -21,26 +21,15 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import static org.geolatte.geom.Vector.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/7/12
  */
 public class TestVector {
-
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-
 
     @Test
     public void testDotProduct2D() {

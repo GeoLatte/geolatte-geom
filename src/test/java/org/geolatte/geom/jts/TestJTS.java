@@ -23,13 +23,12 @@ package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Point;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
 import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.PostgisTestCases;
@@ -37,6 +36,7 @@ import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,15 +49,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestJTS {
 
-    private static CoordinateReferenceSystem<P2D> crs = CrsRegistry.getUndefinedProjectedCoordinateReferenceSystem();
-    private static CoordinateReferenceSystem<P3D> crsZ = crs.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P2DM> crsM = crs.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<P3DM> crsZM = crsZ.addMeasureAxis(Unit.METER);
-
-    private static CoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-    private static CoordinateReferenceSystem<G3D> wgs84_Z= wgs84.addVerticalAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G2DM> wgs84_M = wgs84.addMeasureAxis(Unit.METER);
-    private static CoordinateReferenceSystem<G3DM> wgs84_ZM = wgs84_Z.addMeasureAxis(Unit.METER);
 
     WktDecoder wktDecoder = Wkt.newDecoder();
     WKTReader jtsWktDecoder = new WKTReader();
@@ -158,7 +149,7 @@ public class TestJTS {
 
     @Test
     public void test_to_with_srid() {
-        assertEquals(4326, JTS.to(point(wgs84, g(1.0, 2.0))).getSRID());
+        assertEquals(4326, JTS.to(point(WGS84, g(1.0, 2.0))).getSRID());
     }
 
     private void test_empty(Geometry empty) {

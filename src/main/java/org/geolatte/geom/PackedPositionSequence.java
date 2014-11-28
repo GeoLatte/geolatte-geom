@@ -32,8 +32,8 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
     private final double[] coordinates;
 
 
-    PackedPositionSequence(PositionTypeDescriptor<P> descriptor, double[] coordinates) {
-        super(descriptor);
+    PackedPositionSequence(PositionFactory<P> factory, double[] coordinates) {
+        super(factory);
         if (coordinates == null) {
             this.coordinates = new double[0];
         } else {

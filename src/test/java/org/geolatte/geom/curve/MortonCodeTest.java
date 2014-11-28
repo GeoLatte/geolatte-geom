@@ -44,8 +44,8 @@ public class MortonCodeTest {
     CoordinateReferenceSystem<P2D> crs2 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31300);
 
     Envelope<P2D> extent = new Envelope<P2D>(new P2D(0.0, 0.0), new P2D(100.0, 100.0), crs);
-    MortonContext<P2D> ctxtLvl1 = new MortonContext<>(extent, 1);
-    MortonContext<P2D> ctxtLvl2 = new MortonContext<>(extent, 2);
+    MortonContext<P2D> ctxtLvl1 = new MortonContext<P2D>(extent, 1);
+    MortonContext<P2D> ctxtLvl2 = new MortonContext<P2D>(extent, 2);
     MortonCode<P2D> mcLevel1 = new MortonCode<P2D>(ctxtLvl1);
     MortonCode<P2D> mcLevel2 = new MortonCode<P2D>(ctxtLvl2);
 
@@ -101,19 +101,19 @@ public class MortonCodeTest {
     @Test
     public void testofPointandofGeometryGiveSameResultForPoints() {
         P2D pos = new P2D(0, 0);
-        Point<P2D> pnt = new Point<>(pos, crs);
+        Point<P2D> pnt = new Point<P2D>(pos, crs);
         assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
         pos = new P2D(10, 55);
-        pnt = new Point<>(pos, crs);
+        pnt = new Point<P2D>(pos, crs);
         assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
         pos = new P2D(76, 24);
-        pnt = new Point<>(pos, crs);
+        pnt = new Point<P2D>(pos, crs);
         assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
         pos = new P2D(76, 79);
-        pnt = new Point<>(pos, crs);
+        pnt = new Point<P2D>(pos, crs);
         assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
     }
 
@@ -146,19 +146,19 @@ public class MortonCodeTest {
 
     @Test
     public void testEnvelopeOfMortonCodeLevel1() {
-        assertEquals(new Envelope<>(new P2D(0.0, 0.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf(""));
-        assertEquals(new Envelope<>(new P2D(0.0, 0.0), new P2D(50.0, 50.0),crs), mcLevel2.envelopeOf("0"));
-        assertEquals(new Envelope<>(new P2D(0.0, 50.0), new P2D(50.0, 100.0), crs), mcLevel2.envelopeOf("1"));
-        assertEquals(new Envelope<>(new P2D(50.0, 0.0), new P2D(100.0, 50.0), crs), mcLevel2.envelopeOf("2"));
-        assertEquals(new Envelope<>(new P2D(50.0, 50.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf("3"));
+        assertEquals(new Envelope<P2D>(new P2D(0.0, 0.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf(""));
+        assertEquals(new Envelope<P2D>(new P2D(0.0, 0.0), new P2D(50.0, 50.0),crs), mcLevel2.envelopeOf("0"));
+        assertEquals(new Envelope<P2D>(new P2D(0.0, 50.0), new P2D(50.0, 100.0), crs), mcLevel2.envelopeOf("1"));
+        assertEquals(new Envelope<P2D>(new P2D(50.0, 0.0), new P2D(100.0, 50.0), crs), mcLevel2.envelopeOf("2"));
+        assertEquals(new Envelope<P2D>(new P2D(50.0, 50.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf("3"));
     }
 
     @Test
     public void testEnvelopeOfMortonCodeLevel2() {
-        assertEquals(new Envelope<>(new P2D(0.0, 0.0), new P2D(25.0, 25.0), crs), mcLevel2.envelopeOf("00"));
-        assertEquals(new Envelope<>(new P2D(25.0, 50.0), new P2D(50.0, 75.0), crs), mcLevel2.envelopeOf("12"));
-        assertEquals(new Envelope<>(new P2D(50.0, 25.0), new P2D(75.0, 50.0), crs), mcLevel2.envelopeOf("21"));
-        assertEquals(new Envelope<>(new P2D(75.0, 75.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf("33"));
+        assertEquals(new Envelope<P2D>(new P2D(0.0, 0.0), new P2D(25.0, 25.0), crs), mcLevel2.envelopeOf("00"));
+        assertEquals(new Envelope<P2D>(new P2D(25.0, 50.0), new P2D(50.0, 75.0), crs), mcLevel2.envelopeOf("12"));
+        assertEquals(new Envelope<P2D>(new P2D(50.0, 25.0), new P2D(75.0, 50.0), crs), mcLevel2.envelopeOf("21"));
+        assertEquals(new Envelope<P2D>(new P2D(75.0, 75.0), new P2D(100.0, 100.0), crs), mcLevel2.envelopeOf("33"));
     }
 
     @Test(expected = IllegalArgumentException.class)
