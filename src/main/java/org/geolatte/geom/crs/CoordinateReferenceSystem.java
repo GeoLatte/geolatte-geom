@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiable {
+public abstract class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiable {
 
     private final CoordinateSystem<P> coordinateSystem;
 
