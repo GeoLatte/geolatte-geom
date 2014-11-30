@@ -124,8 +124,8 @@ public class TestDefaultMeasureGeometryOperations {
             assertEquals("MeasureOnLenthOp does not preserve Y-coordinate:", expected.getPositionN(i).getY(), received.getPositionN(i).getY(), Math.ulp(10));
             if (hasVerticalAxis(expected.getCoordinateReferenceSystem())) {
                 assertEquals("MeasureOnLenthOp does not preserve Z-coordinate:",
-                        ((Vertical) expected.getPositionN(i)).getAltitude(),
-                        ((Vertical) received.getPositionN(i)).getAltitude(), Math.ulp(10));
+                        (expected.getPositionN(i)).getCoordinate(2),
+                        (received.getPositionN(i)).getCoordinate(2), Math.ulp(10));
             }
         }
     }

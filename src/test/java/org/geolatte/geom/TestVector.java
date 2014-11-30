@@ -53,16 +53,8 @@ public class TestVector {
         P3D p0 = new P3D(2, 4, 3);
         P3D p1 = new P3D(3, 5, 2);
         double received = dot(p0, p1);
-        assertEquals("Wrong result vor dot-product of (2,4,3).(3,5,2): ", (32d), received, Math.ulp(10));
+        assertEquals("Wrong result vor dot-product of (2,4,3).(3,5,2): ", (26d), received, Math.ulp(10));
 
-    }
-
-    @Test
-    public void testDotProduct3DLimitedTo2D() {
-        P3D p0 = new P3D(2, 4, 3);
-        P3D p1 = new P3D(3, 5, 2);
-        double received = dot(p0, p1, true);
-        assertEquals("Wrong result vor dot-product of (2,4,3).(3,5,2) with limitTo2D set: ", (26d), received, Math.ulp(10));
     }
 
     @Test

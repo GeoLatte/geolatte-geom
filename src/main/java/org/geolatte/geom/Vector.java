@@ -48,7 +48,7 @@ public class Vector {
         //for algorithm, see "Geometric Tools for Computer Graphics", Ch. 6.
         P d = Vector.substract(p1, p0);
         P ymp0 = Vector.substract(y, p0);
-        double t = Vector.dot(d, ymp0, true);
+        double t = Vector.dot(d, ymp0);
         double dd = Vector.dot(d, d);
         if (t <= 0) {
             // p0 is closest to y
@@ -64,37 +64,22 @@ public class Vector {
         return new double[]{dist, t / dd};
     }
 
-    /**
-     * Returns the dot-product of the specified <code>Position</code>s
-     *
-     * @param p0 first operand
-     * @param p1 second operand
-     * @return the dot-product of p0 and p1
-     */
-    public static <P extends P2D> double dot(P p0, P p1) {
-        return dot(p0, p1, false);
-    }
 
     /**
      * Returns the dot-product of the specified <code>Position</code>s
      * <p/>
-     * <p>If limit2D is set to true, Z-coordinates will be ignored so that the product is calculated in 2D.</p>
-     * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
-     * @param p0      first operand
-     * @param p1      second operand
-     * @param limit2D if true, the dot-product will be in 2D.
+     * @param p0 first operand
+     * @param p1 second operand
      * @return the dot-product of p0 and p1.
      */
-    public static <P extends P2D> double dot(P p0, P p1, boolean limit2D) {
+    public static <P extends P2D> double dot(P p0, P p1) {
         if (p0.isEmpty() || p1.isEmpty()) return Double.NaN;
-        if (limit2D || !(p0 instanceof Vertical) || !(p1 instanceof Vertical)) {
-            return p0.getX() * p1.getX() + p0.getY() * p1.getY();
-        } else {
-            Vertical v0 = (Vertical) p0;
-            Vertical v1 = (Vertical) p1;
-            return p0.getX() * p1.getX() + p0.getY() * p1.getY() + ((Vertical) p0).getAltitude() * ((Vertical) p1).getAltitude();
-        }
+        int d1 = p0.getCoordinateDimension();
+        int d2 = p1.getCoordinateDimension();
+
+        return p0.getX() * p1.getX() + p0.getY() * p1.getY();
+
     }
 
     /**
@@ -112,7 +97,7 @@ public class Vector {
         for (int i = 0; i < dim; i++) {
             result[i] = p0.getCoordinate(i) + p1.getCoordinate(i);
         }
-        return (P)Positions.mkPosition(p0.getClass(), result);
+        return (P) Positions.mkPosition(p0.getClass(), result);
     }
 
     /**
@@ -130,12 +115,13 @@ public class Vector {
         for (int i = 0; i < dim; i++) {
             result[i] = p0.getCoordinate(i) - p1.getCoordinate(i);
         }
-        return (P)Positions.mkPosition(p0.getClass(), result);
+        return (P) Positions.mkPosition(p0.getClass(), result);
     }
 
     /**
      * Hill's "perp" operator.
-     * <p>The application of this operator on a vector <code>P</code> returns the vector perpendicular at 90 deg. counterclockwise
+     * <p>The application of this operator on a vector <code>P</code> returns the vector perpendicular at 90 deg.
+     * counterclockwise
      * from <code>P</code> in the 2D (X/Y) plane.</p>
      *
      * @param p a vector represented by a Position.

@@ -23,10 +23,6 @@ package org.geolatte.geom.builder.client;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -86,19 +82,19 @@ public class DslTest {
         CollectionUtils.addAll(points, lr.getPositions().iterator());
         assertEquals(points.get(0).getLon(), 0, DELTA);
         assertEquals(points.get(0).getLat(), 0, DELTA);
-        assertEquals(points.get(0).getAltitude(), 0, DELTA);
+        assertEquals(points.get(0).getHeight(), 0, DELTA);
         assertEquals(points.get(1).getLon(), 1, DELTA);
         assertEquals(points.get(1).getLat(), 0, DELTA);
-        assertEquals(points.get(1).getAltitude(), 0, DELTA);
+        assertEquals(points.get(1).getHeight(), 0, DELTA);
         assertEquals(points.get(2).getLon(), 1, DELTA);
         assertEquals(points.get(2).getLat(), 1, DELTA);
-        assertEquals(points.get(2).getAltitude(), 0, DELTA);
+        assertEquals(points.get(2).getHeight(), 0, DELTA);
         assertEquals(points.get(3).getLon(), 0, DELTA);
         assertEquals(points.get(3).getLat(), 1, DELTA);
-        assertEquals(points.get(3).getAltitude(), 0, DELTA);
+        assertEquals(points.get(3).getHeight(), 0, DELTA);
         assertEquals(points.get(4).getLon(), 0, DELTA);
         assertEquals(points.get(4).getLat(), 0, DELTA);
-        assertEquals(points.get(4).getAltitude(), 0, DELTA);
+        assertEquals(points.get(4).getHeight(), 0, DELTA);
     }
 
     @Test(expected = IllegalArgumentException.class)

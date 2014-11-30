@@ -6,7 +6,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */
-public class P3D extends P2D implements Vertical {
+public class P3D extends P2D {
 
     public P3D() {
         super();
@@ -20,8 +20,7 @@ public class P3D extends P2D implements Vertical {
         super(coords);
     }
 
-    @Override
-    public double getAltitude() {
+    public double getZ() {
         return getCoordinate(2);
     }
 

@@ -275,12 +275,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testGetZ() {
-        assertEquals(0d, testSeq3D.getPositionN(0).getAltitude(), Math.ulp(10d));
-        assertEquals(1d, testSeq3D.getPositionN(1).getAltitude(), Math.ulp(10d));
-        assertEquals(2d, testSeq3D.getPositionN(2).getAltitude(), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getPositionN(0).getAltitude(), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getPositionN(1).getAltitude(), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getPositionN(2).getAltitude(), Math.ulp(10d));
+        assertEquals(0d, testSeq3D.getPositionN(0).getZ(), Math.ulp(10d));
+        assertEquals(1d, testSeq3D.getPositionN(1).getZ(), Math.ulp(10d));
+        assertEquals(2d, testSeq3D.getPositionN(2).getZ(), Math.ulp(10d));
+        assertEquals(0d, testSeq3DM.getPositionN(0).getZ(), Math.ulp(10d));
+        assertEquals(1d, testSeq3DM.getPositionN(1).getZ(), Math.ulp(10d));
+        assertEquals(2d, testSeq3DM.getPositionN(2).getZ(), Math.ulp(10d));
 
         try {
             testSeq3D.getPositionN(3);
@@ -322,8 +322,8 @@ public class PackedPointSequenceTest {
             Assert.assertEquals(testSeq3DM.getY(i), testSeq3DM.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
 
             //Z
-            Assert.assertEquals(testSeq3D.getPositionN(i).getAltitude(), testSeq3D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getPositionN(i).getAltitude(), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
+            Assert.assertEquals(testSeq3D.getPositionN(i).getZ(), testSeq3D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
+            Assert.assertEquals(testSeq3DM.getPositionN(i).getZ(), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
 
             //M
             Assert.assertEquals(testSeq2DM.getPositionN(i).getM(), testSeq2DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));

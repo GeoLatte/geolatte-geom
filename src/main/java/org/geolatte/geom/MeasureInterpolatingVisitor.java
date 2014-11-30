@@ -158,17 +158,12 @@ public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements Ge
     }
 
     private P  interpolate(P p0, P p1, double r) {
-        double x = p0.getX() + r * (p1.getX() - p0.getX());
-        double y = p0.getY() + r * (p1.getY() - p0.getY());
-        double m = p0.getM() + r * (p1.getM() - p0.getM());
-        if (p0 instanceof Vertical) {
-            Vertical v0 = (Vertical)p0;
-            Vertical v1 = (Vertical)p1;
-            double z = v0.getAltitude() + r * (v1.getAltitude() - v0.getAltitude());
-            return Positions.mkPosition(getCrs(), x, y, z, m);
-        } else {
-            return Positions.mkPosition(getCrs(), x, y, m);
+        int dim = getCrs().getCoordinateDimension();
+        double result[] = new double[dim];
+        for (int i = 0; i < dim; i++) {
+            result[i] = p0.getCoordinate(i) + r * (p1.getCoordinate(i) - p0.getCoordinate(i));
         }
+        return Positions.mkPosition(getCrs(), result);
     }
 
     @Override

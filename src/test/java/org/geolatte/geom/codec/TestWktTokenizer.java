@@ -27,7 +27,6 @@ import org.geolatte.geom.P2DM;
 import org.geolatte.geom.P3D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -143,11 +142,11 @@ public class TestWktTokenizer {
         P3D pos = (P3D) pstoken.getPositions().getPositionN(0);
         assertEquals(20, pos.getX(), Math.ulp(20d));
         assertEquals(33.3, pos.getY(), Math.ulp(20d));
-        assertEquals(0.24, pos.getAltitude(), Math.ulp(2d));
+        assertEquals(0.24, pos.getZ(), Math.ulp(2d));
         pos = (P3D) pstoken.getPositions().getPositionN(1);
         assertEquals(.1d, pos.getX(), Math.ulp(20d));
         assertEquals(2d, pos.getY(), Math.ulp(20d));
-        assertEquals(3d, pos.getAltitude(), Math.ulp(2d));
+        assertEquals(3d, pos.getZ(), Math.ulp(2d));
         assertTrue(tokens.moreTokens());
         assertEquals(tokens.nextToken() ,words.getCloseList());
         assertFalse(tokens.moreTokens());

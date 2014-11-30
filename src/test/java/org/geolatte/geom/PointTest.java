@@ -65,8 +65,8 @@ public class PointTest {
 
     @Test
     public void testGetZ() throws Exception {
-        assertEquals(-3, point3D.getPosition().getAltitude(), Math.ulp(10d));
-        assertEquals(3, point3DM.getPosition().getAltitude(), Math.ulp(10d));
+        assertEquals(-3, point3D.getPosition().getZ(), Math.ulp(10d));
+        assertEquals(3, point3DM.getPosition().getZ(), Math.ulp(10d));
     }
 
     @Test
