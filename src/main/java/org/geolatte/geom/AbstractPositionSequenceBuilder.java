@@ -29,6 +29,7 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
 
     protected final PositionFactory<P> factory;
     protected final double[] coords;
+    private int numAdded = 0;
 
     public AbstractPositionSequenceBuilder(PositionFactory<P> factory) {
         if (factory == null) throw new IllegalArgumentException("Require a non-null Coordinate reference system.");
@@ -43,6 +44,7 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
         for (int i = 0; i < factory.getCoordinateDimension(); i++) {
             addCoordinate(coordinates[i]);
         }
+        numAdded++;
         return this;
     }
 
@@ -52,7 +54,13 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
         for (double coord : coords) {
             addCoordinate(coord);
         }
+        numAdded++;
         return this;
+    }
+
+    @Override
+    public int getNumAdded() {
+        return numAdded;
     }
 
     protected abstract void addCoordinate(double val);

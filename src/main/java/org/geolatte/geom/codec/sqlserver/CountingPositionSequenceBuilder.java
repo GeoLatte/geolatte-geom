@@ -55,7 +55,8 @@ public class CountingPositionSequenceBuilder<P extends Position> implements Posi
         return delegate.toPositionSequence();
     }
 
-    //TODO -- this method should be moved to the top interface
+
+    @Override
     public int getNumAdded(){
         return num;
     }

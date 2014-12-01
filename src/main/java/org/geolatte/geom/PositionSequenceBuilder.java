@@ -53,4 +53,9 @@ public interface PositionSequenceBuilder<P extends Position> {
      */
     PositionSequence<P> toPositionSequence();
 
+    /**
+     * Returns the number of positions that have already been added.
+     * @return the number of positions that have already been added.
+     */
+    int getNumAdded();
 }
