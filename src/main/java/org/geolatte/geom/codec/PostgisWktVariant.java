@@ -118,7 +118,7 @@ class PostgisWktVariant extends WktVariant {
      *
      * @param candidate The candidate wkt geometry token
      * @param geometry  The geometry to check the candidate wkt geometry token for
-     * @param ignoreMeasureMarker
+     * @param ignoreMeasureMarker when set to true, this method returns true iff the candidate token is not measured
      * @return The candidate is measured if and only if the geometry is measured and not 3D
      */
     private boolean hasSameMeasuredSuffixInWkt(WktGeometryToken candidate, Geometry geometry, boolean ignoreMeasureMarker) {

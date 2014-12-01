@@ -24,6 +24,7 @@ package org.geolatte.geom.curve;
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.regex.Pattern;
@@ -112,10 +113,10 @@ public class MortonCode<P extends C2D> {
         // recalculate the X,Y coordinates to grid-cell coordinates. These are
         // the row,column-indices of grid formed by the (lowest-level) leaves
         // of the Quadtree
-        int colMin = getCol(envelope.getMinC0());
-        int rowMin = getRow(envelope.getMinC1());
-        int colMax = getCol(envelope.getMaxC0());
-        int rowMax = getRow(envelope.getMaxC1());
+        int colMin = getCol(envelope.lowerLeft().getCoordinate(0));
+        int rowMin = getRow(envelope.lowerLeft().getCoordinate(1));
+        int colMax = getCol(envelope.upperRight().getCoordinate(0));
+        int rowMax = getRow(envelope.upperRight().getCoordinate(1));
         int[] cols = {colMin, colMax};
         int[] rows = {rowMin, rowMax};
 
@@ -165,8 +166,6 @@ public class MortonCode<P extends C2D> {
                     "Parameter %s is not a valid mortoncode with max. depth %d.", mortoncode, mortonContext.getDepth()));
         }
         return envelopeOf(mortoncode, 0, mortonContext.getExtent());
-
-
     }
 
     /*
@@ -179,10 +178,10 @@ public class MortonCode<P extends C2D> {
             return extent;
         }
         char c = mortoncode.charAt(index);
-        double minX = extent.getMinC0();
-        double minY = extent.getMinC1();
-        double w = (extent.getMaxC0() - extent.getMinC0()) / 2.0;
-        double h = (extent.getMaxC1() - extent.getMinC1()) / 2.0;
+        double minX = extent.lowerLeft().getCoordinate(0);
+        double minY = extent.lowerLeft().getCoordinate(1);
+        double w = (extent.extentAlongDimension(0)) / 2.0;
+        double h = (extent.extentAlongDimension(1)) / 2.0;
         CoordinateReferenceSystem<P> crs = extent.getCoordinateReferenceSystem();
         switch (c) {
             case '0':

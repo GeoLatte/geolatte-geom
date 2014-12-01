@@ -25,10 +25,10 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-//TODO -- do we need crs in this class? Does it need to have type params?
-
 /**
  * A <code>WktToken</code> for point sequences in the input text.
+ * <p>Note that the tokenizer returns in a {@code WktPointSequenceToken} a different {@code CoordinateReferenceSystem}
+ * then the one declared in the WKT for the case of 3D and/or measured coordinate system. </p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
@@ -48,12 +48,11 @@ class WktPointSequenceToken<P extends Position> implements WktToken {
     }
 
     public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
-            return this.crs;
-        }
+        return this.crs;
+    }
 
 
-
-    public String toString(){
+    public String toString() {
         return positions.toString();
     }
 

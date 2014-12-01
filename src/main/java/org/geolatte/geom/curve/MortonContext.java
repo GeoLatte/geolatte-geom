@@ -23,6 +23,7 @@ package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -62,8 +63,8 @@ public class MortonContext<P extends C2D> {
         this.extent = extent;
 
         this.numOfDivisionsAlongAxis = (int) (Math.pow(2, depth));
-        this.leafWidth =  (extent.getMaxC0() - extent.getMinC0()) / numOfDivisionsAlongAxis;
-        this.leafHeight = (extent.getMaxC1() - extent.getMinC1()) / numOfDivisionsAlongAxis;
+        this.leafWidth =  (extent.extentAlongDimension(0)) / numOfDivisionsAlongAxis;
+        this.leafHeight = (extent.extentAlongDimension(1)) / numOfDivisionsAlongAxis;
 
     }
 
@@ -73,7 +74,7 @@ public class MortonContext<P extends C2D> {
      * @return the maximum X-coordinate of the extent
      */
     public double getMaxX() {
-        return extent.upperRight().getX();
+        return extent.upperRight().getCoordinate(0);
     }
 
     /**
@@ -82,7 +83,7 @@ public class MortonContext<P extends C2D> {
      * @return the maximum Y-coordinate of the extent
      */
     public double getMaxY() {
-        return extent.upperRight().getY();
+        return extent.upperRight().getCoordinate(1);
     }
 
     /**
@@ -91,7 +92,7 @@ public class MortonContext<P extends C2D> {
      * @return the minimum X-coordinate of the extent
      */
     public double getMinX() {
-        return extent.lowerLeft().getX();
+        return extent.lowerLeft().getCoordinate(0);
     }
     /**
      * Returns the minimum Y-coordinate of the extent
@@ -99,7 +100,7 @@ public class MortonContext<P extends C2D> {
      * @return the minimum Y-coordinate of the extent
      */
     public double getMinY() {
-        return extent.lowerLeft().getY();
+        return extent.lowerLeft().getCoordinate(1);
     }
 
     /**
@@ -116,7 +117,7 @@ public class MortonContext<P extends C2D> {
      *
      * @return the CrsId of the spatial extent
      */
-    public CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
+    public CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
         return extent.getCoordinateReferenceSystem();
     }
 
@@ -169,7 +170,7 @@ public class MortonContext<P extends C2D> {
      * @return true if the specified envelope is contained in the extent, false otherwise
      * @throws IllegalArgumentException if the specified envelope does not share this extent's {@code CrsId}
      */
-    public boolean extentContains(Envelope envelope) {
+    public boolean extentContains(Envelope<P> envelope) {
         return this.extent.contains(envelope);
     }
 

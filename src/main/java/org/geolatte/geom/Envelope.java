@@ -8,9 +8,11 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * <p>An <code>Envelope</code> is characterised by a lower-left and an upper-right coordinate.</p>
  * <p>An <code>Envelope</code> is empty if the set of enclosed points is empty. </p>
  *
+ * <p>An empty Envelope has Double.NaN for its lowerleft/upperright coordinates.</p>
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  *         <p/>
- *         <p>An empty Envelope has Double.NaN for min. and max. X and Y coordinates.</p>
+
  */
 public class Envelope<P extends Position> {
 
@@ -70,8 +72,8 @@ public class Envelope<P extends Position> {
         }
 
         this.crs =  crs;
-        this.lowerLeft = Positions.mkPosition(crs, new double[]{minC1, minC2});
-        this.upperRight = Positions.mkPosition(crs, new double[]{maxC1, maxC2});
+        this.lowerLeft = Positions.mkPosition(crs, minC1, minC2);
+        this.upperRight = Positions.mkPosition(crs, maxC1, maxC2);
 
 
     }
@@ -131,20 +133,19 @@ public class Envelope<P extends Position> {
         return builder.toString();
     }
 
-    //TODO get rid of minCx/maxCX public methods
-    public double getMinC0() {
+    protected double getMinC0() {
         return lowerLeft.getCoordinate(0);
     }
 
-    public double getMinC1() {
+    protected double getMinC1() {
         return lowerLeft.getCoordinate(1);
     }
 
-    public double getMaxC0() {
+    protected double getMaxC0() {
         return upperRight.getCoordinate(0);
     }
 
-    public double getMaxC1() {
+    protected double getMaxC1() {
         return upperRight.getCoordinate(1);
     }
 
@@ -219,6 +220,13 @@ public class Envelope<P extends Position> {
                 other.getMaxC1() >= this.getMaxC1();
     }
 
+    public double extentAlongDimension(int i) {
+        if (i < 0 || i > 2) {
+            throw new IndexOutOfBoundsException("Index negative or larger than defined extent dimension");
+        }
+        return upperRight.getCoordinate(i) - lowerLeft.getCoordinate(i);
+    }
+
     /**
      * Checks whether this <code>Envelope</code> contains the specifies <code>Envelope</code>.
      *
@@ -238,7 +246,6 @@ public class Envelope<P extends Position> {
      * @throws IllegalArgumentException when the specified <code>Point</code> doesn't have the same coordinate reference system as this instance.
      */
     public boolean contains(P p) {
-        //TODO -- is this test required??
         if (!p.getClass().equals(this.getCoordinateReferenceSystem().getPositionClass()))
             throw new IllegalArgumentException("Position and envelope of different types");
         if (isEmpty()) return false;
@@ -287,4 +294,5 @@ public class Envelope<P extends Position> {
         result = 31 * result + (upperRight != null ? upperRight.hashCode() : 0);
         return result;
     }
+
 }

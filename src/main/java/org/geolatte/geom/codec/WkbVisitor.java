@@ -108,7 +108,6 @@ class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
         output.put(output.getByteOrder().byteValue());
     }
 
-    //TODO why is named write..AndSrid when no SRID is written?
     protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
         int typeCode = getGeometryType(geometry);
         output.putUInt(typeCode);

@@ -22,7 +22,9 @@
 package org.geolatte.geom.curve;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
@@ -41,7 +43,6 @@ import static org.junit.Assert.assertTrue;
 public class MortonCodeTest {
 
     CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-    CoordinateReferenceSystem<C2D> crs2 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31300);
 
     Envelope<C2D> extent = new Envelope<C2D>(new C2D(0.0, 0.0), new C2D(100.0, 100.0), crs);
     MortonContext<C2D> ctxtLvl1 = new MortonContext<C2D>(extent, 1);
@@ -176,15 +177,14 @@ public class MortonCodeTest {
         mcLevel2.envelopeOf("42");
     }
 
-    // TODO -- uncomment after codec package is redone.
     //test code for bug
-//    @Test
-//    public void testMortonCodeShouldNotReturnEmptyString() {
-//        String wkt = "SRID=4326;POINT(-87.064293 33.087386)";
-//        Point geom = (Point) Wkt.fromWkt(wkt);
-//        MortonCode mortonCode = new MortonCode(new MortonContext(new Envelope(-140.0, 15, -40.0, 50.0, CrsId.valueOf(4326)), 8));
-//        assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPosition(geom));
-//    }
+    @Test
+    public void testMortonCodeShouldNotReturnEmptyString() {
+        String wkt = "SRID=31370;POINT(-87.064293 33.087386)";
+        Point<C2D> geom = (Point<C2D>) Wkt.fromWkt(wkt);
+        MortonCode<C2D> mortonCode = new MortonCode<C2D>(new MortonContext<C2D>(new Envelope<C2D>(-140.0, 15, -40.0, 50.0, crs), 8));
+        assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPosition(geom.getPosition()));
+    }
 
 
 }

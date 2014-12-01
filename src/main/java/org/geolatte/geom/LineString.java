@@ -96,7 +96,6 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
      *
      * @return true if this <code>LineString</code> is a ring.
      */
-    //TODO re-instate simplicity check?
     public boolean isRing() {
         return !isEmpty() && isClosed();
     }

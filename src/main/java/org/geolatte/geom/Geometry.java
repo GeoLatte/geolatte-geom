@@ -104,7 +104,6 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return new NestedPositionSequence<T>(sequences);
     }
 
-    //TODO -- check that all geoms have the SAME CRS
     @SuppressWarnings("unchecked")
     protected static <T extends Position> CoordinateReferenceSystem<T> getCrs(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {

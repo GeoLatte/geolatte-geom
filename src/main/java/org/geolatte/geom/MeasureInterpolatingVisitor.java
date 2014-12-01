@@ -30,21 +30,12 @@ import java.util.List;
  * A <code>GeometryVisitor</code> that derives a <code>Geometry</code>
  * by interpolating on the measure values of the visited <code>Geometries</code>.
  * <p/>
- * TODO -- rewrite (is copied from SQL/MM specs)
  * <p>Interpolation is used to determine any points on the 1-dimensional geometry with an m coordinate value
  * between SM and EM inclusively. The implementation-defined interpolation algorithm is used to estimate
  * values between measured values, usually using a mathematical function. For example, given a measure
  * of 6 and a 2-point linestring where the m coordinate value of the start point is 4 and the m coordinate
  * value of the end point is 8, since 6 is halfway between 4 and 8, the interpolation algorithm would be a
- * point on the linestring halfway between the start and end points. The interpolation is within a line
- * segment and not across line segments in an ST_Curve. The interpolation is within an ST_Curve element
- * and not across ST_Curve elements in an ST_MultiCurve.
- * The results are produced in a geometry collection. If there are consecutive points in the 1-dimensional
- * geometry with an m coordinate value between SM and EM inclusively, then a curve value element is
- * added to the geometry collection to represent the curve elements between these consecutive points. Any
- * disconnected points in the 1-dimensional geometry value with m coordinate values between SM and EM
- * inclusively are also added to the geometry collection. If no matching m coordinate values are found, then
- * an empty set of type ST_Point is returned.
+ * point on the linestring halfway between the start and end points.
  * </p>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -86,7 +77,6 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
         }
     }
 
-    //TODO -- make this more robust against rounding errors
 
     @Override
     public void visit(LineString<P> lineString) {

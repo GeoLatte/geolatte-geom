@@ -135,15 +135,14 @@ public class CrsId {
         CrsId crsId = (CrsId) o;
 
         if (code != crsId.code) return false;
-        //TODO - Should be able to simplify: authority can never be null.
-        if (authority != null ? !authority.equals(crsId.authority) : crsId.authority != null) return false;
+        if (!authority.equals(crsId.authority)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = authority != null ? authority.hashCode() : 0;
+        int result = authority.hashCode();
         result = 31 * result + code;
         return result;
     }

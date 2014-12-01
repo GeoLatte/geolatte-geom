@@ -169,7 +169,7 @@ public class CoordinateReferenceSystems {
     public static Geographic2DCoordinateReferenceSystem WGS84 = CrsRegistry
             .getGeographicCoordinateReferenceSystemForEPSG(4326);
 
-    public static <P extends Position> boolean hasAxisOrder(CoordinateReferenceSystem crs, int order){
+    public static <P extends Position> boolean hasAxisOrder(CoordinateReferenceSystem<P> crs, int order){
         CoordinateSystemAxis[] axes = crs.getCoordinateSystem().getAxes();
         for (CoordinateSystemAxis axis : axes) {
             if (axis.getNormalOrder() == order) {
@@ -179,11 +179,11 @@ public class CoordinateReferenceSystems {
         return false;
     }
 
-    public static <P extends Position> boolean hasVerticalAxis(CoordinateReferenceSystem crs) {
+    public static <P extends Position> boolean hasVerticalAxis(CoordinateReferenceSystem<P> crs) {
         return hasAxisOrder(crs, 2);
     }
 
-    public static <P extends Position> boolean hasMeasureAxis(CoordinateReferenceSystem crs) {
+    public static <P extends Position> boolean hasMeasureAxis(CoordinateReferenceSystem<P> crs) {
         return hasAxisOrder(crs, 3);
     }
 

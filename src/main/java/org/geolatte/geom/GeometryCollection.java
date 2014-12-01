@@ -154,7 +154,6 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
      * @throws IllegalStateException When geometries contains a null value or when the given geometries do not share the
      *                               same {@link CrsId}
      */
-    //TODO -- can this check not be incorporated in nestPositionSequences ??
     private void check(G[] geometries) {
         if (geometries == null || geometries.length == 0) return;
         String msg = "NULL element not allowd in Geometry array";

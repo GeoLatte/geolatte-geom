@@ -109,7 +109,6 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, Geographic2DCoordinateReferenceSystem.class);
         CrsId cr = decodeOptionalAuthority(srid);
         matchesCloseList();
-        //TODO clean up casting.
         Geographic2DCoordinateReferenceSystem system = new Geographic2DCoordinateReferenceSystem(cr, crsName, new
                 EllipsoidalCoordinateSystem2D((EllipsoidalAxis) twinAxes[0], (EllipsoidalAxis) twinAxes[1]));
         system.setDatum(datum);
