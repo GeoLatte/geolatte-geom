@@ -33,28 +33,28 @@ import static org.junit.Assert.assertTrue;
 public class PositionSequencePositionEqualityTest {
 
 
-    PositionSequence<P3DM> ps1 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
+    PositionSequence<C3DM> ps1 = PositionSequenceBuilders.fixedSized(3, C3DM.class)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPositionSequence();
 
-    PositionSequence<P2D> ps1_2D = PositionSequenceBuilders.fixedSized(3, P2D.class)
+    PositionSequence<C2D> ps1_2D = PositionSequenceBuilders.fixedSized(3, C2D.class)
             .add(1, 2)
             .add(2, 3)
             .add(3, 4).toPositionSequence();
 
 
-    PositionSequence<P3DM> ps2 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
+    PositionSequence<C3DM> ps2 = PositionSequenceBuilders.fixedSized(3, C3DM.class)
             .add(1, 2, 3, 4)
             .add(2, 3, 4, 5)
             .add(3, 4, 5, 6).toPositionSequence();
 
-    PositionSequence<P3DM> ps3 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
+    PositionSequence<C3DM> ps3 = PositionSequenceBuilders.fixedSized(3, C3DM.class)
             .add(1, 2, 4, 5)
             .add(2, 3, 3, 2)
             .add(3, 4, 5, 2).toPositionSequence();
 
-    PositionSequence<P3DM> ps4 = PositionSequenceBuilders.fixedSized(3, P3DM.class)
+    PositionSequence<C3DM> ps4 = PositionSequenceBuilders.fixedSized(3, C3DM.class)
             .add(2, 2, 4, 5)
             .add(2, 4, 3, 2)
             .add(3, 4, 5, 2).toPositionSequence();
@@ -73,11 +73,11 @@ public class PositionSequencePositionEqualityTest {
     @Test
     public void testEmptyPointSequencesAreEqual() {
         assertTrue(eq.equals(
-                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence(),
-                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence()));
+                PositionSequenceBuilders.fixedSized(0, C2D.class).toPositionSequence(),
+                PositionSequenceBuilders.fixedSized(0, C2D.class).toPositionSequence()));
 
         assertFalse(eq.equals(
-                PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence(),
+                PositionSequenceBuilders.fixedSized(0, C2D.class).toPositionSequence(),
                 ps1_2D));
     }
 

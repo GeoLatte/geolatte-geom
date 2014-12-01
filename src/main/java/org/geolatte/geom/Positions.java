@@ -23,7 +23,6 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -112,11 +111,11 @@ public class Positions {
     }
 
     //Factories
-    public static class CanMakeP2D implements PositionFactory<P2D>{
+    public static class CanMakeP2D implements PositionFactory<C2D>{
 
         @Override
-        public Class<P2D> forClass() {
-            return P2D.class;
+        public Class<C2D> forClass() {
+            return C2D.class;
         }
 
         @Override
@@ -125,8 +124,8 @@ public class Positions {
         }
 
         @Override
-        public P2D mkPosition(double... coordinates) {
-            return (coordinates.length == 0 ? new P2D() : new P2D(coordinates[0], coordinates[1]));
+        public C2D mkPosition(double... coordinates) {
+            return (coordinates.length == 0 ? new C2D() : new C2D(coordinates[0], coordinates[1]));
         }
 
         @Override
@@ -145,11 +144,11 @@ public class Positions {
         }
     }
 
-    public static class CanMakeP2DM implements PositionFactory<P2DM> {
+    public static class CanMakeP2DM implements PositionFactory<C2DM> {
 
         @Override
-        public Class<P2DM> forClass() {
-            return P2DM.class;
+        public Class<C2DM> forClass() {
+            return C2DM.class;
         }
 
         @Override
@@ -158,8 +157,8 @@ public class Positions {
         }
 
         @Override
-        public P2DM mkPosition(double... coordinates) {
-            return coordinates.length == 0 ? new P2DM() : new P2DM(coordinates[0], coordinates[1], coordinates[2]);
+        public C2DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new C2DM() : new C2DM(coordinates[0], coordinates[1], coordinates[2]);
         }
 
         @Override
@@ -178,11 +177,11 @@ public class Positions {
         }
     }
 
-    public static class CanMakeP3D implements PositionFactory<P3D> {
+    public static class CanMakeP3D implements PositionFactory<C3D> {
 
         @Override
-        public Class<P3D> forClass() {
-            return P3D.class;
+        public Class<C3D> forClass() {
+            return C3D.class;
         }
 
         @Override
@@ -191,8 +190,8 @@ public class Positions {
         }
 
         @Override
-        public P3D mkPosition(double... coordinates) {
-            return coordinates.length == 0 ? new P3D() : new P3D(coordinates[0], coordinates[1], coordinates[2]);
+        public C3D mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new C3D() : new C3D(coordinates[0], coordinates[1], coordinates[2]);
         }
 
         @Override
@@ -211,11 +210,11 @@ public class Positions {
         }
     }
 
-    public static class CanMakeP3DM implements PositionFactory<P3DM> {
+    public static class CanMakeP3DM implements PositionFactory<C3DM> {
 
         @Override
-        public Class<P3DM> forClass() {
-            return P3DM.class;
+        public Class<C3DM> forClass() {
+            return C3DM.class;
         }
 
         @Override
@@ -224,8 +223,8 @@ public class Positions {
         }
 
         @Override
-        public P3DM mkPosition(double... coordinates) {
-            return coordinates.length == 0 ? new P3DM() : new P3DM(coordinates[0], coordinates[1], coordinates[2],
+        public C3DM mkPosition(double... coordinates) {
+            return coordinates.length == 0 ? new C3DM() : new C3DM(coordinates[0], coordinates[1], coordinates[2],
                     coordinates[3]);
         }
 

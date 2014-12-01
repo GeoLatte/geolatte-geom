@@ -197,11 +197,11 @@ public class JTS {
      * @return the corresponding geolatte Envelope.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope<P2D> from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
+    public static org.geolatte.geom.Envelope<C2D> from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
         if (jtsEnvelope == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return new org.geolatte.geom.Envelope<P2D>(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
+        return new org.geolatte.geom.Envelope<C2D>(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
                 jtsEnvelope.getMaxY(), CoordinateReferenceSystems.PROJECTED_2D_METER);
     }
 

@@ -38,7 +38,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<P2D> {
+public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<C2D> {
 
     private final Projection projection;
     private final Geographic2DCoordinateReferenceSystem geoCRS;

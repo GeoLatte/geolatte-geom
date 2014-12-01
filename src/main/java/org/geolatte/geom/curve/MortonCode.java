@@ -23,7 +23,7 @@ package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.P2D;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.regex.Pattern;
@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
-public class MortonCode<P extends P2D> {
+public class MortonCode<P extends C2D> {
 
     private final Pattern VALID_MORTONCODE_PATTERN = Pattern.compile("[0,1,2,3]*");
     private final MortonContext<P> mortonContext;

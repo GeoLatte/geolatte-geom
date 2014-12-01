@@ -1,17 +1,17 @@
 package org.geolatte.geom;
 
 /**
- * A position in a projected coordinate reference system.
+ * A position in a cartesian coordinate reference system.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */
-public class P2D extends Position {
+public class C2D extends Position {
 
     /**
      * Constructs an empty instance
      */
-    public P2D() {
+    public C2D() {
         super();
     }
 
@@ -22,11 +22,11 @@ public class P2D extends Position {
      * @param x coordinate for axis in EAST or WEST direction
      * @param y coordinate for axis in NORTH or SOUTH direction
      */
-    public P2D(double x, double y) {
+    public C2D(double x, double y) {
         super(x, y);
     }
 
-    protected P2D(double... coords) {
+    protected C2D(double... coords) {
         super(coords);
     }
 

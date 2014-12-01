@@ -137,11 +137,11 @@ public class TestJTS {
 
     @Test
     public void test_from_with_srid() {
-        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, p(1, 2)));
+        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, c(1, 2)));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 
-        geometry = JTS.to(polygon(ring(crs, p(0, 0), p(1, 0), p(1, 1), p(0, 1), p(0, 0))));
+        geometry = JTS.to(polygon(ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 

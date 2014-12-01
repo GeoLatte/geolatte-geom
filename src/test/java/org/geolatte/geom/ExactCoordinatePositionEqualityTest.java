@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -46,7 +45,7 @@ public class ExactCoordinatePositionEqualityTest {
 
     @Test
     public void testNullPositionsAreNotEqualUnlessBothNull() {
-        assertTrue(eq.equals((P2D)null, null));
+        assertTrue(eq.equals((C2D)null, null));
         assertFalse(eq.equals(pos1, null));
         assertFalse(eq.equals(null, pos1));
 

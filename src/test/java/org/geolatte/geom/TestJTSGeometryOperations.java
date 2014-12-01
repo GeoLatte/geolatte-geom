@@ -36,8 +36,8 @@ import static org.junit.Assert.*;
  */
 public class TestJTSGeometryOperations {
     
-    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
-    private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+    private static CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+    private static CoordinateReferenceSystem<C2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
     JTSGeometryOperations ops = new JTSGeometryOperations();
 
@@ -48,36 +48,36 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testIntersectsOp() {
-        LineString<P2D> lineString = linestring(crs, p(1, 1), p(2, 2));
-        LineString<P2D> lineString2 = linestring(crs, p(3, 3), p(4, 4));
+        LineString<C2D> lineString = linestring(crs, c(1, 1), c(2, 2));
+        LineString<C2D> lineString2 = linestring(crs, c(3, 3), c(4, 4));
         assertFalse(ops.intersects(lineString, lineString2));
-        LineString<P2D> lineString3 = linestring(crs, p(2, 2), p(4, 4));
+        LineString<C2D> lineString3 = linestring(crs, c(2, 2), c(4, 4));
         assertTrue(ops.intersects(lineString, lineString3));
     }
 
     @Test
     public void testTouchesOp() {
-        LineString<P2D> lineString = linestring(crs, p(1, 1), p(2, 2));
-        LineString<P2D> lineString2 = linestring(crs, p(3, 3), p(4, 4));
+        LineString<C2D> lineString = linestring(crs, c(1, 1), c(2, 2));
+        LineString<C2D> lineString2 = linestring(crs, c(3, 3), c(4, 4));
         assertFalse(ops.touches(lineString, lineString2));
-        LineString<P2D> lineString3 = linestring(crs, p(2, 2), p(4, 4));
+        LineString<C2D> lineString3 = linestring(crs, c(2, 2), c(4, 4));
         assertTrue(ops.touches(lineString, lineString3));
     }
 
     @Test
     public void testCrossesOp() {
-        LineString<P2D> lineString = linestring(crs, p(1, 1), p(1, 3));
-        LineString lineString2 = linestring(crs, p(3, 3), p(4, 4));
+        LineString<C2D> lineString = linestring(crs, c(1, 1), c(1, 3));
+        LineString lineString2 = linestring(crs, c(3, 3), c(4, 4));
         assertFalse(ops.crosses(lineString, lineString2));
-        LineString lineString3 = linestring(crs, p(0, 2), p(3, 2));
+        LineString lineString3 = linestring(crs, c(0, 2), c(3, 2));
         assertTrue(ops.crosses(lineString, lineString3));
     }
 
 
     @Test
     public void testContainsOp() {
-        LineString<P2D> lineString = linestring(crs, p(1, 1), p(1, 2));
-        Polygon<P2D> polygon = polygon(ring(crs, p(0, 0), p(0, 4), p(4, 4), p(4, 0), p(0, 0)));
+        LineString<C2D> lineString = linestring(crs, c(1, 1), c(1, 2));
+        Polygon<C2D> polygon = polygon(ring(crs, c(0, 0), c(0, 4), c(4, 4), c(4, 0), c(0, 0)));
         assertFalse(ops.contains(lineString, polygon));
         assertTrue(ops.contains(polygon, lineString));
     }
@@ -85,37 +85,37 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testOverlapsOp() {
-        Polygon<P2D> polygon = polygon(ring(crs, p(-1, -1), p(-1, 2), p(2, 2), p(2, -1), p(-1, -1)));
-        Polygon<P2D> polygon2 = polygon(ring(crs, p(0, 0), p(0, 4), p(4, 4), p(4, 0), p(0, 0)));
+        Polygon<C2D> polygon = polygon(ring(crs, c(-1, -1), c(-1, 2), c(2, 2), c(2, -1), c(-1, -1)));
+        Polygon<C2D> polygon2 = polygon(ring(crs, c(0, 0), c(0, 4), c(4, 4), c(4, 0), c(0, 0)));
         assertTrue(ops.overlaps(polygon, polygon2));
         assertTrue(ops.overlaps(polygon2, polygon));
-        Polygon<P2D> polygon3 = polygon(ring(crs,p(10, 10),p(10, 14),p(14, 14),p(14, 10),p(10, 10)));
+        Polygon<C2D> polygon3 = polygon(ring(crs, c(10, 10), c(10, 14), c(14, 14), c(14, 10), c(10, 10)));
         assertFalse(ops.overlaps(polygon3, polygon2));
         assertFalse(ops.overlaps(polygon2, polygon3));
     }
 
     @Test
     public void testRelateOp() {
-        Polygon<P2D> polygon = polygon(ring(crs, p(-1, -1), p(-1, 2), p(2, 2), p(2, -1), p(-1, -1)));
-        Polygon<P2D> polygon2 = polygon(ring(crs, p(0, 0), p(0, 4), p(4, 4), p(4, 0), p(0, 0)));
+        Polygon<C2D> polygon = polygon(ring(crs, c(-1, -1), c(-1, 2), c(2, 2), c(2, -1), c(-1, -1)));
+        Polygon<C2D> polygon2 = polygon(ring(crs, c(0, 0), c(0, 4), c(4, 4), c(4, 0), c(0, 0)));
         assertTrue(ops.relates(polygon, polygon2, "T*T***T**"));
         assertTrue(ops.relates(polygon2, polygon, "T*T***T**"));
-        Polygon<P2D> polygon3 = polygon(ring(crs,p(10, 10),p(10, 14),p(14, 14),p(14, 10),p(10, 10)));
+        Polygon<C2D> polygon3 = polygon(ring(crs, c(10, 10), c(10, 14), c(14, 14), c(14, 10), c(10, 10)));
         assertFalse(ops.relates(polygon3, polygon2, "T*T***T**"));
         assertFalse(ops.relates(polygon2, polygon3, "T*T***T**"));
     }
 
     @Test
     public void testDistanceOp() {
-        LineString<P2D> lineString = linestring(crs, p(1, 1), p(1, 3));
-        LineString<P2D> lineString2 = linestring(crs, p(3, 1), p(3, 4));
+        LineString<C2D> lineString = linestring(crs, c(1, 1), c(1, 3));
+        LineString<C2D> lineString2 = linestring(crs, c(3, 1), c(3, 4));
         assertEquals(2., ops.distance(lineString, lineString2), 0.00001d);
     }
 
     @Test
     public void testBufferOp() {
-        LineString<P2D> lineString = linestring(crs, p(0, 0), p(1, 1));
-        Geometry<P2D> buffer = ops.buffer(lineString, 10d);
+        LineString<C2D> lineString = linestring(crs, c(0, 0), c(1, 1));
+        Geometry<C2D> buffer = ops.buffer(lineString, 10d);
         assertTrue(ops.contains(buffer, lineString));
         assertEquals(JTS.from(JTS.to(lineString).buffer(10d), crs), buffer);
     }
@@ -123,18 +123,18 @@ public class TestJTSGeometryOperations {
 
     @Test
     public void testConvexHullOp() {
-        LineString<P2D> lineString = linestring(crs, p(0, 0), p(1, 1));
-        Geometry<P2D> hull = ops.convexHull(lineString);
+        LineString<C2D> lineString = linestring(crs, c(0, 0), c(1, 1));
+        Geometry<C2D> hull = ops.convexHull(lineString);
         assertTrue(ops.contains(hull, lineString));
         assertEquals(JTS.from(JTS.to(lineString).convexHull(), crs), hull);
     }
 
     @Test
     public void testIntersectionOp() {
-        Polygon<P2D> polygon1 = polygon(ring(crs, p(0, 0), p(5, 0), p(5, 5), p(0, 5), p(0, 0)));
-        Polygon<P2D> polygon2 = polygon(ring(crs,p(3, 3),p(7, 3),p(7, 7),p(3, 7),p(3, 3)));
-        Polygon<P2D> polygon3 = polygon(ring(l72, p(3, 3), p(7, 3), p(7, 7), p(3, 7), p(3, 3)));
-        Polygon<P2D> expected = polygon(ring(crs, p(3, 5), p(5, 5), p(5, 3), p(3, 3), p(3, 5)));
+        Polygon<C2D> polygon1 = polygon(ring(crs, c(0, 0), c(5, 0), c(5, 5), c(0, 5), c(0, 0)));
+        Polygon<C2D> polygon2 = polygon(ring(crs, c(3, 3), c(7, 3), c(7, 7), c(3, 7), c(3, 3)));
+        Polygon<C2D> polygon3 = polygon(ring(l72, c(3, 3), c(7, 3), c(7, 7), c(3, 7), c(3, 3)));
+        Polygon<C2D> expected = polygon(ring(crs, c(3, 5), c(5, 5), c(5, 3), c(3, 3), c(3, 5)));
         assertEquals("Intersection returned incorrect result", expected,
                 ops.intersection(polygon1, polygon2));
 
@@ -144,41 +144,41 @@ public class TestJTSGeometryOperations {
         } catch (IllegalArgumentException e) {
         }
 
-        Polygon<P2D> polygon4 = new Polygon(crs);
-        assertEquals("Intersection with empty is not a GeometryCollection", new GeometryCollection<P2D, Geometry<P2D>>(crs),
+        Polygon<C2D> polygon4 = new Polygon(crs);
+        assertEquals("Intersection with empty is not a GeometryCollection", new GeometryCollection<C2D, Geometry<C2D>>(crs),
                 ops.intersection(polygon1, polygon4));
     }
 
     @Test
     public void testUnionOp() {
-        Polygon<P2D> polygon1 = polygon(ring(crs,p(0, 0),p(5, 0),p(5, 5),p(0, 5),p(0, 0)));
-        Polygon<P2D> polygon2 = polygon(ring(crs, p(3, 3), p(7, 3), p(7, 7), p(3, 7), p(3, 3)));
-        Polygon<P2D> expected = polygon(ring(crs, p(5, 3), p(5, 0), p(0, 0), p(0, 5), p(3, 5),
-                p(3, 7), p(7, 7), p(7, 3), p(5, 3)));
+        Polygon<C2D> polygon1 = polygon(ring(crs, c(0, 0), c(5, 0), c(5, 5), c(0, 5), c(0, 0)));
+        Polygon<C2D> polygon2 = polygon(ring(crs, c(3, 3), c(7, 3), c(7, 7), c(3, 7), c(3, 3)));
+        Polygon<C2D> expected = polygon(ring(crs, c(5, 3), c(5, 0), c(0, 0), c(0, 5), c(3, 5),
+                c(3, 7), c(7, 7), c(7, 3), c(5, 3)));
         assertEquals(expected, ops.union(polygon1, polygon2));
     }
 
     @Test
     public void testDifferenceOp() {
-        Polygon<P2D> pg1 = polygon(ring(crs, p(0, 0), p(5, 0), p(5, 5), p(0, 5), p(0, 0)));
-        Polygon<P2D> pg2 = polygon(ring(crs, p(0, 3), p(0, 6), p(5, 6), p(5, 3), p(0, 3)));
-        Polygon<P2D> expected = polygon(ring(crs, p(5, 3), p(5, 0), p(0, 0), p(0, 3), p(5, 3)));
+        Polygon<C2D> pg1 = polygon(ring(crs, c(0, 0), c(5, 0), c(5, 5), c(0, 5), c(0, 0)));
+        Polygon<C2D> pg2 = polygon(ring(crs, c(0, 3), c(0, 6), c(5, 6), c(5, 3), c(0, 3)));
+        Polygon<C2D> expected = polygon(ring(crs, c(5, 3), c(5, 0), c(0, 0), c(0, 3), c(5, 3)));
         assertEquals(expected, ops.difference(pg1, pg2));
-        assertEquals(pg1, ops.difference(pg1, new Polygon<P2D>(crs)));
-        assertEquals(new GeometryCollection<P2D, Geometry<P2D>>(crs),
-                ops.difference(new Polygon<P2D>(crs), pg2));
+        assertEquals(pg1, ops.difference(pg1, new Polygon<C2D>(crs)));
+        assertEquals(new GeometryCollection<C2D, Geometry<C2D>>(crs),
+                ops.difference(new Polygon<C2D>(crs), pg2));
     }
 
     @Test
     public void testSymDifferenceOp() {
-        Polygon<P2D> pg1 = polygon(ring(crs, p(0, 0), p(6, 0), p(6, 6), p(0, 6), p(0, 0)));
-        Polygon<P2D> pg2 = polygon(ring(crs, p(0, 3), p(6, 3), p(6, 8), p(0, 8), p(0, 3)));
-        Polygon<P2D> expected1 = polygon(ring(crs,p(6, 3),p(6, 0),p(0, 0),p(0, 3),p(6, 3)));
-        Polygon<P2D> expected2 = polygon(ring(crs, p(6, 6), p(0, 6), p(0, 8), p(6, 8), p(6, 6)));
+        Polygon<C2D> pg1 = polygon(ring(crs, c(0, 0), c(6, 0), c(6, 6), c(0, 6), c(0, 0)));
+        Polygon<C2D> pg2 = polygon(ring(crs, c(0, 3), c(6, 3), c(6, 8), c(0, 8), c(0, 3)));
+        Polygon<C2D> expected1 = polygon(ring(crs, c(6, 3), c(6, 0), c(0, 0), c(0, 3), c(6, 3)));
+        Polygon<C2D> expected2 = polygon(ring(crs, c(6, 6), c(0, 6), c(0, 8), c(6, 8), c(6, 6)));
         MultiPolygon expected = new MultiPolygon(new Polygon[]{expected1, expected2});
         assertEquals(expected, ops.symmetricDifference(pg1, pg2));
-        assertEquals(pg1, ops.symmetricDifference(pg1, new Polygon<P2D>(crs)));
-        assertEquals(pg2, ops.symmetricDifference(new Polygon<P2D>(crs), pg2));
+        assertEquals(pg1, ops.symmetricDifference(pg1, new Polygon<C2D>(crs)));
+        assertEquals(pg2, ops.symmetricDifference(new Polygon<C2D>(crs), pg2));
     }
  
 

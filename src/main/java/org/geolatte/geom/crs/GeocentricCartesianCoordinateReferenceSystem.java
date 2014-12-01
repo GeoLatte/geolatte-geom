@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.P3D;
+import org.geolatte.geom.C3D;
 
 /**
  * A geo-centric <code>CoordinateReferenceSystem</code>.
@@ -35,7 +35,7 @@ import org.geolatte.geom.P3D;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/5/11
  */
-public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<P3D>  {
+public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<C3D>  {
 
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.

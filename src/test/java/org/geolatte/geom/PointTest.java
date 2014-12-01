@@ -34,18 +34,18 @@ import static org.junit.Assert.*;
  */
 public class PointTest {
 
-    private static CoordinateReferenceSystem<P2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+    private static CoordinateReferenceSystem<C2D> l72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
 //    PositionSequence seq2D = new PackedPositionSequence(new double[]{1,2} , DimensionalFlag.d2D, wgs84);
 //    PositionSequence seq3D = new PackedPositionSequence(new double[]{1,2, -3} , DimensionalFlag.d3D, wgs84);
 //    PositionSequence seq2DM = new PackedPositionSequence(new double[]{1,2, 3} , DimensionalFlag.d2DM, wgs84);
 //    PositionSequence seq3DM = new PackedPositionSequence(new double[]{1,2, 3, 4} , DimensionalFlag.d3DM, wgs84);
 
-    Point<P2D> point2D = point(crs, p(1, 2));
-    Point<P3D> point3D =  point(crsZ, p(1,2,-3));
-    Point<P2DM> point2DM = point(crsM, pM(1, 2, 3));
-    Point<P3DM> point3DM = point(crsZM, p(1, 2, 3, 4));
-    Point<P2D> emptyPoint = new Point<P2D>(crs);
+    Point<C2D> point2D = point(crs, c(1, 2));
+    Point<C3D> point3D =  point(crsZ, c(1, 2, -3));
+    Point<C2DM> point2DM = point(crsM, cM(1, 2, 3));
+    Point<C3DM> point3DM = point(crsZM, c(1, 2, 3, 4));
+    Point<C2D> emptyPoint = new Point<C2D>(crs);
 
     @Test
     public void testGetX() throws Exception {
@@ -110,45 +110,45 @@ public class PointTest {
 
     @Test
     public void testEmptyPointsAreAlwaysEqual(){
-        Point<P2D> empty = new Point<P2D>(crs);
+        Point<C2D> empty = new Point<C2D>(crs);
         assertTrue(empty.equals(emptyPoint));
     }
 
     @Test
     public void testEqualsAndHashCode(){
-        Point<P2D> test2D = point(crs, p(1, 2));
+        Point<C2D> test2D = point(crs, c(1, 2));
         assertTrue(point2D.equals(test2D));
         assertEquals(point2D.hashCode() , test2D.hashCode());
-        Point<P3D> test3D = point(crsZ, p(1, 2, -3));
+        Point<C3D> test3D = point(crsZ, c(1, 2, -3));
         assertTrue(point3D.equals(test3D));
         assertEquals(point3D.hashCode() , test3D.hashCode());
-        Point<P2DM> test2DM = point(crsM, pM(1, 2, 3));
+        Point<C2DM> test2DM = point(crsM, cM(1, 2, 3));
 
         assertTrue(point2DM.equals(test2DM));
         assertEquals(point2DM.hashCode() , test2DM.hashCode());
-        Point<P3DM> test3DM = point(crsZM, p(1, 2, 3, 4));
+        Point<C3DM> test3DM = point(crsZM, c(1, 2, 3, 4));
         assertTrue(point3DM.equals(test3DM));
         assertEquals(point3DM.hashCode() , test3DM.hashCode());
-        assertFalse(point2D.equals( point(l72, p(1, 2))));
-        assertFalse(point2D.equals(point(crsZ, p(1,2,3))));
-        assertFalse(point2D.equals(point(crsM, pM(1, 2, 3))));
+        assertFalse(point2D.equals( point(l72, c(1, 2))));
+        assertFalse(point2D.equals(point(crsZ, c(1, 2, 3))));
+        assertFalse(point2D.equals(point(crsM, cM(1, 2, 3))));
     }
 
     @Test
     public void testPointEquality() {
         GeometryPointEquality eq2D = new GeometryPointEquality(new ExactPositionEquality());
-        assertTrue(point3DM.equals(point(crsZM, p(1, 2, 3, 4))));
-        assertTrue(eq2D.equals(point2D, point(crs, p(1, 2))));
+        assertTrue(point3DM.equals(point(crsZM, c(1, 2, 3, 4))));
+        assertTrue(eq2D.equals(point2D, point(crs, c(1, 2))));
         assertFalse(point2D.equals(emptyPoint));
     }
 
 
     @Test
     public void testEqualsAndHashCodeOnEmptyPoints(){
-        Point<P2D> empty1 = new Point<P2D>(crs);
-        Point<P2D> empty2 = new Point<P2D>(crs);
+        Point<C2D> empty1 = new Point<C2D>(crs);
+        Point<C2D> empty2 = new Point<C2D>(crs);
         assertEquals(empty1, empty2);
-        Point<P2D> empty3 = new Point<P2D>(crs);
+        Point<C2D> empty3 = new Point<C2D>(crs);
         assertEquals(empty1, empty3);
     }
 }

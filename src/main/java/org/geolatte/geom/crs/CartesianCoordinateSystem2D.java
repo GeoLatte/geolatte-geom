@@ -1,7 +1,6 @@
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.P2D;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.C2D;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  * <p/>
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
-public class CartesianCoordinateSystem2D extends CoordinateSystem<P2D> {
+public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
 
     private final static List<Integer> REQUIRED_AXIS_NORMAL_ORDER = Arrays.asList(0, 1);
 
@@ -40,18 +39,18 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<P2D> {
 
 
     @Override
-    public Class<P2D> getPositionClass() {
-        return P2D.class;
+    public Class<C2D> getPositionClass() {
+        return C2D.class;
     }
 
     @Override
-    public CoordinateSystem<? extends P2D> merge(OneDimensionCoordinateSystem<?> coordinateSystem) {
+    public CoordinateSystem<? extends C2D> merge(OneDimensionCoordinateSystem<?> coordinateSystem) {
         CoordinateSystemAxis axis = coordinateSystem.getAxis();
         return extend(axis);
     }
 
     @Override
-    public CoordinateSystem<? extends P2D> extend(CoordinateSystemAxis axis) {
+    public CoordinateSystem<? extends C2D> extend(CoordinateSystemAxis axis) {
         if (axis instanceof VerticalStraightLineAxis) {
             return new CartesianCoordinateSystem3D((StraightLineAxis)getAxis(0), (StraightLineAxis)getAxis(1), (VerticalStraightLineAxis)axis);
         }

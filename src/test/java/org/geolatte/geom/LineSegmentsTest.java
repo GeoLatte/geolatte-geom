@@ -21,15 +21,10 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
-import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -39,14 +34,14 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegments() {
-        PositionSequenceBuilder<P3D> builder = new FixedSizePositionSequenceBuilder<P3D>(3, P3D.class);
+        PositionSequenceBuilder<C3D> builder = new FixedSizePositionSequenceBuilder<C3D>(3, C3D.class);
         builder.add(1, 1, 1);
         builder.add(2, 2, 2);
         builder.add(3, 3, 3);
-        PositionSequence<P3D> sequence = builder.toPositionSequence();
+        PositionSequence<C3D> sequence = builder.toPositionSequence();
         int cnt = 0;
         double startX = 1.0d;
-        for (LineSegment<P3D> ls : new LineSegments<P3D>(sequence)) {
+        for (LineSegment<C3D> ls : new LineSegments<C3D>(sequence)) {
             assertEquals(startX, ls.getStartPosition().getX(), Math.ulp(1.0d));
             startX = ls.getEndPosition().getX();
             cnt++;
@@ -56,9 +51,9 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PositionSequenceBuilder<P2D> builder = new FixedSizePositionSequenceBuilder<P2D>(0, P2D.class);
-        PositionSequence<P2D> sequence = builder.toPositionSequence();
-        for (LineSegment<P2D> ls : new LineSegments<P2D>(sequence)) {
+        PositionSequenceBuilder<C2D> builder = new FixedSizePositionSequenceBuilder<C2D>(0, C2D.class);
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
+        for (LineSegment<C2D> ls : new LineSegments<C2D>(sequence)) {
             fail();
         }
     }

@@ -142,26 +142,26 @@ public class CoordinateReferenceSystems {
     /**
      * A generic projected 2D {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static SingleCoordinateReferenceSystem<P2D> PROJECTED_2D_METER = CoordinateReferenceSystems.mkProjected
+    final public static SingleCoordinateReferenceSystem<C2D> PROJECTED_2D_METER = CoordinateReferenceSystems.mkProjected
             (Unit.METER);
 
     /**
      * A generic projected 2DM {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CompoundCoordinateReferenceSystem<P2DM> PROJECTED_2DM_METER = addLinearSystem(PROJECTED_2D_METER,
-            P2DM.class, Unit.METER);
+    final public static CompoundCoordinateReferenceSystem<C2DM> PROJECTED_2DM_METER = addLinearSystem(PROJECTED_2D_METER,
+            C2DM.class, Unit.METER);
 
     /**
      * A generic projected 3D {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CompoundCoordinateReferenceSystem<P3D> PROJECTED_3D_METER = addVerticalSystem(PROJECTED_2D_METER, P3D
+    final public static CompoundCoordinateReferenceSystem<C3D> PROJECTED_3D_METER = addVerticalSystem(PROJECTED_2D_METER, C3D
             .class, Unit.METER);
 
     /**
      * A generic projected 3DM {@code CoordinateReferenceSystem} with meter coordinates
      */
-    final public static CompoundCoordinateReferenceSystem<P3DM> PROJECTED_3DM_METER = addLinearSystem(PROJECTED_3D_METER,
-            P3DM.class, Unit.METER);
+    final public static CompoundCoordinateReferenceSystem<C3DM> PROJECTED_3DM_METER = addLinearSystem(PROJECTED_3D_METER,
+            C3DM.class, Unit.METER);
 
             /**
              * The WGS 84 {@code GeographicCoordinateReferenceSystem}

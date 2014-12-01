@@ -32,27 +32,27 @@ import static org.junit.Assert.fail;
  */
 public class PositionSequenceIteratorTest {
 
-    private static PositionFactory<P2D> des2D = Positions.getFactoryFor(P2D.class);
-    private static PositionFactory<P3D> des3D = Positions.getFactoryFor(P3D.class);
+    private static PositionFactory<C2D> des2D = Positions.getFactoryFor(C2D.class);
+    private static PositionFactory<C3D> des3D = Positions.getFactoryFor(C3D.class);
 
-    PositionSequence<P2D> sequence = new PackedPositionSequence<P2D>(des2D, new double[]{0, 0, 1, 2, 3, 4});
-    PositionSequence<P2D> emptySequence = PositionSequenceBuilders.fixedSized(0, P2D.class).toPositionSequence();
+    PositionSequence<C2D> sequence = new PackedPositionSequence<C2D>(des2D, new double[]{0, 0, 1, 2, 3, 4});
+    PositionSequence<C2D> emptySequence = PositionSequenceBuilders.fixedSized(0, C2D.class).toPositionSequence();
 
-    PositionSequenceIterator<P2D> itSeq;
-    PositionSequenceIterator<P2D> itEmpty;
+    PositionSequenceIterator<C2D> itSeq;
+    PositionSequenceIterator<C2D> itEmpty;
 
 
     @Before
     public void setUp() throws Exception {
-        itSeq = new PositionSequenceIterator<P2D>(sequence);
-        itEmpty = new PositionSequenceIterator<P2D>(emptySequence);
+        itSeq = new PositionSequenceIterator<C2D>(sequence);
+        itEmpty = new PositionSequenceIterator<C2D>(emptySequence);
     }
 
     @Test
     public void test_iteration() throws Exception {
         int i = 0;
         while (itSeq.hasNext()) {
-            P2D received = itSeq.next();
+            C2D received = itSeq.next();
             assertEquals(sequence.getPositionN(i).getX(), received.getX(), Math.ulp(10d));
             assertEquals(sequence.getPositionN(i).getY(), received.getY(), Math.ulp(10d));
             i++;

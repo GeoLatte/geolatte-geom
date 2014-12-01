@@ -33,7 +33,7 @@ public class PositionSequenceBuilderTest {
 
     @Test
     public void testMethodInvocationInconsistentWithDimensionThrowsIllegalStateException() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, P2D.class);
+        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, C2D.class);
         builder.add(1.0, 1.0);
         try {
             builder.add(1.0, 1.0, 1.0);
@@ -45,14 +45,14 @@ public class PositionSequenceBuilderTest {
 
     @Test
     public void testAdding3DOr3DMCoordinates() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, P3D.class);
+        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, C3D.class);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);
             fail("Adding 2D point to 3D PointSequence should throw IllegalStateException");
         }catch(IllegalArgumentException e){
         }
-        builder = PositionSequenceBuilders.fixedSized(2, P2DM.class);
+        builder = PositionSequenceBuilders.fixedSized(2, C2DM.class);
         builder.add(1.0, 1.0, 1.0);
         try {
             builder.add(1.0, 1.0);
@@ -64,7 +64,7 @@ public class PositionSequenceBuilderTest {
 
     @Test(expected=IllegalStateException.class)
     public void testFixedSizePSBuilderThrowsIllegalStateExceptionIfNotCompletelyFilled() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(10, P2D.class);
+        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(10, C2D.class);
         builder.add(2, 3);
         builder.add(1, 2);
         builder.toPositionSequence();
@@ -72,7 +72,7 @@ public class PositionSequenceBuilderTest {
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testFixedSizePSBuilderThrowsIndexOutOfBoundsExcpIfFilledBeyondCapacity() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, P2D.class);
+        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, C2D.class);
         builder.add(2, 3);
         builder.add(1, 2);
         builder.add(4, 4);

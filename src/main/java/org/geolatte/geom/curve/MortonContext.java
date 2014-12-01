@@ -22,7 +22,7 @@
 package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.P2D;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -34,7 +34,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
-public class MortonContext<P extends P2D> {
+public class MortonContext<P extends C2D> {
 
     final private static String ERR_MSG_MAX_DEPTH = "Max. depth is limited to " + (Integer.SIZE - 1);
     final private static String ERR_MSG_NULL = "No Null arguments allowed.";

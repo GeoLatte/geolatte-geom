@@ -33,26 +33,26 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void test() throws Exception {
-        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<P2D>(P2D.class);
+        PositionSequenceBuilder<C2D> builder = new VariableSizePositionSequenceBuilder<C2D>(C2D.class);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
         }
 
-        PositionSequence<P2D> sequence = builder.toPositionSequence();
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
         assertEquals(100, sequence.size());
 
     }
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PositionSequenceBuilder<P2D> builder = new VariableSizePositionSequenceBuilder<P2D>(P2D.class);
+        PositionSequenceBuilder<C2D> builder = new VariableSizePositionSequenceBuilder<C2D>(C2D.class);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());
         }
 
-        PositionSequence<P2D> sequence = builder.toPositionSequence();
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
         assertEquals(4, sequence.size());
 
     }

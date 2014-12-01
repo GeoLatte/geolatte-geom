@@ -22,7 +22,7 @@
 package org.geolatte.geom.crs;
 
 import org.geolatte.geom.G2D;
-import org.geolatte.geom.P2D;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.CrsWktDecoder;
 import org.geolatte.geom.codec.WktDecodeException;
@@ -35,8 +35,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.geolatte.geom.crs.CoordinateSystemAxis.*;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
@@ -128,7 +126,7 @@ public class CrsRegistry {
 
     public static ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
-        if (crs.getPositionClass().equals(P2D.class)) {
+        if (crs.getPositionClass().equals(C2D.class)) {
             return (ProjectedCoordinateReferenceSystem) crs;
         }
         throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));

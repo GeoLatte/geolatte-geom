@@ -1,8 +1,6 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.P2D;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.junit.Test;
@@ -27,7 +25,7 @@ public class TestWktDecodingIdempotent {
 
     @Test
     public void testWktConversionShouldBeIdempotent() {
-        Geometry original = point(crs, p(68878.8400879, 169038.177124));
+        Geometry original = point(crs, c(68878.8400879, 169038.177124));
 
         String originalWkt = "SRID=31370;POINT(68878.8400879 169038.177124)";
         assertEquals(originalWkt, Wkt.toWkt(original));

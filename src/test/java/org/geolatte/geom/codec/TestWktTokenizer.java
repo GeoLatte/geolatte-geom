@@ -22,9 +22,9 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.P2D;
-import org.geolatte.geom.P2DM;
-import org.geolatte.geom.P3D;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.C2DM;
+import org.geolatte.geom.C3D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  */
 public class TestWktTokenizer {
 
-    private static CoordinateReferenceSystem<P2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+    private static CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
 
     private WktVariant words = new PostgisWktVariant();
@@ -117,7 +117,7 @@ public class TestWktTokenizer {
         assertTrue(tokens.moreTokens());
         WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(1, pstoken.getPositions().size());
-        P2DM pos = (P2DM) pstoken.getPositions().getPositionN(0);
+        C2DM pos = (C2DM) pstoken.getPositions().getPositionN(0);
         assertEquals(20, pos.getX(), Math.ulp(20d));
         assertEquals(33.3, pos.getY(), Math.ulp(20d));
         assertEquals(0.24, pos.getM(), Math.ulp(2d));
@@ -139,11 +139,11 @@ public class TestWktTokenizer {
         assertTrue(tokens.moreTokens());
         WktPointSequenceToken pstoken = (WktPointSequenceToken) (tokens.nextToken());
         assertEquals(2, pstoken.getPositions().size());
-        P3D pos = (P3D) pstoken.getPositions().getPositionN(0);
+        C3D pos = (C3D) pstoken.getPositions().getPositionN(0);
         assertEquals(20, pos.getX(), Math.ulp(20d));
         assertEquals(33.3, pos.getY(), Math.ulp(20d));
         assertEquals(0.24, pos.getZ(), Math.ulp(2d));
-        pos = (P3D) pstoken.getPositions().getPositionN(1);
+        pos = (C3D) pstoken.getPositions().getPositionN(1);
         assertEquals(.1d, pos.getX(), Math.ulp(20d));
         assertEquals(2d, pos.getY(), Math.ulp(20d));
         assertEquals(3d, pos.getZ(), Math.ulp(2d));

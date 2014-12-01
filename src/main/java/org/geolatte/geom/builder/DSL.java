@@ -36,9 +36,9 @@ import java.util.Arrays;
  * The methods for creating {@code Position}s are:
  * </p>
  * <ul>
- *     <li>g(lon, lat), g(lon,lat,alt), gM(lon,lat, measure), and g(lon,lat,alt, measure) for resp. {@code G2D}, {@code G3D}, {@code G2DM} and
+ *     <li>g(lon, lat), g(lon,lat,height), gM(lon,lat, measure), and g(lon,lat,height, measure) for resp. {@code G2D}, {@code G3D}, {@code G2DM} and
  *     {@code G3DM} {@code Position} instances</li>
- *     <li>p(x,y), p(x,y,z), pM(x,y,measure), p(x,y,z,m) for resp. {@code P2D}, {@code P3D}, {@code P2DM} and {@code P3DM} {@code Position} instances</li>
+ *     <li>c(x,y), p(x,y,z), cM(x,y,measure), c(x,y,z,m) for resp. {@code P2D}, {@code P3D}, {@code P2DM} and {@code P3DM} {@code Position} instances</li>
  * </ul>
  * <p>
  * The methods for creating geometries are named for the geometry the create.
@@ -78,8 +78,8 @@ public class DSL {
      * @param y y or northing
      * @return a projected 2D PosToken
      */
-    public static P2D p(double x, double y) {
-        return new P2D(x, y);
+    public static C2D c(double x, double y) {
+        return new C2D(x, y);
     }
 
     /**
@@ -87,11 +87,11 @@ public class DSL {
      *
      * @param x x or easting
      * @param y y or northing
-     * @param z z or altitude
+     * @param z z or height
      * @return a projected 3D PosToken
      */
-    public static P3D p(double x, double y, double z) {
-        return new P3D(x, y, z);
+    public static C3D c(double x, double y, double z) {
+        return new C3D(x, y, z);
     }
 
     /**
@@ -102,8 +102,8 @@ public class DSL {
      * @param m measure value
      * @return a projected 2DM PosToken
      */
-    public static P2DM pM(double x, double y, double m) {
-        return new P2DM(x, y, m);
+    public static C2DM cM(double x, double y, double m) {
+        return new C2DM(x, y, m);
     }
 
     /**
@@ -111,12 +111,12 @@ public class DSL {
      *
      * @param x x or easting
      * @param y y or northing
-     * @param z z or altitude
+     * @param z z or heightitude
      * @param m measure value
      * @return a projected 3DM PosToken
      */
-    public static P3DM p(double x, double y, double z, double m) {
-        return new P3DM(x, y, z, m);
+    public static C3DM c(double x, double y, double z, double m) {
+        return new C3DM(x, y, z, m);
     }
 
     /**
@@ -135,11 +135,11 @@ public class DSL {
      *
      * @param lon longitude
      * @param lat latitude
-     * @param alt altitude
+     * @param height height
      * @return a geographic 3D PosToken
      */
-    public static G3D g(double lon, double lat, double alt) {
-        return new G3D(lon, lat, alt);
+    public static G3D g(double lon, double lat, double height) {
+        return new G3D(lon, lat, height);
     }
 
     /**
@@ -159,12 +159,12 @@ public class DSL {
      *
      * @param lon longitude
      * @param lat latitude
-     * @param alt altitude
+     * @param height height
      * @param m  measure value
      * @return a geographic 3DM PosToken
      */
-    public static G3DM g(double lon, double lat, double alt, double m) {
-        return new G3DM(lon, lat, alt, m);
+    public static G3DM g(double lon, double lat, double height, double m) {
+        return new G3DM(lon, lat, height, m);
     }
 
 

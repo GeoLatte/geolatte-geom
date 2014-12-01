@@ -33,8 +33,8 @@ public class TestVector {
 
     @Test
     public void testDotProduct2D() {
-        P2D p0 = new P2D(2, 4);
-        P2D p1 = new P2D(3, 5);
+        C2D p0 = new C2D(2, 4);
+        C2D p1 = new C2D(3, 5);
         double received = dot(p0, p1);
         assertEquals("Wrong result vor dot-product of (2,4).(3,5): ", (26d), received, Math.ulp(10));
 
@@ -42,16 +42,16 @@ public class TestVector {
 
     @Test
     public void testDotProductWithEmptyPointReturnsNaN() {
-        P2D p0 = new P2D(2, 3);
-        P2D p1 = new P2D();
+        C2D p0 = new C2D(2, 3);
+        C2D p1 = new C2D();
         double v = dot(p0, p1);
         assertTrue("Dot-product with EMPTY P2D fails to return NaN: ", Double.isNaN(v));
     }
 
     @Test
     public void testDotProduct3D() {
-        P3D p0 = new P3D(2, 4, 3);
-        P3D p1 = new P3D(3, 5, 2);
+        C3D p0 = new C3D(2, 4, 3);
+        C3D p1 = new C3D(3, 5, 2);
         double received = dot(p0, p1);
         assertEquals("Wrong result vor dot-product of (2,4,3).(3,5,2): ", (26d), received, Math.ulp(10));
 
@@ -59,34 +59,34 @@ public class TestVector {
 
     @Test
     public void testPointToSegmentBasicCases() {
-        P2D p0 = new P2D(0, 0);
-        P2D p1 = new P2D(2, 1);
-        P2D y = new P2D(1, 0.5);
+        C2D p0 = new C2D(0, 0);
+        C2D p1 = new C2D(2, 1);
+        C2D y = new C2D(1, 0.5);
         double[] received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0.5, received[1], Math.ulp(100));
 
-        y = new P2D(0, 0);
+        y = new C2D(0, 0);
         received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0, received[1], Math.ulp(100));
 
-        y = new P2D(2, 1);
+        y = new C2D(2, 1);
         received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.0d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 1.0d, received[1], Math.ulp(100));
 
-        y = new P2D(-2, -1);
+        y = new C2D(-2, -1);
         received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 5d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", -1.0d, received[1], Math.ulp(100));
 
-        y = new P2D(4, 2);
+        y = new C2D(4, 2);
         received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 5d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 2.0d, received[1], Math.ulp(100));
 
-        y = new P2D(1, 1);
+        y = new C2D(1, 1);
         received = positionToSegment2D(p0, p1, y);
         assertEquals("Squared distance of y to p0-p1 should be: ", 0.2d * 0.2d + 0.4d * 0.4d, received[0], Math.ulp(100));
         assertEquals("Projection should be: ", 0.6d, received[1], Math.ulp(100));
@@ -94,10 +94,10 @@ public class TestVector {
 
     @Test
     public void testPerpBasicCases() {
-        P2DM p = new P2DM(1, 0.2, 3);
-        P2DM expected = new P2DM(-0.2, 1, 3);
+        C2DM p = new C2DM(1, 0.2, 3);
+        C2DM expected = new C2DM(-0.2, 1, 3);
         assertEquals(expected, perp(p));
-        assertEquals(new P2DM(-1, -0.2, 3), perp(perp(p)));
+        assertEquals(new C2DM(-1, -0.2, 3), perp(perp(p)));
     }
 
     @Test
@@ -107,14 +107,14 @@ public class TestVector {
 
     @Test
     public void testEmptyPoint() {
-        assertEquals(new P2D(), perp(new P2D()));
+        assertEquals(new C2D(), perp(new C2D()));
     }
 
     @Test
     public void testPerpDotBasicCase() {
-        P2D p0 = new P2D(1, 1);
-        P2D p1 = new P2D(1, 1.2);
-        P2D p2 = new P2D(1, 0.8);
+        C2D p0 = new C2D(1, 1);
+        C2D p1 = new C2D(1, 1.2);
+        C2D p2 = new C2D(1, 0.8);
 
         //check definition
         assertEquals(dot(perp(p0), p1), perpDot(p0, p1), Math.ulp(10));
@@ -131,12 +131,12 @@ public class TestVector {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNullArgumentPerpDot() {
-        perpDot(null, new P2D());
+        perpDot(null, new C2D());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyPointArgument() {
-        perpDot(new P2D(), new P2D(1, 2));
+        perpDot(new C2D(), new C2D(1, 2));
     }
 
 }

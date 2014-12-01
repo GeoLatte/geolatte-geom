@@ -50,7 +50,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/10/12
  */
-public class MeasureInterpolatingVisitor<P extends P2D & Measured> implements GeometryVisitor<P> {
+public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements GeometryVisitor<P> {
 
     private static final String INVALID_TYPE_MSG =
             "Operation only valid on Point, MultiPoint, LineString, and MultiLineString Geometries.";

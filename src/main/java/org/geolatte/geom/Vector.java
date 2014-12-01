@@ -44,7 +44,7 @@ public class Vector {
      * @return an array of length 2, with first element being the squared distance of Position y to the linesegment,
      * and second element the projection factor
      */
-    public static <P extends P2D> double[] positionToSegment2D(P p0, P p1, P y) {
+    public static <P extends C2D> double[] positionToSegment2D(P p0, P p1, P y) {
         //for algorithm, see "Geometric Tools for Computer Graphics", Ch. 6.
         P d = Vector.substract(p1, p0);
         P ymp0 = Vector.substract(y, p0);
@@ -73,7 +73,7 @@ public class Vector {
      * @param p1 second operand
      * @return the dot-product of p0 and p1.
      */
-    public static <P extends P2D> double dot(P p0, P p1) {
+    public static <P extends C2D> double dot(P p0, P p1) {
         if (p0.isEmpty() || p1.isEmpty()) return Double.NaN;
         int d1 = p0.getCoordinateDimension();
         int d2 = p1.getCoordinateDimension();
@@ -91,7 +91,7 @@ public class Vector {
      * @param p1 second operand
      * @return the sum of p0 and p1.
      */
-    public static <P extends P2D> P add(P p0, P p1) {
+    public static <P extends C2D> P add(P p0, P p1) {
         int dim = p0.getCoordinateDimension();
         double[] result = new double[dim];
         for (int i = 0; i < dim; i++) {
@@ -109,7 +109,7 @@ public class Vector {
      * @param p1 second operand
      * @return the Position x = p0 - p1.
      */
-    public static <P extends P2D> P substract(P p0, P p1) {
+    public static <P extends C2D> P substract(P p0, P p1) {
         int dim = p0.getCoordinateDimension();
         double[] result = new double[dim];
         for (int i = 0; i < dim; i++) {
@@ -127,7 +127,7 @@ public class Vector {
      * @param p a vector represented by a Position.
      * @return the vector perpendicular to p in the 2D-plane, at 90 deg. counterclockwise.
      */
-    public static <P extends P2D> P perp(P p) {
+    public static <P extends C2D> P perp(P p) {
         if (p == null || p.isEmpty()) return p;
         double[] crds = p.toArray(null);
         double h = crds[0];
@@ -149,7 +149,7 @@ public class Vector {
      * @param p1 second operand
      * @return the Perp dot of p0 and p1.
      */
-    public static <P extends P2D> double perpDot(P p0, P p1) {
+    public static <P extends C2D> double perpDot(P p0, P p1) {
         if (p0 == null || p1 == null || p0.isEmpty() | p1.isEmpty()) {
             throw new IllegalArgumentException("Null or empty Position passed.");
         }

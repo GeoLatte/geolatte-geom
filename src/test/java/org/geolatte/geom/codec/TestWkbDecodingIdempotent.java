@@ -1,12 +1,11 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.builder.DSL;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +18,7 @@ public class TestWkbDecodingIdempotent {
 
     @Test
     public void testWkbConversionShouldBeStable() {
-        Geometry original =  point(crs, p(68878.8400879, 169038.177124));
+        Geometry original =  point(crs, DSL.c(68878.8400879, 169038.177124));
 
         String originalWkb = "01010000208A7A000084020071EDD0F040DBFCBF6A71A20441";
 

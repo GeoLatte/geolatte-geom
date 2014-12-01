@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.P3D;
+import org.geolatte.geom.C3D;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.*;
 
@@ -89,7 +89,7 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
      *
      * @throws UnsupportedConversionException Geocentric CRS is currently not implemented
      */
-    private CoordinateReferenceSystem<P3D> decodeGeocentricCrs() {
+    private CoordinateReferenceSystem<C3D> decodeGeocentricCrs() {
         throw new UnsupportedConversionException("Currently not implemented");
     }
 

@@ -22,13 +22,10 @@
 package org.geolatte.geom;
 
 
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
+import org.geolatte.geom.builder.DSL;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.linestring;
-import static org.geolatte.geom.builder.DSL.p;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 import static org.junit.Assert.*;
@@ -49,17 +46,17 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateMeasureOnLengthOpThrowsExceptionOnNullParameter() {
-        measureOps.measureOnLength(null, P2DM.class, false);
+        measureOps.measureOnLength(null, C2DM.class, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateMeasureOnLengthOpWithInconsistentTypeMarker() {
-        measureOps.measureOnLength(linestring(crs, p(1, 2), p(3, 4)), P3DM.class, false);
+        measureOps.measureOnLength(linestring(crs, DSL.c(1, 2), DSL.c(3, 4)), C3DM.class, false);
     }
 
     @Test
     public void testCreateMeasureOnLengthOpReturnsParameterOnEmptyGeometry() {
-        Geometry geometry = measureOps.measureOnLength(tc.emptyLineString, P2DM.class, false);
+        Geometry geometry = measureOps.measureOnLength(tc.emptyLineString, C2DM.class, false);
         assertEquals("MeasureOnLengthOp returns non-empty geometry on empty geometry.", tc.emptyMeasuredLineString, geometry);
     }
 
@@ -84,7 +81,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testCreateMeasureOnLengthOpOnRegularMLineStringWithKeepInitial() {
-        Geometry<P3DM> measured = measureOps.measureOnLength(tc.lineString3DM, P3DM.class, true);
+        Geometry<C3DM> measured = measureOps.measureOnLength(tc.lineString3DM, C3DM.class, true);
         assertEquals("MeasureOnLengthOp creates wrong result at point 0:", 5.0, measured.getPositionN(0).getM(), Math.ulp(10));
         assertEquals("MeasureOnLengthOp creates wrong result at point 1:", 6.0, measured.getPositionN(1).getM(), Math.ulp(10));
         assertEquals("MeasureOnLengthOp creates wrong result at point 2:", 7.0, measured.getPositionN(2).getM(), Math.ulp(10));
@@ -114,11 +111,11 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateMeasureOnLengthFailsForNonEmptyNonLinealGeometries() {
-        Point point = point(crs, p(3, 4));
-        measureOps.measureOnLength(point, P2DM.class, false);
+        Point point = point(crs, DSL.c(3, 4));
+        measureOps.measureOnLength(point, C2DM.class, false);
     }
 
-    private void checkXYZcoordinateEquality(Geometry<? extends P2D> expected, Geometry<? extends P2D> received) {
+    private void checkXYZcoordinateEquality(Geometry<? extends C2D> expected, Geometry<? extends C2D> received) {
         for (int i = 0; i < expected.getNumPositions(); i++) {
             assertEquals("MeasureOnLenthOp does not preserve X-coordinate:", expected.getPositionN(i).getX(), received.getPositionN(i).getX(), Math.ulp(10));
             assertEquals("MeasureOnLenthOp does not preserve Y-coordinate:", expected.getPositionN(i).getY(), received.getPositionN(i).getY(), Math.ulp(10));
@@ -132,7 +129,7 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateGetMeasureOpThrowsExceptionOnNullGeometry() {
-        measureOps.measureAt((Geometry<P2DM>) null, new P2DM(1, 2, 0), 1);
+        measureOps.measureAt((Geometry<C2DM>) null, new C2DM(1, 2, 0), 1);
 
     }
 
@@ -144,41 +141,41 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
-        double m = measureOps.measureAt(new LineString<P2DM>(crsM), new P2DM(1, 2, 0), 0.1);
+        double m = measureOps.measureAt(new LineString<C2DM>(crsM), new C2DM(1, 2, 0), 0.1);
         assertTrue(Double.isNaN(m));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetMeasureThrowsExceptionWhenPointNotOnMeasuredGeometry() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(5, 5, 0), 0.001);
+        double m = measureOps.measureAt(tc.measuredLineString2D, new C2DM(5, 5, 0), 0.001);
     }
 
     @Test
     public void testGetMeasureOpOnRegularLine() {
-        double m = measureOps.measureAt(tc.measuredLineString2D, new P2DM(1.5, 1, 0), 0.001);
+        double m = measureOps.measureAt(tc.measuredLineString2D, new C2DM(1.5, 1, 0), 0.001);
         assertEquals(2.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiLine() {
-        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(4.5, 1, 0), 0.001);
+        double m = measureOps.measureAt(tc.measuredMultiLineString2D, new C2DM(4.5, 1, 0), 0.001);
         assertEquals(4.5, m, Math.ulp(10));
 
         try {
-            m = measureOps.measureAt(tc.measuredMultiLineString2D, new P2DM(2.5, 1, 0), 0.001);
+            m = measureOps.measureAt(tc.measuredMultiLineString2D, new C2DM(2.5, 1, 0), 0.001);
             fail();
         } catch(IllegalArgumentException e) {}
     }
 
     @Test
     public void testGetMeasureOpOnRegularLinearRing() {
-        double m = measureOps.measureAt(tc.measuredLinearRing, new P2DM(0, 0.5, 0), 0.001);
+        double m = measureOps.measureAt(tc.measuredLinearRing, new C2DM(0, 0.5, 0), 0.001);
         assertEquals(3.5, m, Math.ulp(10));
     }
 
     @Test
     public void testGetMeasureOpOnRegularMultiPoint() {
-        double m = measureOps.measureAt(tc.measuredMultiPoint, new P2DM(1, 2, 0), 0.001);
+        double m = measureOps.measureAt(tc.measuredMultiPoint, new C2DM(1, 2, 0), 0.001);
         assertEquals(2d, m, Math.ulp(10));
     }
 
@@ -209,6 +206,6 @@ public class TestDefaultMeasureGeometryOperations {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetMinimumMeasureOpOnNull() {
-        double m = measureOps.minimumMeasure((LineString<P2DM>)null);
+        double m = measureOps.minimumMeasure((LineString<C2DM>)null);
     }
 }

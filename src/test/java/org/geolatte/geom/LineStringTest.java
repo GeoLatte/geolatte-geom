@@ -40,25 +40,25 @@ public class LineStringTest {
             2, -2, 3, 4
     };
 
-    LineString<P2D> linestr2d;
-    LineString<P3D> linestr3d;
-    LineString<P2DM> linestr2dm;
-    LineString<P3DM> linestr3dm;
-    LineString<P2D> emptyLine;
-    LineString<P2D> simpleClosed;
-    LineString<P2D> line2d;
+    LineString<C2D> linestr2d;
+    LineString<C3D> linestr3d;
+    LineString<C2DM> linestr2dm;
+    LineString<C3DM> linestr3dm;
+    LineString<C2D> emptyLine;
+    LineString<C2D> simpleClosed;
+    LineString<C2D> line2d;
 
     @Before
     public void setUp() {
-        linestr2d = linestring(crs, p(0, 0), p(1, -1), p(2, -2));
-        linestr3d = linestring(crsZ, p(0, 0, 0), p(1, -1, 1), p(2, -2, 3));
-        linestr2dm = linestring(crsM, pM(0, 0, 0), pM(1, -1, 2), pM(2, -2, 4));
-        linestr3dm = linestring(crsZM, p(0, 0, 0, 0), p(1, -1, 1, 2), p(2, -2, 3, 4));
+        linestr2d = linestring(crs, c(0, 0), c(1, -1), c(2, -2));
+        linestr3d = linestring(crsZ, c(0, 0, 0), c(1, -1, 1), c(2, -2, 3));
+        linestr2dm = linestring(crsM, cM(0, 0, 0), cM(1, -1, 2), cM(2, -2, 4));
+        linestr3dm = linestring(crsZM, c(0, 0, 0, 0), c(1, -1, 1, 2), c(2, -2, 3, 4));
         emptyLine = linestring(crs);
 
-        simpleClosed = linestring(crs, p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0));
+        simpleClosed = linestring(crs, c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0));
 //        nonSimpleClosed = linestring(crs, p(1, 1), p(-1, -1), p(1, -1), p(-1, 1), p(1,1));
-        line2d = linestring(crs, p(0, 0), p(1, 1));
+        line2d = linestring(crs, c(0, 0), c(1, 1));
 
     }
 
@@ -73,13 +73,13 @@ public class LineStringTest {
 
     @Test
     public void testPointN() {
-        Assert.assertEquals(new P2D(0, 0), linestr2d.getPositionN(0));
-        assertEquals(new P3D(0, 0, 0), linestr3d.getPositionN(0));
-        assertEquals(new P3DM(0, 0, 0, 0), linestr3dm.getPositionN(0));
+        Assert.assertEquals(new C2D(0, 0), linestr2d.getPositionN(0));
+        assertEquals(new C3D(0, 0, 0), linestr3d.getPositionN(0));
+        assertEquals(new C3DM(0, 0, 0, 0), linestr3dm.getPositionN(0));
 
-        assertEquals(new P2D(2, -2), linestr2d.getPositionN(2));
-        assertEquals(new P3D(2, -2, 3), linestr3d.getPositionN(2));
-        assertEquals(new P3DM(2, -2, 3, 4), linestr3dm.getPositionN(2));
+        assertEquals(new C2D(2, -2), linestr2d.getPositionN(2));
+        assertEquals(new C3D(2, -2, 3), linestr3d.getPositionN(2));
+        assertEquals(new C3DM(2, -2, 3, 4), linestr3dm.getPositionN(2));
 
         try {
             linestr3dm.getPositionN(3);
@@ -91,9 +91,9 @@ public class LineStringTest {
 
     @Test
     public void testStartPoint() {
-        assertEquals(new P2D(0, 0), linestr2d.getStartPosition());
-        assertEquals(new P3D(0, 0, 0), linestr3d.getStartPosition());
-        assertEquals(new P3DM(0, 0, 0, 0), linestr3dm.getStartPosition());
+        assertEquals(new C2D(0, 0), linestr2d.getStartPosition());
+        assertEquals(new C3D(0, 0, 0), linestr3d.getStartPosition());
+        assertEquals(new C3DM(0, 0, 0, 0), linestr3dm.getStartPosition());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -103,9 +103,9 @@ public class LineStringTest {
 
     @Test
     public void testEndPoint() {
-        assertEquals(new P2D(2, -2), linestr2d.getEndPosition());
-        assertEquals(new P3D(2, -2, 3), linestr3d.getEndPosition());
-        assertEquals(new P3DM(2, -2, 3, 4), linestr3dm.getEndPosition());
+        assertEquals(new C2D(2, -2), linestr2d.getEndPosition());
+        assertEquals(new C3D(2, -2, 3), linestr3d.getEndPosition());
+        assertEquals(new C3DM(2, -2, 3, 4), linestr3dm.getEndPosition());
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -145,26 +145,26 @@ public class LineStringTest {
 
     @Test
        public void testCreateEnvelopeOp() {
-           LineString<P2D> lineString = linestring(crs, p(-1, 3), p(2, 5), p(10, -8), p(9, -1));
-           assertEquals(new Envelope<P2D>(-1, -8, 10, 5, crs), lineString.getEnvelope());
+           LineString<C2D> lineString = linestring(crs, c(-1, 3), c(2, 5), c(10, -8), c(9, -1));
+           assertEquals(new Envelope<C2D>(-1, -8, 10, 5, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnlyNegative() {
-           LineString<P2D> lineString = linestring(crs, p(-101, -97), p(-98, -95), p(-90, -108), p(-91, -101));
-           assertEquals(new Envelope<P2D>(-101, -108, -90, -95, crs), lineString.getEnvelope());
+           LineString<C2D> lineString = linestring(crs, c(-101, -97), c(-98, -95), c(-90, -108), c(-91, -101));
+           assertEquals(new Envelope<C2D>(-101, -108, -90, -95, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnlyPositive() {
-           LineString<P2D> lineString = linestring(crs, p(99, 103), p(102, 105), p(110, 92), p(109, 99));
-           assertEquals(new Envelope<P2D>(99, 92, 110, 105, crs), lineString.getEnvelope());
+           LineString<C2D> lineString = linestring(crs, c(99, 103), c(102, 105), c(110, 92), c(109, 99));
+           assertEquals(new Envelope<C2D>(99, 92, 110, 105, crs), lineString.getEnvelope());
        }
 
        @Test
        public void testCreateEnvelopeOpOnEmpty() {
-           LineString<P2D> lineString = new LineString<P2D>(crs);
-           assertEquals(new Envelope<P2D>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
+           LineString<C2D> lineString = new LineString<C2D>(crs);
+           assertEquals(new Envelope<C2D>(Double.NaN, Double.NaN, Double.NaN, Double.NaN, crs), lineString.getEnvelope());
        }
 
 }

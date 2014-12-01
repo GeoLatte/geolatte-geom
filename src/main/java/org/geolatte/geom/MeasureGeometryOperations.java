@@ -49,7 +49,7 @@ public interface MeasureGeometryOperations {
      * specified range of M-coordinate values.
      * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
      */
-    public <P extends P2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure);
+    public <P extends C2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure);
 
     /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
@@ -63,7 +63,7 @@ public interface MeasureGeometryOperations {
      * the specified M-coordinate value.
      * @throws IllegalArgumentException if this method is executed on 2-dimensional <code>Geometry</code>s.
      */
-    public <P extends P2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue);
+    public <P extends C2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue);
 
     /**
      * Creates a <code>GeometryOperation</code> to calculate the measure value
@@ -74,7 +74,7 @@ public interface MeasureGeometryOperations {
      * @param tolerance the maximum value allowed for distance between pos and geometry.
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
-    public <P extends P2D & Measured> double measureAt(Geometry<P> geometry, P pos, double tolerance);
+    public <P extends C2D & Measured> double measureAt(Geometry<P> geometry, P pos, double tolerance);
 
     /**
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
@@ -89,7 +89,7 @@ public interface MeasureGeometryOperations {
      * @param positionTypeMarker the type of {@code Position} for the result of the created operations
      * @return a <code>GeometryOperation</code> that returns a Geometry with measures increasing with length
      */
-    public <P extends P2D, M extends P2D & Measured> Geometry<M> measureOnLength(
+    public <P extends C2D, M extends C2D & Measured> Geometry<M> measureOnLength(
             Geometry<P> geometry, Class<M> positionTypeMarker, boolean keepBeginMeasure);
 
     /**

@@ -1,8 +1,7 @@
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.P3D;
-import org.geolatte.geom.P3DM;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.C3D;
+import org.geolatte.geom.C3DM;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
-public class CartesianCoordinateSystem3D extends CoordinateSystem<P3D> {
+public class CartesianCoordinateSystem3D extends CoordinateSystem<C3D> {
 
     private final static List<Integer> REQUIRED_AXIS_NORMAL_ORDER = Arrays.asList(0, 1, 2);
 
@@ -29,8 +28,8 @@ public class CartesianCoordinateSystem3D extends CoordinateSystem<P3D> {
 
 
     @Override
-    public Class<P3D> getPositionClass() {
-        return P3D.class;
+    public Class<C3D> getPositionClass() {
+        return C3D.class;
     }
 
     @Override
@@ -40,7 +39,7 @@ public class CartesianCoordinateSystem3D extends CoordinateSystem<P3D> {
     }
 
     @Override
-    public CoordinateSystem<P3DM> extend(CoordinateSystemAxis axis) {
+    public CoordinateSystem<C3DM> extend(CoordinateSystemAxis axis) {
         if (axis instanceof MeasureStraightLineAxis) {
             return new CartesianCoordinateSystem3DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1),
                     (VerticalStraightLineAxis) getAxis(2), (MeasureStraightLineAxis) axis);

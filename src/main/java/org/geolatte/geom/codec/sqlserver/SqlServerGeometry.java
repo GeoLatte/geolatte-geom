@@ -190,7 +190,7 @@ public class SqlServerGeometry<P extends Position> {
 	}
 
     CoordinateReferenceSystem<P> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
-        CoordinateReferenceSystem<P2D> defaultCrs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+        CoordinateReferenceSystem<C2D> defaultCrs = CoordinateReferenceSystems.PROJECTED_2D_METER;
         CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, defaultCrs);
         if (hasZValues) {
             crs = CoordinateReferenceSystems.addVerticalSystem(crs, Unit.METER);

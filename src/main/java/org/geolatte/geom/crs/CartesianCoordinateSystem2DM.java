@@ -1,8 +1,7 @@
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.P2DM;
-import org.geolatte.geom.P3DM;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.C2DM;
+import org.geolatte.geom.C3DM;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
  * <p/>
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
-public class CartesianCoordinateSystem2DM extends CoordinateSystem<P2DM> {
+public class CartesianCoordinateSystem2DM extends CoordinateSystem<C2DM> {
 
     private final static List<Integer> REQUIRED_AXIS_NORMAL_ORDER = Arrays.asList(0, 1, 3);
 
@@ -30,18 +29,18 @@ public class CartesianCoordinateSystem2DM extends CoordinateSystem<P2DM> {
     }
 
     @Override
-    public Class<P2DM> getPositionClass() {
-        return P2DM.class;
+    public Class<C2DM> getPositionClass() {
+        return C2DM.class;
     }
 
     @Override
-    public CoordinateSystem<P3DM> merge(OneDimensionCoordinateSystem<?> coordinateSystem) {
+    public CoordinateSystem<C3DM> merge(OneDimensionCoordinateSystem<?> coordinateSystem) {
         CoordinateSystemAxis axis = coordinateSystem.getAxis();
         return extend(axis);
     }
 
     @Override
-    public CoordinateSystem<P3DM> extend(CoordinateSystemAxis axis) {
+    public CoordinateSystem<C3DM> extend(CoordinateSystemAxis axis) {
         if (axis instanceof VerticalStraightLineAxis) {
             return new CartesianCoordinateSystem3DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1),
                     (VerticalStraightLineAxis) axis, (MeasureStraightLineAxis) getAxis(1));

@@ -43,15 +43,15 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
     private final static PositionEquality pntEq = new ExactPositionEquality();
 
     @Override
-    public <P extends P2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
+    public <P extends C2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
         return locateBetween(geometry, mValue, mValue);
     }
 
     @Override
-    public <P extends P2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
+    public <P extends C2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
         if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
-        if (P2D.class.isAssignableFrom(geometry.getPositionClass()) &&
+        if (C2D.class.isAssignableFrom(geometry.getPositionClass()) &&
                 Measured.class.isAssignableFrom(geometry.getPositionClass())) {
             MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
             geometry.accept((GeometryVisitor<P>) visitor);
@@ -64,7 +64,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends P2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
+    public <P extends C2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
         if (geometry.isEmpty()) return Double.NaN;
         InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, tolerance);
@@ -76,7 +76,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends P2D, M extends P2D & Measured> Geometry<M> measureOnLength(
+    public <P extends C2D, M extends C2D & Measured> Geometry<M> measureOnLength(
             final Geometry<P> geometry, final Class<M> positionTypeMarker, final boolean keepBeginMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
         if (positionTypeMarker == null)
@@ -136,7 +136,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         };
     }
 
-    private static class InterpolatingVisitor<P extends P2D & Measured> implements GeometryVisitor<P> {
+    private static class InterpolatingVisitor<P extends C2D & Measured> implements GeometryVisitor<P> {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
         public static final String OUTSIDE_TOL_MSG = "Search point not within tolerance: distance to geometry is %f > %f";
@@ -226,7 +226,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
 
     }
 
-    private static class OnLengthMeasureOp<M extends P2D & Measured> implements GeometryOperation<Geometry<M>> {
+    private static class OnLengthMeasureOp<M extends C2D & Measured> implements GeometryOperation<Geometry<M>> {
         private double length = 0;
 
         final private Geometry<?> geometry;
@@ -261,7 +261,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         //TODO -- the measure() functions can probably be simplified
 
         @SuppressWarnings("unchecked")
-        private <T extends P2D & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
+        private <T extends C2D & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
             LineString<T>[] measuredParts = (LineString<T>[]) new LineString[geometry.getNumGeometries()];
             for (int part = 0; part < geometry.getNumGeometries(); part++) {
                 LineString<T> lineString = geometry.getGeometryN(part);
@@ -270,7 +270,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
             return new MultiLineString<T>(measuredParts);
         }
 
-        private <T extends P2D & Measured> LineString<T> measure(LineString<T> geometry) {
+        private <T extends C2D & Measured> LineString<T> measure(LineString<T> geometry) {
             CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
             PositionSequence originalPoints = geometry.getPositions();
             PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),

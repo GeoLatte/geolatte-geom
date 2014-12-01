@@ -23,7 +23,7 @@ package org.geolatte.geom.curve;
 
 import junit.framework.Assert;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.P2D;
+import org.geolatte.geom.C2D;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
@@ -36,20 +36,20 @@ import org.junit.Test;
  */
 public class MortonContextTest {
 
-    CoordinateReferenceSystem<P2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+    CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
 
-    P2D p0 = new P2D(0, 0);
-    P2D p1 = new P2D(10, 10);
-    Envelope<P2D> envelope = new Envelope<P2D>(p0, p1, crs);
+    C2D p0 = new C2D(0, 0);
+    C2D p1 = new C2D(10, 10);
+    Envelope<C2D> envelope = new Envelope<C2D>(p0, p1, crs);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentIfLevelExceedsLimit() {
-        new MortonContext<P2D>(envelope, 32);
+        new MortonContext<C2D>(envelope, 32);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentExcOnNullExtent() {
-        new MortonContext<P2D>(null, 4);
+        new MortonContext<C2D>(null, 4);
     }
 
     /**
@@ -57,7 +57,7 @@ public class MortonContextTest {
      */
     @Test
     public void testProperties() {
-        MortonContext<P2D> context = new MortonContext<P2D>(envelope, 3);
+        MortonContext<C2D> context = new MortonContext<C2D>(envelope, 3);
 
         Assert.assertEquals(p0.getX(), context.getMinX());
         Assert.assertEquals(p0.getY(), context.getMinY());

@@ -1,22 +1,22 @@
 package org.geolatte.geom;
 
 /**
- * A projected {@code Position} having an altitude.
+ * A cartesian {@code Position} having an z-value.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/14
  */
-public class P3D extends P2D {
+public class C3D extends C2D {
 
-    public P3D() {
+    public C3D() {
         super();
     }
 
-    public P3D(double x, double y, double z) {
+    public C3D(double x, double y, double z) {
         super(x, y, z);
     }
 
-    protected P3D(double... coords) {
+    protected C3D(double... coords) {
         super(coords);
     }
 
