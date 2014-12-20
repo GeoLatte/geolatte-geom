@@ -33,10 +33,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,8 +126,14 @@ public class JTS {
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return from(jtsGeometry, CrsRegistry.getCoordinateReferenceSystemForEPSG(jtsGeometry.getSRID(),
-                CoordinateReferenceSystems.PROJECTED_3D_METER));
+        Coordinate testCo = jtsGeometry.getCoordinate();
+        boolean is3D = !(testCo == null || Double.isNaN(testCo.z));
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(jtsGeometry.getSRID(),
+                CoordinateReferenceSystems.PROJECTED_2D_METER);
+        if (is3D) {
+            crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
+        }
+        return from(jtsGeometry, crs);
     }
 
     /**

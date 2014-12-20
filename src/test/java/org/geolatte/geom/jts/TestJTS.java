@@ -155,7 +155,7 @@ public class TestJTS {
     private void test_empty(Geometry empty) {
         com.vividsolutions.jts.geom.Geometry jts = JTS.to(empty);
         assertTrue(jts.isEmpty());
-        assertEquals(empty, JTS.from(jts));
+        assertEquals(empty, JTS.from(jts, empty.getCoordinateReferenceSystem()));
     }
 
 
