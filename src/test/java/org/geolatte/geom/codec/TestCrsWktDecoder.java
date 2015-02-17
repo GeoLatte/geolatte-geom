@@ -114,7 +114,7 @@ public class TestCrsWktDecoder {
     @Test
     public void testDecodeLambert72(){
         CrsWktDecoder decoder = new CrsWktDecoder();
-        CoordinateReferenceSystem system = decoder.decode(WKT_31370, 31370);
+        CoordinateReferenceSystem<?> system = decoder.decode(WKT_31370, 31370);
         assertNotNull(system);
         assertTrue (system instanceof ProjectedCoordinateReferenceSystem);
         ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem)system;

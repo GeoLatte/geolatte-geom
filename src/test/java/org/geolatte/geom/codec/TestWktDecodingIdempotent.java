@@ -5,8 +5,9 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.*;
-import static org.junit.Assert.*;
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.point;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
