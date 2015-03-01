@@ -33,7 +33,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
  */
-class PointEncoder extends AbstractEncoder {
+class PointSqlServerEncoder extends AbstractSqlServerEncoder {
 
     /**
      * Encodes a point as an <code>SQLGeometryV1</code> object.

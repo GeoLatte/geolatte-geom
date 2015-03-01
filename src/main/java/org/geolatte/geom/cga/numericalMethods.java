@@ -21,6 +21,7 @@ public class NumericalMethods {
         return ts.estimate + ts.error; // this is different from just the estimate, if the estimate is zero
     }
 
+
     public static double crossProduct(double x0, double y0, double x1, double y1) {
         return determinant(x0, x1, y0, y1);
     }
@@ -52,7 +53,6 @@ public class NumericalMethods {
         TwoSum det = new TwoSum(tl2.estimate, -tr2.estimate);
 
         return det.estimate + det.error + tl1.error + tl2.error - tr1.error - tr2.error;
-
     }
 
     /**

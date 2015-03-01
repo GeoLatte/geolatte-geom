@@ -22,13 +22,12 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class AbstractGeometryCollectionDecoder extends AbstractDecoder {
+abstract class AbstractGeometryCollectionSqlServerDecoder extends AbstractSqlServerDecoder {
 
     @Override
     protected OpenGisType getOpenGisType() {
@@ -53,7 +52,7 @@ abstract class AbstractGeometryCollectionDecoder extends AbstractDecoder {
             if (!nativeGeom.isParentShapeOf(shapeIndex, childIdx)) {
                 continue;
             }
-            AbstractDecoder decoder = (AbstractDecoder) Decoders.decoderFor(
+            AbstractSqlServerDecoder decoder = (AbstractSqlServerDecoder) Decoders.decoderFor(
                     nativeGeom.getOpenGisTypeOfShape(
                             childIdx
                     )

@@ -25,12 +25,14 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
 /**
- * An <code>Encoder</code> can encode
- * geometries of type T to a <code>SqlServerGeometry</code>.
+ * An {@code Encoder} encodes geometries in instances of type {@code N}
  *
  * @author Karel Maesen, Geovise BVBA.
+ *
+ * @param <N> the type of encoding result
  */
 public interface Encoder<N> {
+
 
 	public <P extends Position, G extends Geometry<P>> N encode(G geom);
 

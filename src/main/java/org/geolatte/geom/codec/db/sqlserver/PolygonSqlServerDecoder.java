@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author Karel Maesen, Geovise BVBA
  */
-class PolygonDecoder extends AbstractDecoder {
+class PolygonSqlServerDecoder extends AbstractSqlServerDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {

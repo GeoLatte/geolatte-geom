@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-abstract class AbstractEncoder implements Encoder<SqlServerGeometry> {
+abstract class AbstractSqlServerEncoder implements Encoder<SqlServerGeometry> {
 
     @SuppressWarnings("unchecked")
     public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {

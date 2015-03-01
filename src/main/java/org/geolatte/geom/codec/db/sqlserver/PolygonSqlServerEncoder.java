@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @uthor Karel Maesen, Geovise BVBA
  */
-class PolygonEncoder extends AbstractEncoder {
+class PolygonSqlServerEncoder extends AbstractSqlServerEncoder {
 
 	public boolean accepts(Geometry geom) {
 		return geom instanceof Polygon;

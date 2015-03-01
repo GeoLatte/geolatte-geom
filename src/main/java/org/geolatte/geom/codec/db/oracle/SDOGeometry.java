@@ -35,15 +35,23 @@ import java.util.List;
 class SDOGeometry {
 
 	private static final String SQL_TYPE_NAME = "MDSYS.SDO_GEOMETRY";
-	private SDOGType gtype;
-	private int srid;
-	private SDOPoint point;
-	private ElemInfo info;
-	private Ordinates ordinates;
+	final private SDOGType gtype;
+	final private int srid;
+	final private SDOPoint point;
+	final private ElemInfo info;
+	final private Ordinates ordinates;
 
 
-	public SDOGeometry() {
-
+	public SDOGeometry(SDOGType gtype,
+                       int srid,
+                       SDOPoint point,
+                       ElemInfo info,
+                       Ordinates ordinates) {
+        this.gtype = gtype;
+        this.srid = srid;
+        this.point = point;
+        this.info = info;
+        this.ordinates = ordinates;
 	}
 
 	public static String getTypeName() {
@@ -64,6 +72,8 @@ class SDOGeometry {
 		return stb.toString();
 	}
 
+
+    //TODO -- do we still need this??
 	/**
 	 * This joins an array of SDO_GEOMETRIES to a SDOGeometry of type
 	 * COLLECTION
@@ -72,31 +82,31 @@ class SDOGeometry {
 	 *
 	 * @return The SDO Collection Geometry
 	 */
-	public static SDOGeometry join(SDOGeometry[] sdoElements) {
-		final SDOGeometry sdoCollection = new SDOGeometry();
-		if ( sdoElements == null || sdoElements.length == 0 ) {
-			sdoCollection.setGType( new SDOGType( 2, 0, TypeGeometry.COLLECTION ) );
-		}
-		else {
-			final SDOGeometry firstElement = sdoElements[0];
-			final int dim = firstElement.getGType().getDimension();
-			final int lrsDim = firstElement.getGType().getLRSDimension();
-			sdoCollection.setGType( new SDOGType( dim, lrsDim, TypeGeometry.COLLECTION ) );
-			int ordinatesOffset = 1;
-			for ( int i = 0; i < sdoElements.length; i++ ) {
-				final ElemInfo element = sdoElements[i].getInfo();
-				final Double[] ordinates = sdoElements[i].getOrdinates().getOrdinateArray();
-				if ( element != null && element.getSize() > 0 ) {
-					final int shift = ordinatesOffset - element.getOrdinatesOffset( 0 );
-					shiftOrdinateOffset( element, shift );
-					sdoCollection.addElement( element );
-					sdoCollection.addOrdinates( ordinates );
-					ordinatesOffset += ordinates.length;
-				}
-			}
-		}
-		return sdoCollection;
-	}
+//	public static SDOGeometry join(SDOGeometry[] sdoElements) {
+//
+//		if ( sdoElements == null || sdoElements.length == 0 ) {
+//			return new SDOGeometry(new SDOGType( 2, 0, TypeGeometry.COLLECTION ), 0, null, null,null );
+//		}
+//		else {
+//			final SDOGeometry firstElement = sdoElements[0];
+//			final int dim = firstElement.getGType().getDimension();
+//			final int lrsDim = firstElement.getGType().getLRSDimension();
+//            SDOGType gtype =  new SDOGType( dim, lrsDim, TypeGeometry.COLLECTION );
+//			int ordinatesOffset = 1;
+//			for ( int i = 0; i < sdoElements.length; i++ ) {
+//				final ElemInfo element = sdoElements[i].getInfo();
+//				final Double[] ordinates = sdoElements[i].getOrdinates().getOrdinateArray();
+//				if ( element != null && element.getSize() > 0 ) {
+//					final int shift = ordinatesOffset - element.getOrdinatesOffset( 0 );
+//					shiftOrdinateOffset( element, shift );
+//					sdoCollection.addElement( element );
+//					sdoCollection.addOrdinates( ordinates );
+//					ordinatesOffset += ordinates.length;
+//				}
+//			}
+//		}
+//		return sdoCollection;
+//	}
 
 	private static void shiftOrdinateOffset(ElemInfo elemInfo, int offset) {
 		for ( int i = 0; i < elemInfo.getSize(); i++ ) {
@@ -150,65 +160,45 @@ class SDOGeometry {
 			throw new RuntimeException( e );
 		}
 
-		final SDOGeometry geom = new SDOGeometry();
-		geom.setGType( SDOGType.parse( data[0] ) );
-		geom.setSRID( data[1] );
-		if ( data[2] != null ) {
-			geom.setPoint( new SDOPoint( (Struct) data[2] ) );
-		}
-		geom.setInfo( new ElemInfo( (Array) data[3] ) );
-		geom.setOrdinates( new Ordinates( (Array) data[4] ) );
+		return new SDOGeometry(
+                SDOGType.parse( data[0] ),
+                parseSRID(data[1]),
+                data[2] == null ? null :new SDOPoint( (Struct) data[2] ),
+                new ElemInfo( (Array) data[3] ),
+                new Ordinates( (Array) data[4] )
+        );
 
-		return geom;
 	}
 
 	public ElemInfo getInfo() {
 		return info;
 	}
 
-	public void setInfo(ElemInfo info) {
-		this.info = info;
-	}
 
 	public SDOGType getGType() {
 		return gtype;
-	}
-
-	public void setGType(SDOGType gtype) {
-		this.gtype = gtype;
 	}
 
 	public Ordinates getOrdinates() {
 		return ordinates;
 	}
 
-	public void setOrdinates(Ordinates ordinates) {
-		this.ordinates = ordinates;
-	}
 
 	public SDOPoint getPoint() {
 		return point;
-	}
-
-	public void setPoint(SDOPoint point) {
-		this.point = point;
 	}
 
 	public int getSRID() {
 		return srid;
 	}
 
-	public void setSRID(int srid) {
-		this.srid = srid;
-	}
 
-	private void setSRID(Object datum) {
+	private static int parseSRID(Object datum) {
 		if ( datum == null ) {
-			this.srid = 0;
-			return;
+			return 0;
 		}
 		try {
-			this.srid = ( (Number) datum ).intValue();
+			return ( (Number) datum ).intValue();
 		}
 		catch ( Exception e ) {
 			throw new RuntimeException( e );
@@ -263,23 +253,23 @@ class SDOGeometry {
 		return stb.toString();
 	}
 
-	public void addOrdinates(Double[] newOrdinates) {
-		if ( this.ordinates == null ) {
-			this.ordinates = new Ordinates( newOrdinates );
-		}
-		else {
-			this.ordinates.addOrdinates( newOrdinates );
-		}
-	}
-
-	public void addElement(ElemInfo element) {
-		if ( this.info == null ) {
-			this.info = element;
-		}
-		else {
-			this.info.addElement( element );
-		}
-	}
+//	public void addOrdinates(Double[] newOrdinates) {
+//		if ( this.ordinates == null ) {
+//			this.ordinates = new Ordinates( newOrdinates );
+//		}
+//		else {
+//			this.ordinates.addOrdinates( newOrdinates );
+//		}
+//	}
+//
+//	public void addElement(ElemInfo element) {
+//		if ( this.info == null ) {
+//			this.info = element;
+//		}
+//		else {
+//			this.info.addElement( element );
+//		}
+//	}
 
 	/**
 	 * If this SDOGeometry is a COLLECTION, this method returns an array of
@@ -311,13 +301,10 @@ class SDOGeometry {
 				else if ( et.isCompound() ) {
 					next = i + this.getInfo().getNumCompounds( i ) + 1;
 				}
-				final SDOGeometry elemGeom = new SDOGeometry();
+
 				final SDOGType elemGtype = deriveGTYPE( this.getInfo().getElementType( i ), this );
-				elemGeom.setGType( elemGtype );
-				elemGeom.setSRID( this.getSRID() );
-				final ElemInfo elemInfo = new ElemInfo( this.getInfo().getElement( i ) );
-				shiftOrdinateOffset( elemInfo, -elemInfo.getOrdinatesOffset( 0 ) + 1 );
-				elemGeom.setInfo( elemInfo );
+                final ElemInfo elemInfo = new ElemInfo( this.getInfo().getElement( i ) );
+                shiftOrdinateOffset( elemInfo, -elemInfo.getOrdinatesOffset( 0 ) + 1 );
 				final int startPosition = this.getInfo().getOrdinatesOffset( i );
 				Ordinates elemOrdinates = null;
 				if ( next < this.getNumElements() ) {
@@ -333,7 +320,14 @@ class SDOGeometry {
 									.getOrdinatesArray( startPosition )
 					);
 				}
-				elemGeom.setOrdinates( elemOrdinates );
+
+                SDOGeometry elemGeom = new SDOGeometry(
+                        elemGtype,
+                        this.getSRID(),
+                        null,
+                        elemInfo,
+                        elemOrdinates
+                );
 				elements.add( elemGeom );
 				i = next;
 			}

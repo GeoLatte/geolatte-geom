@@ -13,7 +13,7 @@ public class V extends Position{
     }
 
     /**
-     * Constructs an instance with the specified longitude and latitude
+     * Constructs an instance with the specified vertical value
      *
      * @param value the vertical value
      */
@@ -22,9 +22,8 @@ public class V extends Position{
     }
 
     /**
-     * Constructs an instance from the specified coordinates.
+     * Constructs an instance from the specified coordinate.
      *
-     * It expects first the longitude, then the latitude coordinate
      * @param coords
      */
     protected V(double... coords) {

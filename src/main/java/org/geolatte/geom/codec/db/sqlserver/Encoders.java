@@ -34,18 +34,18 @@ import java.util.List;
  */
 public class Encoders {
 
-	final private static List<AbstractEncoder> ENCODERS = new ArrayList<AbstractEncoder>();
+	final private static List<AbstractSqlServerEncoder> ENCODERS = new ArrayList<AbstractSqlServerEncoder>();
 
 
 	static {
 		//Encoders
-		ENCODERS.add( new PointEncoder() );
-		ENCODERS.add( new LineStringEncoder() );
-		ENCODERS.add( new PolygonEncoder() );
-		ENCODERS.add( new GeometryCollectionEncoder(OpenGisType.MULTIPOINT) );
-		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.MULTILINESTRING ) );
-		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.MULTIPOLYGON ) );
-		ENCODERS.add( new GeometryCollectionEncoder( OpenGisType.GEOMETRYCOLLECTION ) );
+		ENCODERS.add( new PointSqlServerEncoder() );
+		ENCODERS.add( new LineStringSqlServerEncoder() );
+		ENCODERS.add( new PolygonSqlServerEncoder() );
+		ENCODERS.add( new GeometryCollectionSqlServerEncoder(OpenGisType.MULTIPOINT) );
+		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.MULTILINESTRING ) );
+		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.MULTIPOLYGON ) );
+		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.GEOMETRYCOLLECTION ) );
 
 	}
 

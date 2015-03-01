@@ -32,11 +32,11 @@ import java.util.List;
  *
  * @Author Karel Maesen
  */
-class GeometryCollectionEncoder extends AbstractEncoder {
+class GeometryCollectionSqlServerEncoder extends AbstractSqlServerEncoder {
 
 	private final OpenGisType openGisType;
 
-	GeometryCollectionEncoder(OpenGisType openGisType) {
+	GeometryCollectionSqlServerEncoder(OpenGisType openGisType) {
 		this.openGisType = openGisType;
 	}
 
@@ -69,7 +69,7 @@ class GeometryCollectionEncoder extends AbstractEncoder {
 	}
 
 	protected void encodeComponent(Geometry geom, int thisShapeIndex, CountingPositionSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
-		AbstractEncoder encoder = (AbstractEncoder) Encoders.encoderFor( geom );
+		AbstractSqlServerEncoder encoder = (AbstractSqlServerEncoder) Encoders.encoderFor( geom );
 		encoder.encode( geom, thisShapeIndex, coordinates, figures, shapes );
 	}
 }

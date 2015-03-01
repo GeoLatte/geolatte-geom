@@ -18,7 +18,7 @@
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-package org.geolatte.geom.codec.db.oracle;
+package org.geolatte.geom;
 
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-//TODO -- verify code, and put into Geolatte.
+//TODO -- verify code, and place in utility class
 
 /**
  * This class provides operations for handling the usage of Circles and arcs in

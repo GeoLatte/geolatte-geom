@@ -23,7 +23,6 @@ package org.geolatte.geom.codec.db.sqlserver;
 
 
 import org.geolatte.geom.Point;
-import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -31,7 +30,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
  */
-class PointDecoder extends AbstractDecoder {
+class PointSqlServerDecoder extends AbstractSqlServerDecoder {
 
 
 	@Override

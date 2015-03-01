@@ -27,7 +27,7 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.db.Decoder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-abstract class AbstractDecoder implements Decoder<SqlServerGeometry> {
+abstract class AbstractSqlServerDecoder implements Decoder<SqlServerGeometry> {
 
 	public Geometry<?> decode(SqlServerGeometry nativeGeom) {
 		if ( !accepts( nativeGeom ) ) {

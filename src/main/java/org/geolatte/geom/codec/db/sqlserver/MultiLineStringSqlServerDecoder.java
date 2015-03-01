@@ -21,24 +21,25 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.MultiPolygon;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.MultiLineString;
 
 import java.util.List;
 
-import static org.geolatte.geom.Geometries.mkMultiPolygon;
+import static org.geolatte.geom.Geometries.mkMultiLineString;
 
-class MultiPolygonDecoder extends AbstractGeometryCollectionDecoder {
+
+class MultiLineStringSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTIPOLYGON;
+		return OpenGisType.MULTILINESTRING;
 	}
 
     @Override
-    protected MultiPolygon<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
-        return mkMultiPolygon( geometries );
+    protected MultiLineString<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
+        return mkMultiLineString( geometries );
     }
+
 
 
 }

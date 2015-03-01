@@ -21,26 +21,30 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.MultiLineString;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryCollection;
 
 import java.util.List;
 
-import static org.geolatte.geom.Geometries.mkMultiLineString;
+import static org.geolatte.geom.Geometries.mkGeometryCollection;
 
+/**
+ * <code>Decoder</code> for GeometryCollections.
+ *
+ * @Author Karel Maesen
+ */
+class GeometryCollectionSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
-class MultiLineStringDecoder extends AbstractGeometryCollectionDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTILINESTRING;
+		return OpenGisType.GEOMETRYCOLLECTION;
 	}
 
     @Override
-    protected MultiLineString<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
-        return mkMultiLineString( geometries );
+    protected GeometryCollection<?, Geometry<?>> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
+        return mkGeometryCollection(geometries);
     }
-
 
 
 }

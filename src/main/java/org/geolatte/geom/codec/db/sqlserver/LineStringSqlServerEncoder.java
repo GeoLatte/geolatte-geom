@@ -26,7 +26,7 @@ import org.geolatte.geom.*;
 import java.util.List;
 
 
-class LineStringEncoder extends AbstractEncoder {
+class LineStringSqlServerEncoder extends AbstractSqlServerEncoder {
 
 	@Override
 	protected  void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {

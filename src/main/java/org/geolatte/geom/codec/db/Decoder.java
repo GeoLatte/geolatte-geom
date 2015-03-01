@@ -29,11 +29,13 @@ import org.geolatte.geom.Position;
  * Decodes native database objects to geometries of type T.
  *
  * @author Karel Maesen, Geovise BVBA.
- */
+ *
+ * @param <N> the type of native database object that can be decoded to a {@code Geometry}
+  */
 public interface Decoder<N> {
 
-	public <P extends Position> Geometry<P> decode(N nativeGeom);
+	public Geometry<?> decode(N nativeGeom);
 
-	public <P extends Position> boolean accepts(N nativeGeom);
+	public boolean accepts(N nativeGeom);
 
 }

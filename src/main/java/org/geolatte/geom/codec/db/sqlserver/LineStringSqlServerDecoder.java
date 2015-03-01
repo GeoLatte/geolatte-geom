@@ -22,11 +22,10 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-class LineStringDecoder extends AbstractDecoder {
+class LineStringSqlServerDecoder extends AbstractSqlServerDecoder {
 
 
 	@Override

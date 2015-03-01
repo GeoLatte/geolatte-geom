@@ -21,29 +21,23 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.MultiPoint;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.MultiPolygon;
 
 import java.util.List;
 
-import static org.geolatte.geom.Geometries.mkMultiPoint;
+import static org.geolatte.geom.Geometries.mkMultiPolygon;
 
-/**
- * <code>Decoder</code> for GeometryCollections.
- *
- * @author Karel Maesen, Geovise BVBA
- */
-
-class MultiPointDecoder extends AbstractGeometryCollectionDecoder {
+class MultiPolygonSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
 	@Override
 	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTIPOINT;
+		return OpenGisType.MULTIPOLYGON;
 	}
 
     @Override
-    protected MultiPoint<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
-        return mkMultiPoint(geometries);
+    protected MultiPolygon<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
+        return mkMultiPolygon( geometries );
     }
+
 
 }

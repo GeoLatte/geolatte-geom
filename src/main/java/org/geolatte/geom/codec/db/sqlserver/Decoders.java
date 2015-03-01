@@ -38,13 +38,13 @@ public class Decoders {
 
 	static {
 		//Decoders
-		DECODERS.add( new PointDecoder() );
-		DECODERS.add( new LineStringDecoder() );
-		DECODERS.add( new PolygonDecoder() );
-		DECODERS.add( new MultiLineStringDecoder(  ) );
-		DECODERS.add( new MultiPolygonDecoder(  ) );
-		DECODERS.add( new MultiPointDecoder( ) );
-		DECODERS.add( new GeometryCollectionDecoder(  ) );
+		DECODERS.add( new PointSqlServerDecoder() );
+		DECODERS.add( new LineStringSqlServerDecoder() );
+		DECODERS.add( new PolygonSqlServerDecoder() );
+		DECODERS.add( new MultiLineStringSqlServerDecoder(  ) );
+		DECODERS.add( new MultiPolygonSqlServerDecoder(  ) );
+		DECODERS.add( new MultiPointSqlServerDecoder( ) );
+		DECODERS.add( new GeometryCollectionSqlServerDecoder(  ) );
 	}
 
 

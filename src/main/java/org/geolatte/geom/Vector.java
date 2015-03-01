@@ -75,11 +75,7 @@ public class Vector {
      */
     public static <P extends C2D> double dot(P p0, P p1) {
         if (p0.isEmpty() || p1.isEmpty()) return Double.NaN;
-        int d1 = p0.getCoordinateDimension();
-        int d2 = p1.getCoordinateDimension();
-
         return p0.getX() * p1.getX() + p0.getY() * p1.getY();
-
     }
 
     /**
