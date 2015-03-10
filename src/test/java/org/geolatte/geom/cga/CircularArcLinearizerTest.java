@@ -18,22 +18,48 @@ import static org.junit.Assert.assertEquals;
 public class CircularArcLinearizerTest {
 
     private static final int SAMPLE_SIZE = 1000;
-    private static final double EPSILON = 0.0000001d;
+    private static final double EPSILON = 0.0001d;
 
     CircleGenerator cgen = new CircleGenerator(-10, 10, 10);
 
     Circle c;
     C2D[] p;
+    private StringBuilder errormsg;
 
     @Test
     public void check(){
         for(int i = 0; i < SAMPLE_SIZE; i++) {
+            errormsg = new StringBuilder();
             c = cgen.sample();
             p = new ThreePositionsOnCircleGenerator(c).sample();
             CircularArcLinearizer<C2D> linearizer = new CircularArcLinearizer<C2D>(p[0], p[1], p[2], 0.0001);
             PositionSequence<C2D> sequence = linearizer.linearize();
             verify(sequence);
+            sequence = linearizer.linearizeCircle();
+            verifyCircle(sequence);
         }
+    }
+
+    private void verifyCircle(PositionSequence<C2D> seq){
+        C2D prev = null;
+        double angle = 0;
+        for(C2D co : seq){
+
+            if (prev == null) {
+                assertEquals(co, p[0]); // first position in sequence exactly equals p0
+                prev = co;
+                continue;
+            }
+
+            //check that co is on the circle
+            verifyOnCircle(co);
+            angle += getAngle(prev, co);
+            prev = co;
+
+        }
+        assertEquals(prev, p[0]); //is same as first
+        assertEquals(String.format("Difference is: %f (on Circle %s)", 2*Math.PI - angle, c.toString())
+                + errormsg.toString(), 2*Math.PI, angle, 0.0001);
     }
 
     private void verify(PositionSequence<C2D> seq){
@@ -65,11 +91,18 @@ public class CircularArcLinearizerTest {
 
     private void verifyOnCircle(C2D co) {
         double d = Math.hypot(co.getX() - c.x, co.getY() - c.y);
-        assertEquals(c.radius, d, EPSILON);
+        assertEquals(c.radius, d, c.radius*EPSILON);
     }
 
     private int getDirection(C2D prev, C2D co) {
         return (int) Math.signum(NumericalMethods.crossProduct(prev.getX() -c.x, co.getX() -c.x, prev.getY() -c.y, co.getY() -c.y));
+    }
+
+    private double getAngle(C2D prev, C2D co) {
+        double cp =  NumericalMethods.crossProduct(prev.getX() -c.x, co.getX() -c.x, prev.getY() -c.y, co.getY() -c.y);
+        double theta = Math.asin(cp / Math.pow(c.radius, 2));
+        errormsg.append("\n" + "Theta: " + theta + " for points:" + co.getX() + "," + co.getY());
+        return theta;
     }
 
 }
