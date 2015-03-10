@@ -40,8 +40,9 @@ public class CircularArcLinearizer<P extends Position> {
     public PositionSequence<P> linearizeCircle(){
         double angleIncr = acos((c.radius - threshold) / c.radius);
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
+        double theta0 = angleInDirection(p0);
         builder.add(p0);
-        AddPointsBetweenPolarCoordinates(0, 2 * Math.PI, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta0, theta0 + 2 * Math.PI, angleIncr, builder);
         builder.add(p0);
         return builder.toPositionSequence();
     }
@@ -51,30 +52,9 @@ public class CircularArcLinearizer<P extends Position> {
      * @return a PositionSequence that approximates the arc segment
      */
     public PositionSequence<P> linearize() {
-        double x0 = p0.getCoordinate(0);
-        double y0 = p0.getCoordinate(1);
-        double x1 = p1.getCoordinate(0);
-        double y1 = p1.getCoordinate(1);
-        double x2 = p2.getCoordinate(0);
-        double y2 = p2.getCoordinate(1);
-
-        //TODO -- add quick check to see if positions need to linearized (e.g. when very close to each other)
-
-
-        //translate coordinate system to that origin is at the center of circle c
-        double xd0 = (x0 - c.x);
-        double yd0 = (y0 - c.y);
-
-        double xd1 = (x1 - c.x);
-        double yd1 = (y1 - c.y);
-
-        double xd2 = (x2 - c.x);
-        double yd2 = (y2 - c.y);
-
-
-        double theta0 = angleInDirection(xd0, yd0);
-        double theta1 = angleInDirection(xd1, yd1);
-        double theta2 = angleInDirection(xd2, yd2);
+        double theta0 = angleInDirection(p0);
+        double theta1 = angleInDirection(p1);
+        double theta2 = angleInDirection(p2);
 
         //we linearize by incrementing start angle theta by and increment.
         // the following will always hold:
@@ -84,6 +64,8 @@ public class CircularArcLinearizer<P extends Position> {
         // so angleIncrement is garuanteed to be positive and small
         double angleIncr = acos((c.radius - threshold) / c.radius);
 
+        //TODO -- quick check if angles theta are closer together than angleIncr, then we don't need to
+        // linearize
 
         //now we "walk" from theta, over theta1 to theta2 (or inversely)
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
@@ -111,7 +93,9 @@ public class CircularArcLinearizer<P extends Position> {
     //atan2 give the angular coordinate theta of the polar coordinates (r, theta)
     //the angular coordinate ranges between -PI and PI, but to define the circular segment, we
     //should normalize to [0 ,2*PI] if counterclockwise, and [0, -2*PI] if clockwise
-    private double angleInDirection(double x, double y) {
+    private double angleInDirection(Position p) {
+        double x = (p.getCoordinate(0) - c.x);
+        double y = (p.getCoordinate(1) - c.y);
         double theta = atan2(y, x);
         if (isCounterClockwise) {
             return (theta >= 0) ? theta : 2*Math.PI + theta;
