@@ -4,6 +4,8 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.PositionSequenceBuilder;
 
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
 
@@ -24,6 +26,8 @@ public class CircularArcLinearizer<P extends Position> {
     final private boolean isCounterClockwise;
     final private PositionSequenceBuilder<P> builder;
 
+    //TODO threshold must become parameter of linearize/linearizeCircle!!
+    // to that tolerance can be calculated as proportional to radius.
     public CircularArcLinearizer(P p0, P p1, P p2, double threshold) {
         if (p0 == null || p1 == null | p2 == null) {
             throw new IllegalArgumentException();
@@ -35,6 +39,14 @@ public class CircularArcLinearizer<P extends Position> {
         this.c = new Circle(p0, p1, p2, false);
         this.isCounterClockwise = NumericalMethods.isCounterClockwise(p0, p1, p2);
         this.builder = variableSized((Class<P>) p0.getClass());
+    }
+
+    public Circle getCircle(){
+        return this.c;
+    }
+
+    public double getRadius(){
+        return this.c.radius;
     }
 
     public PositionSequence<P> linearizeCircle(){
@@ -84,8 +96,12 @@ public class CircularArcLinearizer<P extends Position> {
         //first find direction:
         double sign = theta < theta1 ? 1d : -1d;
         double a = theta + sign*angleIncr;
+        double[] buf = new double[p0.getCoordinateDimension()];
+        Arrays.fill(buf, Double.NaN);
         while (sign * a < sign * theta1) {
-            builder.add(c.x + c.radius * cos(a), c.y + c.radius * sin(a));
+            buf[0] = c.x + c.radius * cos(a);
+            buf[1] = c.y + c.radius * sin(a);
+            builder.add(buf);
             a = a + sign * angleIncr;
         }
     }
