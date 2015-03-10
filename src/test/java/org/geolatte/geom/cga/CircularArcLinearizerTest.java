@@ -33,7 +33,30 @@ public class CircularArcLinearizerTest {
             CircularArcLinearizer<C2D> linearizer = new CircularArcLinearizer<C2D>(p[0], p[1], p[2], 0.0001);
             PositionSequence<C2D> sequence = linearizer.linearize();
             verify(sequence);
+            sequence = linearizer.linearizeCircle();
+            verifyCircle(sequence);
         }
+    }
+
+    private void verifyCircle(PositionSequence<C2D> seq){
+        C2D prev = null;
+        double angle = 0;
+        for(C2D co : seq){
+
+            if (prev == null) {
+                assertEquals(co, p[0]); // first position in sequence exactly equals p0
+                prev = co;
+                continue;
+            }
+
+            //check that co is on the circle
+            verifyOnCircle(co);
+            angle += getAngle(prev, co);
+            prev = co;
+
+        }
+        assertEquals(angle, 2 * Math.PI, 0.000001);
+        assertEquals(prev, p[0]); //is same as first
     }
 
     private void verify(PositionSequence<C2D> seq){
@@ -70,6 +93,11 @@ public class CircularArcLinearizerTest {
 
     private int getDirection(C2D prev, C2D co) {
         return (int) Math.signum(NumericalMethods.crossProduct(prev.getX() -c.x, co.getX() -c.x, prev.getY() -c.y, co.getY() -c.y));
+    }
+
+    private double getAngle(C2D prev, C2D co) {
+        double cp =  NumericalMethods.crossProduct(prev.getX() -c.x, co.getX() -c.x, prev.getY() -c.y, co.getY() -c.y);
+        return Math.asin(cp / Math.pow(c.radius, 2));
     }
 
 }

@@ -37,6 +37,19 @@ public class CircularArcLinearizer<P extends Position> {
         this.builder = variableSized((Class<P>) p0.getClass());
     }
 
+    public PositionSequence<P> linearizeCircle(){
+        double angleIncr = acos((c.radius - threshold) / c.radius);
+        PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
+        builder.add(p0);
+        AddPointsBetweenPolarCoordinates(0, 2 * Math.PI, angleIncr, builder);
+        builder.add(p0);
+        return builder.toPositionSequence();
+    }
+
+    /**
+     * Linearizes the arc segment defined by the three {@code Position}s specified in this instance's constructor
+     * @return a PositionSequence that approximates the arc segment
+     */
     public PositionSequence<P> linearize() {
         double x0 = p0.getCoordinate(0);
         double y0 = p0.getCoordinate(1);
@@ -79,7 +92,6 @@ public class CircularArcLinearizer<P extends Position> {
         builder.add(p1);
         AddPointsBetweenPolarCoordinates(theta1, theta2, angleIncr, builder);
         builder.add(p2);
-
         return builder.toPositionSequence();
 
     }
