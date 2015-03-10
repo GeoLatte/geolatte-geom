@@ -53,8 +53,11 @@ public class CircularArcLinearizer<P extends Position> {
         double angleIncr = acos((c.radius - threshold) / c.radius);
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
         double theta0 = angleInDirection(p0);
+        double theta1 = angleInDirection(p1);
         builder.add(p0);
-        AddPointsBetweenPolarCoordinates(theta0, theta0 + 2 * Math.PI, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
+        builder.add(p1);
+        AddPointsBetweenPolarCoordinates(theta1, theta0 + 2 * Math.PI, p1, p0, angleIncr, builder);
         builder.add(p0);
         return builder.toPositionSequence();
     }
@@ -82,27 +85,54 @@ public class CircularArcLinearizer<P extends Position> {
         //now we "walk" from theta, over theta1 to theta2 (or inversely)
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
         builder.add(p0);
-        AddPointsBetweenPolarCoordinates(theta0, theta1, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
         builder.add(p1);
-        AddPointsBetweenPolarCoordinates(theta1, theta2, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
         builder.add(p2);
         return builder.toPositionSequence();
 
     }
 
     // Adds points strictly between theta and theta1, using the specified angle-increment
-    private void AddPointsBetweenPolarCoordinates(double theta, double theta1, double angleIncr,
+    // and interpolates the "higher dimensions" on the run
+    private void AddPointsBetweenPolarCoordinates(double theta, double theta1, P p, P p1, double maxAngleIncr,
                                                   PositionSequenceBuilder<P> builder) {
-        //first find direction:
+        int dim = p.getCoordinateDimension();
+
+        //first a number of steps and angleIncrement such that we go in equal increment steps from theta to theta1
+        int steps = (int)Math.ceil(Math.abs(theta1 - theta) / maxAngleIncr);
+        double angleIncr = maxAngleIncr / (double)steps;
+
+        //determine increments for Z and M dimensions:
+        double[] incr = new double[dim - 2];
+        for (int i = 0; i < incr.length; i++) {
+            incr[i] = (p1.getCoordinate(2 + i) - p.getCoordinate(2 + i)) / steps;
+        }
+
+        //now find direction:
         double sign = theta < theta1 ? 1d : -1d;
-        double a = theta + sign*angleIncr;
-        double[] buf = new double[p0.getCoordinateDimension()];
-        Arrays.fill(buf, Double.NaN);
+
+        double a = theta + sign*angleIncr; //this is the angle for the current point
+        double[] buf = new double[dim];
+
+        // we initialize the higher dimensions
+        for (int i = 0; i < incr.length; i++) {
+            buf[2+i] = p.getCoordinate(2+i);
+        }
+
         while (sign * a < sign * theta1) {
+            //calculate x,y positions
             buf[0] = c.x + c.radius * cos(a);
             buf[1] = c.y + c.radius * sin(a);
-            builder.add(buf);
             a = a + sign * angleIncr;
+
+            //and interpolate
+            for (int i = 0; i < incr.length; i++) {
+                buf[2 + i] = buf[2 + i] + incr[i];
+            }
+            builder.add(buf);
+
+
         }
     }
 
