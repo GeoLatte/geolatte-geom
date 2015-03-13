@@ -205,6 +205,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
     private <P extends Position> LinearRing<P> decodeLinearRingText(CoordinateReferenceSystem<P> crs) {
         try {
             WktPointSequenceToken<P> token = decodePointSequence(crs);
+            if (token == null) throw new WktDecodeException("No Linear Ring when expected");
             return new LinearRing<P>(token.getPositions(), token.getCoordinateReferenceSystem());
         } catch (IllegalArgumentException ex) {
             throw new WktDecodeException(ex.getMessage());
