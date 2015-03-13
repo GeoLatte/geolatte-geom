@@ -22,15 +22,16 @@
 package org.geolatte.geom.codec.sqlserver;
 
 
-import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Point;
-import org.geolatte.geom.PointSequence;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
  */
-class PointDecoder extends AbstractDecoder<Point> {
+class PointDecoder extends AbstractDecoder {
 
 
 	@Override
@@ -38,28 +39,27 @@ class PointDecoder extends AbstractDecoder<Point> {
 		return OpenGisType.POINT;
 	}
 
-	protected Point createNullGeometry() {
-		return Point.createEmpty();
+	protected <P extends Position> Point<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
+		return new Point<P>(crs);
 	}
 
-	protected Point createGeometry(SqlServerGeometry nativeGeom) {
+    protected <P extends Position> Point<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
 		return createPoint( nativeGeom, 0 );
 	}
 
 	@Override
-	protected Point createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected <P extends Position>  Point<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
 		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry();
+			return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
 		}
 		int figureOffset = nativeGeom.getFiguresForShape( shapeIndex ).start;
 		int pntOffset = nativeGeom.getPointsForFigure( figureOffset ).start;
 		return createPoint( nativeGeom, pntOffset );
 	}
 
-	private Point createPoint(SqlServerGeometry nativeGeom, int pntOffset) {
-        DimensionalFlag df = DimensionalFlag.valueOf(nativeGeom.hasZValues(), nativeGeom.hasMValues());
-        PointSequence pointSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
-        return new Point(pointSequence);
+	private <P extends Position> Point<P> createPoint(SqlServerGeometry<P> nativeGeom, int pntOffset) {
+        PositionSequence<P> positionSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
+        return new Point<P>(positionSequence, nativeGeom.getCoordinateReferenceSystem());
     }
 
 

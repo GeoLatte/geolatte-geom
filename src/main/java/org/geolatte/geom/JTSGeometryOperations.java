@@ -29,18 +29,18 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import com.vividsolutions.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.vividsolutions.jts.operation.relate.RelateOp;
-import org.geolatte.geom.codec.Wkb;
-import org.geolatte.geom.codec.Wkt;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
 /**
+ * An implementation of {@code ProjectedGeometryOperations} that delegates to the corresponding JTS operations.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 5/3/11
  */
-class JTSGeometryOperations implements GeometryOperations {
+public class JTSGeometryOperations implements ProjectedGeometryOperations {
 
-    private static boolean envelopeIntersect(Geometry geometry1, Geometry geometry2) {
+    private <P extends C2D> boolean envelopeIntersect(Geometry<P> geometry1, Geometry<P> geometry2) {
         return (geometry1.getEnvelope().intersects(geometry2.getEnvelope()));
     }
 
@@ -50,298 +50,167 @@ class JTSGeometryOperations implements GeometryOperations {
      *
      * @param geom
      */
-    private static void checkNotGeometryCollection(Geometry geom) {
+    private <P extends C2D> void checkNotGeometryCollection(Geometry<P> geom) {
         if (GeometryCollection.class.equals(geom.getClass())) {
             throw new IllegalArgumentException("GeometryCollection is not allowed");
         }
     }
 
-    private static void checkCompatibleCRS(Geometry geometry, Geometry other) {
-        if (!geometry.getCrsId().equals(other.getCrsId())) {
+    private void checkCompatibleCRS(Geometry<?> geometry, Geometry<?> other) {
+        if (!geometry.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem())) {
             throw new IllegalArgumentException("Geometries have different CRS's");
         }
     }
 
     @Override
-    public GeometryOperation<Boolean> createIsSimpleOp(final Geometry geometry) {
-        final IsSimpleOp isSimpleOp = new IsSimpleOp(JTS.to(geometry));
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                return isSimpleOp.isSimple();
-            }
-        };
+    public <P extends C2D> boolean isSimple(final Geometry<P> geometry) {
+        return new IsSimpleOp(JTS.to(geometry)).isSimple();
     }
 
     @Override
-    public GeometryOperation<Geometry> createBoundaryOp(final Geometry geometry) {
+    public <P extends C2D> Geometry<P> boundary(final Geometry<P> geometry) {
         final BoundaryOp boundaryOp = new BoundaryOp(JTS.to(geometry));
-        final CrsId crsId = geometry.getCrsId();
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                return JTS.from(boundaryOp.getBoundary(), crsId);
-            }
-        };
+        final CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
+        return JTS.from(boundaryOp.getBoundary(), crs);
     }
 
     @Override
-    public GeometryOperation<Envelope> createEnvelopeOp(final Geometry geometry) {
-        return new GeometryOperation<Envelope>() {
+    public <P extends C2D> boolean intersects(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
+        RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isIntersects();
 
-            @Override
-            public Envelope execute() {
-                PointCollection ps = geometry.getPoints();
-                EnvelopeVisitor visitor = new EnvelopeVisitor(geometry.getCrsId());
-                ps.accept(visitor);
-                return visitor.result();
-            }
-        };
     }
 
     @Override
-    public GeometryOperation<Boolean> createIntersectsOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+    public <P extends C2D> boolean touches(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isTouches(geometry.getDimension(), other.getDimension());
+
+    }
+
+    @Override
+    public <P extends C2D> boolean crosses(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isCrosses(geometry.getDimension(), other.getDimension());
+    }
+
+    @Override
+    public <P extends C2D> boolean contains(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isContains();
+    }
+
+    @Override
+    public <P extends C2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isOverlaps(geometry.getDimension(), other.getDimension());
+    }
+
+    @Override
+    public <P extends C2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().matches(matrix);
+    }
+
+
+    @Override
+    public <P extends C2D> double distance(final Geometry<P> geometry, final Geometry<P> other) {
+        final DistanceOp op = new DistanceOp(JTS.to(geometry), JTS.to(other));
+        return op.distance();
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
+        final BufferOp op = new BufferOp(JTS.to(geometry));
+        return JTS.from(op.getResultGeometry(distance), geometry.getCoordinateReferenceSystem());
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> convexHull(final Geometry<P> geometry) {
+        final ConvexHull convexHull = new ConvexHull(JTS.to(geometry));
+        return JTS.from(convexHull.getConvexHull(), geometry.getCoordinateReferenceSystem());
+
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other) {
+        checkCompatibleCRS(geometry, other);
+        if (geometry.isEmpty() || other.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
+        checkNotGeometryCollection(geometry);
+        checkNotGeometryCollection(other);
+        com.vividsolutions.jts.geom.Geometry intersection = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.INTERSECTION);
+        return JTS.from(intersection, geometry.getCoordinateReferenceSystem());
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other) {
+        checkCompatibleCRS(geometry, other);
+        if (geometry.isEmpty()) return other;
+        if (other.isEmpty()) return geometry;
+        checkNotGeometryCollection(geometry);
+        checkNotGeometryCollection(other);
+        com.vividsolutions.jts.geom.Geometry union = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.UNION);
+        return JTS.from(union, geometry.getCoordinateReferenceSystem());
+
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
+        checkCompatibleCRS(geometry, other);
+        if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
+        if (other.isEmpty()) return geometry;
+        checkNotGeometryCollection(geometry);
+        checkNotGeometryCollection(other);
+        com.vividsolutions.jts.geom.Geometry difference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.DIFFERENCE);
+        return JTS.from(difference, geometry.getCoordinateReferenceSystem());
+
+    }
+
+    @Override
+    public  <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other) {
                 checkCompatibleCRS(geometry, other);
-                if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
-                RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().isIntersects();
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Boolean> createTouchesOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                checkCompatibleCRS(geometry, other);
-                if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
-                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().isTouches(geometry.getDimension(), other.getDimension());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Boolean> createCrossesOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                checkCompatibleCRS(geometry, other);
-                if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
-                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().isCrosses(geometry.getDimension(), other.getDimension());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Boolean> createContainsOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                checkCompatibleCRS(geometry, other);
-                if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
-                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().isContains();
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Boolean> createOverlapsOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                checkCompatibleCRS(geometry, other);
-                if (!envelopeIntersect(geometry, other)) return Boolean.FALSE;
-                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().isOverlaps(geometry.getDimension(), other.getDimension());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Boolean> createRelateOp(final Geometry geometry, final Geometry other, final String matrix) {
-        return new GeometryOperation<Boolean>() {
-            @Override
-            public Boolean execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
-                checkCompatibleCRS(geometry, other);
-                final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
-                return relateOp.getIntersectionMatrix().matches(matrix);
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createLocateAlongOp(final Geometry geometry, final double mValue) {
-        return createLocateBetweenOp(geometry, mValue, mValue);
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createLocateBetweenOp(final Geometry geometry, final double startMeasure, final double endMeasure) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
-                if (geometry.isEmpty()) return Point.EMPTY;
-                MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
-                geometry.accept(visitor);
-                return visitor.result();
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Double> createDistanceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Double>() {
-            @Override
-            public Double execute() {
-                final DistanceOp op = new DistanceOp(JTS.to(geometry), JTS.to(other));
-                return op.distance();
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createBufferOp(final Geometry geometry, final double distance) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                final BufferOp op = new BufferOp(JTS.to(geometry));
-                return JTS.from(op.getResultGeometry(distance), geometry.getCrsId());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createConvexHullOp(final Geometry geometry) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                final ConvexHull convexHull = new ConvexHull(JTS.to(geometry));
-                return JTS.from(convexHull.getConvexHull(), geometry.getCrsId());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createIntersectionOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                if (geometry.isEmpty() || other.isEmpty()) return GeometryCollection.createEmpty();
-                checkNotGeometryCollection(geometry);
-                checkNotGeometryCollection(other);
-                checkCompatibleCRS(geometry, other);
-                com.vividsolutions.jts.geom.Geometry intersection = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.INTERSECTION);
-                return JTS.from(intersection, geometry.getCrsId());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createUnionOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
                 if (geometry.isEmpty()) return other;
                 if (other.isEmpty()) return geometry;
                 checkNotGeometryCollection(geometry);
                 checkNotGeometryCollection(other);
-                checkCompatibleCRS(geometry, other);
-                com.vividsolutions.jts.geom.Geometry union = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.UNION);
-                return JTS.from(union, geometry.getCrsId());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createDifferenceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                if (geometry.isEmpty()) return GeometryCollection.createEmpty();
-                if (other.isEmpty()) return geometry;
-                checkNotGeometryCollection(geometry);
-                checkNotGeometryCollection(other);
-                checkCompatibleCRS(geometry, other);
-                com.vividsolutions.jts.geom.Geometry difference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.DIFFERENCE);
-                return JTS.from(difference, geometry.getCrsId());
-            }
-        };
-    }
-
-    @Override
-    public GeometryOperation<Geometry> createSymDifferenceOp(final Geometry geometry, final Geometry other) {
-        return new GeometryOperation<Geometry>() {
-            @Override
-            public Geometry execute() {
-                if (geometry.isEmpty()) return other;
-                if (other.isEmpty()) return geometry;
-                checkNotGeometryCollection(geometry);
-                checkNotGeometryCollection(other);
-                checkCompatibleCRS(geometry, other);
                 com.vividsolutions.jts.geom.Geometry symDifference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.SYMDIFFERENCE);
-                return JTS.from(symDifference, geometry.getCrsId());
-            }
-        };
+                return JTS.from(symDifference, geometry.getCoordinateReferenceSystem());
     }
 
     @Override
-    public GeometryOperation<String> createToWktOp(final Geometry geometry) {
-        return new GeometryOperation<String>() {
-            @Override
-            public String execute() {
-                return Wkt.toWkt(geometry);
-            }
-        };
+    public <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry) {
+                return JTS.to(geometry).getLength();
+
     }
 
     @Override
-    public GeometryOperation<ByteBuffer> createToWkbOp(final Geometry geometry) {
-        return new GeometryOperation<ByteBuffer>() {
-            @Override
-            public ByteBuffer execute() {
-                return Wkb.toWkb(geometry);
-            }
-        };
+    public  <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry) {
+                return JTS.to(geometry).getArea();
+
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public  <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {
+                return (Point<P>) JTS.from(JTS.to(geometry).getCentroid());
 
-    private static class EnvelopeVisitor implements PointVisitor {
-
-        double xMin = Double.POSITIVE_INFINITY;
-        double yMin = Double.POSITIVE_INFINITY;
-        double xMax = Double.NEGATIVE_INFINITY;
-        double yMax = Double.NEGATIVE_INFINITY;
-        final CrsId crsId;
-
-        EnvelopeVisitor(CrsId crsId) {
-            this.crsId = crsId;
-        }
-
-
-        @Override
-        public void visit(double[] coordinates) {
-            xMin = Math.min(xMin, coordinates[0]);
-            xMax = Math.max(xMax, coordinates[0]);
-            yMin = Math.min(yMin, coordinates[1]);
-            yMax = Math.max(yMax, coordinates[1]);
-        }
-
-        public Envelope result() {
-            return new Envelope(xMin, yMin, xMax, yMax, crsId);
-        }
     }
 
 

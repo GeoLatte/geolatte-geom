@@ -40,7 +40,7 @@ enum WkbGeometryType {
 
     POLYGON(3, Polygon.class),
 
-    POLYHEDRAL_SURFACE(15, PolyHedralSurface.class),
+//    POLYHEDRAL_SURFACE(15, PolyHedralSurface.class),
 
     MULTI_POINT(4, MultiPoint.class),
 

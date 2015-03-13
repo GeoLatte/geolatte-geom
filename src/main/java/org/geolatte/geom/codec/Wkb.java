@@ -78,7 +78,7 @@ public class Wkb {
      * @param byteOrder The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
-    public static ByteBuffer toWkb(Geometry geometry, ByteOrder byteOrder) {
+    public static ByteBuffer toWkb(Geometry<?> geometry, ByteOrder byteOrder) {
         WkbEncoder encoder = newEncoder(DEFAULT_DIALECT);
         return encoder.encode(geometry, byteOrder);
     }
@@ -90,7 +90,7 @@ public class Wkb {
      * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
      * @return The <code>Geometry</code> that is encoded in the WKB.
      */
-    public static Geometry fromWkb(ByteBuffer byteBuffer) {
+    public static Geometry<?> fromWkb(ByteBuffer byteBuffer) {
         WkbDecoder decoder = newDecoder(DEFAULT_DIALECT);
         return decoder.decode(byteBuffer);
     }

@@ -65,7 +65,7 @@ class PostgisWktEncoder implements WktEncoder {
      * @return the WKT representation of the given geometry
      */
     @Override
-    public String encode(Geometry geometry) {
+    public <P extends Position> String encode(Geometry<P> geometry) {
         prepare();
         addSridIfValid(geometry);
         addGeometry(geometry);
@@ -77,7 +77,7 @@ class PostgisWktEncoder implements WktEncoder {
         inGeometryCollection = false;
     }
 
-    private void addSridIfValid(Geometry geometry) {
+    private <P extends Position> void addSridIfValid(Geometry<P> geometry) {
         if (geometry.getSRID() < 1) {
             return;
         }
@@ -86,12 +86,12 @@ class PostgisWktEncoder implements WktEncoder {
                 .append(";");
     }
 
-    private void addGeometry(Geometry geometry) {
+    private <P extends Position> void addGeometry(Geometry<P> geometry) {
         addGeometryTag(geometry);
         addGeometryText(geometry);
     }
 
-    private void addGeometryText(Geometry geometry) {
+    private <P extends Position> void addGeometryText(Geometry<P> geometry) {
         if (geometry.isEmpty()) {
             addEmptyKeyword();
             return;
@@ -100,24 +100,24 @@ class PostgisWktEncoder implements WktEncoder {
         switch (type) {
             case POINT:
             case LINE_STRING:
-            case LINEAR_RING:
-                addPointList(geometry.getPoints());
+            case LINEARRING:
+                addPointList(geometry.getPositions());
                 break;
             case POLYGON:
                 addStartList();
-                addLinearRings((Polygon) geometry);
+                addLinearRings((Polygon<P>) geometry);
                 addEndList();
                 break;
-            case GEOMETRY_COLLECTION:
+            case GEOMETRYCOLLECTION:
                 addStartList();
-                addGeometries((GeometryCollection) geometry, true);
+                addGeometries((GeometryCollection<P, ?>) geometry, true);
                 addEndList();
                 break;
-            case MULTI_POINT:
-            case MULTI_LINE_STRING:
-            case MULTI_POLYGON:
+            case MULTIPOINT:
+            case MULTILINESTRING:
+            case MULTIPOLYGON:
                 addStartList();
-                addGeometries((GeometryCollection) geometry, false);
+                addGeometries((GeometryCollection<P, ?>) geometry, false);
                 addEndList();
                 break;
             default:
@@ -125,7 +125,7 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private void addGeometries(GeometryCollection collection, boolean withTag) {
+    private <P extends Position, G extends Geometry<P>> void addGeometries(GeometryCollection<P,G> collection, boolean withTag) {
         inGeometryCollection = true;
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             if (i > 0) {
@@ -140,7 +140,7 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private void addLinearRings(Polygon geometry) {
+    private <P extends Position> void addLinearRings(Polygon<P> geometry) {
         addRing(geometry.getExteriorRing());
         for (int i = 0; i < geometry.getNumInteriorRing(); i++) {
             addDelimiter();
@@ -148,18 +148,18 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private void addRing(LinearRing ring) {
-        addPointList(ring.getPoints());
+    private <P extends Position> void addRing(LinearRing<P> ring) {
+        addPointList(ring.getPositions());
     }
 
-    private void addPointList(PointCollection points) {
+    private <P extends Position> void addPointList(PositionSequence<P> points) {
         addStartList();
         double[] coords = new double[points.getCoordinateDimension()];
         for (int i = 0; i < points.size(); i++) {
             if (i > 0) {
                 addDelimiter();
             }
-            points.getCoordinates(coords, i);
+            points.getCoordinates(i, coords);
             addPoint(coords);
         }
         addEndList();

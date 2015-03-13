@@ -22,10 +22,16 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.Unit;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * A <code>SqlServerGeometry</code> represents the native SQL Server database object.
@@ -35,7 +41,7 @@ import java.nio.ByteOrder;
  *
  * @author Karel Maesen, Geovise BVBA.
  */
-public class SqlServerGeometry {
+public class SqlServerGeometry<P extends Position> {
 
 	public static final byte SUPPORTED_VERSION = 1;
 
@@ -47,7 +53,8 @@ public class SqlServerGeometry {
 
 	private ByteBuffer buffer;
 	private Integer srid;
-	private byte version;
+    private CoordinateReferenceSystem<P> crs;
+    private byte version;
 	private byte serializationPropertiesByte;
 	private int numberOfPoints;
 	private double[] points;
@@ -116,16 +123,17 @@ public class SqlServerGeometry {
 		return result;
 	}
 
-	void copyCoordinate(int index, double[] coords, DimensionalFlag df) {
+	<P extends Position> void copyCoordinate(int index, double[] coords, CoordinateReferenceSystem<P> crs) {
 		coords[0] = points[2 * index];
 		coords[1] = points[2 * index + 1];
+        int idx = 2;
 		if ( hasZValues() ) {
-			assert ( df.is3D() );
-			coords[df.Z] = zValues[index];
+			assert ( hasVerticalAxis(crs) );
+			coords[idx++] = zValues[index];
 		}
 		if ( hasMValues() ) {
-			assert ( df.isMeasured() );
-			coords[df.M] = mValues[index];
+			assert ( CoordinateReferenceSystems.hasMeasureAxis(crs) );
+			coords[idx] = mValues[index];
 		}
 	}
 
@@ -181,20 +189,28 @@ public class SqlServerGeometry {
 		return getShape( shpIdx ).openGisType;
 	}
 
-	PointSequence coordinateRange(IndexRange range) {
-		DimensionalFlag df = DimensionalFlag.valueOf( hasZValues(), hasMValues() );
-		PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(
-				range.end - range.start,
-				df,
-				CrsId.valueOf( getSrid() )
-		);
-		double[] coordinates = new double[df.getCoordinateDimension()];
-		for ( int idx = range.start, i = 0; idx < range.end; idx++, i++ ) {
-			copyCoordinate( idx, coordinates, df );
-			psBuilder.add( coordinates );
-		}
-		return psBuilder.toPointSequence();
-	}
+    CoordinateReferenceSystem<P> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
+        CoordinateReferenceSystem<C2D> defaultCrs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, defaultCrs);
+        if (hasZValues) {
+            crs = CoordinateReferenceSystems.addVerticalSystem(crs, Unit.METER);
+        }
+        if (hasMValues) {
+            crs = CoordinateReferenceSystems.addLinearSystem(crs, Unit.METER);
+        }
+        return (CoordinateReferenceSystem<P>)crs;
+    }
+
+	PositionSequence<P> coordinateRange(IndexRange range) {
+        crs = getCRS(getSrid(), hasZValues(), hasMValues());
+        PositionSequenceBuilder<P> psBuilder = PositionSequenceBuilders.fixedSized(range.end - range.start, crs.getPositionClass());
+        double[] coordinates = new double[crs.getCoordinateDimension()];
+        for (int idx = range.start, i = 0; idx < range.end; idx++, i++) {
+            copyCoordinate(idx, coordinates, crs);
+            psBuilder.add(coordinates);
+        }
+        return psBuilder.toPositionSequence();
+    }
 
 	private Figure getFigure(int index) {
 		return figures[index];
@@ -204,16 +220,20 @@ public class SqlServerGeometry {
 		return shapes[index];
 	}
 
-	void setCoordinate(int index, PointCollection coordinate) {
-		points[2 * index] = coordinate.getX( index );
-		points[2 * index + 1] = coordinate.getY( index );
-		if ( hasZValues() ) {
-			zValues[index] = coordinate.getZ( index );
-		}
-		if ( hasMValues() ) {
-			mValues[index] = coordinate.getM( index );
-		}
-	}
+	void setCoordinate(int index, PositionSequence<?> positions) {
+        points[2 * index] = positions.getPositionN(index).getCoordinate(0);
+        points[2 * index + 1] = positions.getPositionN(index).getCoordinate(1);
+        if (hasZValues()) {
+            //TODO ensure this conditions is satisfied
+            if (!hasVerticalAxis(crs)) throw new IllegalStateException();
+            zValues[index] = positions.getPositionN(index).getCoordinate(2);
+        }
+        if (hasMValues()) {
+            if (!hasMeasureAxis(crs)) throw new IllegalStateException();
+			int idx = hasZValues() ? 3 : 2;
+            mValues[index] = positions.getPositionN(index).getCoordinate(idx);
+        }
+    }
 
 	boolean isEmpty() {
 		return this.numberOfPoints == 0;
@@ -463,6 +483,10 @@ public class SqlServerGeometry {
 	int getNumFigures() {
 		return this.numberOfFigures;
 	}
+
+    CoordinateReferenceSystem<P> getCoordinateReferenceSystem() {
+        return this.crs;
+    }
 
 
 }

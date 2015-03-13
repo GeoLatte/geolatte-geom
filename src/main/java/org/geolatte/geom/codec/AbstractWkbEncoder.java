@@ -36,7 +36,7 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     @Override
-    public ByteBuffer encode(Geometry geometry, ByteOrder byteOrder) {
+    public  <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, true));
         if (byteOrder != null) {
             output.setByteOrder(byteOrder);
@@ -46,15 +46,15 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         return output;
     }
 
-    protected void writeGeometry(Geometry geom, ByteBuffer output) {
-        geom.accept(newWkbVisitor(output));
+    protected <P extends Position> void writeGeometry(Geometry<P> geom, ByteBuffer output) {
+        geom.accept(newWkbVisitor(output, geom));
     }
 
-    protected WkbVisitor newWkbVisitor(ByteBuffer output) {
-        return new WkbVisitor(output);
+    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geometry) {
+        return new WkbVisitor<P>(output);
     }
 
-    protected int calculateSize(Geometry geom, boolean includeSrid) {
+    protected <P extends Position>  int calculateSize(Geometry<P> geom, boolean includeSrid) {
         int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
         if (geom.getSRID() > 0 && includeSrid) {
             size += 4;
@@ -62,46 +62,37 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         //empty geoms have same representation as an empty GeometryCollection
         if (geom.isEmpty()) return size + sizeEmptyGeometry(geom);
         if (geom instanceof GeometryCollection) {
-            size += sizeOfGeometryCollection((GeometryCollection) geom);
+            size += sizeOfGeometryCollection((GeometryCollection<P, ?>) geom);
         } else if (geom instanceof Polygon) {
-            size += getPolygonSize((Polygon) geom);
+            size += getPolygonSize((Polygon<P>) geom);
         } else if (geom instanceof Point) {
             size += getPointByteSize(geom);
-        } else if (geom instanceof PolyHedralSurface) {
-            size += getPolyHedralSurfaceSize((PolyHedralSurface) geom);
         } else {
             size += ByteBuffer.UINT_SIZE; //to hold number of points
-            size += getPointByteSize(geom) * geom.getNumPoints();
+            size += getPointByteSize(geom) * geom.getNumPositions();
         }
         return size;
     }
 
-    abstract protected int sizeEmptyGeometry(Geometry geometry);
+    abstract protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry);
 
-    private int getPointByteSize(Geometry geom) {
+    private <P extends Position> int getPointByteSize(Geometry<P> geom) {
         return geom.getCoordinateDimension() * ByteBuffer.DOUBLE_SIZE;
     }
 
-    private int getPolyHedralSurfaceSize(PolyHedralSurface geom) {
-        int size = ByteBuffer.UINT_SIZE;
-        for (int i = 0; i < geom.getNumPatches(); i++) {
-            size += getPolygonSize(geom.getPatchN(i));
-        }
-        return size;
-    }
 
-    private int getPolygonSize(Polygon geom) {
+    private <P extends Position> int getPolygonSize(Polygon<P> geom) {
         //to hold the number of linear rings
         int size = ByteBuffer.UINT_SIZE;
         //for each linear ring, a UINT holds the number of points
         size += geom.isEmpty() ? 0 : ByteBuffer.UINT_SIZE * (geom.getNumInteriorRing() + 1);
-        size += getPointByteSize(geom) * geom.getNumPoints();
+        size += getPointByteSize(geom) * geom.getNumPositions();
         return size;
     }
 
-    private int sizeOfGeometryCollection(GeometryCollection collection) {
+    private <P extends Position, G extends Geometry<P>> int sizeOfGeometryCollection(GeometryCollection<P,G> collection) {
         int size = ByteBuffer.UINT_SIZE;
-        for (Geometry g : collection) {
+        for (G g : collection) {
             size += calculateSize(g, false);
         }
         return size;

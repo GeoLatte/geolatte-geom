@@ -21,79 +21,39 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
+ * A 0-dimensional {@code Geometry}.
+ * 
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class Point extends Geometry {
+public class Point<P extends Position> extends Geometry<P> implements Simple {
 
-    static final Point EMPTY = new Point(EmptyPointSequence.INSTANCE, null);
-
-    private final PointSequence points;
-
-    public static Point createEmpty() {
-        return EMPTY;
+    public Point(CoordinateReferenceSystem<P> crs) {
+        super(crs);
     }
 
-    public Point(PointSequence sequence, GeometryOperations geometryOperations) {
-        super(geometryOperations);
-        this.points = sequence;
+    public Point(PositionSequence<P> sequence, CoordinateReferenceSystem<P> crs) {
+        super(sequence, crs);
     }
 
-    public Point(PointSequence sequence) {
-        this(sequence, null);
+    public Point(P position, CoordinateReferenceSystem<P> crs) {
+        this(new PackedPositionSequence<P>(
+                Positions.getFactoryFor(crs.getPositionClass()), position.coords), crs);
     }
 
-    public Point(Point point) {
-        this(point.getPoints());
-    }
-
-    @Override
-    public PointSequence getPoints() {
-        return points;
+    public Point(Point<P> point) {
+        this(point.getPositions(), point.getCoordinateReferenceSystem());
     }
 
     /**
-     * Returns the X-coordinate of this <code>Point</code>.
+     * Returns the <code>Position</code> of this <code>Point</code>.
      *
-     * <p>If this <code>Point</code> is empty, it returns <code>Double.NaN</code>.</p>
-     *
-     * @return the X-coordinate of this <code>Point</code>
+     * @return the <code>Position</code> of this <code>Point</code>.
      */
-    public double getX() {
-        return isEmpty() ? Double.NaN : getPoints().getX(0);
-    }
-
-    /**
-     * Returns the Y-coordinate of this <code>Point</code>.
-     *
-     * <p>If this <code>Point</code> is empty, it returns <code>Double.NaN</code>.</p>
-     *
-     * @return the Y-coordinate of this <code>Point</code>
-     */
-    public double getY() {
-        return isEmpty() ? Double.NaN : getPoints().getY(0);
-    }
-
-    /**
-     * Returns the Z-coordinate of this <code>Point</code>.
-     *
-     * <p>If this <code>Point</code> is empty, it returns <code>Double.NaN</code>.</p>
-     *
-     * @return the Z-coordinate of this <code>Point</code>
-     */
-    public double getZ() {
-        return isEmpty() ? Double.NaN : getPoints().getZ(0);
-    }
-
-    /**
-     * Returns the M-coordinate of this <code>Point</code>.
-     *
-     * <p>If this <code>Point</code> is empty, it returns <code>Double.NaN</code>.</p>
-     *
-     * @return the M-coordinate of this <code>Point</code>
-     */
-    public double getM() {
-        return isEmpty() ? Double.NaN : getPoints().getM(0);
+    public P getPosition() {
+        return getPositions().getPositionN(0) ;
     }
 
     @Override
@@ -107,17 +67,7 @@ public class Point extends Geometry {
     }
 
     @Override
-    public boolean isSimple() {
-        return true;
-    }
-
-    @Override
-    public Geometry getBoundary() {
-        return EMPTY;
-    }
-
-    @Override
-    public void accept(GeometryVisitor visitor) {
+    public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
     }
 }

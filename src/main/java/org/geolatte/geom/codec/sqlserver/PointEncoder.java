@@ -23,6 +23,8 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
 import java.util.List;
 
@@ -31,66 +33,67 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA.
  *         Date: Nov 2, 2009
  */
-class PointEncoder extends AbstractEncoder<Point> {
+class PointEncoder extends AbstractEncoder {
 
-	/**
-	 * Encodes a point as an <code>SQLGeometryV1</code> object.
-	 * <p/>
-	 * This is a specific implementation because points don't explicitly serialize figure and shape components.
-	 *
-	 * @param geom Geometry to serialize
-	 *
-	 * @return
-	 */
-	@Override
-	public SqlServerGeometry encode(Point geom) {
+    /**
+     * Encodes a point as an <code>SQLGeometryV1</code> object.
+     * <p/>
+     * This is a specific implementation because points don't explicitly serialize figure and shape components.
+     *
+     * @param geom Geometry to serialize
+     * @return
+     */
+    @Override
+    public <P extends Position, G extends Geometry<P>> SqlServerGeometry<P> encode(G geom) {
 
-		SqlServerGeometry sqlServerGeom = new SqlServerGeometry();
-		int srid = geom.getSRID();
-		sqlServerGeom.setSrid( srid < 0 ? 0 : srid );
-		sqlServerGeom.setIsValid();
+        SqlServerGeometry<P> sqlServerGeom = new SqlServerGeometry<P>();
+        int srid = geom.getSRID();
+        sqlServerGeom.setSrid(srid < 0 ? 0 : srid);
+        sqlServerGeom.setIsValid();
 
-		if ( geom.isEmpty() ) {
-			sqlServerGeom.setNumberOfPoints( 0 );
-			sqlServerGeom.setNumberOfFigures( 0 );
-			sqlServerGeom.setNumberOfShapes( 1 );
-			sqlServerGeom.setShape( 0, new Shape( -1, -1, OpenGisType.POINT ) );
-			return sqlServerGeom;
-		}
+        if (geom.isEmpty()) {
+            sqlServerGeom.setNumberOfPoints(0);
+            sqlServerGeom.setNumberOfFigures(0);
+            sqlServerGeom.setNumberOfShapes(1);
+            sqlServerGeom.setShape(0, new Shape(-1, -1, OpenGisType.POINT));
+            return sqlServerGeom;
+        }
 
-		sqlServerGeom.setIsSinglePoint();
-		sqlServerGeom.setNumberOfPoints( 1 );
-		if ( geom.is3D() ) {
-			sqlServerGeom.setHasZValues();
-			sqlServerGeom.allocateZValueArray();
-		}
-		if ( geom.isMeasured() ) {
-			sqlServerGeom.setHasMValues();
-			sqlServerGeom.allocateMValueArray();
-		}
-		sqlServerGeom.setCoordinate( 0, geom.getPoints() );
-		return sqlServerGeom;
-	}
+        sqlServerGeom.setIsSinglePoint();
+        sqlServerGeom.setNumberOfPoints(1);
+        if (CoordinateReferenceSystems.hasVerticalAxis(geom.getCoordinateReferenceSystem())) {
+            sqlServerGeom.setHasZValues();
+            sqlServerGeom.allocateZValueArray();
+        }
+        if (CoordinateReferenceSystems.hasMeasureAxis(geom.getCoordinateReferenceSystem())) {
+            sqlServerGeom.setHasMValues();
+            sqlServerGeom.allocateMValueArray();
+        }
+        sqlServerGeom.setCoordinate(0, geom.getPositions());
+        return sqlServerGeom;
+    }
 
     @Override
-    protected void encode(Geometry geom, int parentIdx, CountingPointSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
-		if ( !( geom instanceof Point ) ) {
-			throw new IllegalArgumentException( "Require Point geometry" );
-		}
-		if ( geom.isEmpty() ) {
-			shapes.add( new Shape( parentIdx, -1, OpenGisType.POINT ) );
-			return;
-		}
-		int pntOffset = coordinates.getNumAdded();
-		int figureOffset = figures.size();
-		coordinates.add( geom.getPointN(0) );
-		Figure figure = new Figure( FigureAttribute.Stroke, pntOffset );
-		figures.add( figure );
-		Shape shape = new Shape( parentIdx, figureOffset, OpenGisType.POINT );
-		shapes.add( shape );
-	}
+    protected <P extends Position> void encode(Geometry<P> geom, int parentIdx, CountingPositionSequenceBuilder<P> coordinates, List
+            <Figure> figures, List<Shape> shapes) {
+        if (!(geom instanceof Point)) {
+            throw new IllegalArgumentException("Require Point geometry");
+        }
+        if (geom.isEmpty()) {
+            shapes.add(new Shape(parentIdx, -1, OpenGisType.POINT));
+            return;
+        }
+        int pntOffset = coordinates.getNumAdded();
+        int figureOffset = figures.size();
+        double[] c = new double[coordinates.getCoordinateDimension()];
+        coordinates.add(geom.getPositionN(0).toArray(c));
+        Figure figure = new Figure(FigureAttribute.Stroke, pntOffset);
+        figures.add(figure);
+        Shape shape = new Shape(parentIdx, figureOffset, OpenGisType.POINT);
+        shapes.add(shape);
+    }
 
-	public boolean accepts(Geometry geom) {
-		return geom instanceof Point;
-	}
+    public boolean accepts(Geometry geom) {
+        return geom instanceof Point;
+    }
 }

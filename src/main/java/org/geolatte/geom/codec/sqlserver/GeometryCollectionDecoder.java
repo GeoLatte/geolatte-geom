@@ -23,15 +23,18 @@ package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Position;
 
 import java.util.List;
+
+import static org.geolatte.geom.Geometries.mkGeometryCollection;
 
 /**
  * <code>Decoder</code> for GeometryCollections.
  *
  * @Author Karel Maesen
  */
-class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder<GeometryCollection> {
+class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder {
 
 
 	@Override
@@ -39,10 +42,10 @@ class GeometryCollectionDecoder extends AbstractGeometryCollectionDecoder<Geomet
 		return OpenGisType.GEOMETRYCOLLECTION;
 	}
 
-	protected GeometryCollection createGeometry(List<Geometry> geometries, boolean hasM) {
-		Geometry[] geomArray = geometries != null ? geometries.toArray( new Geometry[geometries.size()] ) : null;
-		return new GeometryCollection( geomArray );
-	}
+    @Override
+    protected <P extends Position> GeometryCollection<P, Geometry<P>> createGeometry(List geometries, SqlServerGeometry<P> nativeGeom) {
+        return mkGeometryCollection(geometries);
+    }
 
 
 }

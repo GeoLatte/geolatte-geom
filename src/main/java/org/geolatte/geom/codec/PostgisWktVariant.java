@@ -23,8 +23,12 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.*;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * Punctuation and keywords for Postgis EWKT/WKT representations.
@@ -44,6 +48,8 @@ class PostgisWktVariant extends WktVariant {
     }
 
     static {
+
+        //TODO -- this doesn't work well with LinearRings (geometry type doesn't match 1-1 to WKT types)
         //register the geometry tokens
         add(GeometryType.POINT, false, "POINT");
         add(GeometryType.POINT, true, "POINTM");
@@ -51,14 +57,14 @@ class PostgisWktVariant extends WktVariant {
         add(GeometryType.LINE_STRING, false, "LINESTRING");
         add(GeometryType.POLYGON, false, "POLYGON");
         add(GeometryType.POLYGON, true, "POLYGONM");
-        add(GeometryType.MULTI_POINT, true, "MULTIPOINTM");
-        add(GeometryType.MULTI_POINT, false, "MULTIPOINT");
-        add(GeometryType.MULTI_LINE_STRING, false, "MULTILINESTRING");
-        add(GeometryType.MULTI_LINE_STRING, true, "MULTILINESTRINGM");
-        add(GeometryType.MULTI_POLYGON, false, "MULTIPOLYGON");
-        add(GeometryType.MULTI_POLYGON, true, "MULTIPOLYGONM");
-        add(GeometryType.GEOMETRY_COLLECTION, false, "GEOMETRYCOLLECTION");
-        add(GeometryType.GEOMETRY_COLLECTION, true, "GEOMETRYCOLLECTIONM");
+        add(GeometryType.MULTIPOINT, true, "MULTIPOINTM");
+        add(GeometryType.MULTIPOINT, false, "MULTIPOINT");
+        add(GeometryType.MULTILINESTRING, false, "MULTILINESTRING");
+        add(GeometryType.MULTILINESTRING, true, "MULTILINESTRINGM");
+        add(GeometryType.MULTIPOLYGON, false, "MULTIPOLYGON");
+        add(GeometryType.MULTIPOLYGON, true, "MULTIPOLYGONM");
+        add(GeometryType.GEOMETRYCOLLECTION, false, "GEOMETRYCOLLECTION");
+        add(GeometryType.GEOMETRYCOLLECTION, true, "GEOMETRYCOLLECTIONM");
         //create an unmodifiable set of all pattern tokens
         Set<WktKeywordToken> allTokens = new HashSet<WktKeywordToken>();
         allTokens.addAll(GEOMETRIES);
@@ -94,7 +100,10 @@ class PostgisWktVariant extends WktVariant {
     }
 
     private boolean sameGeometryType(WktGeometryToken token, Geometry geometry) {
-        return token.getType() == geometry.getGeometryType();
+        //TODO Need better handling for difference WKT/Geometry types. See comment above .
+        return token.getType() == geometry.getGeometryType() ||
+                (token.getType().equals(GeometryType.LINE_STRING) &&
+                geometry.getGeometryType().equals(GeometryType.LINEARRING));
     }
 
     /**
@@ -109,14 +118,15 @@ class PostgisWktVariant extends WktVariant {
      *
      * @param candidate The candidate wkt geometry token
      * @param geometry  The geometry to check the candidate wkt geometry token for
-     * @param ignoreMeasureMarker
+     * @param ignoreMeasureMarker when set to true, this method returns true iff the candidate token is not measured
      * @return The candidate is measured if and only if the geometry is measured and not 3D
      */
     private boolean hasSameMeasuredSuffixInWkt(WktGeometryToken candidate, Geometry geometry, boolean ignoreMeasureMarker) {
         if (ignoreMeasureMarker) {
             return !candidate.isMeasured();
         }
-        if (geometry.isMeasured() && !geometry.is3D()) {
+        CoordinateReferenceSystem<?> crs = geometry.getCoordinateReferenceSystem();
+        if (hasMeasureAxis(crs) && ! hasVerticalAxis(crs)) {
             return candidate.isMeasured();
         } else {
             return !candidate.isMeasured();

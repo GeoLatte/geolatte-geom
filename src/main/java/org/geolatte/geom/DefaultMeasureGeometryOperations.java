@@ -21,9 +21,16 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.Unit;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+
 /**
  * Default implementation of {@link MeasureGeometryOperations}.
- *
+ * <p/>
  * <p>This implementation conforms to the SQL/MM and SFA 1.2.1 specifications. See
  * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access -
  * Part 1: common architecture</a>, sec. 6.1.2.6 </p>
@@ -33,140 +40,144 @@ package org.geolatte.geom;
  */
 public class DefaultMeasureGeometryOperations implements MeasureGeometryOperations {
 
-    private final static PointEquality pntEq = new ExactCoordinatePointEquality(DimensionalFlag.d2D);
+    private final static PositionEquality pntEq = new ExactPositionEquality();
 
     @Override
-    public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point, final double tolerance) {
-        return measureOp(geometry, point, tolerance, true);
+    public <P extends C2D & Measured> Geometry<P> locateAlong(final Geometry<P> geometry, final double mValue) {
+        return locateBetween(geometry, mValue, mValue);
+    }
+
+    @Override
+    public <P extends C2D & Measured> Geometry<P> locateBetween(final Geometry<P> geometry, final double startMeasure, final double endMeasure) {
+        if (geometry == null) throw new IllegalArgumentException("Null geometries not allowed.");
+        if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
+        if (C2D.class.isAssignableFrom(geometry.getPositionClass()) &&
+                Measured.class.isAssignableFrom(geometry.getPositionClass())) {
+            MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
+            geometry.accept((GeometryVisitor<P>) visitor);
+            return (Geometry<P>) visitor.result();
+        }
+        throw new IllegalArgumentException("Requires projected coordinates");
     }
 
     /**
      * @inheritDoc
      */
     @Override
-    public GeometryOperation<Double> createGetMeasureOp(final Geometry geometry, final Point point) {
-        return measureOp(geometry, point, 0.0d, false);
+    public <P extends C2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
+        if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
+        if (geometry.isEmpty()) return Double.NaN;
+        InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, tolerance);
+        geometry.accept(visitor);
+        return visitor.m();
     }
-
-    private GeometryOperation<Double> measureOp(final Geometry geometry, final Point point, final double tolerance,
-                                                final boolean testTolerance){
-        if (geometry == null || point == null) throw new IllegalArgumentException("Parameters must not be NULL");
-        return new GeometryOperation<Double>(){
-            @Override
-            public Double execute() {
-                if(geometry.isEmpty() || point.isEmpty()) return Double.NaN;
-                InterpolatingVisitor visitor = new InterpolatingVisitor(point, tolerance, testTolerance);
-                geometry.accept(visitor);
-                return visitor.m();
-            }
-        };
-    }
-
 
     /**
      * @inheritDoc
      */
     @Override
-    public GeometryOperation<Geometry> createMeasureOnLengthOp(final Geometry geometry, final boolean keepBeginMeasure) {
+    public <P extends C2D, M extends C2D & Measured> Geometry<M> measureOnLength(
+            final Geometry<P> geometry, final Class<M> positionTypeMarker, final boolean keepBeginMeasure) {
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
+        if (positionTypeMarker == null)
+            throw new IllegalArgumentException("PositionTypeMarker parameter must not be NULL");
         if (geometry.getGeometryType() != GeometryType.LINE_STRING
-                && geometry.getGeometryType() != GeometryType.MULTI_LINE_STRING) {
+                && geometry.getGeometryType() != GeometryType.MULTILINESTRING) {
             throw new IllegalArgumentException("Geometry parameter must be of type LineString or MultiLineString");
         }
-        return new GeometryOperation<Geometry>() {
-            private double length = 0;
+        final CoordinateReferenceSystem<P> sourceCRS = geometry.getCoordinateReferenceSystem();
+
+        final CoordinateReferenceSystem<M> measuredVariant = !hasMeasureAxis(sourceCRS) ?
+                (CoordinateReferenceSystem<M>) addLinearSystem(sourceCRS, Unit.METER) :
+                (CoordinateReferenceSystem<M>)sourceCRS;
+
+
+        if (!measuredVariant.getPositionClass().equals(positionTypeMarker)) {
+            throw new IllegalArgumentException(String.format(
+                    "Inconsistent types: measured CRS has position type %s,  but positionTypeMarker is %s.",
+                    measuredVariant.getPositionClass().getName(),
+                    positionTypeMarker.getName()));
+        }
+        return new OnLengthMeasureOp<M>(geometry, measuredVariant, keepBeginMeasure).execute();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public <P extends Position & Measured> double minimumMeasure(Geometry<P> geometry) {
+        return createGetExtrMeasureOp(geometry, true).execute();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    @Override
+    public <P extends Position & Measured> double maximumMeasure(Geometry<P> geometry) {
+        return createGetExtrMeasureOp(geometry, false).execute();
+    }
+
+    private <P extends Position & Measured> GeometryOperation<Double> createGetExtrMeasureOp(final Geometry<P> geometry, final boolean min) {
+        return new GeometryOperation<Double>() {
+
             @Override
-            public Geometry execute() {
-                if (geometry.isEmpty()) return geometry;
-                if (keepBeginMeasure ) {
-                    double initialValue = geometry.getPointN(0).getM();
-                    length = (Double.isNaN(initialValue)? 0 : initialValue);
+            public Double execute() {
+                if (geometry == null) {
+                    throw new IllegalArgumentException("Operation expects a non-empty geometry");
                 }
-                if (geometry instanceof LineString) {
-                    return measure((LineString) geometry);
-                } else if (geometry instanceof MultiLineString) {
-                    return measure((MultiLineString) geometry);
-                } else {
-                    throw new IllegalStateException(
-                            String.format("Requires a LineString or MultiLineString, but received %s",
-                                    geometry.getClass().getName()));
+                if (geometry.isEmpty()) {
+                    return Double.NaN;
                 }
-            }
 
-            private MultiLineString measure(MultiLineString geometry) {
-                LineString[] measuredParts = new LineString[geometry.getNumGeometries()];
-                for (int part = 0; part < geometry.getNumGeometries(); part++) {
-                    LineString lineString = geometry.getGeometryN(part);
-                    measuredParts[part] = measure(lineString);
-                }
-                return new MultiLineString(measuredParts);
+                FindExtremumMeasureVisitor<P> visitor = new FindExtremumMeasureVisitor<P>(min);
+                geometry.getPositions().accept(visitor);
+                return visitor.extremum;
             }
-
-            private LineString measure(LineString geometry) {
-                PointSequence originalPoints = geometry.getPoints();
-                DimensionalFlag dimFlag = DimensionalFlag.valueOf(geometry.is3D(), true);
-                PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(originalPoints.size(), dimFlag, originalPoints.getCrsId());
-                double[] coordinates = new double[geometry.getCoordinateDimension() + 1];
-                double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
-                for (int i = 0; i < originalPoints.size(); i++) {
-                    originalPoints.getCoordinates(coordinates, i);
-                    if (i > 0) {
-                        length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
-                    }
-                    coordinates[dimFlag.M] = length;
-                    builder.add(coordinates);
-                    prevCoordinates[0] = coordinates[0]; prevCoordinates[1] = coordinates[1];
-                }
-                return new LineString(builder.toPointSequence(), geometry.getGeometryOperations());
-            }
-
         };
     }
 
-    private static class InterpolatingVisitor implements GeometryVisitor {
+    private static class InterpolatingVisitor<P extends C2D & Measured> implements GeometryVisitor<P> {
 
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
         public static final String OUTSIDE_TOL_MSG = "Search point not within tolerance: distance to geometry is %f > %f";
 
-        final Point searchPoint;
+        final P searchPosition;
         final double tolerance;
-        final boolean testTolerance;
         double mValue = Double.NaN;
         double distToSearchPoint = Double.MAX_VALUE;
 
-
-        InterpolatingVisitor(Point pnt, double tolerance, boolean testTolerance){
+        InterpolatingVisitor(P pnt, double tolerance) {
             if (pnt == null) throw new IllegalArgumentException("Null point is not allowed.");
-            searchPoint = pnt;
+            searchPosition = pnt;
             this.tolerance = Math.abs(tolerance);
-            this.testTolerance = testTolerance;
         }
 
-        double m(){
-            if (!testTolerance || (testTolerance && distToSearchPoint <= tolerance)) {
+        double m() {
+            if (distToSearchPoint <= tolerance) {
                 return mValue;
             }
             throw new IllegalArgumentException(String.format(OUTSIDE_TOL_MSG, distToSearchPoint, tolerance));
         }
 
         @Override
-        public void visit(Point point) {
+        public void visit(Point<P> point) {
             // Note that this is also used when visiting MultiPoints
-            double dts = searchPoint.distance(point);
+            P pos = point.getPosition();
+            double dts = Math.hypot(pos.getX() - searchPosition.getX(), pos.getY() - searchPosition.getY());
             if (dts <= distToSearchPoint) {
-                mValue = point.getM();
+                mValue = point.getPosition().getM();
                 distToSearchPoint = dts;
             }
         }
 
         @Override
-        public void visit(LineString lineString) {
-            LineSegments lineSegments = new LineSegments(lineString.getPoints());
-            for (LineSegment segment : lineSegments) {
-                Point p0 = segment.getStartPoint();
-                Point p1 = segment.getEndPoint();
-                double[] dAndR = Vector.pointToSegment2D(p0, p1, searchPoint);
-                double d = Math.sqrt(Math.abs(dAndR[0])); //TODO -- Math.abs() should not be necessary. Check pointToSegment2D()
+        public void visit(LineString<P> lineString) {
+            LineSegments<P> lineSegments = new LineSegments<P>(lineString.getPositions());
+            for (LineSegment<P> segment : lineSegments) {
+                P p0 = segment.getStartPosition();
+                P p1 = segment.getEndPosition();
+                double[] dAndR = Vector.positionToSegment2D(p0, p1, searchPosition);
+                double d = Math.sqrt(dAndR[0]);
                 if (d <= distToSearchPoint ) {
                     double r = dAndR[1];
                     if (r <= 0) {
@@ -178,28 +189,109 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
                     }
                     distToSearchPoint = d;
                 }
-
             }
         }
 
         @Override
-        public void visit(Polygon polygon) {
+        public void visit(Polygon<P> polygon) {
             throw new IllegalArgumentException(INVALID_TYPE_MSG);
         }
 
         @Override
-        public void visit(GeometryCollection collection) {
+        public <G extends Geometry<P>> void visit(GeometryCollection<P, G> collection) {
+        }
 
+    }
+
+    private static class FindExtremumMeasureVisitor<P extends Position & Measured> implements PositionVisitor<P> {
+
+        final boolean findMinimum;
+        double extremum;
+
+        FindExtremumMeasureVisitor(boolean minimum) {
+            findMinimum = minimum;
+            extremum = minimum ? Double.MAX_VALUE : Double.MIN_VALUE;
         }
 
         @Override
-        public void visit(LinearRing linearRing) {
-            visit((LineString) linearRing);
+        public void visit(P position) {
+            //assume measure value is last component (must be guaranteed by calling method).
+            double m = position.getM();
+            if (findMinimum) {
+                extremum = m < extremum ? m : extremum;
+            } else {
+                extremum = m > extremum ? m : extremum;
+            }
+        }
+
+    }
+
+    private static class OnLengthMeasureOp<M extends C2D & Measured> implements GeometryOperation<Geometry<M>> {
+        private double length = 0;
+
+        final private Geometry<?> geometry;
+        final private CoordinateReferenceSystem<M> measuredVariant;
+        final private boolean keepBeginMeasure;
+
+        OnLengthMeasureOp(Geometry<?> geometry, CoordinateReferenceSystem<M> measuredVariant, boolean keepBeginMeasure) {
+            this.geometry = geometry;
+            this.measuredVariant = measuredVariant;
+            this.keepBeginMeasure = keepBeginMeasure;
         }
 
         @Override
-        public void visit(PolyHedralSurface surface) {
-            throw new IllegalArgumentException(INVALID_TYPE_MSG);
+        public Geometry<M> execute() {
+            Geometry<M> measured = Geometry.forceToCrs(geometry, measuredVariant);
+            if (measured.isEmpty()) return measured;
+            if (keepBeginMeasure) {
+                double initialValue = measured.getPositionN(0).getM();
+                length = (Double.isNaN(initialValue) ? 0 : initialValue);
+            }
+            if (measured instanceof LineString) {
+                return measure((LineString<M>) measured);
+            } else if (geometry instanceof MultiLineString) {
+                return measure((MultiLineString<M>) measured);
+            } else {
+                throw new IllegalStateException(
+                        String.format("Requires a LineString or MultiLineString, but received %s",
+                                geometry.getClass().getName()));
+            }
         }
+
+        //TODO -- the measure() functions can probably be simplified
+
+        @SuppressWarnings("unchecked")
+        private <T extends C2D & Measured> MultiLineString<T> measure(MultiLineString<T> geometry) {
+            LineString<T>[] measuredParts = (LineString<T>[]) new LineString[geometry.getNumGeometries()];
+            for (int part = 0; part < geometry.getNumGeometries(); part++) {
+                LineString<T> lineString = geometry.getGeometryN(part);
+                measuredParts[part] = measure(lineString);
+            }
+            return new MultiLineString<T>(measuredParts);
+        }
+
+        private <T extends C2D & Measured> LineString<T> measure(LineString<T> geometry) {
+            CoordinateReferenceSystem<T> crs = geometry.getCoordinateReferenceSystem();
+            PositionSequence originalPoints = geometry.getPositions();
+            PositionSequenceBuilder<T> builder = PositionSequenceBuilders.fixedSized(originalPoints.size(),
+                    geometry.getPositionClass());
+            int mIdx = hasVerticalAxis(crs) ? 3 :2;
+            double[] coordinates = new double[geometry.getCoordinateDimension()];
+            double[] prevCoordinates = new double[geometry.getCoordinateDimension()];
+            for (int i = 0; i < originalPoints.size(); i++) {
+                originalPoints.getCoordinates(i, coordinates);
+                if (i > 0) {
+                    length += Math.hypot(coordinates[0] - prevCoordinates[0], coordinates[1] - prevCoordinates[1]);
+                }
+                coordinates[mIdx] = length;
+                builder.add(coordinates);
+                prevCoordinates[0] = coordinates[0];
+                prevCoordinates[1] = coordinates[1];
+
+            }
+            return new LineString<T>(builder.toPositionSequence(), crs);
+        }
+
+
     }
 }

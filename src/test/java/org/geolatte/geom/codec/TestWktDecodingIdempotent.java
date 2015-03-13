@@ -1,14 +1,11 @@
 package org.geolatte.geom.codec;
 
-
-import org.geolatte.geom.DimensionalFlag;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.PointSequenceBuilders;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.junit.Test;
-import sun.misc.FloatingDecimal;
 
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
 
 /**
@@ -16,9 +13,11 @@ import static org.junit.Assert.*;
  */
 public class TestWktDecodingIdempotent {
 
+    ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+
     @Test
-    public void testFastNumberReader(){
-        WktTokenizer tokenizer = new WktTokenizer("169038.177124  ", new PostgisWktVariant(), CrsId.valueOf(31370));
+    public void testFastNumberReader() {
+        WktTokenizer tokenizer = new WktTokenizer("169038.177124  ", new PostgisWktVariant(), crs);
         double v = tokenizer.fastReadNumber();
         assertEquals("169038.177124", String.valueOf(v));
 
@@ -26,13 +25,12 @@ public class TestWktDecodingIdempotent {
 
     @Test
     public void testWktConversionShouldBeIdempotent() {
-        Geometry original = new Point(PointSequenceBuilders.fixedSized(1, DimensionalFlag.d2D, new CrsId("EPSG", 31370))
-                .add(68878.8400879, 169038.177124).toPointSequence());
+        Geometry original = point(crs, c(68878.8400879, 169038.177124));
 
         String originalWkt = "SRID=31370;POINT(68878.8400879 169038.177124)";
         assertEquals(originalWkt, Wkt.toWkt(original));
 
         // geom to wkb to geom zou stabiel moeten blijven
-        assertEquals(Wkt.fromWkt(Wkt.toWkt(original)),original);
+        assertEquals(Wkt.fromWkt(Wkt.toWkt(original)), original);
     }
 }

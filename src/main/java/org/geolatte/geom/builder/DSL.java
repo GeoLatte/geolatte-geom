@@ -22,19 +22,41 @@
 package org.geolatte.geom.builder;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * Contains a Domain Specific Language for constructing Geometries.
- *
+ * <p>
+ * The DSL has methods for creating {@code Position}s, {@code Geometry}s and {@code GeometryTokens}.
+ * </p>
+ * <p>
+ * The methods for creating {@code Position}s are:
+ * </p>
+ * <ul>
+ *     <li>g(lon, lat), g(lon,lat,height), gM(lon,lat, measure), and g(lon,lat,height, measure) for resp. {@code G2D}, {@code G3D}, {@code G2DM} and
+ *     {@code G3DM} {@code Position} instances</li>
+ *     <li>c(x,y), p(x,y,z), cM(x,y,measure), c(x,y,z,m) for resp. {@code P2D}, {@code P3D}, {@code P2DM} and {@code P3DM} {@code Position} instances</li>
+ * </ul>
+ * <p>
+ * The methods for creating geometries are named for the geometry the create.
+ * </p>
+ * <p>
+ * {@code GeometryToken}s are intermediate representations that are handy when creating a {@code Geometry} that is composed of {@code Geometry}s. It allows the
+ * DSL user to specify the coordinate reference system only once.
+ * </p>
  * Usage example:
  * <pre>
  * {@code
  *
  * import static org.geolatte.geom.builder.DSL.*;
  *
+ *
  * public Polygon createPolygon() {
- *     return polygon(4326, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0)));
+ *     CoordinateReferenceSystem crs = ...
+ *     return polygon(crs, ring(p(0, 0), p(0, 1), p(1, 1), p(1, 0), p(0, 0)));
  * }
  *
  * }
@@ -45,823 +67,483 @@ import org.geolatte.geom.crs.CrsId;
  */
 public class DSL {
 
-    public static Vertex2DToken[] empty() {
-        return new Vertex2DToken[0];
-    }
-
-    public static Point point(int srid, Vertex2DToken token) {
-        return new Point2DToken(token).toGeometry(srid);
-    }
-
-    public static Point point(int srid, Vertex3DToken token) {
-        return new Point3DToken(token).toGeometry(srid);
-    }
-
-    public static Point point(int srid, Vertex2DMToken token) {
-        return new Point2DMToken(token).toGeometry(srid);
-    }
-
-    public static Point point(int srid, Vertex3DMToken token) {
-        return new Point3DMToken(token).toGeometry(srid);
-    }
-
-    public static LineString linestring(int srid, Vertex2DToken... points) {
-        return new LineString2DToken(points).toGeometry(srid);
-    }
-
-    public static LineString linestring(int srid, Vertex2DMToken... points) {
-        return new LineString2DMToken(points).toGeometry(srid);
-    }
-
-    public static LineString linestring(int srid, Vertex3DToken... points) {
-        return new LineString3DToken(points).toGeometry(srid);
-    }
-
-    public static LineString linestring(int srid, Vertex3DMToken... points) {
-        return new LineString3DMToken(points).toGeometry(srid);
-    }
-
-    public static LinearRing ring(int srid, Vertex2DToken... points) {
-        return new LinearRing2DToken(points).toGeometry(srid);
-    }
-
-    public static LinearRing ring(int srid, Vertex2DMToken... points) {
-        return new LinearRing2DMToken(points).toGeometry(srid);
-    }
-
-    public static LinearRing ring(int srid, Vertex3DToken... points) {
-        return new LinearRing3DToken(points).toGeometry(srid);
-    }
-
-    public static LinearRing ring(int srid, Vertex3DMToken... points) {
-        return new LinearRing3DMToken(points).toGeometry(srid);
-    }
-
-    public static GeometryCollection geometrycollection(int srid, Geometry2DToken... geometryTokens) {
-        return new GeometryCollection2DToken(geometryTokens).toGeometry(srid);
-    }
-
-    public static GeometryCollection geometrycollection(int srid, Geometry3DToken... geometryTokens) {
-        return new GeometryCollection3DToken(geometryTokens).toGeometry(srid);
-    }
-
-    public static GeometryCollection geometrycollection(int srid, Geometry2DMToken... geometryTokens) {
-        return new GeometryCollection2DMToken(geometryTokens).toGeometry(srid);
-    }
-
-    public static GeometryCollection geometrycollection(int srid, Geometry3DMToken... geometryTokens) {
-        return new GeometryCollection3DMToken(geometryTokens).toGeometry(srid);
-    }
-
-
-    public static Polygon polygon(int srid, LinearRing2DToken... rings) {
-        return new Polygon2DToken(rings).toGeometry(srid);
-    }
-
-    public static Polygon polygon(int srid, LinearRing3DToken... rings) {
-        return new Polygon3DToken(rings).toGeometry(srid);
-    }
-
-    public static Polygon polygon(int srid, LinearRing2DMToken... rings) {
-        return new Polygon2DMToken(rings).toGeometry(srid);
-    }
-
-    public static Polygon polygon(int srid, LinearRing3DMToken... rings) {
-        return new Polygon3DMToken(rings).toGeometry(srid);
-    }
-
-    public static MultiPoint multipoint(int srid, Point2DToken... pointTokens) {
-        return new MultiPoint2DToken(pointTokens).toGeometry(srid);
-    }
-
-    public static MultiPoint multipoint(int srid, Point3DToken... pointTokens) {
-        return new MultiPoint3DToken(pointTokens).toGeometry(srid);
-    }
-
-    public static MultiPoint multipoint(int srid, Point2DMToken... pointTokens) {
-        return new MultiPoint2DMToken(pointTokens).toGeometry(srid);
-    }
-
-    public static MultiPoint multipoint(int srid, Point3DMToken... pointTokens) {
-        return new MultiPoint3DMToken(pointTokens).toGeometry(srid);
-    }
-
-    public static MultiLineString multilinestring(int srid, LineString2DToken... tokens) {
-        return new MultiLineString2DToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiLineString multilinestring(int srid, LineString3DToken... tokens) {
-        return new MultiLineString3DToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiLineString multilinestring(int srid, LineString2DMToken... tokens) {
-        return new MultiLineString2DMToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiLineString multilinestring(int srid, LineString3DMToken... tokens) {
-        return new MultiLineString3DMToken(tokens).toGeometry(srid);
-    }
-
-
-    public static MultiPolygon multipolygon(int srid, Polygon2DToken... tokens) {
-        return new MultiPolygon2DToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiPolygon multipolygon(int srid, Polygon3DToken... tokens) {
-        return new MultiPolygon3DToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiPolygon multipolygon(int srid, Polygon2DMToken... tokens) {
-        return new MultiPolygon2DMToken(tokens).toGeometry(srid);
-    }
-
-    public static MultiPolygon multipolygon(int srid, Polygon3DMToken... tokens) {
-        return new MultiPolygon3DMToken(tokens).toGeometry(srid);
-    }
-
-
-    //GeometryCollection Tokens
-    public static GeometryCollection2DToken geometrycollection(Geometry2DToken... geometryTokens) {
-        return new GeometryCollection2DToken(geometryTokens);
-    }
-
-    public static GeometryCollection3DToken geometrycollection(Geometry3DToken... geometryTokens) {
-        return new GeometryCollection3DToken(geometryTokens);
-    }
-
-    public static GeometryCollection2DMToken geometrycollection(Geometry2DMToken... geometryTokens) {
-        return new GeometryCollection2DMToken(geometryTokens);
-    }
-
-    public static GeometryCollection3DMToken geometrycollection(Geometry3DMToken... geometryTokens) {
-        return new GeometryCollection3DMToken(geometryTokens);
-    }
-
-    private abstract static class GeometryCollectionToken extends ComposedGeometryToken<GeometryCollection> {
-
-        GeometryCollectionToken(GeometryToken... tokens) {
-            super(tokens);
-        }
-
-        @Override
-        public GeometryCollection toGeometry(int srid) {
-            Geometry[] geoms = mkGeometryArray();
-            loadGeometries(srid, geoms);
-            return toGeometryCollection(geoms);
-        }
-
-        protected void loadGeometries(int srid, Geometry[] geoms) {
-            int i = 0;
-            for (GeometryToken token : geometryTokens) {
-                geoms[i++] = token.toGeometry(srid);
-            }
-        }
-
-        protected GeometryCollection toGeometryCollection(Geometry[] geoms) {
-            return new GeometryCollection(geoms);
-        }
-
-        protected Geometry[] mkGeometryArray() {
-            return new Geometry[geometryTokens.length];
-        }
-    }
-
-    public static class GeometryCollection2DToken extends GeometryCollectionToken implements Geometry2DToken{
-        GeometryCollection2DToken(Geometry2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class GeometryCollection3DToken extends GeometryCollectionToken implements Geometry3DToken {
-        GeometryCollection3DToken(Geometry3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class GeometryCollection2DMToken extends GeometryCollectionToken implements Geometry2DMToken{
-        GeometryCollection2DMToken(Geometry2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class GeometryCollection3DMToken extends GeometryCollectionToken implements Geometry3DMToken {
-        GeometryCollection3DMToken(Geometry3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-
-    public static MultiPoint2DToken multipoint(Point2DToken... pointTokens) {
-        return new MultiPoint2DToken(pointTokens);
-    }
-
-    public static MultiPoint3DToken multipoint(Point3DToken... pointTokens) {
-        return new MultiPoint3DToken(pointTokens);
-    }
-
-    public static MultiPoint2DMToken multipoint(Point2DMToken... pointTokens) {
-        return new MultiPoint2DMToken(pointTokens);
-    }
-
-    public static MultiPoint3DMToken multipoint(Point3DMToken... pointTokens) {
-        return new MultiPoint3DMToken(pointTokens);
-    }
-
-    private abstract static class MultiPointToken extends GeometryCollectionToken {
-
-        public MultiPointToken(GeometryToken... tokens) {
-            super(tokens);
-        }
-
-        protected MultiPoint toGeometryCollection(Geometry[] geoms) {
-            return new MultiPoint((Point[]) geoms);
-        }
-
-        protected Point[] mkGeometryArray() {
-            return new Point[geometryTokens.length];
-        }
-
-        public MultiPoint toGeometry(int srid) {
-            return (MultiPoint) super.toGeometry(srid);
-        }
-
-    }
-
-    public static class MultiPoint2DToken extends MultiPointToken implements Geometry2DToken {
-        MultiPoint2DToken(Point2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiPoint3DToken extends MultiPointToken implements Geometry3DToken {
-        MultiPoint3DToken(Point3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiPoint2DMToken extends MultiPointToken implements Geometry2DMToken {
-        MultiPoint2DMToken(Point2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiPoint3DMToken extends MultiPointToken implements Geometry3DMToken {
-        MultiPoint3DMToken(Point3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-
-    public static MultiLineString2DToken multilinestring(LineString2DToken... tokens) {
-        return new MultiLineString2DToken(tokens);
-    }
-
-    public static MultiLineString3DToken multilinestring(LineString3DToken... tokens) {
-        return new MultiLineString3DToken(tokens);
-    }
-
-    public static MultiLineString2DMToken multilinestring(LineString2DMToken... tokens) {
-        return new MultiLineString2DMToken(tokens);
-    }
-
-    public static MultiLineString3DMToken multilinestring(LineString3DMToken... tokens) {
-        return new MultiLineString3DMToken(tokens);
-    }
-
-    private abstract static class MultiLineStringToken extends GeometryCollectionToken {
-        MultiLineStringToken(GeometryToken... tokens) {
-            super(tokens);
-        }
-
-        protected MultiLineString toGeometryCollection(Geometry[] geoms) {
-            return new MultiLineString((LineString[]) geoms);
-        }
-
-        protected LineString[] mkGeometryArray() {
-            return new LineString[geometryTokens.length];
-        }
-
-        public MultiLineString toGeometry(int srid) {
-            return (MultiLineString) super.toGeometry(srid);
-        }
-
-    }
-
-    public static class MultiLineString2DToken extends MultiLineStringToken implements Geometry2DToken{
-        MultiLineString2DToken(LineString2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiLineString3DToken extends MultiLineStringToken implements Geometry3DToken {
-        MultiLineString3DToken(LineString3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiLineString2DMToken extends MultiLineStringToken implements Geometry2DMToken {
-        MultiLineString2DMToken(LineString2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class MultiLineString3DMToken extends MultiLineStringToken implements Geometry3DMToken {
-        MultiLineString3DMToken(LineString3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-
-    public static MultiPolygon2DToken multipolygon(Polygon2DToken... tokens) {
-        return new MultiPolygon2DToken(tokens);
-    }
-
-    public static MultiPolygon3DToken multipolygon(Polygon3DToken... tokens) {
-        return new MultiPolygon3DToken(tokens);
-    }
-
-    public static MultiPolygon2DMToken multipolygon(Polygon2DMToken... tokens) {
-        return new MultiPolygon2DMToken(tokens);
-    }
-
-    public static MultiPolygon3DMToken multipolygon(Polygon3DMToken... tokens) {
-        return new MultiPolygon3DMToken(tokens);
-    }
-    
-
-    private abstract static class MultiPolygonToken extends GeometryCollectionToken {
-        MultiPolygonToken(GeometryToken... tokens) {
-            super(tokens);
-        }
-
-        protected MultiPolygon toGeometryCollection(Geometry[] geoms) {
-            return new MultiPolygon((Polygon[]) geoms);
-        }
-
-        protected Polygon[] mkGeometryArray() {
-            return new Polygon[geometryTokens.length];
-        }
-
-        public MultiPolygon toGeometry(int srid) {
-            return (MultiPolygon) super.toGeometry(srid);
-        }
-    }
-
-    public static class MultiPolygon2DToken extends MultiPolygonToken implements Geometry2DToken {
-        MultiPolygon2DToken(Polygon2DToken... tokens) {
-            super(tokens);
-        }        
-    }
-
-    public static class MultiPolygon3DToken extends MultiPolygonToken implements Geometry3DToken {
-        MultiPolygon3DToken(Polygon3DToken... tokens) {
-            super(tokens);
-        }        
-    }
-
-    public static class MultiPolygon2DMToken extends MultiPolygonToken implements Geometry2DMToken {
-        MultiPolygon2DMToken(Polygon2DMToken... tokens) {
-            super(tokens);
-        }        
-    }
-
-    public static class MultiPolygon3DMToken extends MultiPolygonToken implements Geometry3DMToken {
-        MultiPolygon3DMToken(Polygon3DMToken... tokens) {
-            super(tokens);
-        }        
-    }
-    
-    
-
-    //Polygon tokens
-    public static Polygon2DToken polygon(LinearRing2DToken... rings) {
-        return new Polygon2DToken(rings);
-    }
-
-    public static Polygon3DToken polygon(LinearRing3DToken... rings) {
-        return new Polygon3DToken(rings);
-    }
-
-    public static Polygon2DMToken polygon(LinearRing2DMToken... rings) {
-        return new Polygon2DMToken(rings);
-    }
-
-    public static Polygon3DMToken polygon(LinearRing3DMToken... rings) {
-        return new Polygon3DMToken(rings);
-    }
-
-    private static abstract class PolygonToken extends ComposedGeometryToken<Polygon> {
-
-        PolygonToken(GeometryToken... tokens) {
-            super(tokens);
-        }
-
-        protected LinearRing[] toGeometryArray(int srid) {
-            LinearRing[] result = new LinearRing[geometryTokens.length];
-            int i = 0;
-            for (GeometryToken token : geometryTokens) {
-                result[i++] = ((LinearRingToken) token).toGeometry(srid);
-            }
-            return result;
-        }
-
-        public Polygon toGeometry(int srid) {
-            return new Polygon((LinearRing[]) toGeometryArray(srid));
-        }
-    }
-
-    public static class Polygon2DToken extends PolygonToken implements Geometry2DToken {
-        Polygon2DToken(LinearRing2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class Polygon3DToken extends PolygonToken implements Geometry3DToken {
-        Polygon3DToken(LinearRing3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class Polygon2DMToken extends PolygonToken implements Geometry2DMToken {
-        Polygon2DMToken(LinearRing2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class Polygon3DMToken extends PolygonToken implements Geometry3DMToken {
-        Polygon3DMToken(LinearRing3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-
-    // LinearRing tokens
-    public static LinearRing2DToken ring(Vertex2DToken... points) {
-        return new LinearRing2DToken(points);
-    }
-
-    public static LinearRing2DMToken ring(Vertex2DMToken... points) {
-        return new LinearRing2DMToken(points);
-    }
-
-    public static LinearRing3DToken ring(Vertex3DToken... points) {
-        return new LinearRing3DToken(points);
-    }
-
-    public static LinearRing3DMToken ring(Vertex3DMToken... points) {
-        return new LinearRing3DMToken(points);
-    }
-
-    private abstract static class LinearRingToken extends SimpleGeometryToken<LinearRing> {
-        LinearRingToken(VertexToken... tokens) {
-            super(tokens);
-        }
-
-        public LinearRing toGeometry(int srid) {
-            return new LinearRing(mkPointSequence(srid));
-        }
-    }
-
-    public static class LinearRing2DToken extends LinearRingToken implements Geometry2DToken {
-        LinearRing2DToken(Vertex2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LinearRing3DToken extends LinearRingToken implements Geometry3DToken {
-        LinearRing3DToken(Vertex3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LinearRing2DMToken extends LinearRingToken implements Geometry2DMToken {
-        LinearRing2DMToken(Vertex2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LinearRing3DMToken extends LinearRingToken implements Geometry3DMToken {
-        LinearRing3DMToken(Vertex3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-
-    //LineString tokens
-    public static LineString2DToken linestring(Vertex2DToken... points) {
-        return new LineString2DToken(points);
-    }
-
-    public static LineString2DMToken lineString(Vertex2DMToken... points) {
-        return new LineString2DMToken(points);
-    }
-
-    public static LineString3DToken linestring(Vertex3DToken... points) {
-        return new LineString3DToken(points);
-    }
-
-    public static LineString3DMToken lineString(Vertex3DMToken... points) {
-        return new LineString3DMToken(points);
-    }
-
-    private abstract static class LineStringToken extends SimpleGeometryToken<LineString> {
-
-        LineStringToken(VertexToken... tokens) {
-            super(tokens);
-        }
-
-        @Override
-        public LineString toGeometry(int srid) {
-            return new LineString(mkPointSequence(srid));
-        }
-    }
-
-    public static class LineString2DToken extends LineStringToken implements Geometry2DToken {
-        LineString2DToken(Vertex2DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LineString3DToken extends LineStringToken implements Geometry3DToken {
-        LineString3DToken(Vertex3DToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LineString2DMToken extends LineStringToken implements Geometry2DMToken {
-        LineString2DMToken(Vertex2DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    public static class LineString3DMToken extends LineStringToken implements Geometry3DMToken {
-        LineString3DMToken(Vertex3DMToken... tokens) {
-            super(tokens);
-        }
-    }
-
-    //Point Tokens
-    public static Point2DToken point(Vertex2DToken token) {
-        return new Point2DToken(token);
-    }
-
-    public static Point3DToken point(Vertex3DToken token) {
-        return new Point3DToken(token);
-    }
-
-    public static Point2DMToken point(Vertex2DMToken token) {
-        return new Point2DMToken(token);
-    }
-
-    public static Point3DMToken point(Vertex3DMToken token) {
-        return new Point3DMToken(token);
-    }
-
-    public abstract static class PointToken extends SimpleGeometryToken<Point> {
-
-        PointToken(VertexToken... token) {
-            super(token);
-        }
-
-        @Override
-        public Point toGeometry(int srid) {
-            return new Point(mkPointSequence(srid));
-        }
-    }
-
-    public static class Point2DToken extends PointToken implements Geometry2DToken {
-        Point2DToken(Vertex2DToken token) {
-            super(token);
-        }
-    }
-
-    public static class Point3DToken extends PointToken implements Geometry3DToken {
-        Point3DToken(Vertex3DToken token) {
-            super(token);
-        }
-    }
-
-    public static class Point2DMToken extends PointToken implements Geometry2DMToken {
-        Point2DMToken(Vertex2DMToken token) {
-            super(token);
-        }
-    }
-
-    public static class Point3DMToken extends PointToken implements Geometry3DMToken {
-        Point3DMToken(Vertex3DMToken token) {
-            super(token);
-        }
-    }
-
-    //    dimensional marker interfaces
-    public abstract static interface GeometryToken {
-        Geometry toGeometry(int srid);
-
-        DimensionalFlag dimFlag();
-    }
-
-    public abstract static interface Geometry2DToken extends GeometryToken {
-    }
-
-    public abstract static interface Geometry3DToken extends GeometryToken {
-    }
-
-    public abstract static interface Geometry2DMToken extends GeometryToken {
-    }
-
-    public abstract static interface Geometry3DMToken extends GeometryToken {
-    }
-
-
-    //base classes for GeometryTokens
-    private abstract static class AbstractGeometryToken<G extends Geometry> {
-        DimensionalFlag dimFlag;
-
-        abstract G toGeometry(int srid);
-
-        public DimensionalFlag dimFlag() {
-            return this.dimFlag;
-        }
-
-        void extractDimensionalFlag(VertexToken[] tokens) {
-            this.dimFlag = (tokens == null || tokens.length == 0) ? DimensionalFlag.d2D : tokens[0].dFlag();
-        }
-    }
-
-    private abstract static class SimpleGeometryToken<G extends Geometry> extends AbstractGeometryToken<G> {
-        VertexToken[] pointTokens;
-
-        SimpleGeometryToken(VertexToken... tokens) {
-            this.pointTokens = tokens;
-            extractDimensionalFlag(tokens);
-        }
-
-        protected PointSequence mkPointSequence(int srid) {
-            PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(pointTokens.length, dimFlag, CrsId.valueOf(srid));
-            for (VertexToken pt : pointTokens) {
-                pt.addTo(psBuilder);
-            }
-            return psBuilder.toPointSequence();
-        }
-
-    }
-
-    private abstract static class ComposedGeometryToken<G extends Geometry> extends AbstractGeometryToken<G> {
-        GeometryToken[] geometryTokens;
-        DimensionalFlag dimFlag;
-
-        ComposedGeometryToken(GeometryToken... tokens) {
-            this.geometryTokens = tokens;
-            this.dimFlag = (tokens == null || tokens.length == 0) ? DimensionalFlag.d2D : tokens[0].dimFlag();
-        }
-
-        protected Geometry[] toGeometryArray(int srid) {
-            Geometry[] result = new Geometry[geometryTokens.length];
-            int i = 0;
-            for (GeometryToken token : geometryTokens) {
-                result[i++] = token.toGeometry(srid);
-            }
-            return result;
-        }
-
-        public DimensionalFlag dimFlag() {
-            return this.dimFlag;
-        }
+    private DSL(){
+        //do nothing.
     }
 
     /**
-     * A 2D vertex
+     * Creates a projected 2D position token.
      *
-     * @param x the X-coordinate
-     * @param y the Y-coordinate
-     * @return
+     * @param x x or easting
+     * @param y y or northing
+     * @return a projected 2D PosToken
      */
-    public static Vertex2DToken c(double x, double y) {
-        return new Vertex2DToken(x, y);
+    public static C2D c(double x, double y) {
+        return new C2D(x, y);
     }
 
     /**
-     * A 2DM vertex
+     * Creates a projected 3D position token
      *
-     * @param x
-     * @param y
-     * @param m
-     * @return
+     * @param x x or easting
+     * @param y y or northing
+     * @param z z or height
+     * @return a projected 3D PosToken
      */
-    public static Vertex2DMToken cM(double x, double y, double m) {
-        return new Vertex2DMToken(x, y, m);
+    public static C3D c(double x, double y, double z) {
+        return new C3D(x, y, z);
     }
 
     /**
-     * A 3D vertex
+     * Creates a projected 2DM position token
      *
-     * @param x
-     * @param y
-     * @param z
-     * @return
+     * @param x x or easting
+     * @param y y or northing
+     * @param m measure value
+     * @return a projected 2DM PosToken
      */
-    public static Vertex3DToken c(double x, double y, double z) {
-        return new Vertex3DToken(x, y, z);
+    public static C2DM cM(double x, double y, double m) {
+        return new C2DM(x, y, m);
     }
 
     /**
-     * A 3DM vertex
+     * Creates a projected 3DM position token
      *
-     * @param x
-     * @param y
-     * @param z
-     * @param m
-     * @return
+     * @param x x or easting
+     * @param y y or northing
+     * @param z z or heightitude
+     * @param m measure value
+     * @return a projected 3DM PosToken
      */
-    public static Vertex3DMToken cM(double x, double y, double z, double m) {
-        return new Vertex3DMToken(x, y, z, m);
+    public static C3DM c(double x, double y, double z, double m) {
+        return new C3DM(x, y, z, m);
     }
 
-    abstract static class VertexToken {
-        abstract void addTo(PointSequenceBuilder psBuilder);
-
-        abstract DimensionalFlag dFlag();
+    /**
+     * Creates a geographic 2D position token
+     *
+     * @param lon longitude
+     * @param lat latitude
+     * @return a geographic 2D PosToken
+     */
+    public static G2D g(double lon, double lat) {
+        return new G2D(lon, lat);
     }
 
-    public static class Vertex2DToken extends VertexToken {
-        protected final double x, y;
+    /**
+     * Creates a geographic 3D position token
+     *
+     * @param lon longitude
+     * @param lat latitude
+     * @param height height
+     * @return a geographic 3D PosToken
+     */
+    public static G3D g(double lon, double lat, double height) {
+        return new G3D(lon, lat, height);
+    }
 
-        Vertex2DToken(double x, double y) {
-            this.x = x;
-            this.y = y;
+    /**
+     * Creates a geographic 2DM position token
+     *
+     * @param lon longitude
+     * @param lat latitude
+     * @param m   measure value
+     * @return a geographic 2DM PosToken
+     */
+    public static G2DM gM(double lon, double lat, double m) {
+        return new G2DM(lon, lat, m);
+    }
+
+    /**
+     * Creates a geographic 3DM position token
+     *
+     * @param lon longitude
+     * @param lat latitude
+     * @param height height
+     * @param m  measure value
+     * @return a geographic 3DM PosToken
+     */
+    public static G3DM g(double lon, double lat, double height, double m) {
+        return new G3DM(lon, lat, height, m);
+    }
+
+
+    /**
+     * Creates a {@code Point}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code Point}
+     * @param p the {@code Position} for the {@code Point}
+     * @param <P> the {@code Position} type
+     * @return a {@code Point} having the specified {@code Position} and {@code CoordinateReferenceSystem}
+     */
+    public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
+        return new Point<P>(p, crs);
+    }
+
+    /**
+     * Creates a {@code PointToken}
+     * @param position the {@code Position} for the {@code PointToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code PointToken} having the specified {@code Position}
+     */
+    public static <P extends Position> PointToken<P> point(P position) {
+        return new PointToken<P>(position);
+    }
+
+    /**
+     * Creates a {@code LineString}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code LineString}
+     * @param positions the {@code Position}s for the {@code LineString}
+     * @param <P> the {@code Position} type
+     * @return a {@code LineString} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
+     */
+    public static <P extends Position> LineString<P> linestring(CoordinateReferenceSystem<P> crs, P... positions) {
+        return new LineString<P>(toSeq(crs, positions), crs);
+    }
+
+    /**
+     * Creates a {@code LineStringToken}
+     *
+     * @param positions the {@code Position}s for the {@code LineStringToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code LineStringToken} having the specified {@code Position}s
+     */
+    public static <P extends Position> LineStringToken<P> linestring(P... positions) {
+        return new LineStringToken<P>(positions);
+    }
+
+    /**
+     * Creates a {@code LinearRing}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code LinearRing}
+     * @param positions the {@code Position}s for the {@code LinearRing}
+     * @param <P> the {@code Position} type
+     * @return a {@code LinearRing} having the specified {@code Position}s and {@code CoordinateReferenceSystem}
+     */
+    public static <P extends Position> LinearRing<P> ring(CoordinateReferenceSystem<P> crs, P... positions) {
+        return new LinearRing<P>(toSeq(crs, positions), crs);
+    }
+
+    /**
+     * Creates a {@code LinearRingToken}
+     *
+     * @param positions the {@code Position}s for the {@code LinearRingToken}
+     * @param <P> the {@code Position} type
+     * @return a {@code LinearRingToken} having the specified {@code Position}s
+     */
+    public static <P extends Position> LinearRingToken<P> ring(P... positions) {
+        return new LinearRingToken<P>(positions);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <P extends Position, G extends Geometry<P>> G[] combine(Class<G> resultType, G geometry, G... geometries) {
+        Object[] allGeometries = (Object[]) Array.newInstance(resultType, geometries.length + 1);
+        allGeometries[0] = geometry;
+        System.arraycopy(geometries, 0, allGeometries, 1, geometries.length);
+        return (G[]) allGeometries;
+    }
+
+    /**
+     * Creates a {@code GeometryCollection} from the specified {@code Geometry}s.
+     * @param geometry the first constituent {@code Geometry}
+     * @param geometries the rest of the constituent {@code Geometry}s
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s.
+     */
+    public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
+        return new GeometryCollection<P, Geometry<P>>(combine(Geometry.class, geometry, geometries));
+    }
+
+    /**
+     * Creates a {@code GeometryCollection} from the specified {@code GeometryToken}s and {@code CoordinateReferenceSystem}.
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code GeometryCollection}
+     * @param tokens the {@code GeometryTokens} for the constituent {@code Geometry}s of the returned {@code GeometryCollection}
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s and {@code CoordinateReferenceSystem}
+     */
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
+        if (tokens.length == 0) return new GeometryCollection<P, Geometry<P>>(crs);
+        Geometry<P>[] parts = new Geometry[tokens.length];
+        int idx = 0;
+        for (GeometryToken t : tokens) {
+            parts[idx++] = t.toGeometry(crs);
+        }
+        return new GeometryCollection<P, Geometry<P>>(parts);
+    }
+
+    /**
+     * Creates a {@code GeometryCollectionToken} of the specified {@code GeometryToken}s
+     *
+     * @param tokens the {@code GeometryToken}s that represent the constituent {@code Geometry}s of the returned {@code GeometryCollection}
+     * @param <P> the {@code Position} type
+     * @return the {@code GeometryCollectionToken} of the specified constituent {@code GeometryToken}s
+     */
+    public static <P extends Position> GeometryCollectionToken<P> geometrycollection(GeometryToken<P>... tokens) {
+        return new GeometryCollectionToken<P>(tokens);
+    }
+
+    /**
+     * Creates a {@code Polygon} from the specified outer ring (or hull) and inner rings (if any)
+     *
+     * @param hull the outer ring of the returned {@code Polygon}
+     * @param rings the inner rings of the returned {@code Polygon}
+     * @param <P> the {@code Position} type
+     * @return the {@code Polygon} defined by the specified outer and inner rings.
+     */
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> Polygon<P> polygon(LinearRing<P> hull, LinearRing<P>... rings) {
+        LinearRing<P>[] combined = combine(LinearRing.class, hull, rings);
+        return new Polygon<P>(combined);
+    }
+
+    /**
+     * Creates a {@code Polygon} from the specified ring tokens and {@code CoordinateReferenceSystem}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the returned {@code Polygon}
+     * @param tokens the {@code GeometryTokens} representing (in order) the outer and any inner rings
+     * @param <P> the {@code Position} type
+     * @return the {@code Polygon} defined by the specified coordinate reference system and ring tokens
+     */
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> Polygon<P> polygon(CoordinateReferenceSystem<P> crs, LinearRingToken<P>... tokens) {
+        if (tokens.length == 0) {
+            return new Polygon<P>(crs);
+        }
+        LinearRing<P>[] rings = new LinearRing[tokens.length];
+        int idx = 0;
+        for (LinearRingToken t : tokens) {
+            rings[idx++] = t.toGeometry(crs);
+        }
+        return new Polygon<P>(rings);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> PolygonToken<P> polygon(LinearRingToken<P>... tokens) {
+        return new PolygonToken<P>(tokens);
+    }
+
+    public static <P extends Position> MultiPoint<P> multipoint(Point<P> point, Point<P>... points) {
+        return new MultiPoint<P>(combine(Point.class, point, points));
+    }
+
+    public static <P extends Position> MultiPointToken<P> multipoint(PointToken<P>... tokens) {
+        return new MultiPointToken<P>(tokens);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, PointToken<P>... tokens) {
+
+        if (tokens.length == 0) return new MultiPoint<P>(crs);
+
+        Point<P>[] points = new Point[tokens.length];
+        int idx = 0;
+        for (PointToken t : tokens) {
+            points[idx++] = t.toGeometry(crs);
+        }
+        return new MultiPoint<P>(points);
+
+    }
+
+    public static <P extends Position> MultiLineString<P> multilinestring(LineString<P> linestring, LineString<P>... linestrings) {
+        return new MultiLineString<P>(combine(LineString.class, linestring, linestrings));
+    }
+
+    public static <P extends Position> MultiLineStringToken<P> multilinestring(LineStringToken<P>... tokens) {
+        return new MultiLineStringToken<P>(tokens);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> MultiLineString<P> multilinestring(CoordinateReferenceSystem<P> crs, LineStringToken<P>... tokens) {
+        if (tokens.length == 0) return new MultiLineString<P>(crs);
+        LineString<P>[] linestrings = new LineString[tokens.length];
+        int idx = 0;
+        for (LineStringToken t : tokens) {
+            linestrings[idx++] = t.toGeometry(crs);
+        }
+        return new MultiLineString<P>(linestrings);
+    }
+
+    public static <P extends Position> MultiPolygon<P> multipolygon(Polygon<P> polygon, Polygon<P>... polygons) {
+        return new MultiPolygon<P>(combine(Polygon.class, polygon, polygons));
+    }
+
+    public static <P extends Position> MultiPolygonToken<P> multipolygon(PolygonToken<P>... tokens) {
+        return new MultiPolygonToken<P>(tokens);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> MultiPolygon<P> multipolygon(CoordinateReferenceSystem<P> crs, PolygonToken<P>... tokens) {
+
+        if (tokens.length == 0) return new MultiPolygon<P>(crs);
+        Polygon<P>[] polygons = new Polygon[tokens.length];
+        int idx = 0;
+        for (PolygonToken t : tokens) {
+            polygons[idx++] = t.toGeometry(crs);
+        }
+        return new MultiPolygon<P>(polygons);
+
+    }
+
+
+    static <P extends Position> PositionSequence<P> toSeq(CoordinateReferenceSystem<P> crs, P[] positions) {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, crs.getPositionClass());
+        double[] coords = new double[crs.getCoordinateDimension()];
+        for (P t : positions) {
+            P pos = Positions.mkPosition(crs, t.toArray(coords));
+            builder.add(pos);
+        }
+        return builder.toPositionSequence();
+    }
+
+    public abstract static class GeometryToken<P extends Position> {
+        abstract Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs);
+
+    }
+
+    public static class PointToken<P extends Position> extends GeometryToken<P> {
+        private P p;
+
+        PointToken(P p) {
+            this.p = p;
         }
 
         @Override
-        void addTo(PointSequenceBuilder psBuilder) {
-            psBuilder.add(x, y);
-        }
-
-        @Override
-        DimensionalFlag dFlag() {
-            return DimensionalFlag.d2D;
+        Point<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            return new Point<P>(p, crs);
         }
     }
 
-    public static class Vertex2DMToken extends VertexToken {
-        protected final double x, y, m;
+    public static class LineStringToken<P extends Position> extends GeometryToken<P> {
+        private P[] positions;
 
-        Vertex2DMToken(double x, double y, double m) {
-            this.x = x;
-            this.y = y;
-            this.m = m;
+
+        LineStringToken(P... positions) {
+            this.positions = Arrays.copyOf(positions, positions.length);
         }
 
         @Override
-        void addTo(PointSequenceBuilder psBuilder) {
-            psBuilder.add(x, y, m);
-        }
-
-        @Override
-        DimensionalFlag dFlag() {
-            return DimensionalFlag.d2DM;
+        LineString<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            return new LineString<P>(toSeq(crs, positions), crs);
         }
     }
 
-    public static class Vertex3DToken extends VertexToken {
-        protected final double x, y, z;
+    public static class LinearRingToken<P extends Position> extends GeometryToken<P> {
+        private P[] positions;
 
-        Vertex3DToken(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+
+        LinearRingToken(P... positions) {
+            this.positions = Arrays.copyOf(positions, positions.length);
         }
 
         @Override
-        void addTo(PointSequenceBuilder psBuilder) {
-            psBuilder.add(x, y, z);
-        }
-
-        @Override
-        DimensionalFlag dFlag() {
-            return DimensionalFlag.d3D;
+        LinearRing<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            return new LinearRing<P>(toSeq(crs, positions), crs);
         }
     }
 
-    public static class Vertex3DMToken extends VertexToken {
-        protected final double x, y, z, m;
 
-        Vertex3DMToken(double x, double y, double z, double m) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.m = m;
+    public static class PolygonToken<P extends Position> extends GeometryToken<P> {
+        private LinearRingToken[] ringTokens;
+
+        PolygonToken(LinearRingToken<P>... ringTokens) {
+            this.ringTokens = Arrays.copyOf(ringTokens, ringTokens.length);
         }
 
         @Override
-        void addTo(PointSequenceBuilder psBuilder) {
-            psBuilder.add(x, y, z, m);
-        }
+        @SuppressWarnings("unchecked")
+        Polygon<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            LinearRing<P>[] rings = new LinearRing[ringTokens.length];
 
-        @Override
-        DimensionalFlag dFlag() {
-            return DimensionalFlag.d3DM;
+            for (int i = 0; i < rings.length; i++) {
+                rings[i] = ringTokens[i].toGeometry(crs);
+            }
+            return new Polygon(rings);
         }
     }
 
+    public static class GeometryCollectionToken<P extends Position> extends GeometryToken<P> {
+        private GeometryToken[] tokens;
+
+
+        GeometryCollectionToken(GeometryToken<P>... tokens) {
+            this.tokens = Arrays.copyOf(tokens, tokens.length);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        GeometryCollection<P, Geometry<P>> toGeometry(CoordinateReferenceSystem<P> crs) {
+            Geometry<P>[] parts = new Geometry[tokens.length];
+
+            for (int i = 0; i < tokens.length; i++) {
+                parts[i] = tokens[i].toGeometry(crs);
+            }
+            return new GeometryCollection<P, Geometry<P>>(parts);
+        }
+
+    }
+
+    public static class MultiPointToken<P extends Position> extends GeometryToken<P> {
+        private PointToken[] tokens;
+
+        MultiPointToken(PointToken<P>... tokens) {
+            this.tokens = Arrays.copyOf(tokens, tokens.length);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        MultiPoint<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            Point<P>[] parts = new Point[tokens.length];
+
+            for (int i = 0; i < tokens.length; i++) {
+                parts[i] = tokens[i].toGeometry(crs);
+            }
+            return new MultiPoint<P>(parts);
+        }
+
+    }
+
+
+    public static class MultiLineStringToken<P extends Position> extends GeometryToken<P> {
+        private LineStringToken[] tokens;
+
+        MultiLineStringToken(LineStringToken... tokens) {
+            this.tokens = Arrays.copyOf(tokens, tokens.length);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        MultiLineString<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            LineString<P>[] parts = new LineString[tokens.length];
+
+            for (int i = 0; i < tokens.length; i++) {
+                parts[i] = tokens[i].toGeometry(crs);
+            }
+            return new MultiLineString<P>(parts);
+        }
+
+    }
+
+    public static class MultiPolygonToken<P extends Position> extends GeometryToken<P> {
+        private PolygonToken[] tokens;
+
+        MultiPolygonToken(PolygonToken... tokens) {
+            this.tokens = Arrays.copyOf(tokens, tokens.length);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        MultiPolygon<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            Polygon<P>[] parts = new Polygon[tokens.length];
+
+            for (int i = 0; i < tokens.length; i++) {
+                parts[i] = tokens[i].toGeometry(crs);
+            }
+            return new MultiPolygon<P>(parts);
+        }
+
+    }
 
 }

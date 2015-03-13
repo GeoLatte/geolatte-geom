@@ -21,30 +21,28 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
+ * A {@code GeometryCollection} of {@code Point}s.
+ *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class MultiPoint extends GeometryCollection {
+public class MultiPoint<P extends Position> extends GeometryCollection<P, Point<P>> {
 
-
-    static final MultiPoint EMPTY = new MultiPoint(new Point[0]);
-
-    /**
-     * Constructs an empty <code>MultiPoint</code>.
-     *
-     * @return an empty <code>MultiPoint</code>.
-     */
-    public static MultiPoint createEmpty() {
-        return EMPTY;
-    }
 
     /**
      * Constructs a <code>MultiPoint</code> from the specified <code>Point</code>s
      *
      * @param points the element <code>Point</code>s for the constructed <code>MultiPoint</code>
      */
-    public MultiPoint(Point[] points) {
+//    @SafeVarargs
+    public MultiPoint(Point<P>... points) {
         super(points);
+    }
+
+    public MultiPoint(CoordinateReferenceSystem<P> crs) {
+        super(crs);
     }
 
     @Override
@@ -54,17 +52,13 @@ public class MultiPoint extends GeometryCollection {
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_POINT;
+        return GeometryType.MULTIPOINT;
     }
 
-    @Override
-    public Geometry getBoundary() {
-        return MultiPoint.EMPTY;
-    }
 
     @Override
-    public Point getGeometryN(int num) {
-        return (Point)super.getGeometryN(num);
+    public Class<? extends Geometry> getComponentType() {
+        return Point.class;
     }
 
 }

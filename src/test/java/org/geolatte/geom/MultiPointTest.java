@@ -21,12 +21,16 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.geolatte.geom.builder.DSL.g;
+import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.*;
 
 /**
@@ -35,15 +39,15 @@ import static org.junit.Assert.*;
  */
 public class MultiPointTest {
 
-    MultiPoint pnt1;
-    MultiPoint pnt2;
-    CrsId wgs84 = CrsId.valueOf(4326);
+    MultiPoint<G2D> pnt1;
+    MultiPoint<G2D> pnt2;
+    Geographic2DCoordinateReferenceSystem wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 
     @Before
     public void setUp(){
 
-        this.pnt1 = new MultiPoint(createPointsAllDifferent(5, wgs84));
-        this.pnt2 = new MultiPoint(createPointsNotAllDifferent(5, wgs84));
+        this.pnt1 = new MultiPoint<G2D>(createPointsAllDifferent(5, wgs84));
+        this.pnt2 = new MultiPoint<G2D>(createPointsNotAllDifferent(5, wgs84));
     }
 
     @Test
@@ -51,8 +55,8 @@ public class MultiPointTest {
         com.vividsolutions.jts.geom.Geometry jtsMP = JTS.to(pnt1);
         assertEquals(jtsMP.getNumGeometries(), pnt1.getNumGeometries());
         for (int i = 0; i < pnt1.getNumGeometries(); i++) {
-            assertEquals(jtsMP.getGeometryN(i).getCoordinate().x, pnt1.getGeometryN(i).getX(), Math.ulp(100));
-            assertEquals(jtsMP.getGeometryN(i).getCoordinate().y, pnt1.getGeometryN(i).getY(), Math.ulp(100));
+            assertEquals(jtsMP.getGeometryN(i).getCoordinate().x, pnt1.getGeometryN(i).getPosition().getCoordinate(0), Math.ulp(100));
+            assertEquals(jtsMP.getGeometryN(i).getCoordinate().y, pnt1.getGeometryN(i).getPosition().getCoordinate(1), Math.ulp(100));
         }
     }
 
@@ -64,42 +68,26 @@ public class MultiPointTest {
 
     @Test
     public void testGetGeometryType() throws Exception {
-        Assert.assertEquals(GeometryType.MULTI_POINT, pnt1.getGeometryType());
+        Assert.assertEquals(GeometryType.MULTIPOINT, pnt1.getGeometryType());
 
     }
 
-    @Test
-    public void testGetBoundary() throws Exception {
-        assertEquals(MultiPoint.EMPTY, pnt1.getBoundary());
-    }
-
-    @Test
-    public void testGetGeometryN() throws Exception {
-        for (int i = 0; i < pnt1.getNumGeometries(); i++){
-            Assert.assertEquals(Points.create2D(i, i, wgs84), pnt1.getGeometryN(i));
-        }
-    }
-
-    @Test
-    public void testIsSimple() throws Exception{
-        assertTrue(pnt1.isSimple());
-        assertFalse(pnt2.isSimple());
-    }
-
-    private Point[] createPointsNotAllDifferent(int size, CrsId crsId) {
+    @SuppressWarnings("unchecked")
+    private Point<G2D>[] createPointsNotAllDifferent(int size, CoordinateReferenceSystem<G2D> crs) {
         if (size < 4 ) throw new IllegalArgumentException("Size must be at least 4");
-        Point[] points = new Point[size];
+        Point<G2D>[] points = (Point<G2D>[])new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Points.create2D(i, i, crsId);
+            points[i] = point(crs,g(i,i));
         }
         points[0] = points[size -1];
         return points;
     }
 
-    private Point[] createPointsAllDifferent(int size, CrsId crsId) {
-        Point[] points = new Point[size];
+    @SuppressWarnings("unchecked")
+    private Point<G2D>[] createPointsAllDifferent(int size, CoordinateReferenceSystem<G2D> crs) {
+        Point<G2D>[] points = (Point<G2D>[])new Point[size];
         for (int i = 0; i < size; i++) {
-            points[i] = Points.create2D(i, i, crsId);
+            points[i] = point(crs, g(i, i));
         }
         return points;
     }

@@ -21,23 +21,27 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
 public class MultiLineStringTest {
 
-    private MultiLineString ml1;
-    private MultiLineString ml2;
-    private MultiLineString empty;
-    private MultiLineString closedSimple;
+
+    private static PositionFactory<C2D> d2D = Positions.getFactoryFor(crs.getPositionClass());
+    private static PositionFactory<C2DM> d2DM = Positions.getFactoryFor(crsM.getPositionClass());
+
+    private MultiLineString<C2DM> ml1;
+    private MultiLineString<C2DM> ml2;
+    private MultiLineString<C2DM> empty;
+    private MultiLineString<C2DM> closedSimple;
 
     double[] c1 = new double[]{0,0,1, 1,1,2, 2,2, 3};
     double[] c2 = new double[]{3,2,1, 4,2,2, 5,1, 3};
@@ -45,27 +49,21 @@ public class MultiLineStringTest {
     double[] cClosedSimple = new double[]{0,0,1, 0,1,1, 1,1,2, 1,0,3, 0,0,4};
     double[] cClosedNonSimple = new double[]{1,1,1, 1,-1,2, -1,1,3, -1,-1,4, 1,1,5 };
 
-    LineString ls1 = new LineString(new PackedPointSequence(c1, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString ls2 = new LineString(new PackedPointSequence(c2, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString ls3 = new LineString(new PackedPointSequence(c3, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString lcs = new LineString(new PackedPointSequence(cClosedSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
-    LineString lcns = new LineString(new PackedPointSequence(cClosedNonSimple, DimensionalFlag.d2DM, CrsId.UNDEFINED));
+    LineString<C2DM> ls1 = new LineString<C2DM>(new PackedPositionSequence<C2DM>(d2DM, c1), crsM);
+    LineString<C2DM> ls2 = new LineString<C2DM>(new PackedPositionSequence<C2DM>(d2DM, c2), crsM);
+    LineString<C2DM> ls3 = new LineString<C2DM>(new PackedPositionSequence<C2DM>(d2DM,c3), crsM);
+    LineString<C2DM> lcs = new LineString<C2DM>(new PackedPositionSequence<C2DM>(d2DM, cClosedSimple), crsM);
+    LineString<C2DM> lcns = new LineString<C2DM>(new PackedPositionSequence<C2DM>(d2DM, cClosedNonSimple), crsM);
 
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() {
-        ml1 = new MultiLineString(new LineString[]{ls1, ls2});
-        ml2 = new MultiLineString(new LineString[]{ls2, ls3});
-        empty = MultiLineString.createEmpty();
-        closedSimple = new MultiLineString(new LineString[]{lcs});
-        MultiLineString closedNonSimple = new MultiLineString(new LineString[]{lcs,lcns});
-    }
-
-    @Test
-    public void testConstituentsHaveSameDimension(){
-        for (int i = 0; i < ml1.getNumGeometries(); i++) {
-            assertEquals(((LineString) ml1.getGeometryN(i)).getPoints().getDimensionalFlag(), ml1.getPoints().getDimensionalFlag());
-        }
+        ml1 = new MultiLineString<C2DM>(ls1, ls2);
+        ml2 = new MultiLineString<C2DM>(ls2, ls3);
+        empty = new MultiLineString(crs);
+        closedSimple = new MultiLineString<C2DM>(lcs);
+        MultiLineString closedNonSimple = new MultiLineString(lcs,lcns);
     }
 
     @Test
@@ -82,11 +80,6 @@ public class MultiLineStringTest {
         assertEquals(ls2, ml1.getGeometryN(1));
     }
 
-    @Test
-    public void testGetLength() throws Exception {
-        assertEquals(0.0d, empty.getLength(), Math.ulp(1d));
-        assertEquals(1+3 * Math.sqrt(2), ml1.getLength(), Math.ulp(1f));
-    }
 
     @Test
     public void testIterator() throws Exception {
@@ -98,13 +91,6 @@ public class MultiLineStringTest {
         assertEquals(2, i);
     }
 
-    @Test
-    public void testGeometryVisitor() throws Exception {
-        LengthCollectingVisitor visitor =  new LengthCollectingVisitor();
-        ml1.accept(visitor);
-        assertEquals(ml1.getLength(), visitor.length, Math.ulp(visitor.length));
-
-    }
 
     @Test
     public void testIsClosed() throws Exception {
@@ -126,39 +112,4 @@ public class MultiLineStringTest {
 
     }
 
-    static class LengthCollectingVisitor implements GeometryVisitor {
-            double length = 0.0d;
-
-        @Override
-        public void visit(Point point) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(LineString lineString) {
-            length += lineString.getLength();
-        }
-
-        @Override
-        public void visit(Polygon polygon) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(GeometryCollection collection) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(LinearRing linearRing) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void visit(PolyHedralSurface surface) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-
-    }
 }

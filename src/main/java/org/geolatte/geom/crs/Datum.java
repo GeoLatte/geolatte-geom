@@ -33,7 +33,7 @@ import java.util.Arrays;
  * "These parameters can be used to approximate a transformation from the horizontal datum
  * to the WGS84 datum. However, it must be remembered that this transformation is only an approximation.
  * For a given horizontal datum, different Bursa Wolf transformations can be used to minimize the errors over different
- * regions. If the DATUM clause contains a TOWGS84 clause, then this should be its “preferred”
+ * regions. If the DATUM clause contains a TOWGS84 clause, then this should be its "preferred"
  * transformation, which will often be the transformation which gives a broad approximation over the whole
  * area of interest (e.g. the area of interest in the containing geographic coordinate system).
  * Sometimes, only the first three or six parameters are defined. In this case the remaining parameters must be zero.

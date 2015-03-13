@@ -22,48 +22,49 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class AbstractGeometryCollectionDecoder<T extends GeometryCollection> extends AbstractDecoder<T> {
+abstract class AbstractGeometryCollectionDecoder extends AbstractDecoder {
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.GEOMETRYCOLLECTION;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.GEOMETRYCOLLECTION;
+    }
 
-	@Override
-	protected T createNullGeometry() {
-		return createGeometry( (List<Geometry>) null, false );
-	}
+    @Override
+    protected <P extends Position> Geometry<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
+        return createGeometry((List) null, null);
+    }
 
-	@Override
-	protected T createGeometry(SqlServerGeometry nativeGeom) {
-		return createGeometry( nativeGeom, 0 );
-	}
+    @Override
+    protected <P extends Position> Geometry<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
+        return createGeometry(nativeGeom, 0);
+    }
 
-	@Override
-	protected T createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
-		int startChildIdx = shapeIndex + 1;
-		List<Geometry> geometries = new ArrayList<Geometry>( nativeGeom.getNumShapes() );
-		for ( int childIdx = startChildIdx; childIdx < nativeGeom.getNumShapes(); childIdx++ ) {
-			if ( !nativeGeom.isParentShapeOf( shapeIndex, childIdx ) ) {
-				continue;
-			}
-			AbstractDecoder<?> decoder = (AbstractDecoder<?>) Decoders.decoderFor(
-					nativeGeom.getOpenGisTypeOfShape(
-							childIdx
-					)
-			);
-			Geometry geometry = decoder.createGeometry( nativeGeom, childIdx );
-			geometries.add( geometry );
-		}
-		return createGeometry( geometries, nativeGeom.hasMValues() );
-	}
+    @Override
+    protected <P extends Position> Geometry<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
+        int startChildIdx = shapeIndex + 1;
+        List<Geometry<P>> geometries = new ArrayList<Geometry<P>>(nativeGeom.getNumShapes());
+        for (int childIdx = startChildIdx; childIdx < nativeGeom.getNumShapes(); childIdx++) {
+            if (!nativeGeom.isParentShapeOf(shapeIndex, childIdx)) {
+                continue;
+            }
+            AbstractDecoder decoder = (AbstractDecoder) Decoders.decoderFor(
+                    nativeGeom.getOpenGisTypeOfShape(
+                            childIdx
+                    )
+            );
+            Geometry<P> geometry = decoder.createGeometry(nativeGeom, childIdx);
+            geometries.add(geometry);
+        }
+        return createGeometry(geometries, nativeGeom);
+    }
 
-	abstract protected T createGeometry(List<Geometry> geometries, boolean hasM);
+    abstract protected <P extends Position> Geometry<P> createGeometry(List geometries, SqlServerGeometry<P> nativeGeom);
 
 
 }

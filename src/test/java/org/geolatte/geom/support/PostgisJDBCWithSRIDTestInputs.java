@@ -22,17 +22,20 @@
 package org.geolatte.geom.support;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+
+import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 10/13/12
  */
 public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
-    final CrsId crsId = CrsId.valueOf(4326);
 
-    public PostgisJDBCWithSRIDTestInputs(){
+    public PostgisJDBCWithSRIDTestInputs() {
         PostgisJDBCUnitTestInputs base = new PostgisJDBCUnitTestInputs();
         for (Integer testCase : base.getCases()) {
             addCase(testCase,
@@ -46,75 +49,23 @@ public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
     private Geometry addCrsId(PostgisJDBCUnitTestInputs base, Integer testCase) {
         Geometry geom = base.getExpected(testCase);
-        if (geom.isEmpty()) return geom;
-        return addCrsId(geom);
+        CoordinateReferenceSystem<?> crs = null;
+        CoordinateReferenceSystem<?> srcCrs = geom.getCoordinateReferenceSystem();
 
-    }
-
-    private Geometry addCrsId(Geometry geom) {
-        if (geom instanceof Point) {
-            Point pnt = (Point) geom;
-            return new Point(forceCrsId(pnt.getPoints()));
-        } else if (geom instanceof LinearRing) {
-            LinearRing lr = (LinearRing)geom;
-            return new LinearRing(forceCrsId(lr.getPoints()));
-        } else if (geom instanceof LineString) {
-            LineString ls = (LineString)geom;
-            return new LineString(forceCrsId(ls.getPoints()));
-        } else if (geom instanceof MultiPoint) {
-            MultiPoint mp = (MultiPoint)geom;
-            Point[] points = new Point[mp.getNumGeometries()];
-            addCrsId(points, mp);
-            return new MultiPoint(points);
-        } else if (geom instanceof Polygon) {
-            Polygon pg = (Polygon)geom;
-            LinearRing[] rings = new LinearRing[pg.getNumInteriorRing() + 1];
-            addCrsId(rings, pg);
-            return new Polygon(rings);
-        } else if (geom instanceof MultiPolygon) {
-            MultiPolygon mpg = (MultiPolygon)geom;
-            Polygon[] polygons = new Polygon[mpg.getNumGeometries()];
-            addCrsId(polygons, mpg);
-            return new MultiPolygon(polygons);
-        } else if (geom instanceof MultiLineString) {
-            MultiLineString mls = (MultiLineString)geom;
-            LineString[] ls = new LineString[mls.getNumGeometries()];
-            addCrsId(ls, mls);
-            return new MultiLineString(ls);
-        }  else if (geom instanceof GeometryCollection) {
-            GeometryCollection gc = (GeometryCollection)geom;
-            Geometry[] parts = new Geometry[gc.getNumGeometries()];
-            addCrsId(parts, gc);
-            return new GeometryCollection(parts);
+        if (hasVerticalAxis(srcCrs) &&  hasMeasureAxis(srcCrs)) {
+            crs = WGS84_ZM;
+        } else if (hasVerticalAxis(srcCrs)) {
+            crs = WGS84_Z;
+        } else if (hasMeasureAxis(srcCrs)) {
+            crs = WGS84_M;
+        } else {
+            crs = WGS84;
         }
-        return geom;
-    }
+        return Geometry.forceToCrs(base.getExpected(testCase), crs);
 
-    private PointSequence forceCrsId(PointSequence pointSequence) {
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(pointSequence.size(), pointSequence.getDimensionalFlag(), crsId);
-        for (Point pnt : pointSequence) {
-            builder.add(pnt);
-        }
-        return builder.toPointSequence();
-    }
-
-    private void addCrsId(Geometry[] result, GeometryCollection source) {
-        for (int i = 0; i < result.length; i++) {
-            result[i] = addCrsId(source.getGeometryN(i));
-        }
-    }
-
-    private void addCrsId(Geometry[] result, Polygon source) {
-        result[0] = addCrsId(source.getExteriorRing());
-        for (int i = 1; i < result.length; i++) {
-            result[i] = addCrsId(source.getInteriorRingN(i - 1));
-        }
     }
 
     private String toSRIDPrefixedWKB(PostgisJDBCUnitTestInputs base, Integer testCase) {
-        if (base.getExpected(testCase).isEmpty()) {
-            return base.getWKBHexString(testCase);
-        }
         String hexBase = base.getWKBHexString(testCase);
         ByteBuffer inBuffer = ByteBuffer.from(hexBase);
         //get the relevant parts

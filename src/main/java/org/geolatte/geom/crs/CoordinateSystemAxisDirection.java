@@ -29,16 +29,28 @@ package org.geolatte.geom.crs;
  */
 public enum CoordinateSystemAxisDirection {
 
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST,
-    UP,
-    DOWN,
-    OTHER,
-    UNKNOWN,
-    GeocentricX,
-    GeocentricY,
-    GeocentricZ
+    NORTH(1),
+    EAST(0),
+    SOUTH(1),
+    WEST(0),
+    UP(2),
+    DOWN(2),
+    OTHER(3),
+    UNKNOWN(3),
+    GeocentricX(0),
+    GeocentricY(1),
+    GeocentricZ(2);
+
+    public final int defaultNormalOrder;
+
+    private CoordinateSystemAxisDirection(int order) {
+        this.defaultNormalOrder = order;
+    }
+
+    int getDefaultNormalOrder() {
+        return defaultNormalOrder;
+    }
+
 
 }
+

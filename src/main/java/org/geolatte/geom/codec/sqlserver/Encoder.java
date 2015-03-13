@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 
 /**
  * An <code>Encoder</code> can encode
@@ -29,10 +30,10 @@ import org.geolatte.geom.Geometry;
  *
  * @author Karel Maesen, Geovise BVBA.
  */
-public interface Encoder<T extends Geometry> {
+public interface Encoder {
 
-	public SqlServerGeometry encode(T geom);
+	public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom);
 
-	public boolean accepts(Geometry geom);
+	public <P extends Position> boolean accepts(Geometry<P> geom);
 
 }

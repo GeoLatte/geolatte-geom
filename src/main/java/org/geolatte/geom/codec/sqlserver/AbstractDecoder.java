@@ -23,15 +23,17 @@ package org.geolatte.geom.codec.sqlserver;
 
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-abstract class AbstractDecoder<G extends Geometry> implements Decoder<G> {
+abstract class AbstractDecoder implements Decoder {
 
-	public G decode(SqlServerGeometry nativeGeom) {
+	public <P extends Position> Geometry<P> decode(SqlServerGeometry<P> nativeGeom) {
 		if ( !accepts( nativeGeom ) ) {
 			throw new IllegalArgumentException( getClass().getSimpleName() + " received object of type " + nativeGeom.openGisType() );
 		}
 		if ( nativeGeom.isEmpty() ) {
-			G nullGeom = createNullGeometry();
+			Geometry<P> nullGeom = createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
 			return nullGeom;
 		}
 		return createGeometry( nativeGeom );
@@ -41,16 +43,16 @@ abstract class AbstractDecoder<G extends Geometry> implements Decoder<G> {
 		return type == getOpenGisType();
 	}
 
-	public boolean accepts(SqlServerGeometry nativeGeom) {
+	public <P extends Position> boolean accepts(SqlServerGeometry<P> nativeGeom) {
 		return accepts( nativeGeom.openGisType() );
 	}
 
 	protected abstract OpenGisType getOpenGisType();
 
-	protected abstract G createNullGeometry();
+	protected abstract <P extends Position> Geometry<P> createNullGeometry(CoordinateReferenceSystem<P> crs);
 
-	protected abstract G createGeometry(SqlServerGeometry nativeGeom);
+	protected abstract <P extends Position> Geometry<P> createGeometry(SqlServerGeometry<P> nativeGeom);
 
-	protected abstract G createGeometry(SqlServerGeometry nativeGeom, int shapeIndex);
+	protected abstract <P extends Position> Geometry<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex);
 
 }

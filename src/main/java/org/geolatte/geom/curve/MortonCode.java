@@ -23,8 +23,9 @@ package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.regex.Pattern;
 
@@ -53,10 +54,10 @@ import java.util.regex.Pattern;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
-public class MortonCode {
+public class MortonCode<P extends C2D> {
 
     private final Pattern VALID_MORTONCODE_PATTERN = Pattern.compile("[0,1,2,3]*");
-    private final MortonContext mortonContext;
+    private final MortonContext<P> mortonContext;
     /**
      * The width of the leaves of the quadtree implied by the MortonContext
      */
@@ -75,7 +76,7 @@ public class MortonCode {
      *
      * @param mortonContext the context to  use when calculating morton codes.
      */
-    public MortonCode(MortonContext mortonContext) {
+    public MortonCode(MortonContext<P> mortonContext) {
         this.mortonContext = mortonContext;
         gridWidth = mortonContext.getLeafWidth();
         gridHeight = mortonContext.getLeafHeight();
@@ -92,7 +93,7 @@ public class MortonCode {
      * @throws IllegalArgumentException if the geometry is null, or has an envelope which is not contained in
      *                                  the spatial extent of this instance's {@code MortonContext}
      */
-    public String ofGeometry(Geometry geometry) {
+    public String ofGeometry(Geometry<P> geometry) {
         checkForNull(geometry);
         return ofEnvelope(geometry.getEnvelope());
     }
@@ -105,17 +106,17 @@ public class MortonCode {
      * @throws IllegalArgumentException if the value of the envelope parameter is null, or is not contained in
      *                                  the spatial extent of this instance's {@code MortonContext}
      */
-    public String ofEnvelope(Envelope envelope) {
+    public String ofEnvelope(Envelope<P> envelope) {
         checkForNull(envelope);
         checkWithinExtent(envelope);
 
         // recalculate the X,Y coordinates to grid-cell coordinates. These are
         // the row,column-indices of grid formed by the (lowest-level) leaves
         // of the Quadtree
-        int colMin = getCol(envelope.getMinX());
-        int rowMin = getRow(envelope.getMinY());
-        int colMax = getCol(envelope.getMaxX());
-        int rowMax = getRow(envelope.getMaxY());
+        int colMin = getCol(envelope.lowerLeft().getCoordinate(0));
+        int rowMin = getRow(envelope.lowerLeft().getCoordinate(1));
+        int colMax = getCol(envelope.upperRight().getCoordinate(0));
+        int rowMax = getRow(envelope.upperRight().getCoordinate(1));
         int[] cols = {colMin, colMax};
         int[] rows = {rowMin, rowMax};
 
@@ -131,17 +132,17 @@ public class MortonCode {
     /**
      * Returns the Morton code for the specified {@code Point}.
      *
-     * @param point an {@code Point} value.
+     * @param pos an {@code Point} value.
      * @return the morton code for the specified {@code Point} value.
      * @throws IllegalArgumentException if the value of the point parameter is null, or is not contained in
      *                                  the spatial extent of this instance's {@code MortonContext}
      */
-    public String ofPoint(Point point) {
+    public String ofPosition(P pos) {
         //check inputs
-        checkForNull(point);
-        checkWithinExtent(point);
-        int col = getCol(point.getX());
-        int row = getRow(point.getY());
+        checkForNull(pos);
+        checkWithinExtent(pos);
+        int col = getCol(pos.getX());
+        int row = getRow(pos.getY());
         long interleaved = interleave(col, row);
         return pointMortonCodeAsString(interleaved);
     }
@@ -159,40 +160,38 @@ public class MortonCode {
      * @param mortoncode a morton code String
      * @return the {@code} envelope representing the specified morton code
      */
-    public Envelope envelopeOf(String mortoncode) {
+    public Envelope<P> envelopeOf(String mortoncode) {
         if (mortoncode == null || ! isValidMortonCode(mortoncode)) {
             throw new IllegalArgumentException(String.format(
                     "Parameter %s is not a valid mortoncode with max. depth %d.", mortoncode, mortonContext.getDepth()));
         }
         return envelopeOf(mortoncode, 0, mortonContext.getExtent());
-
-
     }
 
     /*
     A recursive procedure for calculating the envelope of a mortoncode.
     We recurse on index into the morton code (in this way we do not have to take apart the mortoncode String)
      */
-    private Envelope envelopeOf(String mortoncode, int index, Envelope extent) {
+    private Envelope<P> envelopeOf(String mortoncode, int index, Envelope<P> extent) {
         assert (extent != null);
         if (index >= mortoncode.length()) {
             return extent;
         }
         char c = mortoncode.charAt(index);
-        double minX = extent.getMinX();
-        double minY = extent.getMinY();
-        double w = extent.getWidth() / 2.0;
-        double h = extent.getHeight() / 2.0;
-        CrsId crs = extent.getCrsId();
+        double minX = extent.lowerLeft().getCoordinate(0);
+        double minY = extent.lowerLeft().getCoordinate(1);
+        double w = (extent.extentAlongDimension(0)) / 2.0;
+        double h = (extent.extentAlongDimension(1)) / 2.0;
+        CoordinateReferenceSystem<P> crs = extent.getCoordinateReferenceSystem();
         switch (c) {
             case '0':
-                return envelopeOf(mortoncode, ++index, new Envelope(minX, minY, minX + w, minY + h, crs));
+                return envelopeOf(mortoncode, ++index, new Envelope<P>(minX, minY, minX + w, minY + h, crs));
             case '1':
-                return envelopeOf(mortoncode, ++index, new Envelope(minX, minY + h, minX + w, minY + 2 * h, crs));
+                return envelopeOf(mortoncode, ++index, new Envelope<P>(minX, minY + h, minX + w, minY + 2 * h, crs));
             case '2':
-                return envelopeOf(mortoncode, ++index, new Envelope(minX + w, minY, minX + 2 * w, minY + h, crs));
+                return envelopeOf(mortoncode, ++index, new Envelope<P>(minX + w, minY, minX + 2 * w, minY + h, crs));
             case '3':
-                return envelopeOf(mortoncode, ++index, new Envelope(minX + w, minY + h, minX + 2 * w, minY + 2 * h, crs));
+                return envelopeOf(mortoncode, ++index, new Envelope<P>(minX + w, minY + h, minX + 2 * w, minY + 2 * h, crs));
             default:
                 //this can only be a programming error!
                 throw new IllegalStateException("Received a mortoncode element that is not 0, 1, 2 or 3.");
@@ -220,13 +219,13 @@ public class MortonCode {
         return row > maxGridCellCoordinate ? row - 1 : row;
     }
 
-    private void checkWithinExtent(Point pnt) {
-        if (!mortonContext.extentContains(pnt)) {
+    private void checkWithinExtent(P pos) {
+        if (!mortonContext.extentContains(pos)) {
             throw new IllegalArgumentException("Point not in extent of this MortonCodeContext.");
         }
     }
 
-    private void checkWithinExtent(Envelope envelope) {
+    private void checkWithinExtent(Envelope<P> envelope) {
         if (!mortonContext.extentContains(envelope)) {
             throw new IllegalArgumentException("Geometry envelope not in extent of this MortonCodeContext.");
         }
@@ -284,7 +283,7 @@ public class MortonCode {
      *
      * @param interleaved the morton code as a long
      * @param level       the level of the morton code
-     * @return
+     * @return  a String representation of the MortonCode
      */
     private String toRadix4String(long interleaved, int level) {
         char[] cbuf = new char[level];

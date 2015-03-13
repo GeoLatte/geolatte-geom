@@ -22,9 +22,11 @@
 package org.geolatte.geom.codec.sqlserver;
 
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.PointSequence;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-class LineStringDecoder extends AbstractDecoder<LineString> {
+class LineStringDecoder extends AbstractDecoder {
 
 
 	@Override
@@ -32,26 +34,27 @@ class LineStringDecoder extends AbstractDecoder<LineString> {
 		return OpenGisType.LINESTRING;
 	}
 
-	protected LineString createNullGeometry() {
-		return LineString.createEmpty();
+	protected <P extends Position> LineString<P> createNullGeometry(CoordinateReferenceSystem<P> crs) {
+		return new LineString<P>(crs);
 	}
 
-	protected LineString createGeometry(SqlServerGeometry nativeGeom) {
+	protected <P extends Position>  LineString<P> createGeometry(SqlServerGeometry<P> nativeGeom) {
 		return createLineString( nativeGeom, new IndexRange( 0, nativeGeom.getNumPoints() ) );
 	}
 
 	@Override
-	protected LineString createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+	protected <P extends Position>  LineString<P> createGeometry(SqlServerGeometry<P> nativeGeom, int shapeIndex) {
 		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry();
+			return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
 		}
 		int figureOffset = nativeGeom.getFiguresForShape( shapeIndex ).start;
 		IndexRange pntIndexRange = nativeGeom.getPointsForFigure( figureOffset );
 		return createLineString( nativeGeom, pntIndexRange );
 	}
 
-	protected LineString createLineString(SqlServerGeometry nativeGeom, IndexRange pntIndexRange) {
-		PointSequence coordinates = nativeGeom.coordinateRange( pntIndexRange );
-		return new LineString(coordinates);
-	}
+	protected <P extends Position>  LineString<P> createLineString(SqlServerGeometry<P> nativeGeom, IndexRange pntIndexRange) {
+		PositionSequence<P> coordinates = nativeGeom.coordinateRange( pntIndexRange );
+        CoordinateReferenceSystem<P> coordinateReferenceSystem = nativeGeom.getCoordinateReferenceSystem();
+        return new LineString<P>(coordinates, coordinateReferenceSystem);
+    }
 }

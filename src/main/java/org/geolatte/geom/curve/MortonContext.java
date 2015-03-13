@@ -22,8 +22,9 @@
 package org.geolatte.geom.curve;
 
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A context for the calculation of Morton codes.
@@ -34,12 +35,12 @@ import org.geolatte.geom.crs.CrsId;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 2/19/13
  */
-public class MortonContext {
+public class MortonContext<P extends C2D> {
 
     final private static String ERR_MSG_MAX_DEPTH = "Max. depth is limited to " + (Integer.SIZE - 1);
     final private static String ERR_MSG_NULL = "No Null arguments allowed.";
     final private int depth;
-    final private Envelope extent;
+    final private Envelope<P> extent;
     final private int numOfDivisionsAlongAxis;
     final private double leafWidth;
     final private double leafHeight;
@@ -50,7 +51,7 @@ public class MortonContext {
      * @param extent the extent for this instance
      * @param depth  the tree-depth
      */
-    public MortonContext(Envelope extent, int depth) {
+    public MortonContext(Envelope<P> extent, int depth) {
         if (extent == null) {
             throw new IllegalArgumentException(ERR_MSG_NULL);
         }
@@ -62,8 +63,8 @@ public class MortonContext {
         this.extent = extent;
 
         this.numOfDivisionsAlongAxis = (int) (Math.pow(2, depth));
-        this.leafWidth =  (extent.getMaxX() - extent.getMinX()) / numOfDivisionsAlongAxis;
-        this.leafHeight = (extent.getMaxY() - extent.getMinY()) / numOfDivisionsAlongAxis;
+        this.leafWidth =  (extent.extentAlongDimension(0)) / numOfDivisionsAlongAxis;
+        this.leafHeight = (extent.extentAlongDimension(1)) / numOfDivisionsAlongAxis;
 
     }
 
@@ -73,7 +74,7 @@ public class MortonContext {
      * @return the maximum X-coordinate of the extent
      */
     public double getMaxX() {
-        return extent.getMaxX();
+        return extent.upperRight().getCoordinate(0);
     }
 
     /**
@@ -82,7 +83,7 @@ public class MortonContext {
      * @return the maximum Y-coordinate of the extent
      */
     public double getMaxY() {
-        return extent.getMaxY();
+        return extent.upperRight().getCoordinate(1);
     }
 
     /**
@@ -91,7 +92,7 @@ public class MortonContext {
      * @return the minimum X-coordinate of the extent
      */
     public double getMinX() {
-        return extent.getMinX();
+        return extent.lowerLeft().getCoordinate(0);
     }
     /**
      * Returns the minimum Y-coordinate of the extent
@@ -99,7 +100,7 @@ public class MortonContext {
      * @return the minimum Y-coordinate of the extent
      */
     public double getMinY() {
-        return extent.getMinY();
+        return extent.lowerLeft().getCoordinate(1);
     }
 
     /**
@@ -116,8 +117,8 @@ public class MortonContext {
      *
      * @return the CrsId of the spatial extent
      */
-    public CrsId getCrsId() {
-        return extent.getCrsId();
+    public CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
+        return extent.getCoordinateReferenceSystem();
     }
 
     /**
@@ -154,12 +155,12 @@ public class MortonContext {
     /**
      * Checks whether the specified {@code Point} is contained in the extent.
      *
-     * @param pnt a {@code Point} value
+     * @param pos a {@code Point} value
      * @return true if the specified point is contained in the extent, false otherwise
      * @throws IllegalArgumentException if the specified point does not share this extent's {@code CrsId}
      */
-    public boolean extentContains(Point pnt) {
-        return this.extent.contains(pnt);
+    public boolean extentContains(P pos) {
+        return this.extent.contains(pos);
     }
 
     /**
@@ -169,7 +170,7 @@ public class MortonContext {
      * @return true if the specified envelope is contained in the extent, false otherwise
      * @throws IllegalArgumentException if the specified envelope does not share this extent's {@code CrsId}
      */
-    public boolean extentContains(Envelope envelope) {
+    public boolean extentContains(Envelope<P> envelope) {
         return this.extent.contains(envelope);
     }
 
@@ -177,7 +178,7 @@ public class MortonContext {
      * Returns the spatial extent of this instance
      * @return an {@code Envelope} representing the spatial extent of this instance
      */
-    public Envelope getExtent() {
+    public Envelope<P> getExtent() {
         return extent;
     }
 }

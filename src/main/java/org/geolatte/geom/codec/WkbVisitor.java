@@ -27,7 +27,7 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-class WkbVisitor implements GeometryVisitor {
+class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
 
     private final ByteBuffer output;
@@ -38,86 +38,55 @@ class WkbVisitor implements GeometryVisitor {
     }
 
     @Override
-    public void visit(Point geom) {
+    public void visit(Point<P> geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
+        writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
             output.putUInt(0);
         } else {
-            writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            writePoints(geom.getPositions(), geom.getCoordinateDimension(), output);
         }
     }
 
     @Override
-    public void visit(LineString geom) {
+    public void visit(LineString<P> geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
+        writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
             output.putUInt(0);
         } else {
-            output.putUInt(geom.getNumPoints());
-            writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
+            output.putUInt(geom.getNumPositions());
+            writePoints(geom.getPositions(), geom.getCoordinateDimension(), output);
         }
     }
 
     @Override
-    public void visit(Polygon geom) {
+    public void visit(Polygon<P> geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
+        writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
             output.putUInt(0);
         } else {
             writeNumRings(geom, output);
-            for (LinearRing ring : geom) {
+            for (LinearRing<P> ring : geom) {
                 writeRing(ring);
             }
         }
     }
 
     @Override
-    public void visit(PolyHedralSurface geom) {
+    public  <G extends Geometry<P>>  void visit(GeometryCollection<P,G> geom) {
         writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
-        if (geom.isEmpty()) {
-            output.putUInt(0);
-        } else {
-            output.putUInt(geom.getNumPatches());
-            for (Polygon pg : geom) {
-                pg.accept(this);
-            }
-        }
-    }
-
-    @Override
-    public void visit(GeometryCollection geom) {
-        writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
+        writeTypeCodeAndSrid(geom, output);
         output.putUInt(geom.getNumGeometries());
     }
 
-    @Override
-    public void visit(LinearRing geom) {
-        writeByteOrder(output);
-        DimensionalFlag dimension = DimensionalFlag.valueOf(geom.is3D(), geom.isMeasured());
-        writeTypeCodeAndSrid(geom, dimension, output);
-        if (geom.isEmpty()) {
-            output.putUInt(0);
-        } else {
-            writeRing(geom);
-        }
+    protected void writeRing(LinearRing<P> geom) {
+        output.putUInt(geom.getNumPositions());
+        writePoints(geom.getPositions(), geom.getCoordinateDimension(), output);
     }
 
-    protected void writeRing(LinearRing geom) {
-        output.putUInt(geom.getNumPoints());
-        writePoints(geom.getPoints(), geom.getCoordinateDimension(), output);
-    }
-
-    protected void writeNumRings(Polygon geom, ByteBuffer byteBuffer) {
+    protected void writeNumRings(Polygon<P> geom, ByteBuffer byteBuffer) {
         byteBuffer.putUInt(geom.isEmpty() ? 0 : geom.getNumInteriorRing() + 1);
     }
 
@@ -127,10 +96,10 @@ class WkbVisitor implements GeometryVisitor {
         }
     }
 
-    protected void writePoints(PointSequence points, int coordinateDimension, ByteBuffer output) {
+    protected void writePoints(PositionSequence<P> points, int coordinateDimension, ByteBuffer output) {
         double[] coordinates = new double[coordinateDimension];
         for (int i = 0; i < points.size(); i++) {
-            points.getCoordinates(coordinates, i);
+            points.getCoordinates(i, coordinates);
             writePoint(coordinates, output);
         }
     }
@@ -139,12 +108,12 @@ class WkbVisitor implements GeometryVisitor {
         output.put(output.getByteOrder().byteValue());
     }
 
-    protected void writeTypeCodeAndSrid(Geometry geometry, DimensionalFlag dimension, ByteBuffer output) {
+    protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
         int typeCode = getGeometryType(geometry);
         output.putUInt(typeCode);
     }
 
-    protected int getGeometryType(Geometry geometry) {
+    protected int getGeometryType(Geometry<P> geometry) {
         //empty geometries have the same representation as an empty geometry collection
         if (geometry.isEmpty()) {
             return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();

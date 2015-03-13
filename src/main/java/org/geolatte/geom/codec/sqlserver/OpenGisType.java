@@ -22,13 +22,7 @@
 package org.geolatte.geom.codec.sqlserver;
 
 
-import org.geolatte.geom.GeometryCollection;
-import org.geolatte.geom.LineString;
-import org.geolatte.geom.MultiLineString;
-import org.geolatte.geom.MultiPoint;
-import org.geolatte.geom.MultiPolygon;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.Polygon;
+import org.geolatte.geom.*;
 
 /**
  * The type of geometry.
@@ -47,9 +41,9 @@ public enum OpenGisType {
 	INVALID_TYPE( (byte) 0, null );
 
 	final byte byteValue;
-	final Class geomClass;
+	final Class<? extends Geometry> geomClass;
 
-	OpenGisType(byte v, Class geomClass) {
+	OpenGisType(byte v, Class<? extends Geometry> geomClass) {
 		this.byteValue = v;
 		this.geomClass = geomClass;
 	}
