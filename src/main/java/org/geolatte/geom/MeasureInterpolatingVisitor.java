@@ -98,7 +98,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
             double r1 = Math.min(rs, re);
             double r2 = Math.max(rs, re);
 
-            if (p0.getM() >= startMeasure && p0.getM() <= endMeasure) {
+            if (startMeasure <= p0.getM() && p0.getM() <= endMeasure) {
                 lastAddedPoint = addIfNotEqualLast(lastAddedPoint, p0);
             } else {
                 //p0 not within [startMeasure, endMeasure], so next point to add will not be consecutive with
@@ -110,7 +110,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
                 }
             }
 
-            if (p1.getM() >= startMeasure && p1.getM() <= endMeasure) {
+            if (startMeasure <= p1.getM()  && p1.getM() <= endMeasure) {
                 lastAddedPoint = addIfNotEqualLast(lastAddedPoint, p1);
             } else {
                 if (r2 > 0 && r2 < 1) {
@@ -142,7 +142,6 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
         if (!newPnt.equals(lastPoint)) {
             currentBuilder.add(newPnt);
             lastPoint = newPnt;
-            sequenceIsEmpty = false;
         }
         return lastPoint;
     }
