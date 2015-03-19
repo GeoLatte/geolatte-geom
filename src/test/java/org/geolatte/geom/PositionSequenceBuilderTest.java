@@ -23,6 +23,7 @@ package org.geolatte.geom;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 /**
@@ -60,14 +61,6 @@ public class PositionSequenceBuilderTest {
         }catch(IllegalArgumentException e){
         }
 
-    }
-
-    @Test(expected=IllegalStateException.class)
-    public void testFixedSizePSBuilderThrowsIllegalStateExceptionIfNotCompletelyFilled() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(10, C2D.class);
-        builder.add(2, 3);
-        builder.add(1, 2);
-        builder.toPositionSequence();
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
