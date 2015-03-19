@@ -40,6 +40,10 @@ public class CircularArcLinearizerTest {
         }
     }
 
+
+    //TODO -- add tests for higher dimensions.
+    
+
     private void verifyCircle(PositionSequence<C2D> seq){
         C2D prev = null;
         double angle = 0;

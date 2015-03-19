@@ -29,7 +29,7 @@ public class PointSdoDecoder extends AbstractSDODecoder {
             }
         }
 
-        return new Point(convertOrdinateArray(ordinates, nativeGeom), crs);
+        return new Point(convertOrdinateArray(ordinates, nativeGeom, crs), crs);
     }
 
 }

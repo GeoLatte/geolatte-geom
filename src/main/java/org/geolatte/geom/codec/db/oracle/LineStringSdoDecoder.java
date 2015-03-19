@@ -2,6 +2,7 @@ package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.LineString;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -22,7 +23,7 @@ public class LineStringSdoDecoder extends AbstractSDODecoder {
         final CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem(nativeGeom);
         final ElemInfo info = nativeGeom.getInfo();
 
-        PositionSequence<?> cs = null;
+        PositionSequence cs = null;
 
         int i = 0;
         while (i < info.getSize()) {
@@ -31,11 +32,10 @@ public class LineStringSdoDecoder extends AbstractSDODecoder {
                 cs = add(cs, getCompoundCSeq(i + 1, i + numCompounds, nativeGeom));
                 i += 1 + numCompounds;
             } else {
-                cs = add(cs, getElementCSeq(i, nativeGeom, false));
+                cs = add(cs, getElementCSeq(i, nativeGeom, false, crs));
                 i++;
             }
         }
-
         return new LineString(cs, crs);
 
     }
