@@ -86,13 +86,16 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
         double[] buffer = new double[dim];
         for (int posIdx = 0; posIdx < numPos; posIdx++) {
             int componentIdx = 0; //tracks component in Position
-            buffer[componentIdx++] = oordinates[posIdx * dim]; //x
-            buffer[componentIdx++] = oordinates[posIdx * dim]; //y
+            buffer[componentIdx] = oordinates[posIdx * dim + componentIdx]; //x
+            componentIdx++;
+            buffer[componentIdx] = oordinates[posIdx * dim + componentIdx]; //y
             if (zDim > 0) {
-                buffer[componentIdx++] = oordinates[posIdx * dim + zDim];
+                componentIdx++;
+                buffer[componentIdx] = oordinates[posIdx * dim + zDim];
             }
             if (lrsDim > 0) {
-                buffer[componentIdx++] = oordinates[posIdx * dim + lrsDim];
+                componentIdx++;
+                buffer[componentIdx] = oordinates[posIdx * dim + lrsDim];
             }
 
             sequenceBuilder.add(buffer);

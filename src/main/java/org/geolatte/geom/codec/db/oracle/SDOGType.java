@@ -73,19 +73,19 @@ class SDOGType {
 	}
 
 	public int getZDimension() {
-		if ( this.dimension > 2 ) {
-			if ( !isLRSGeometry() ) {
-				return this.dimension;
-			}
-			else {
-				return ( getLRSDimension() < this.dimension ? 4 : 3 );
-			}
-		}
-		return 0;
+        if (getLRSDimension() == 3 && this.dimension == 3){
+            return -1;
+        } else if( getLRSDimension() == 3 && this.dimension == 4 ) {
+            return 4;
+        } else if (getLRSDimension() == 4 && this.dimension == 4) {
+            return 3;
+        } else {
+            return this.dimension > 2 ? 3 : -1;
+        }
 	}
 
 	public boolean isLRSGeometry() {
-		return ( this.lrsDimension > 0 || ( this.lrsDimension == 0 && this.dimension == 4 ) );
+		return getLRSDimension() > 0;
 	}
 
 	public void setLrsDimension(int lrsDimension) {

@@ -43,10 +43,13 @@ public class Decoders {
      * @return
      */
     public static Geometry decode(Struct raw) {
-        SDOGeometry sqlServerGeom = SDOGeometry.load( raw );
-        Decoder decoder = decoderFor( sqlServerGeom );
-        return decoder.decode( sqlServerGeom );
+        SDOGeometry sdo = SDOGeometry.load( raw );
+        return decode(sdo);
     }
 
+    public static Geometry decode(SDOGeometry sdo) {
+        Decoder decoder = decoderFor(sdo);
+        return decoder.decode( sdo );
+    }
 
 }

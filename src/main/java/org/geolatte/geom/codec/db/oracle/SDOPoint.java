@@ -35,6 +35,16 @@ class SDOPoint {
 
 	public double z = Double.NaN;
 
+    public SDOPoint (double x, double y) {
+        this(x, y, Double.NaN);
+    }
+
+    public SDOPoint(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
 	public SDOPoint(Struct struct) {
 		try {
 			final Object[] data = struct.getAttributes();

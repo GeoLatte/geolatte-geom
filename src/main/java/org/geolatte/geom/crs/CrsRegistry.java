@@ -118,6 +118,7 @@ public class CrsRegistry {
 
     public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
+        if (crs == null) return null;
         if (crs.getPositionClass().equals(G2D.class)) {
             return (Geographic2DCoordinateReferenceSystem) crs;
         }

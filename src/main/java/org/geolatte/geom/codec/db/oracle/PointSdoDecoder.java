@@ -28,7 +28,6 @@ public class PointSdoDecoder extends AbstractSDODecoder {
                 ordinates = new Double[]{nativeGeom.getPoint().x, nativeGeom.getPoint().y, nativeGeom.getPoint().z};
             }
         }
-
         return new Point(convertOrdinateArray(ordinates, nativeGeom, crs), crs);
     }
 
