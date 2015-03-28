@@ -114,7 +114,7 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
         if ( seq2 == null ) {
             return seq1;
         }
-        int totalSize = seq1.size() + seq2.size() - seq2Offset;
+        int totalSize = seq1.size() - seq1Offset + seq2.size() - seq2Offset;
         PositionSequenceBuilder<P> builder = fixedSized(totalSize, seq1.getPositionClass());
         CombiningVisitor<P> visitor = new CombiningVisitor<P>(builder);
 
@@ -178,7 +178,7 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
             // pop off the last element as it is added with the next
             // coordinate sequence
             if ( cs != null && cs.size() > 0 ) {
-                add( cs, 1, getElementCSeq( i, sdoGeom, ( i < idxLast ) , (CoordinateReferenceSystem<P>) crs) , 0);
+                cs = add( cs, 0, getElementCSeq( i, sdoGeom, ( i < idxLast ) , (CoordinateReferenceSystem<P>) crs) , 1);
             } else {
                 cs = add( cs, getElementCSeq( i, sdoGeom, ( i < idxLast ),  (CoordinateReferenceSystem<P>) crs ) );
             }
@@ -245,7 +245,7 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
         PositionSequence<P> result = null;
         int idx = 0;
 
-        while ( idx < positions.size()) {
+        while ( idx < positions.size() -2 ) { //only iterate if we have at least three more points
             P p0 = positions.getPositionN(idx++);
             P p1 = positions.getPositionN(idx++);
             P p2 = positions.getPositionN(idx); //dont' increment, we repeat next iteration from this index
