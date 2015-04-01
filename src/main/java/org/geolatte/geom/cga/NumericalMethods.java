@@ -1,6 +1,7 @@
 package org.geolatte.geom.cga;
 
 import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/03/15.
@@ -57,7 +58,7 @@ public class NumericalMethods {
 
     /**
      * Determines if the triangle determined by p0, p1, p2 is counterclockwise in 2D.
-     *
+     * <p/>
      * <p>This is equivalent to p2 is to the left of the line p0 - p1.</p>
      *
      * @param p0
@@ -71,6 +72,24 @@ public class NumericalMethods {
             throw new IllegalArgumentException("Positions are collinear in 2D");
         }
         return det > 0;
+    }
+
+    /**
+     * Determines whether the specified {@code PositionSequence} is counter-clockwise.
+     * <p/>
+     * <p>Only the first three positions, are inspected to determine whether the sequence is counter-clockwise.
+     * In case are less than three positions in the sequence, the method returns true.</p>
+     *
+     * @param positions a {@code PositionSequence}
+     * @return true if the positions in the specified sequence are counter-clockwise, or if the sequence contains
+     * less than three elements.
+     */
+    public static boolean isCounterClockwise(PositionSequence<?> positions) {
+        if (positions.size() < 3) return true;
+        Position p0 = positions.getPositionN(0);
+        Position p1 = positions.getPositionN(1);
+        Position p2 = positions.getPositionN(2);
+        return isCounterClockwise(p0, p2, p2);
     }
 
     public static boolean collinear(Position p0, Position p1, Position p2) {
@@ -88,6 +107,7 @@ public class NumericalMethods {
     public static class TwoSum {
         final double estimate;
         final double error;
+
         public TwoSum(double a, double b) {
             double s = a + b;
             double a1 = s - b;

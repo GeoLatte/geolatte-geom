@@ -73,42 +73,7 @@ class SDOGeometry {
 	}
 
 
-    //TODO -- do we still need this??
-	/**
-	 * This joins an array of SDO_GEOMETRIES to a SDOGeometry of type
-	 * COLLECTION
-	 *
-	 * @param sdoElements The SDO_geometries to join into an SDO Geometry Collection
-	 *
-	 * @return The SDO Collection Geometry
-	 */
-//	public static SDOGeometry join(SDOGeometry[] sdoElements) {
-//
-//		if ( sdoElements == null || sdoElements.length == 0 ) {
-//			return new SDOGeometry(new SDOGType( 2, 0, TypeGeometry.COLLECTION ), 0, null, null,null );
-//		}
-//		else {
-//			final SDOGeometry firstElement = sdoElements[0];
-//			final int dim = firstElement.getGType().getDimension();
-//			final int lrsDim = firstElement.getGType().getLRSDimension();
-//            SDOGType gtype =  new SDOGType( dim, lrsDim, TypeGeometry.COLLECTION );
-//			int ordinatesOffset = 1;
-//			for ( int i = 0; i < sdoElements.length; i++ ) {
-//				final ElemInfo element = sdoElements[i].getInfo();
-//				final Double[] ordinates = sdoElements[i].getOrdinates().getOrdinateArray();
-//				if ( element != null && element.getSize() > 0 ) {
-//					final int shift = ordinatesOffset - element.getOrdinatesOffset( 0 );
-//					shiftOrdinateOffset( element, shift );
-//					sdoCollection.addElement( element );
-//					sdoCollection.addOrdinates( ordinates );
-//					ordinatesOffset += ordinates.length;
-//				}
-//			}
-//		}
-//		return sdoCollection;
-//	}
-
-	private static void shiftOrdinateOffset(ElemInfo elemInfo, int offset) {
+	static void shiftOrdinateOffset(ElemInfo elemInfo, int offset) {
 		for ( int i = 0; i < elemInfo.getSize(); i++ ) {
 			final int newOffset = elemInfo.getOrdinatesOffset( i ) + offset;
 			elemInfo.setOrdinatesOffset( i, newOffset );
