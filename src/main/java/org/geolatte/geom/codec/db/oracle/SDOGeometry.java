@@ -218,23 +218,6 @@ class SDOGeometry {
 		return stb.toString();
 	}
 
-//	public void addOrdinates(Double[] newOrdinates) {
-//		if ( this.ordinates == null ) {
-//			this.ordinates = new Ordinates( newOrdinates );
-//		}
-//		else {
-//			this.ordinates.addOrdinates( newOrdinates );
-//		}
-//	}
-//
-//	public void addElement(ElemInfo element) {
-//		if ( this.info == null ) {
-//			this.info = element;
-//		}
-//		else {
-//			this.info.addElement( element );
-//		}
-//	}
 
 	/**
 	 * If this SDOGeometry is a COLLECTION, this method returns an array of
@@ -303,4 +286,29 @@ class SDOGeometry {
 		}
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SDOGeometry that = (SDOGeometry) o;
+
+        if (srid != that.srid) return false;
+        if (gtype != null ? !gtype.equals(that.gtype) : that.gtype != null) return false;
+        if (info != null ? !info.equals(that.info) : that.info != null) return false;
+        if (ordinates != null ? !ordinates.equals(that.ordinates) : that.ordinates != null) return false;
+        if (point != null ? !point.equals(that.point) : that.point != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = gtype != null ? gtype.hashCode() : 0;
+        result = 31 * result + srid;
+        result = 31 * result + (point != null ? point.hashCode() : 0);
+        result = 31 * result + (info != null ? info.hashCode() : 0);
+        result = 31 * result + (ordinates != null ? ordinates.hashCode() : 0);
+        return result;
+    }
 }

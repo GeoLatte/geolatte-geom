@@ -22,6 +22,7 @@
 package org.geolatte.geom.codec.db.oracle;
 
 import java.sql.Array;
+import java.util.Arrays;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -89,4 +90,20 @@ class Ordinates {
 		this.ordinates = newOrdinates;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Ordinates ordinates1 = (Ordinates) o;
+
+        if (!Arrays.equals(ordinates, ordinates1.ordinates)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return ordinates != null ? Arrays.hashCode(ordinates) : 0;
+    }
 }

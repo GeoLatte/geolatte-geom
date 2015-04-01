@@ -23,6 +23,7 @@ package org.geolatte.geom.codec.db.oracle;
 
 import java.math.BigDecimal;
 import java.sql.Array;
+import java.util.Arrays;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -137,4 +138,20 @@ class ElemInfo {
 		return ea;
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ElemInfo elemInfo = (ElemInfo) o;
+
+        if (!Arrays.equals(triplets, elemInfo.triplets)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return triplets != null ? Arrays.hashCode(triplets) : 0;
+    }
 }

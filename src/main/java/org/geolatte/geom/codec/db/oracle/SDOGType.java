@@ -128,4 +128,26 @@ class SDOGType {
 	public String toString() {
 		return Integer.toString( this.intValue() );
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SDOGType sdogType = (SDOGType) o;
+
+        if (dimension != sdogType.dimension) return false;
+        if (lrsDimension != sdogType.lrsDimension) return false;
+        if (typeGeometry != sdogType.typeGeometry) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dimension;
+        result = 31 * result + lrsDimension;
+        result = 31 * result + (typeGeometry != null ? typeGeometry.hashCode() : 0);
+        return result;
+    }
 }
