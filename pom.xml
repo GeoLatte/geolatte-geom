@@ -206,6 +206,7 @@
     </build>
 
     <dependencies>
+        <!-- Runtime dependencies -->
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
@@ -216,6 +217,13 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apfloat</groupId>
+            <artifactId>apfloat</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
+        <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

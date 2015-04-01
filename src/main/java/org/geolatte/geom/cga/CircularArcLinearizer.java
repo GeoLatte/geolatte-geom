@@ -4,6 +4,8 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.PositionSequenceBuilder;
 
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
 
@@ -24,6 +26,8 @@ public class CircularArcLinearizer<P extends Position> {
     final private boolean isCounterClockwise;
     final private PositionSequenceBuilder<P> builder;
 
+    //TODO threshold must become parameter of linearize/linearizeCircle!!
+    // to that tolerance can be calculated as proportional to radius.
     public CircularArcLinearizer(P p0, P p1, P p2, double threshold) {
         if (p0 == null || p1 == null | p2 == null) {
             throw new IllegalArgumentException();
@@ -37,31 +41,36 @@ public class CircularArcLinearizer<P extends Position> {
         this.builder = variableSized((Class<P>) p0.getClass());
     }
 
+    public Circle getCircle() {
+        return this.c;
+    }
+
+    public double getRadius() {
+        return this.c.radius;
+    }
+
+    public PositionSequence<P> linearizeCircle() {
+        double angleIncr = acos((c.radius - threshold) / c.radius);
+        PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
+        double theta0 = angleInDirection(p0);
+        double theta1 = angleInDirection(p1);
+        builder.add(p0);
+        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
+        builder.add(p1);
+        AddPointsBetweenPolarCoordinates(theta1, theta0 + 2 * Math.PI, p1, p0, angleIncr, builder);
+        builder.add(p0);
+        return builder.toPositionSequence();
+    }
+
+    /**
+     * Linearizes the arc segment defined by the three {@code Position}s specified in this instance's constructor
+     *
+     * @return a PositionSequence that approximates the arc segment
+     */
     public PositionSequence<P> linearize() {
-        double x0 = p0.getCoordinate(0);
-        double y0 = p0.getCoordinate(1);
-        double x1 = p1.getCoordinate(0);
-        double y1 = p1.getCoordinate(1);
-        double x2 = p2.getCoordinate(0);
-        double y2 = p2.getCoordinate(1);
-
-        //TODO -- add quick check to see if positions need to linearized (e.g. when very close to each other)
-
-
-        //translate coordinate system to that origin is at the center of circle c
-        double xd0 = (x0 - c.x);
-        double yd0 = (y0 - c.y);
-
-        double xd1 = (x1 - c.x);
-        double yd1 = (y1 - c.y);
-
-        double xd2 = (x2 - c.x);
-        double yd2 = (y2 - c.y);
-
-
-        double theta0 = angleInDirection(xd0, yd0);
-        double theta1 = angleInDirection(xd1, yd1);
-        double theta2 = angleInDirection(xd2, yd2);
+        double theta0 = angleInDirection(p0);
+        double theta1 = angleInDirection(p1);
+        double theta2 = angleInDirection(p2);
 
         //we linearize by incrementing start angle theta by and increment.
         // the following will always hold:
@@ -71,40 +80,70 @@ public class CircularArcLinearizer<P extends Position> {
         // so angleIncrement is garuanteed to be positive and small
         double angleIncr = acos((c.radius - threshold) / c.radius);
 
+        //TODO -- quick check if angles theta are closer together than angleIncr, then we don't need to
+        // linearize
 
         //now we "walk" from theta, over theta1 to theta2 (or inversely)
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
         builder.add(p0);
-        AddPointsBetweenPolarCoordinates(theta0, theta1, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
         builder.add(p1);
-        AddPointsBetweenPolarCoordinates(theta1, theta2, angleIncr, builder);
+        AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
         builder.add(p2);
-
         return builder.toPositionSequence();
 
     }
 
     // Adds points strictly between theta and theta1, using the specified angle-increment
-    private void AddPointsBetweenPolarCoordinates(double theta, double theta1, double angleIncr,
+    // and interpolates the "higher dimensions" on the run
+    private void AddPointsBetweenPolarCoordinates(double theta, double theta1, P p, P p1, double maxAngleIncr,
                                                   PositionSequenceBuilder<P> builder) {
-        //first find direction:
+        int dim = p.getCoordinateDimension();
+
+        //first a number of steps and angleIncrement such that we go in equal increment steps from theta to theta1
+        int steps = (int) Math.ceil(Math.abs(theta1 - theta) / maxAngleIncr);
+        double angleIncr = Math.abs(theta1 - theta) / (double) steps;
+
+        //determine increments for Z and M dimensions:
+        double[] incr = new double[dim - 2];
+        for (int i = 0; i < incr.length; i++) {
+            incr[i] = (p1.getCoordinate(2 + i) - p.getCoordinate(2 + i)) / steps;
+        }
+
+        //now find direction:
         double sign = theta < theta1 ? 1d : -1d;
-        double a = theta + sign*angleIncr;
-        while (sign * a < sign * theta1) {
-            builder.add(c.x + c.radius * cos(a), c.y + c.radius * sin(a));
+
+        // we initialize the higher dimensions
+        double[] buf = new double[dim];
+        for (int i = 0; i < incr.length; i++) {
+            buf[2 + i] = p.getCoordinate(2 + i);
+        }
+        double a = theta;
+        for (int idx =0 ; idx < steps-1 ; idx++) {
             a = a + sign * angleIncr;
+            //calculate x,y positions
+            buf[0] = c.x + c.radius * cos(a);
+            buf[1] = c.y + c.radius * sin(a);
+
+            //and interpolate
+            for (int i = 0; i < incr.length; i++) {
+                buf[2 + i] = buf[2 + i] + incr[i];
+            }
+            builder.add(buf);
         }
     }
 
     //atan2 give the angular coordinate theta of the polar coordinates (r, theta)
     //the angular coordinate ranges between -PI and PI, but to define the circular segment, we
     //should normalize to [0 ,2*PI] if counterclockwise, and [0, -2*PI] if clockwise
-    private double angleInDirection(double x, double y) {
+    private double angleInDirection(Position p) {
+        double x = (p.getCoordinate(0) - c.x);
+        double y = (p.getCoordinate(1) - c.y);
         double theta = atan2(y, x);
         if (isCounterClockwise) {
-            return (theta >= 0) ? theta : 2*Math.PI + theta;
+            return (theta >= 0) ? theta : 2 * Math.PI + theta;
         } else {
-            return (theta <= 0) ? theta : theta - 2*Math.PI;
+            return (theta <= 0) ? theta : theta - 2 * Math.PI;
         }
     }
 
