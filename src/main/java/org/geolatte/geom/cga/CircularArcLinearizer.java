@@ -57,6 +57,7 @@ public class CircularArcLinearizer<P extends Position> {
         builder.add(p0);
         AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
         builder.add(p1);
+        //TODO -- I'm not sure whether this actually works if the circle defined by the 3 positions is in clockwise direction
         AddPointsBetweenPolarCoordinates(theta1, theta0 + 2 * Math.PI, p1, p0, angleIncr, builder);
         builder.add(p0);
         return builder.toPositionSequence();
