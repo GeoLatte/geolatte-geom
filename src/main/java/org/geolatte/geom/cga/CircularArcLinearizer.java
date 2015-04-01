@@ -41,15 +41,15 @@ public class CircularArcLinearizer<P extends Position> {
         this.builder = variableSized((Class<P>) p0.getClass());
     }
 
-    public Circle getCircle(){
+    public Circle getCircle() {
         return this.c;
     }
 
-    public double getRadius(){
+    public double getRadius() {
         return this.c.radius;
     }
 
-    public PositionSequence<P> linearizeCircle(){
+    public PositionSequence<P> linearizeCircle() {
         double angleIncr = acos((c.radius - threshold) / c.radius);
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
         double theta0 = angleInDirection(p0);
@@ -64,6 +64,7 @@ public class CircularArcLinearizer<P extends Position> {
 
     /**
      * Linearizes the arc segment defined by the three {@code Position}s specified in this instance's constructor
+     *
      * @return a PositionSequence that approximates the arc segment
      */
     public PositionSequence<P> linearize() {
@@ -100,8 +101,8 @@ public class CircularArcLinearizer<P extends Position> {
         int dim = p.getCoordinateDimension();
 
         //first a number of steps and angleIncrement such that we go in equal increment steps from theta to theta1
-        int steps = (int)Math.ceil(Math.abs(theta1 - theta) / maxAngleIncr);
-        double angleIncr = maxAngleIncr / (double)steps;
+        int steps = (int) Math.ceil(Math.abs(theta1 - theta) / maxAngleIncr);
+        double angleIncr = Math.abs(theta1 - theta) / (double) steps;
 
         //determine increments for Z and M dimensions:
         double[] incr = new double[dim - 2];
@@ -112,27 +113,23 @@ public class CircularArcLinearizer<P extends Position> {
         //now find direction:
         double sign = theta < theta1 ? 1d : -1d;
 
-        double a = theta + sign*angleIncr; //this is the angle for the current point
-        double[] buf = new double[dim];
-
         // we initialize the higher dimensions
+        double[] buf = new double[dim];
         for (int i = 0; i < incr.length; i++) {
-            buf[2+i] = p.getCoordinate(2+i);
+            buf[2 + i] = p.getCoordinate(2 + i);
         }
-
-        while (sign * a < sign * theta1) {
+        double a = theta;
+        for (int idx =0 ; idx < steps-1 ; idx++) {
+            a = a + sign * angleIncr;
             //calculate x,y positions
             buf[0] = c.x + c.radius * cos(a);
             buf[1] = c.y + c.radius * sin(a);
-            a = a + sign * angleIncr;
 
             //and interpolate
             for (int i = 0; i < incr.length; i++) {
                 buf[2 + i] = buf[2 + i] + incr[i];
             }
             builder.add(buf);
-
-
         }
     }
 
@@ -144,9 +141,9 @@ public class CircularArcLinearizer<P extends Position> {
         double y = (p.getCoordinate(1) - c.y);
         double theta = atan2(y, x);
         if (isCounterClockwise) {
-            return (theta >= 0) ? theta : 2*Math.PI + theta;
+            return (theta >= 0) ? theta : 2 * Math.PI + theta;
         } else {
-            return (theta <= 0) ? theta : theta - 2*Math.PI;
+            return (theta <= 0) ? theta : theta - 2 * Math.PI;
         }
     }
 

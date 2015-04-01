@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -20,10 +21,10 @@ public class CircularArcLinearizerTest {
     private static final int SAMPLE_SIZE = 1000;
     private static final double EPSILON = 0.0001d;
 
-    CircleGenerator cgen = new CircleGenerator(-10, 10, 10);
+    CircleGenerator cgen = new CircleGenerator(-100, 100, 100);
 
     Circle c;
-    C2D[] p;
+    ThreePointSample p;
     private StringBuilder errormsg;
 
     @Test
@@ -32,12 +33,18 @@ public class CircularArcLinearizerTest {
             errormsg = new StringBuilder();
             c = cgen.sample();
             p = new ThreePositionsOnCircleGenerator(c).sample();
-            CircularArcLinearizer<C2D> linearizer = new CircularArcLinearizer<C2D>(p[0], p[1], p[2], 0.0001);
+            CircularArcLinearizer<C2D> linearizer = new CircularArcLinearizer<C2D>(p.positions[0], p.positions[1], p.positions[2], 0.0001);
+            assertTrue(equals(c, linearizer.getCircle()));
             PositionSequence<C2D> sequence = linearizer.linearize();
             verify(sequence);
             sequence = linearizer.linearizeCircle();
             verifyCircle(sequence);
         }
+    }
+
+    private boolean equals(Circle c, Circle circle) {
+        return (Math.abs(c.x - circle.x) < EPSILON) && (Math.abs(c.y - circle.y) < EPSILON) && (Math.abs(c.radius -
+                circle.radius) < EPSILON);
     }
 
 
@@ -50,7 +57,7 @@ public class CircularArcLinearizerTest {
         for(C2D co : seq){
 
             if (prev == null) {
-                assertEquals(co, p[0]); // first position in sequence exactly equals p0
+                assertEquals(co, p.positions[0]); // first position in sequence exactly equals p0
                 prev = co;
                 continue;
             }
@@ -59,9 +66,8 @@ public class CircularArcLinearizerTest {
             verifyOnCircle(co);
             angle += getAngle(prev, co);
             prev = co;
-
         }
-        assertEquals(prev, p[0]); //is same as first
+        assertEquals(prev, p.positions[0]); //is same as first
         assertEquals(String.format("Difference is: %f (on Circle %s)", 2*Math.PI - angle, c.toString())
                 + errormsg.toString(), 2*Math.PI, angle, 0.0001);
     }
@@ -73,7 +79,7 @@ public class CircularArcLinearizerTest {
         for(C2D co : seq){
 
             if (prev == null) {
-                assertEquals(co, p[0]); // first position in sequence exactly equals p0
+                assertEquals(co, p.positions[0]); // first position in sequence exactly equals p0
                 prev = co;
                 continue;
             }
@@ -86,11 +92,10 @@ public class CircularArcLinearizerTest {
             } else {
                 assertEquals(dir, getDirection(prev, co));
             }
-
             prev = co;
 
         }
-        assertEquals(prev, p[2]); // last position exactly equals p2;
+        assertEquals(prev, p.positions[2]); // last position exactly equals p2;
     }
 
     private void verifyOnCircle(C2D co) {
@@ -112,7 +117,7 @@ public class CircularArcLinearizerTest {
 }
 
 
-class ThreePositionsOnCircleGenerator implements Generator<C2D[]> {
+class ThreePositionsOnCircleGenerator implements Generator<ThreePointSample> {
 
     final private Circle circle;
     final private Generator<Boolean> isCounterClockwiseGenerator = StdGenerators.bernouilly(0.5);
@@ -122,7 +127,7 @@ class ThreePositionsOnCircleGenerator implements Generator<C2D[]> {
     }
 
     @Override
-    public C2D[] sample() {
+    public ThreePointSample sample() {
         C2D[] positions = new C2D[3];
         double[] theta = new double[3];
         boolean isCCW = isCounterClockwiseGenerator.sample();
@@ -144,11 +149,24 @@ class ThreePositionsOnCircleGenerator implements Generator<C2D[]> {
         assert ((isCCW && NumericalMethods.isCounterClockwise(positions[0], positions[1], positions[2])) ||
                 (!isCCW && !NumericalMethods.isCounterClockwise(positions[0], positions[1], positions[2])) );
 
-        return positions;
+        return new ThreePointSample(isCCW, theta, positions);
 
     }
 
     private C2D toCartesian(double theta0) {
         return new C2D(circle.x + circle.radius * cos(theta0), circle.y + circle.radius * sin(theta0));
+    }
+
+
+}
+
+class ThreePointSample{
+    boolean isCCW;
+    double[] thetas;
+    C2D[] positions;
+    ThreePointSample(boolean isCCW, double[] thetas, C2D[] positions){
+        this.isCCW = isCCW;
+        this.thetas = thetas;
+        this.positions = positions;
     }
 }
