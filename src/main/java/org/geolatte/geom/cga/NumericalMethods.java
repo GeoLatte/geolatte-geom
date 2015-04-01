@@ -89,7 +89,7 @@ public class NumericalMethods {
         Position p0 = positions.getPositionN(0);
         Position p1 = positions.getPositionN(1);
         Position p2 = positions.getPositionN(2);
-        return isCounterClockwise(p0, p2, p2);
+        return isCounterClockwise(p0, p1, p2);
     }
 
     public static boolean collinear(Position p0, Position p1, Position p2) {
