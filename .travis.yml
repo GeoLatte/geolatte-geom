@@ -1,6 +1,6 @@
 language: java
 
-noticiations:
+notifications:
   email:
     recipients:
     - karel@geovise.com
