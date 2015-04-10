@@ -10,4 +10,5 @@ env:
   - secure: "r8rogJ/U8tvGq5kUFxqKFl7JR0WRgRYE2jd7V698buN6zePlLqaMiSPEuFZ58RtapcMheW0SA8MW3ISujgDzdHAHO71tfsIlmb3LHW8KZ3PBOXnPrszS/3EoEX/+OB03yHJ2oQAQCCckAKN5CT0iYXJyxZRK/C2GXyrmF4u2vyI="
   - secure: "t9L7RMZ46iizgGWV69XU7+SMw6fQZrggGlwgXZIi1ibAm3LlP+AEJQ2hJTR7x51hzwRQExtp+XMNBiysHVfYuqAaJWNVPwg9Ec2/Hdix4gX049MfobV0DEUhAsFXFKzJCsbqYRClhKvtNqf9Y0puIfSj+fxYKaMb23dE6leQwHU="
 after_success:
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn deploy; };"
+  - echo "<settings><servers><server><id>ossrh</id><username>\${env.SONATYPE_USERNAME}</username><password>\${env.SONATYPE_PASSWORD}</password></server></servers></settings>" > ~/settings.xml
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn deploy --settings ~/settings.xml; };"
