@@ -33,7 +33,7 @@ public class Encoders {
                 return encoder;
             }
         }
-        throw new IllegalArgumentException("No encoder for type " + geom.getGeometryType());
+        throw new IllegalArgumentException("No encoder for type " + (geom == null ? "NULL" : geom.getGeometryType()));
     }
 
     public static SDOGeometry encode(Geometry<?> geom) {

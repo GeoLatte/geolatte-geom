@@ -21,6 +21,7 @@
 
 package org.geolatte.geom.codec.db.oracle;
 
+import java.io.Serializable;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ import java.sql.Struct;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Jul 3, 2010
  */
-interface SQLTypeFactory {
+interface SQLTypeFactory extends Serializable {
 
 	/**
 	 * Creates a {@code Struct} representing the specified geometry, using the specified Connection.

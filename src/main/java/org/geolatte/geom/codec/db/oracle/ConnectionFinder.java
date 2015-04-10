@@ -20,6 +20,7 @@
  */
 package org.geolatte.geom.codec.db.oracle;
 
+import java.io.Serializable;
 import java.sql.Connection;
 
 /**
@@ -37,7 +38,7 @@ import java.sql.Connection;
  *
  * @author Karel Maesen
  */
-public interface ConnectionFinder {
+public interface ConnectionFinder extends Serializable {
 
         /**
          * Find an instance of Connection that can be cast to an {@code OracleConnection} instance.

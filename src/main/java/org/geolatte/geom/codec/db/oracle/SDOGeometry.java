@@ -32,7 +32,7 @@ import java.util.List;
  *         creation-date: Jun 30, 2010
  */
 
-class SDOGeometry {
+public class SDOGeometry {
 
 	private static final String SQL_TYPE_NAME = "MDSYS.SDO_GEOMETRY";
 	final private SDOGType gtype;
