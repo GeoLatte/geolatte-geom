@@ -190,7 +190,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         if (matchesOpenList()) {
             List<LinearRing<P>> rings = new ArrayList<LinearRing<P>>();
             while (!matchesCloseList()) {
-                LinearRing ring = decodeLinearRingText();
+                LinearRing ring = decodeLinearRingText(crs);
                 if (ring.isEmpty()) {
                     throw new WktDecodeException("Empty ring found in polygon" +
                             "Wkt: " + wktString);
