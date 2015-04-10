@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 notifications:
   email:
     recipients:
@@ -9,4 +11,4 @@ env:
   - secure: LbfGcUboNsfAon9W3MP+XxtM9O3giR71plb4tB2UjcDvW3TatDQdcxEoF7CVVVQLNLbRrSX0iFs8aA2h1Uw4nM1oNS9kY8GKwYEZyYplu4rN05UWCIkqoCA0oWeqmHqZLNftrYdysy3hroJZOQccE+DHhj3w1Pqu3rfLjpeNAw8=
 
 after_success:
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn clean deploy -P release; };"
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn clean deploy; };"
