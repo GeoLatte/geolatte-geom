@@ -10,4 +10,4 @@ env:
   - secure: "BPiU7uZkHjfV6HAr/40Xj4yGi/kmcjpth8+1ewfVH+jKGPTqL7Y6cmvrVEoDS789jyDYI5qd37AzrKpZniw9UaYvib7nV9ZIrszTK2EYs2EcTVj19PldLohGdRRQUuA4hIAGlgBcM0WzZEK8O5VgLuC8MMors01knJeGJ0uNZik="
   - secure: "wp8Szmt8rHbesNTSMQFvJmWhMWr8VZ4K1d/qeLe69UwUH0TflMedREqzC+TUJ/qt74sUvoXPmo3wocTEUai1vjm3v7O5DsP5rOG83ty6EtNiGOPlYJC2lfMo6Jod1mOEzXfxIpQ0UKMdbUYROfN7efyI5JRaxO3ctlK9R8t4Aoc="
 after_success:
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn clean deploy; };"
+  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn deploy; };"
