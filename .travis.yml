@@ -1,14 +1,12 @@
 language: java
-
 notifications:
   email:
     recipients:
     - karel@geovise.com
-
 env:
   global:
   - secure: G+8McDItAJInDRe28m4TVT78LuwzW7WUA/f4ZJUqf5yYdx6pcO20if+l4yQT8ufdE7vpyGO/T4w3iu8RL0Ln0Sl7TlVTBiWW6A5LnJ1/fl8P1/PSpBdgozxxezwPIlFP5UQzL9/hZPUGB2/fD3vLR3NvMJZJ6TIzl8uouGDW8EM=
   - secure: LbfGcUboNsfAon9W3MP+XxtM9O3giR71plb4tB2UjcDvW3TatDQdcxEoF7CVVVQLNLbRrSX0iFs8aA2h1Uw4nM1oNS9kY8GKwYEZyYplu4rN05UWCIkqoCA0oWeqmHqZLNftrYdysy3hroJZOQccE+DHhj3w1Pqu3rfLjpeNAw8=
 
- after_success:
+after_success:
   - "[[ $TRAVIS_BRANCH == \"master\" ]] && { mvn clean deploy -P release; };"
