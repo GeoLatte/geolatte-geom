@@ -1,0 +1,4 @@
+language: java
+
+# after_success:
+#  - "[[ $TRAVIS_BRANCH == \"master\" ]] && { sbt +publish; };"
