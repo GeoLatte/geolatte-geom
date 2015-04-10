@@ -22,14 +22,14 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A decoder for WKT (Well-Known Text) representations.
  * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
- *
  * @author Karel Maesen, Geovise BVBA
- *
  */
 public interface WktDecoder {
 
@@ -40,5 +40,19 @@ public interface WktDecoder {
      * @return the decoded <code>Geometry</code>
      * @throws WktDecodeException when the String is an invalid or unsupported WKT representation
      */
-    Geometry decode(String wkt);
+    Geometry<?> decode(String wkt);
+
+    /**
+     * Decodes a WKT representation using the specified (base) {@code CoordinateReferenceSystem}.
+     *
+     * @param wkt the WKT string to decode
+     * @param crs the base coordinate reference system assumed for the wkt
+     * @param <P> the Position type for the (base)
+     * @return the decoded {@code Geometry}
+     * @throws WktDecodeException when the String is an invalid or unsupported WKT representation
+     */
+    <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs);
+
+
+
 }

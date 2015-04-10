@@ -21,48 +21,91 @@
 
 package org.geolatte.geom.crs;
 
+import org.geolatte.geom.*;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A Coordinate Reference System.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
+public abstract class CoordinateReferenceSystem<P extends Position> extends CrsIdentifiable {
 
-    private final CoordinateSystem coordinateSystem;
+    private final CoordinateSystem<P> coordinateSystem;
 
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.
      *
      * @param crsId the {@link CrsId} that identifies this <code>CoordinateReferenceSystem</code> uniquely
-     * @param name the commonly used name for this <code>CoordinateReferenceSystem</code>
-     * @param axes the {@link CoordinateSystemAxis CoordinateSystemAxes} for this <code>CoordinateReferenceSystem</code>
+     * @param name  the commonly used name for this <code>CoordinateReferenceSystem</code>
+     * @param coordinateSystem the coordinate system to use
      * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
-    public CoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystemAxis... axes) {
+    public CoordinateReferenceSystem(CrsId crsId, String name, CoordinateSystem<P> coordinateSystem) {
         super(crsId, name);
-        this.coordinateSystem = new CoordinateSystem(axes);
+        if (coordinateSystem == null)
+            throw new IllegalArgumentException("No null arguments allowed");
+        this.coordinateSystem = coordinateSystem;
+    }
+
+
+    /**
+     * Returns the type token for the type of <code>Position</code>s referenced in this system.
+     *
+     * @return a Class object
+     */
+    public Class<P> getPositionClass() {
+        return this.coordinateSystem.getPositionClass();
     }
 
 
     /**
      * Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
      *
-     * @return
+     * @return Returns the <code>CoordinateSystem</code> associated with this <code>CoordinateReferenceSystem</code>.
      */
-    public CoordinateSystem getCoordinateSystem() {
+    public CoordinateSystem<P> getCoordinateSystem() {
         return coordinateSystem;
     }
 
     /**
-     * Return the {@link CoordinateSystemAxis CoordinateSystemAxes} associated with this <code>CoordinateRefereeceSystem</code>.
+     * Returns the coordinate dimension, i.e. the number of axes in this coordinate reference system.
+     *
+     * @return the coordinate dimension
+     */
+    public int getCoordinateDimension() {
+        return getCoordinateSystem().getCoordinateDimension();
+    }
+
+    /**
+     * Return the {@link CoordinateSystemAxis CoordinateSystemAxes} associated with this <code>CoordinateReferenceSystem</code>.
      *
      * @return an array of {@link CoordinateSystemAxis CoordinateSystemAxes}.
-     *
      */
-    public CoordinateSystemAxis[] getAxes(){
-        return coordinateSystem.getAxes();
+    public CoordinateSystemAxis getAxis(int idx) {
+        return coordinateSystem.getAxis(idx);
     }
+
+    /**
+     * Returns the index of the specified axis in this {@code CoordinateReferenceSystem}, or
+     * -1 if it is not an axis of this system.
+     *
+     * @param axis the axis to look up
+     * @return the index of the specified axis in this {@code CoordinateReferenceSystem}
+     */
+    public int getAxisIndex(CoordinateSystemAxis axis) {
+        return getCoordinateSystem().getAxisIndex(axis);
+    }
+
+
+    public boolean isCompound() {
+        return false;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -72,14 +115,15 @@ public abstract class CoordinateReferenceSystem extends CrsIdentifiable {
 
         CoordinateReferenceSystem that = (CoordinateReferenceSystem) o;
 
-        return !(coordinateSystem != null ? !coordinateSystem.equals(that.coordinateSystem) : that.coordinateSystem != null);
+        if (!coordinateSystem.equals(that.coordinateSystem)) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (coordinateSystem != null ? coordinateSystem.hashCode() : 0);
+        result = 31 * result + coordinateSystem.hashCode();
         return result;
     }
 }

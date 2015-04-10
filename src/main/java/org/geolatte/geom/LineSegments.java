@@ -30,24 +30,24 @@ import java.util.Iterator;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
  */
-public class LineSegments implements Iterable<LineSegment> {
+public class LineSegments<P extends Position> implements Iterable<LineSegment<P>> {
 
-    private final PointSequence points;
+    private final PositionSequence<P> positions;
 
-    public LineSegments(PointSequence pointSequence) {
-        this.points = pointSequence;
+    public LineSegments(PositionSequence<P> positionSequence) {
+        this.positions = positionSequence;
     }
 
     @Override
-    public Iterator<LineSegment> iterator() {
+    public Iterator<LineSegment<P>> iterator() {
 
-        return new Iterator<LineSegment>() {
+        return new Iterator<LineSegment<P>>() {
 
-            final Iterator<Point> iterator;
-            Point startPoint;
+            final Iterator<P> iterator;
+            P startPoint;
 
             {
-                iterator = points.iterator();
+                iterator = positions.iterator();
                 if (iterator.hasNext()) {
                     startPoint = iterator.next();
                 }
@@ -59,9 +59,9 @@ public class LineSegments implements Iterable<LineSegment> {
             }
 
             @Override
-            public LineSegment next() {
-                Point endPoint = iterator.next();
-                LineSegment ls = new LineSegment(startPoint, endPoint);
+            public LineSegment<P> next() {
+                P endPoint = iterator.next();
+                LineSegment<P> ls = new LineSegment<P>(startPoint, endPoint);
                 startPoint = endPoint;
                 return ls;
             }

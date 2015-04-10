@@ -29,6 +29,8 @@ package org.geolatte.geom.crs;
  */
 public class Projection {
 
+    public final static Projection UNKNOWN = new Projection(CrsId.UNDEFINED, "unknown");
+
     //TODO -- change this class to contain the CrsParameters -- and introducte superclass CrsIdentifiable
 
     private final CrsId crsId;

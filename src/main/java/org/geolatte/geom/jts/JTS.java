@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +46,9 @@ import java.util.NoSuchElementException;
 public class JTS {
 
     private static final GeometryFactory jtsGeometryFactory;
+
+    private static final PointSequenceCoordinateSequenceFactory pscsFactory = new
+            PointSequenceCoordinateSequenceFactory();
 
     private static final Map<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> JTS2GLClassMap =
             new HashMap<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>>();
@@ -76,16 +79,19 @@ public class JTS {
      * @param geometryClass the JTS Geometry class
      * @return the corresponding o.g.geom class
      * @throws IllegalArgumentException when the geometryClass parameter is null.
-     * @throws NoSuchElementException when no corresponding class can be found.
+     * @throws NoSuchElementException   when no corresponding class can be found.
      */
-    public static Class<? extends Geometry> getCorrespondingJTSClass(Class<? extends org.geolatte.geom.Geometry> geometryClass) {
+    public static Class<? extends Geometry> getCorrespondingJTSClass(Class<? extends org.geolatte.geom.Geometry>
+                                                                             geometryClass) {
         if (geometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
-        for ( Map.Entry<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> entry : JTS2GLClassMap.entrySet()) {
+        for (Map.Entry<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> entry : JTS2GLClassMap
+                .entrySet()) {
             if (entry.getValue() == geometryClass) {
-                   return entry.getKey();
+                return entry.getKey();
             }
         }
-        throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.", geometryClass.getCanonicalName()) );
+        throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.", geometryClass
+                .getCanonicalName()));
     }
 
     /**
@@ -95,17 +101,18 @@ public class JTS {
      * @param jtsGeometryClass the Geolatte Geometry class
      * @return the corresponding o.g.geom class
      * @throws IllegalArgumentException when the jtsGeometryClass parameter is null.
-     * @throws NoSuchElementException when no corresponding class can be found.
+     * @throws NoSuchElementException   when no corresponding class can be found.
      */
-    public static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry> jtsGeometryClass) {
+    public static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry>
+                                                                                                    jtsGeometryClass) {
         if (jtsGeometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
         Class<? extends org.geolatte.geom.Geometry> corresponding = JTS2GLClassMap.get(jtsGeometryClass);
         if (corresponding == null) {
-            throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.", jtsGeometryClass.getCanonicalName()) );
+            throw new NoSuchElementException(String.format("No mapping for class %s exists in JTS geom.",
+                    jtsGeometryClass.getCanonicalName()));
         }
         return corresponding;
     }
-
 
 
     /**
@@ -115,40 +122,48 @@ public class JTS {
      * @return an equivalent geolatte geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Geometry from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
+    public static org.geolatte.geom.Geometry<?> from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return from(jtsGeometry, CrsId.valueOf(jtsGeometry.getSRID()));
+        Coordinate testCo = jtsGeometry.getCoordinate();
+        boolean is3D = !(testCo == null || Double.isNaN(testCo.z));
+        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(jtsGeometry.getSRID(),
+                CoordinateReferenceSystems.PROJECTED_2D_METER);
+        if (is3D) {
+            crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
+        }
+        return from(jtsGeometry, crs);
     }
 
     /**
      * Factory method that converts a JTS geometry into an equivalent geolatte geometry and allows the caller to
-     * specify the srid value of the resulting geolatte geometry.
+     * specify the CoordinateReferenceSystem of the resulting geolatte geometry.
      *
      * @param jtsGeometry the jtsGeometry
-     * @param crsId
+     * @param crs         the CoordinateReferenceSystem
      * @return A geolatte geometry that corresponds with the given JTS geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Geometry from(Geometry jtsGeometry, CrsId crsId) {
+    public static <P extends Position> org.geolatte.geom.Geometry<P> from(Geometry jtsGeometry,
+                                                                          CoordinateReferenceSystem<P> crs) {
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
         if (jtsGeometry instanceof Point) {
-            return from((Point) jtsGeometry, crsId);
+            return from((Point) jtsGeometry, crs);
         } else if (jtsGeometry instanceof LineString) {
-            return from((LineString) jtsGeometry, crsId);
+            return from((LineString) jtsGeometry, crs);
         } else if (jtsGeometry instanceof Polygon) {
-            return from((Polygon) jtsGeometry, crsId);
+            return from((Polygon) jtsGeometry, crs);
         } else if (jtsGeometry instanceof MultiPoint) {
-            return from((MultiPoint) jtsGeometry, crsId);
+            return from((MultiPoint) jtsGeometry, crs);
         } else if (jtsGeometry instanceof MultiLineString) {
-            return from((MultiLineString) jtsGeometry, crsId);
+            return from((MultiLineString) jtsGeometry, crs);
         } else if (jtsGeometry instanceof MultiPolygon) {
-            return from((MultiPolygon) jtsGeometry, crsId);
+            return from((MultiPolygon) jtsGeometry, crs);
         } else if (jtsGeometry instanceof GeometryCollection) {
-            return from((GeometryCollection) jtsGeometry, crsId);
+            return from((GeometryCollection) jtsGeometry, crs);
         } else {
             throw new JTSConversionException();
         }
@@ -161,24 +176,24 @@ public class JTS {
      * @return the equivalent JTS geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry geometry) {
+    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry) {
         if (geometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
         if (geometry instanceof org.geolatte.geom.Point) {
-            return to((org.geolatte.geom.Point) geometry);
+            return to((org.geolatte.geom.Point<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.LineString) {
-            return to((org.geolatte.geom.LineString) geometry);
+            return to((org.geolatte.geom.LineString<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.MultiPoint) {
-            return to((org.geolatte.geom.MultiPoint) geometry);
+            return to((org.geolatte.geom.MultiPoint<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.Polygon) {
-            return to((org.geolatte.geom.Polygon) geometry);
+            return to((org.geolatte.geom.Polygon<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.MultiLineString) {
-            return to((org.geolatte.geom.MultiLineString) geometry);
+            return to((org.geolatte.geom.MultiLineString<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.MultiPolygon) {
-            return to((org.geolatte.geom.MultiPolygon) geometry);
+            return to((org.geolatte.geom.MultiPolygon<P>) geometry);
         } else if (geometry instanceof org.geolatte.geom.GeometryCollection) {
-            return to((org.geolatte.geom.GeometryCollection) geometry);
+            return to((org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>) geometry);
         } else {
             throw new JTSConversionException();
         }
@@ -191,12 +206,12 @@ public class JTS {
      * @return the corresponding geolatte Envelope.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
+    public static org.geolatte.geom.Envelope<C2D> from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
         if (jtsEnvelope == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
-                jtsEnvelope.getMaxY());
+        return new org.geolatte.geom.Envelope<C2D>(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX
+                (), jtsEnvelope.getMaxY(), CoordinateReferenceSystems.PROJECTED_2D_METER);
     }
 
     /**
@@ -204,16 +219,18 @@ public class JTS {
      * specified CRS.
      *
      * @param jtsEnvelope the JTS Envelope to convert.
-     * @param crsId       the <code>CrsId</code> to use for the return value.
+     * @param crs         the <code>CoordinateReferenceSystem</code> to use for the return value.
      * @return the corresponding geolatte Envelope, having the CRS specified in the crsId parameter.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope from(com.vividsolutions.jts.geom.Envelope jtsEnvelope, CrsId crsId) {
+    public static <P extends Position> org.geolatte.geom.Envelope<P> from(com.vividsolutions.jts.geom.Envelope
+                                                                                  jtsEnvelope,
+                                                                          CoordinateReferenceSystem<P> crs) {
         if (jtsEnvelope == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return new org.geolatte.geom.Envelope(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
-                jtsEnvelope.getMaxY(), crsId);
+        return new org.geolatte.geom.Envelope<P>(jtsEnvelope.getMinX(), jtsEnvelope.getMinY(), jtsEnvelope.getMaxX(),
+                jtsEnvelope.getMaxY(), crs);
     }
 
     /**
@@ -223,11 +240,12 @@ public class JTS {
      * @return the corresponding JTS Envelope.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope env) {
+    public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope<?> env) {
         if (env == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return new com.vividsolutions.jts.geom.Envelope(env.getMinX(), env.getMaxX(), env.getMinY(), env.getMaxY());
+        return new com.vividsolutions.jts.geom.Envelope(env.lowerLeft().getCoordinate(0), env.upperRight()
+                .getCoordinate(0), env.lowerLeft().getCoordinate(1), env.upperRight().getCoordinate(1));
     }
 
 
@@ -238,27 +256,34 @@ public class JTS {
     /*
      * Converts a jts multipolygon into a geolatte multipolygon
      */
-    private static org.geolatte.geom.MultiPolygon from(MultiPolygon jtsGeometry, CrsId crsId) {
-        org.geolatte.geom.Polygon[] polygons = new org.geolatte.geom.Polygon[jtsGeometry.getNumGeometries()];
+    @SuppressWarnings("unchecked")
+    private static <P extends Position> org.geolatte.geom.MultiPolygon<P> from(MultiPolygon jtsGeometry,
+                                                                               CoordinateReferenceSystem<P> crs) {
+        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiPolygon<P>(crs);
+        org.geolatte.geom.Polygon<P>[] polygons = (org.geolatte.geom.Polygon<P>[]) new org.geolatte.geom
+                .Polygon[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
-            polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crsId);
+            polygons[i] = from((Polygon) jtsGeometry.getGeometryN(i), crs);
         }
-        return new org.geolatte.geom.MultiPolygon(polygons);
+        return new org.geolatte.geom.MultiPolygon<P>(polygons);
     }
 
     /*
      * Converts a jts polygon into a geolatte polygon
      */
-    private static org.geolatte.geom.Polygon from(Polygon jtsGeometry, CrsId crsId) {
+    @SuppressWarnings("unchecked")
+    private static <P extends Position> org.geolatte.geom.Polygon<P> from(Polygon jtsGeometry,
+                                                                          CoordinateReferenceSystem<P> crs) {
         if (jtsGeometry.isEmpty()) {
-            return org.geolatte.geom.Polygon.createEmpty();
+            return new org.geolatte.geom.Polygon<P>(crs);
         }
-        org.geolatte.geom.LinearRing[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() + 1];
-        org.geolatte.geom.LineString extRing = from(jtsGeometry.getExteriorRing(), crsId);
-        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPoints());
+        org.geolatte.geom.LinearRing<P>[] rings = new org.geolatte.geom.LinearRing[jtsGeometry.getNumInteriorRing() +
+                1];
+        org.geolatte.geom.LineString<P> extRing = from(jtsGeometry.getExteriorRing(), crs);
+        rings[0] = new org.geolatte.geom.LinearRing(extRing.getPositions(), extRing.getCoordinateReferenceSystem());
         for (int i = 1; i < rings.length; i++) {
-            org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crsId);
-            rings[i] = new org.geolatte.geom.LinearRing(intRing.getPoints());
+            org.geolatte.geom.LineString intRing = from(jtsGeometry.getInteriorRingN(i - 1), crs);
+            rings[i] = new org.geolatte.geom.LinearRing(intRing);
         }
         return new org.geolatte.geom.Polygon(rings);
     }
@@ -266,60 +291,73 @@ public class JTS {
     /*
      * Converts a jts multilinestring into a geolatte multilinestring
      */
-    private static org.geolatte.geom.MultiLineString from(MultiLineString jtsGeometry, CrsId crsId) {
-        org.geolatte.geom.LineString[] linestrings = new org.geolatte.geom.LineString[jtsGeometry.getNumGeometries()];
+    @SuppressWarnings("unchecked")
+    private static <P extends Position> org.geolatte.geom.MultiLineString<P> from(MultiLineString jtsGeometry,
+                                                                                  CoordinateReferenceSystem<P> crs) {
+        if (jtsGeometry.getNumGeometries() == 0) return new org.geolatte.geom.MultiLineString<P>(crs);
+        org.geolatte.geom.LineString<P>[] linestrings = new org.geolatte.geom.LineString[jtsGeometry.getNumGeometries
+                ()];
         for (int i = 0; i < linestrings.length; i++) {
-            linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), crsId);
+            linestrings[i] = from((LineString) jtsGeometry.getGeometryN(i), crs);
         }
-        return new org.geolatte.geom.MultiLineString(linestrings);
+        return new org.geolatte.geom.MultiLineString<P>(linestrings);
     }
 
     /*
      * Converts a jts geometrycollection into a geolatte geometrycollection
      */
-    private static org.geolatte.geom.GeometryCollection from(GeometryCollection jtsGeometry, CrsId crsId) {
-        org.geolatte.geom.Geometry[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
+    @SuppressWarnings("unchecked")
+    private static <P extends Position> org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>> from
+    (GeometryCollection jtsGeometry, CoordinateReferenceSystem<P> crs) {
+        if (jtsGeometry.getNumGeometries() == 0)
+            return new org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>(crs);
+        org.geolatte.geom.Geometry<P>[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
-            geoms[i] = from(jtsGeometry.getGeometryN(i), crsId);
+            geoms[i] = from(jtsGeometry.getGeometryN(i), crs);
         }
-        return new org.geolatte.geom.GeometryCollection(geoms);
+        return new org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>(geoms);
     }
 
     /*
      * Converts a jts linestring into a geolatte linestring
      */
-    private static org.geolatte.geom.LineString from(LineString jtsLineString, CrsId crsId) {
+    private static <P extends Position> org.geolatte.geom.LineString<P> from(LineString jtsLineString,
+                                                                             CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsLineString.getCoordinateSequence();
-        return new org.geolatte.geom.LineString(toPointSequence(cs, crsId));
+        return new org.geolatte.geom.LineString<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs),
+                crs);
 
     }
 
     /*
      * Converts a jts multipoint into a geolatte multipoint
      */
-    private static org.geolatte.geom.MultiPoint from(MultiPoint jtsMultiPoint, CrsId crsId) {
+    @SuppressWarnings("unchecked")
+    private static <P extends Position> org.geolatte.geom.MultiPoint<P> from(MultiPoint jtsMultiPoint,
+                                                                             CoordinateReferenceSystem<P> crs) {
         if (jtsMultiPoint == null || jtsMultiPoint.getNumGeometries() == 0)
-            return org.geolatte.geom.MultiPoint.createEmpty();
-        org.geolatte.geom.Point[] points = new org.geolatte.geom.Point[jtsMultiPoint.getNumGeometries()];
+            return new org.geolatte.geom.MultiPoint<P>(crs);
+        org.geolatte.geom.Point<P>[] points = new org.geolatte.geom.Point[jtsMultiPoint.getNumGeometries()];
         for (int i = 0; i < points.length; i++) {
-            points[i] = from((Point) jtsMultiPoint.getGeometryN(i), crsId);
+            points[i] = from((Point) jtsMultiPoint.getGeometryN(i), crs);
         }
-        return new org.geolatte.geom.MultiPoint(points);
+        return new org.geolatte.geom.MultiPoint<P>(points);
     }
 
     /*
      * Converts a jts point into a geolatte point
      */
-    private static org.geolatte.geom.Point from(com.vividsolutions.jts.geom.Point jtsPoint, CrsId crsId) {
+    private static <P extends Position> org.geolatte.geom.Point<P> from(com.vividsolutions.jts.geom.Point jtsPoint,
+                                                                        CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
-        return new org.geolatte.geom.Point(toPointSequence(cs, crsId));
+        return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs), crs);
     }
 
     ///
     ///  Helpermethods: geolatte --> jts
     ///
 
-    private static Polygon to(org.geolatte.geom.Polygon polygon) {
+    private static <P extends Position> Polygon to(org.geolatte.geom.Polygon<P> polygon) {
         LinearRing shell = to(polygon.getExteriorRing());
         LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
         for (int i = 0; i < holes.length; i++) {
@@ -330,25 +368,25 @@ public class JTS {
         return pg;
     }
 
-    private static Point to(org.geolatte.geom.Point point) {
+    private static <P extends Position> Point to(org.geolatte.geom.Point<P> point) {
         Point pnt = geometryFactory().createPoint(sequenceOf(point));
         copySRID(point, pnt);
         return pnt;
     }
 
-    private static LineString to(org.geolatte.geom.LineString lineString) {
+    private static <P extends Position> LineString to(org.geolatte.geom.LineString<P> lineString) {
         LineString ls = geometryFactory().createLineString(sequenceOf(lineString));
         copySRID(lineString, ls);
         return ls;
     }
 
-    private static LinearRing to(org.geolatte.geom.LinearRing linearRing) {
+    private static <P extends Position> LinearRing to(org.geolatte.geom.LinearRing<P> linearRing) {
         LinearRing lr = geometryFactory().createLinearRing(sequenceOf(linearRing));
         copySRID(linearRing, lr);
         return lr;
     }
 
-    private static MultiPoint to(org.geolatte.geom.MultiPoint multiPoint) {
+    private static <P extends Position> MultiPoint to(org.geolatte.geom.MultiPoint<P> multiPoint) {
         Point[] points = new Point[multiPoint.getNumGeometries()];
         for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
             points[i] = to(multiPoint.getGeometryN(i));
@@ -358,7 +396,7 @@ public class JTS {
         return mp;
     }
 
-    private static MultiLineString to(org.geolatte.geom.MultiLineString multiLineString) {
+    private static <P extends Position> MultiLineString to(org.geolatte.geom.MultiLineString<P> multiLineString) {
         LineString[] lineStrings = new LineString[multiLineString.getNumGeometries()];
         for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
             lineStrings[i] = to(multiLineString.getGeometryN(i));
@@ -368,7 +406,7 @@ public class JTS {
         return mls;
     }
 
-    private static MultiPolygon to(org.geolatte.geom.MultiPolygon multiPolygon) {
+    private static <P extends Position> MultiPolygon to(org.geolatte.geom.MultiPolygon<P> multiPolygon) {
         Polygon[] polygons = new Polygon[multiPolygon.getNumGeometries()];
         for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
             polygons[i] = to(multiPolygon.getGeometryN(i));
@@ -378,7 +416,8 @@ public class JTS {
         return mp;
     }
 
-    private static GeometryCollection to(org.geolatte.geom.GeometryCollection collection) {
+    private static <P extends Position> GeometryCollection to(org.geolatte.geom.GeometryCollection<P, org.geolatte
+            .geom.Geometry<P>> collection) {
         Geometry[] geoms = new Geometry[collection.getNumGeometries()];
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             geoms[i] = to(collection.getGeometryN(i));
@@ -389,70 +428,16 @@ public class JTS {
     }
 
     private static void copySRID(org.geolatte.geom.Geometry source, Geometry target) {
-        int srid = source.getCrsId() == CrsId.UNDEFINED ? 0 : source.getCrsId().getCode();
+        CrsId crsId = source.getCoordinateReferenceSystem().getCrsId();
+        int srid = crsId == CrsId.UNDEFINED ? 0 : crsId.getCode();
         target.setSRID(srid);
     }
 
-    /*
-     * Helpermethod that transforms a coordinatesequence into a pointsequence.
-     */
-    private static PointSequence toPointSequence(CoordinateSequence cs, CrsId crsId) {
-        if (cs instanceof PointSequence &&
-                ((PointSequence) cs).getCrsId().equals(crsId)) {
-            return (PointSequence) cs;
-        }
-        if (cs.size() == 0) {
-            return EmptyPointSequence.INSTANCE;
-        }
-
-        boolean hasM = hasM(cs.getCoordinate(0));
-        boolean hasZ = hasZ(cs.getCoordinate(0));
-
-        DimensionalFlag df = DimensionalFlag.valueOf(hasZ,hasM);
-        double[] coord = new double[df.getCoordinateDimension()];
-
-        PointSequenceBuilder builder = PointSequenceBuilders.fixedSized(cs.size(), df, crsId);
-        for (int i = 0; i < cs.size(); i++) {
-            // don't use cs.getOrdinate(i, ordinateIndex) because JTS 1.13 CoordinateArraySequence doesn't properly delegate to the Coordinate
-            Coordinate coordinate = cs.getCoordinate(i);
-            coord[0] = cs.getX(i);
-            coord[1] = cs.getY(i);
-            if(hasZ && hasM) {
-                coord[2] = coordinate.getOrdinate(CoordinateSequence.Z);
-                coord[3] = coordinate.getOrdinate(CoordinateSequence.M);
-            } else if (hasZ) {
-                coord[2] = coordinate.getOrdinate(CoordinateSequence.Z);
-            } else if(hasM) {
-                coord[2] = coordinate.getOrdinate(CoordinateSequence.M);
-            }
-            builder.add(coord);
-        }
-        return builder.toPointSequence();
-    }
-
-    /**
-     * Checks if this Coordinate implementation supports M values (the default one doesn't, but some do, eg HibernateSpatial MCoordinates)
-     */
-    private static boolean hasM(Coordinate coordinate) {
-        try {
-            // M value is present and an actual number
-            return ! Double.isNaN(coordinate.getOrdinate(CoordinateSequence.M));
-        } catch (IllegalArgumentException e) {
-            // there is no M whatsoever
-            return false;
-        }
-    }
-
-    private static boolean hasZ(Coordinate coordinate) {
-        return ! Double.isNaN(coordinate.z);
-    }
-
     private static CoordinateSequence sequenceOf(org.geolatte.geom.Geometry geometry) {
-        //TODO - when not Geometry instances, create a new PointSequence from the Geometry's Points.
         if (geometry == null) {
             throw new JTSConversionException("Can't convert null geometries.");
         } else {
-            return (CoordinateSequence) geometry.getPoints();
+            return (CoordinateSequence) geometry.getPositions();
         }
     }
 }

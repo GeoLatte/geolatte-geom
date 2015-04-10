@@ -21,16 +21,18 @@
 
 package org.geolatte.geom.curve;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.Polygon;
+import org.geolatte.geom.*;
 import org.geolatte.geom.codec.Wkt;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+//import org.geolatte.geom.codec.Wkt;
 
 /**
  * Unit test for {@link MortonCode}
@@ -40,94 +42,101 @@ import static org.junit.Assert.assertTrue;
  */
 public class MortonCodeTest {
 
-    Envelope extent = new Envelope(point(0, c(0.0, 0.0)), point(0, c(100.0, 100.0)));
-    MortonContext ctxtLvl1 = new MortonContext(extent, 1);
-    MortonContext ctxtLvl2 = new MortonContext(extent, 2);
-    MortonCode mcLevel1 = new MortonCode(ctxtLvl1);
-    MortonCode mcLevel2 = new MortonCode(ctxtLvl2);
+    CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+
+    Envelope<C2D> extent = new Envelope<C2D>(new C2D(0.0, 0.0), new C2D(100.0, 100.0), crs);
+    MortonContext<C2D> ctxtLvl1 = new MortonContext<C2D>(extent, 1);
+    MortonContext<C2D> ctxtLvl2 = new MortonContext<C2D>(extent, 2);
+    MortonCode<C2D> mcLevel1 = new MortonCode<C2D>(ctxtLvl1);
+    MortonCode<C2D> mcLevel2 = new MortonCode<C2D>(ctxtLvl2);
 
     @Test
     public void testLevel1() {
-        assertEquals("0", mcLevel1.ofPoint(point(0, c(0, 0))));
-        assertEquals("0", mcLevel1.ofPoint(point(0, c(10, 49))));
-        assertEquals("1", mcLevel1.ofPoint(point(0, c(0, 50))));
-        assertEquals("1", mcLevel1.ofPoint(point(0, c(49, 50))));
-        assertEquals("2", mcLevel1.ofPoint(point(0, c(50, 0))));
-        assertEquals("2", mcLevel1.ofPoint(point(0, c(99, 49))));
-        assertEquals("3", mcLevel1.ofPoint(point(0, c(50, 50))));
-        assertEquals("3", mcLevel1.ofPoint(point(0, c(100, 100))));
+        assertEquals("0", mcLevel1.ofPosition(new C2D(0, 0)));
+        assertEquals("0", mcLevel1.ofPosition(new C2D(10, 49)));
+        assertEquals("1", mcLevel1.ofPosition(new C2D(0, 50)));
+        assertEquals("1", mcLevel1.ofPosition(new C2D(49, 50)));
+        assertEquals("2", mcLevel1.ofPosition(new C2D(50, 0)));
+        assertEquals("2", mcLevel1.ofPosition(new C2D(99, 49)));
+        assertEquals("3", mcLevel1.ofPosition(new C2D(50, 50)));
+        assertEquals("3", mcLevel1.ofPosition(new C2D(100, 100)));
     }
 
     @Test
     public void testLevel2() {
-        assertEquals("00", mcLevel2.ofPoint(point(0, c(0, 0))));
-        assertEquals("01", mcLevel2.ofPoint(point(0, c(10, 40))));
-        assertEquals("02", mcLevel2.ofPoint(point(0, c(30, 20))));
-        assertEquals("03", mcLevel2.ofPoint(point(0, c(45, 45))));
+        assertEquals("00", mcLevel2.ofPosition(new C2D(0, 0)));
+        assertEquals("01", mcLevel2.ofPosition(new C2D(10, 40)));
+        assertEquals("02", mcLevel2.ofPosition(new C2D(30, 20)));
+        assertEquals("03", mcLevel2.ofPosition(new C2D(45, 45)));
 
-        assertEquals("10", mcLevel2.ofPoint(point(0, c(10, 55))));
-        assertEquals("11", mcLevel2.ofPoint(point(0, c(10, 90))));
-        assertEquals("12", mcLevel2.ofPoint(point(0, c(49, 55))));
-        assertEquals("13", mcLevel2.ofPoint(point(0, c(49, 80))));
+        assertEquals("10", mcLevel2.ofPosition(new C2D(10, 55)));
+        assertEquals("11", mcLevel2.ofPosition(new C2D(10, 90)));
+        assertEquals("12", mcLevel2.ofPosition(new C2D(49, 55)));
+        assertEquals("13", mcLevel2.ofPosition(new C2D(49, 80)));
 
-        assertEquals("20", mcLevel2.ofPoint(point(0, c(50, 0))));
-        assertEquals("21", mcLevel2.ofPoint(point(0, c(74, 30))));
-        assertEquals("22", mcLevel2.ofPoint(point(0, c(76, 24))));
-        assertEquals("23", mcLevel2.ofPoint(point(0, c(76, 49))));
+        assertEquals("20", mcLevel2.ofPosition(new C2D(50, 0)));
+        assertEquals("21", mcLevel2.ofPosition(new C2D(74, 30)));
+        assertEquals("22", mcLevel2.ofPosition(new C2D(76, 24)));
+        assertEquals("23", mcLevel2.ofPosition(new C2D(76, 49)));
 
-        assertEquals("30", mcLevel2.ofPoint(point(0, c(50, 50))));
-        assertEquals("31", mcLevel2.ofPoint(point(0, c(74, 76))));
-        assertEquals("32", mcLevel2.ofPoint(point(0, c(76, 74))));
-        assertEquals("33", mcLevel2.ofPoint(point(0, c(76, 79))));
+        assertEquals("30", mcLevel2.ofPosition(new C2D(50, 50)));
+        assertEquals("31", mcLevel2.ofPosition(new C2D(74, 76)));
+        assertEquals("32", mcLevel2.ofPosition(new C2D(76, 74)));
+        assertEquals("33", mcLevel2.ofPosition(new C2D(76, 79)));
 
     }
 
     @Test
-    public void testPolygonLevel2(){
-        Polygon pg = polygon(0, ring(c(10,10), c(10, 40), c(40, 40), c(40,10), c(10,10)));
+    public void testPolygonLevel2() {
+        Polygon<C2D> pg = polygon(ring(crs, c(10, 10), c(10, 40), c(40, 40), c(40, 10), c(10, 10)));
         assertEquals("0", mcLevel2.ofGeometry(pg));
 
-        pg = polygon(0, ring(c(60,60), c(60, 90), c(90, 90), c(90,60), c(60,60)));
+        pg = polygon(ring(crs, c(60, 60), c(60, 90), c(90, 90), c(90, 60), c(60, 60)));
         assertEquals("3", mcLevel2.ofGeometry(pg));
 
-        pg = polygon(0, ring(c(10,10), c(10, 90), c(90, 90), c(90,10), c(10,10)));
+        pg = polygon(ring(crs, c(10, 10), c(10, 90), c(90, 90), c(90, 10), c(10, 10)));
         assertTrue(mcLevel2.ofGeometry(pg).isEmpty());
 
     }
 
     @Test
-    public void testofPointandofGeometryGiveSameResultForPoints(){
-        Point pnt = point(0, c(0, 0));
-        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+    public void testofPointandofGeometryGiveSameResultForPoints() {
+        C2D pos = new C2D(0, 0);
+        Point<C2D> pnt = new Point<C2D>(pos, crs);
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
-        pnt = point(0, c(10, 55));
-        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+        pos = new C2D(10, 55);
+        pnt = new Point<C2D>(pos, crs);
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
-        pnt = point(0, c(76, 24));
-        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+        pos = new C2D(76, 24);
+        pnt = new Point<C2D>(pos, crs);
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
 
-        pnt = point(0, c(76, 79));
-        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPoint(pnt));
+        pos = new C2D(76, 79);
+        pnt = new Point<C2D>(pos, crs);
+        assertEquals(mcLevel2.ofGeometry(pnt), mcLevel2.ofPosition(pos));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateWrongCrsIdOfGeometry() {
-        mcLevel1.ofGeometry(point(4326, c(1, 1)));
+        CoordinateReferenceSystem<C2D> lFrN = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(27562);
+        mcLevel1.ofGeometry(point(lFrN, c(1, 1)));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidCoordinateWrongCrsIdOfPoint() {
-        mcLevel1.ofPoint(point(4326, c(1, 1)));
+    public void testInvalidCoordinateWrongCrsIdOfPosition() {
+        mcLevel1.ofPosition(new C2DM(1, 1, 3));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidCoordinateToRightOfExtentPoint() {
-        mcLevel1.ofPoint(point(0, c(101, 101)));
+    public void testInvalidCoordinateToRightOfExtentPosition() {
+        mcLevel1.ofPosition(new C2D(101, 101));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidCoordinateToRightOfExtentGeometry() {
-        mcLevel1.ofGeometry(point(0, c(101, 101)));
+        mcLevel1.ofGeometry(point(crs, c(101, 101)));
     }
 
     @Test
@@ -138,19 +147,19 @@ public class MortonCodeTest {
 
     @Test
     public void testEnvelopeOfMortonCodeLevel1() {
-        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf(""));
-        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(50.0, 50.0))), mcLevel2.envelopeOf("0"));
-        assertEquals(new Envelope(point(0, c(0.0, 50.0)), point(0, c(50.0, 100.0))), mcLevel2.envelopeOf("1"));
-        assertEquals(new Envelope(point(0, c(50.0, 0.0)), point(0, c(100.0, 50.0))), mcLevel2.envelopeOf("2"));
-        assertEquals(new Envelope(point(0, c(50.0, 50.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf("3"));
+        assertEquals(new Envelope<C2D>(new C2D(0.0, 0.0), new C2D(100.0, 100.0), crs), mcLevel2.envelopeOf(""));
+        assertEquals(new Envelope<C2D>(new C2D(0.0, 0.0), new C2D(50.0, 50.0),crs), mcLevel2.envelopeOf("0"));
+        assertEquals(new Envelope<C2D>(new C2D(0.0, 50.0), new C2D(50.0, 100.0), crs), mcLevel2.envelopeOf("1"));
+        assertEquals(new Envelope<C2D>(new C2D(50.0, 0.0), new C2D(100.0, 50.0), crs), mcLevel2.envelopeOf("2"));
+        assertEquals(new Envelope<C2D>(new C2D(50.0, 50.0), new C2D(100.0, 100.0), crs), mcLevel2.envelopeOf("3"));
     }
 
     @Test
     public void testEnvelopeOfMortonCodeLevel2() {
-        assertEquals(new Envelope(point(0, c(0.0, 0.0)), point(0, c(25.0, 25.0))), mcLevel2.envelopeOf("00"));
-        assertEquals(new Envelope(point(0, c(25.0, 50.0)), point(0, c(50.0, 75.0))), mcLevel2.envelopeOf("12"));
-        assertEquals(new Envelope(point(0, c(50.0, 25.0)), point(0, c(75.0, 50.0))), mcLevel2.envelopeOf("21"));
-        assertEquals(new Envelope(point(0, c(75.0, 75.0)), point(0, c(100.0, 100.0))), mcLevel2.envelopeOf("33"));
+        assertEquals(new Envelope<C2D>(new C2D(0.0, 0.0), new C2D(25.0, 25.0), crs), mcLevel2.envelopeOf("00"));
+        assertEquals(new Envelope<C2D>(new C2D(25.0, 50.0), new C2D(50.0, 75.0), crs), mcLevel2.envelopeOf("12"));
+        assertEquals(new Envelope<C2D>(new C2D(50.0, 25.0), new C2D(75.0, 50.0), crs), mcLevel2.envelopeOf("21"));
+        assertEquals(new Envelope<C2D>(new C2D(75.0, 75.0), new C2D(100.0, 100.0), crs), mcLevel2.envelopeOf("33"));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -164,17 +173,17 @@ public class MortonCodeTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-        public void testEnvelopeOfMCInvalidMortonCode() {
-            mcLevel2.envelopeOf("42");
+    public void testEnvelopeOfMCInvalidMortonCode() {
+        mcLevel2.envelopeOf("42");
     }
 
     //test code for bug
     @Test
     public void testMortonCodeShouldNotReturnEmptyString() {
-        String wkt = "SRID=4326;POINT(-87.064293 33.087386)";
-        Point geom = (Point) Wkt.fromWkt(wkt);
-        MortonCode mortonCode = new MortonCode(new MortonContext(new Envelope(-140.0, 15, -40.0, 50.0, CrsId.valueOf(4326)), 8));
-        assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPoint(geom));
+        String wkt = "SRID=31370;POINT(-87.064293 33.087386)";
+        Point<C2D> geom = (Point<C2D>) Wkt.fromWkt(wkt);
+        MortonCode<C2D> mortonCode = new MortonCode<C2D>(new MortonContext<C2D>(new Envelope<C2D>(-140.0, 15, -40.0, 50.0, crs), 8));
+        assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPosition(geom.getPosition()));
     }
 
 

@@ -27,7 +27,7 @@ package org.geolatte.geom.crs;
  * <h3>Warning: identity of <code>CrsIdentifiable</code>s:</h3>
  * <p>In theory the <code>CrsId</code> should identify uniquely the CoordinateReferenceSystem-related objects
  * (whether CRS, datum, projection, etc.). In practice this is not always the case. Users, for example, can add their own
- * definitions of some type (<code>Projection</code>s or <code>Ellipsoid</code>s).
+ * definitions for som <code>Projection</code>s or <code>Ellipsoid</code>s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/21/11
@@ -40,10 +40,11 @@ abstract public class CrsIdentifiable {
     /**
      * Constructs an instance.
      *
-     * @param crsId
+     * @param crsId the code
      * @param name
      */
     protected CrsIdentifiable(CrsId crsId, String name) {
+        if (crsId == null || name == null) throw new IllegalArgumentException(("No null values allowed"));
         this.crsId = crsId;
         this.name = name;
     }

@@ -21,7 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -35,16 +34,16 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegments() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(3, DimensionalFlag.d3D, CrsId.UNDEFINED);
-        builder.add(new double[]{1, 1, 1, 1});
-        builder.add(new double[]{2, 2, 2, 2});
-        builder.add(new double[]{3, 3, 3, 3});
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequenceBuilder<C3D> builder = new FixedSizePositionSequenceBuilder<C3D>(3, C3D.class);
+        builder.add(1, 1, 1);
+        builder.add(2, 2, 2);
+        builder.add(3, 3, 3);
+        PositionSequence<C3D> sequence = builder.toPositionSequence();
         int cnt = 0;
         double startX = 1.0d;
-        for (LineSegment ls : new LineSegments(sequence)) {
-            assertEquals(startX, ls.getStartPoint().getX(), Math.ulp(1.0d));
-            startX = ls.getEndPoint().getX();
+        for (LineSegment<C3D> ls : new LineSegments<C3D>(sequence)) {
+            assertEquals(startX, ls.getStartPosition().getX(), Math.ulp(1.0d));
+            startX = ls.getEndPosition().getX();
             cnt++;
         }
         assertEquals(2, cnt);
@@ -52,9 +51,9 @@ public class LineSegmentsTest {
 
     @Test
     public void testLineSegmentsOnEmptyPointSequence() {
-        PointSequenceBuilder builder = new FixedSizePointSequenceBuilder(0, DimensionalFlag.d3DM, CrsId.UNDEFINED);
-        PointSequence sequence = builder.toPointSequence();
-        for (LineSegment ls : new LineSegments(sequence)) {
+        PositionSequenceBuilder<C2D> builder = new FixedSizePositionSequenceBuilder<C2D>(0, C2D.class);
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
+        for (LineSegment<C2D> ls : new LineSegments<C2D>(sequence)) {
             fail();
         }
     }

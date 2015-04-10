@@ -61,7 +61,7 @@ public enum ByteOrder {
 
     /**
      * Returns the corresponding {@link java.nio.ByteOrder java.nio.ByteOrder}
-     * @return
+     * @return the corresponding {@link java.nio.ByteOrder java.nio.ByteOrder}
      */
     public java.nio.ByteOrder getByteOrder() {
         return this.order;

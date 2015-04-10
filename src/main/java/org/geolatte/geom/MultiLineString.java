@@ -21,51 +21,41 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
+ * A {@code GeometryCollection} of {@code LineString}s.
+ *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
-public class MultiLineString extends GeometryCollection {
+public class MultiLineString<P extends Position> extends GeometryCollection<P, LineString<P>> implements Linear {
 
-
-    static final MultiLineString EMPTY = new MultiLineString(new LineString[0]);
-
-    /**
-     * Constructs an empty <code>MultiLineString</code>.
-     *
-     * @return an empty <code>MultiLineString</code>.
-     */
-    public static MultiLineString createEmpty() {
-        return EMPTY;
-    }
 
     /**
      * Constructs a <code>MultiLineString</code> from the specified <code>LineString</code>s
      *
      * @param lineStrings the element <code>LineString</code>s for the constructed <code>MultiLineString</code>
      */
-    public MultiLineString(LineString[] lineStrings) {
+//    @SafeVarargs
+    public MultiLineString(LineString<P>... lineStrings) {
         super(lineStrings);
     }
 
+    public MultiLineString(CoordinateReferenceSystem<P> crs) {
+        super(crs);
+    }
+
+
+
     @Override
-    public LineString getGeometryN(int i) {
-        return (LineString) super.getGeometryN(i);
+    public Position getStartPosition() {
+        return getPositionN(0);
     }
 
-    public double getLength() {
-        double l = 0.0d;
-        for (int i = 0; i < this.getNumGeometries(); i++) {
-            l += getGeometryN(i).getLength();
-        }
-        return l;
-    }
-
-    public boolean isClosed() {
-        for (int i = 0; i < this.getNumGeometries(); i++) {
-            if (!getGeometryN(i).isClosed()) return false;
-        }
-        return true;
+    @Override
+    public Position getEndPosition() {
+        return getPositionN(getNumPositions() - 1);
     }
 
     @Override
@@ -75,7 +65,11 @@ public class MultiLineString extends GeometryCollection {
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_LINE_STRING;
+        return GeometryType.MULTILINESTRING;
     }
 
+    @Override
+    public Class<? extends Geometry> getComponentType() {
+        return LineString.class;
+    }
 }

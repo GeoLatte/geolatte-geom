@@ -41,7 +41,7 @@ abstract public class CodecUnitTestBase {
         for (Integer testCase : getTestCases().getCases()) {
             String wkt = getTestCases().getWKT(testCase);
             Geometry geom = getWktDecoder().decode(wkt);
-            assertEquals("Wkt decoder gives incorrect result for case: " + wkt, getTestCases().getExpected(testCase), geom);
+            assertEquals(String.format("Wkt decoder gives incorrect result for case: %d : ", testCase) + wkt, getTestCases().getExpected(testCase), geom);
             if (getTestCases().getTestEncoding(testCase)) {
                 Assert.assertEquals("Wkt encoder gives incorrect result for case:" + wkt, wkt, getWktEncoder().encode(geom));
             }

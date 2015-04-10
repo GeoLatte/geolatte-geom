@@ -21,11 +21,9 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.crs.CrsId;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
@@ -35,26 +33,26 @@ public class VariableSizePointSequenceBuilderTest {
 
     @Test
     public void test() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
+        PositionSequenceBuilder<C2D> builder = new VariableSizePositionSequenceBuilder<C2D>(C2D.class);
 
         for (int i = 0; i < 100; i++){
             builder.add(getRandomPoint());
         }
 
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
         assertEquals(100, sequence.size());
 
     }
 
     @Test
     public void testNumPointsLessThanInitialCapacity() throws Exception {
-        PointSequenceBuilder builder = new VariableSizePointSequenceBuilder(DimensionalFlag.d2D, CrsId.UNDEFINED);
+        PositionSequenceBuilder<C2D> builder = new VariableSizePositionSequenceBuilder<C2D>(C2D.class);
 
         for (int i = 0; i < 4; i++){
             builder.add(getRandomPoint());
         }
 
-        PointSequence sequence = builder.toPointSequence();
+        PositionSequence<C2D> sequence = builder.toPositionSequence();
         assertEquals(4, sequence.size());
 
     }

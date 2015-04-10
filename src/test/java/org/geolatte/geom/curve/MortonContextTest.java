@@ -23,11 +23,10 @@ package org.geolatte.geom.curve;
 
 import junit.framework.Assert;
 import org.geolatte.geom.Envelope;
-import org.geolatte.geom.Point;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.junit.Test;
-
-import static org.geolatte.geom.builder.DSL.c;
-import static org.geolatte.geom.builder.DSL.point;
 
 /**
  * Unit test for {@link MortonContext}
@@ -37,18 +36,20 @@ import static org.geolatte.geom.builder.DSL.point;
  */
 public class MortonContextTest {
 
-    Point p0 = point(4326, c(0, 0));
-    Point p1 = point(4326, c(10, 10));
-    Envelope envelope = new Envelope(p0, p1);
+    CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+
+    C2D p0 = new C2D(0, 0);
+    C2D p1 = new C2D(10, 10);
+    Envelope<C2D> envelope = new Envelope<C2D>(p0, p1, crs);
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentIfLevelExceedsLimit() {
-        new MortonContext(envelope, 32);
+        new MortonContext<C2D>(envelope, 32);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstructorThrowsIllegalArgumentExcOnNullExtent() {
-        new MortonContext(null, 4);
+        new MortonContext<C2D>(null, 4);
     }
 
     /**
@@ -56,14 +57,13 @@ public class MortonContextTest {
      */
     @Test
     public void testProperties() {
-        MortonContext context = new MortonContext(envelope, 3);
+        MortonContext<C2D> context = new MortonContext<C2D>(envelope, 3);
 
         Assert.assertEquals(p0.getX(), context.getMinX());
         Assert.assertEquals(p0.getY(), context.getMinY());
         Assert.assertEquals(p1.getX(), context.getMaxX());
         Assert.assertEquals(p1.getY(), context.getMaxY());
         Assert.assertEquals(3, context.getDepth());
-        Assert.assertEquals(p0.getCrsId(), context.getCrsId());
         Assert.assertEquals(3, context.getDepth());
         Assert.assertEquals(1.25, context.getLeafHeight());
         Assert.assertEquals(1.25, context.getLeafWidth());

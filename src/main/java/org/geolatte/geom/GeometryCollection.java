@@ -21,48 +21,43 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
  * A <code>Geometry</code> that is an ordered collection of some number of <code>Geometry</code>s.
- *
+ * <p/>
  * <p>All elements in a <code>GeometryCollection</code> must be in the same <code>CoordinateReferenceSystem</code>,
  * which is also the <code>CoordinateReferenceSystem</code> for the <code>GeometryCollection</code>.</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class GeometryCollection extends Geometry implements Iterable<Geometry>{
+public class GeometryCollection<P extends Position, G extends Geometry<P>> extends Geometry<P> implements Complex<P,G> {
 
-    protected final Geometry[] geometries;
-    protected final PointCollection points;
-
-    final static GeometryCollection EMPTY =  new GeometryCollection(new Geometry[0]);
-
-    /**
-     * Constructs an empty <code>GeometryCollection</code>.
-     *
-     * @return an <code>GeometryCollection</code> that is empty.
-     */
-    public static GeometryCollection createEmpty() {
-        return EMPTY;
-    }
+    protected final Geometry<P>[] geometries;
 
     /**
      * Constructs a <code>GeometryCollection</code> from the specified <code>Geometry</code>s.
      *
      * @param geometries the <code>Geometry</code>s that are the elements of the constructed <code>GeometryCollection</code>.
      */
-    public GeometryCollection(Geometry[] geometries) {
-        super(getGeometryOperations(geometries));
+    public GeometryCollection(G... geometries) {
+        super(nestPositionSequences(geometries), getCrs(geometries));
         check(geometries);
-        points = collectPointSets(geometries);
-        if (points.isEmpty()) {
-            this.geometries = new Geometry[0];
-        } else {
-            this.geometries = geometries;
-        }
+        this.geometries = Arrays.copyOf(geometries, geometries.length);
+    }
+
+    /**
+     * Constructs an empty <code>GeometryCollection</code>
+     *
+     */
+    @SuppressWarnings("unchecked")
+    public GeometryCollection(CoordinateReferenceSystem<P> crs) {
+        super(crs);
+        this.geometries = (Geometry<P>[])new Geometry[0];
     }
 
 
@@ -75,14 +70,20 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
         return geometries.length;
     }
 
+    @Override
+    public Class<? extends Geometry> getComponentType() {
+        return Geometry.class;
+    }
+
     /**
      * Returns the <code>Geometry</code> element at the specified (zero-based) position in this <code>GeometryCollection</code>.
      *
      * @param num the position in the collection of the requested <code>Geometry</code>
      * @return the element <code>Geometry</code> at the position specified by the num parameter.
      */
-    public Geometry getGeometryN(int num) {
-        return geometries[num];
+    @SuppressWarnings("unchecked")
+    public G getGeometryN(int num) {
+        return (G) geometries[num];
     }
 
     @Override
@@ -96,12 +97,7 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.GEOMETRY_COLLECTION;
-    }
-
-    @Override
-    public PointCollection getPoints() {
-        return points;
+        return GeometryType.GEOMETRYCOLLECTION;
     }
 
     /**
@@ -109,8 +105,8 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      *
      * @return an <code>Iterator</code> over the elements of this <code>GeometryCollection</code>.
      */
-    public Iterator<Geometry> iterator() {
-        return new Iterator<Geometry>(){
+    public Iterator<G> iterator() {
+        return new Iterator<G>() {
             private int index = 0;
 
             @Override
@@ -119,8 +115,9 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
             }
 
             @Override
-            public Geometry next() {
-                return geometries[index++];
+            @SuppressWarnings("unchecked")
+            public G next() {
+                return (G) geometries[index++];
             }
 
             @Override
@@ -137,33 +134,34 @@ public class GeometryCollection extends Geometry implements Iterable<Geometry>{
      * @param visitor
      */
     @Override
-    public void accept(GeometryVisitor visitor) {
+    public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
-        for (Geometry part : this) {
+        for (G part : this) {
             part.accept(visitor);
         }
     }
 
     /**
      * Verifies that the <code>Geometry</code> array can be used to construct a Geometry collection.
-     *
+     * <p/>
      * <p>Conditions:</p>
      * <il>
-     *     <li>Array contains no NULL values</li>
-     *     <li>All non-empty elements have the same coordinate reference system/li>
+     * <li>Array contains no NULL values</li>
+     * <li>All non-empty elements have the same coordinate reference system/li>
      * </il>
+     *
      * @param geometries
      * @throws IllegalStateException When geometries contains a null value or when the given geometries do not share the
      *                               same {@link CrsId}
      */
-    private void check(Geometry[] geometries){
+    private void check(G[] geometries) {
         if (geometries == null || geometries.length == 0) return;
         String msg = "NULL element not allowd in Geometry array";
         if (geometries[0] == null) throw new IllegalStateException(msg);
-        CrsId crsId = geometries[0].getCrsId();
+        CoordinateReferenceSystem<P> crs = geometries[0].getCoordinateReferenceSystem();
         for (int i = 1; i < geometries.length; i++) {
             if (geometries[i] == null) throw new IllegalStateException(msg);
-            if (!(geometries[i].isEmpty() || crsId.equals(geometries[i].getCrsId()))){
+            if (!(geometries[i].isEmpty() || crs.equals(geometries[i].getCoordinateReferenceSystem()))) {
                 throw new IllegalStateException("Geometries in the array do no share the same coordinate reference systems.");
             }
         }

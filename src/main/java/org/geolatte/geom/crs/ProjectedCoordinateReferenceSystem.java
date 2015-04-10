@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.crs;
 
+import org.geolatte.geom.*;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -36,10 +38,10 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSystem {
+public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<C2D> {
 
     private final Projection projection;
-    private final GeographicCoordinateReferenceSystem geoCRS;
+    private final Geographic2DCoordinateReferenceSystem geoCRS;
     private final List<CrsParameter> parameters;
 
     /**
@@ -51,13 +53,12 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
      * @param geoCRS     the <code>GeographicCoordinateReferenceSystem</code> for this projection
      * @param projection the map projection method
      * @param parameters the projection parameters for the projection method
-     * @param axes       the {@link CoordinateSystemAxis CoordinateSystemAxes} of the cartesian coordinate system for
-     *                   this <code>ProjectedCoordinateReferenceSystem</code>,
+     * @param crs        the 2D cartesian coordinate system for this coordinate reference system
      */
-    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
-                                              CoordinateSystemAxis... axes) {
-        super(crsId, name, axes);
+                                              CartesianCoordinateSystem2D crs) {
+        super(crsId, name, crs);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
@@ -78,7 +79,7 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
      *
      * @return
      */
-    public GeographicCoordinateReferenceSystem getGeographicCoordinateSystem() {
+    public Geographic2DCoordinateReferenceSystem getGeographicCoordinateSystem() {
         return geoCRS;
     }
 
@@ -93,22 +94,25 @@ public class ProjectedCoordinateReferenceSystem extends CoordinateReferenceSyste
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProjectedCoordinateReferenceSystem)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         ProjectedCoordinateReferenceSystem that = (ProjectedCoordinateReferenceSystem) o;
 
-        if (geoCRS != null ? !geoCRS.equals(that.geoCRS) : that.geoCRS != null) return false;
-        if (parameters != null ? !parameters.equals(that.parameters) : that.parameters != null) return false;
-        if (projection != null ? !projection.equals(that.projection) : that.projection != null) return false;
+        if (!geoCRS.equals(that.geoCRS)) return false;
+        if (!parameters.equals(that.parameters)) return false;
+        if (!projection.equals(that.projection)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = projection != null ? projection.hashCode() : 0;
-        result = 31 * result + (geoCRS != null ? geoCRS.hashCode() : 0);
-        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        int result = super.hashCode();
+        result = 31 * result + projection.hashCode();
+        result = 31 * result + geoCRS.hashCode();
+        result = 31 * result + parameters.hashCode();
         return result;
     }
+
 }

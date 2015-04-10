@@ -409,7 +409,6 @@ public class ByteBuffer {
      * @param other another <code>ByteBuffer</code>
      * @return true if both buffers contain the same bytes, false otherwise
      */
-    //TODO -- is this really different from equals?
     public boolean hasSameContent(ByteBuffer other) {
         if (other == null) return false;
         if (this.limit() != other.limit()) return false;

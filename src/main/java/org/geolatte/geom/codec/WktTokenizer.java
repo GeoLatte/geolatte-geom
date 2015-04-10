@@ -21,10 +21,14 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.DimensionalFlag;
-import org.geolatte.geom.PointSequenceBuilder;
-import org.geolatte.geom.PointSequenceBuilders;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.PositionSequenceBuilders;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.Unit;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
  * A tokenizer for WKT representations.
@@ -37,38 +41,50 @@ import org.geolatte.geom.crs.CrsId;
 class WktTokenizer extends AbstractWktTokenizer {
 
     private boolean isMeasured = false;
-    private final CrsId crsId;
+    private final CoordinateReferenceSystem<?> baseCRS;
+    private final boolean forceToCRS;
+    private CoordinateReferenceSystem<?> targetCRS;
 
     /**
      * A Tokenizer for the specified WKT string
      *
-     * @param wkt                     the string to tokenize
-     * @param variant                 the list of words to recognize as separate variant
-     * @param crsId   the <code>CrsId</code> for the points in the WKT representation.
+     * @param wkt     the string to tokenize
+     * @param variant the list of words to recognize as separate variant
+     * @param baseCRS the <code>CoordinateReferenceSystem</code> for the points in the WKT representation.
      */
-    protected WktTokenizer(CharSequence wkt, WktVariant variant, CrsId crsId) {
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS, boolean forceToCRS) {
         super(wkt, variant);
         if (wkt == null || variant == null)
             throw new IllegalArgumentException("Input WKT and variant must not be null");
-        if (crsId == null) {
-            this.crsId = CrsId.UNDEFINED;
+        if (baseCRS == null) {
+            this.baseCRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
+            this.forceToCRS = false;
         } else {
-            this.crsId = crsId;
+            this.baseCRS = baseCRS;
+            this.forceToCRS = forceToCRS;
         }
+
+    }
+
+    protected WktTokenizer(CharSequence wkt, WktVariant variant, CoordinateReferenceSystem<?> baseCRS) {
+        this(wkt, variant, baseCRS, false);
     }
 
     @Override
     WktToken numericToken() {
-        DimensionalFlag dimensionalFlag = countDimension();
+        CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem();
         int numPoints = countPoints();
-        double[] coords = new double[dimensionalFlag.getCoordinateDimension()];
-        PointSequenceBuilder psBuilder = PointSequenceBuilders.fixedSized(numPoints, dimensionalFlag, crsId);
+        //Note that the coords array can be larger than the number of coordinates available in the pointsequence
+        // e.g. when a composite CRS is passed in the decode function for a 2D WKT.
+        // this works because fastReadNumber returns 0 when attempting to read beyond a point delimiter
+        double[] coords = new double[crs.getCoordinateDimension()];
+        PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(numPoints, crs.getPositionClass());
         for (int i = 0; i < numPoints; i++) {
             readPoint(coords);
             psBuilder.add(coords);
             skipPointDelimiter();
         }
-        return new WktPointSequenceToken(psBuilder.toPointSequence());
+        return new WktPointSequenceToken(psBuilder.toPositionSequence(), getCoordinateReferenceSystem());
     }
 
     private void readPoint(double[] coords) {
@@ -148,14 +164,14 @@ class WktTokenizer extends AbstractWktTokenizer {
         return num;
     }
 
-    /**
-     * Determines the dimension by counting the number of coordinates in the current point,
-     * and taking into account if the tokenizer has already determined that the current Wkt geometery
-     * is measured or not.
-     *
-     * @return
-     */
-    private DimensionalFlag countDimension() {
+    private CoordinateReferenceSystem<?> getCoordinateReferenceSystem() {
+        if (targetCRS == null) {
+            targetCRS = determineTargetCRS();
+        }
+        return targetCRS;
+    }
+
+    private CoordinateReferenceSystem<?> determineTargetCRS() {
         int pos = currentPos;
         int num = 1;
         boolean inNumber = true;
@@ -171,11 +187,25 @@ class WktTokenizer extends AbstractWktTokenizer {
             if (pos == wkt.length() - 1) throw new WktDecodeException("");
             c = wkt.charAt(++pos);
         }
-        if (num == 4) return DimensionalFlag.d3DM;
-        if (num == 3 && isMeasured) return DimensionalFlag.d2DM;
-        if (num == 3 && !isMeasured) return DimensionalFlag.d3D;
-        if (num == 2) return DimensionalFlag.d2D;
+        if (num == 4) return ensureZM(baseCRS, true, true);
+        if (num == 3 && isMeasured) return ensureZM(baseCRS, false, true);
+        if (num == 3 && !isMeasured) return ensureZM(baseCRS, true, false);
+        if (num == 2) return baseCRS;
         throw new WktDecodeException("Point with less than 2 coordinates at position " + currentPos);
+    }
+
+    private CoordinateReferenceSystem<?> ensureZM(CoordinateReferenceSystem<?> crs, boolean needZ, boolean needM) {
+        CoordinateReferenceSystem<?> compound = crs;
+        if (needZ && ! hasVerticalAxis(compound)) {
+            compound = addVerticalSystem(compound, Unit.METER);
+        }
+        if (needM && ! hasMeasureAxis(compound)) {
+            compound = addLinearSystem(compound, Unit.METER);
+        }
+        if (forceToCRS && !compound.equals(crs)) {
+            throw new WktDecodeException("WKT inconsistent with specified Coordinate Reference System");
+        }
+        return compound;
     }
 
     private void skipPointDelimiter() {
@@ -187,9 +217,6 @@ class WktTokenizer extends AbstractWktTokenizer {
         WktToken token = variant.matchKeyword(wkt, currentPos, endPos);
         if (token instanceof WktGeometryToken) {
             this.isMeasured = isMeasured || ((WktGeometryToken) token).isMeasured();
-        }
-        if (token instanceof WktDimensionMarkerToken) {
-            this.isMeasured = isMeasured || ((WktDimensionMarkerToken) token).isMeasured();
         }
         return token;
     }

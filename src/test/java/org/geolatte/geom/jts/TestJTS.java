@@ -23,16 +23,20 @@ package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Point;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
 import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.PostgisTestCases;
+import org.geolatte.geom.support.WktWkbCodecTestBase;
+import org.junit.Assert;
 import org.junit.Test;
 
+import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +61,7 @@ public class TestJTS {
 
     @Test
     public void test_postgis_cases_with_srid() {
-            testInputs(new PostgisJDBCWithSRIDTestInputs());
+        testInputs(new PostgisJDBCWithSRIDTestInputs());
     }
 
     @Test
@@ -72,52 +76,51 @@ public class TestJTS {
     @Test
     public void test_measured_2d() {
         PostgisTestCases testCases = new PostgisTestCases();
-        Geometry geometry = testCases.getExpected(testCases.LINESTRING_3DM);
+        Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_3DM);
         com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
-        assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
+        Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
-        assertEquals(DimensionalFlag.d3DM, dc.getDimensionalFlag());
         assertEquals(dc.getM(), 2, Math.ulp(2));
     }
 
     @Test
     public void test_empty_polygon() {
-        test_empty(Polygon.createEmpty());
+        test_empty( polygon(crsZ));
     }
 
     @Test
     public void test_empty_point() {
-        test_empty(Point.createEmpty());
+        test_empty( new Point(crsZ) );
     }
 
     @Test
     public void test_empty_linestring() {
-        test_empty(LineString.createEmpty());
+        test_empty(linestring(crsZ));
     }
 
     @Test
     public void test_empty_linearRing() {
-        test_empty(LinearRing.createEmpty());
+        test_empty(ring(crsZ));
     }
 
     @Test
     public void test_empty_geometryCollection() {
-        test_empty(GeometryCollection.createEmpty());
+        test_empty(geometrycollection(crsZ));
     }
 
     @Test
     public void test_empty_multipoint() {
-        test_empty(MultiPoint.createEmpty());
+        test_empty(multipoint(crsZ));
     }
 
     @Test
     public void test_empty_multilinestring() {
-        test_empty(MultiLineString.createEmpty());
+        test_empty(multilinestring(crsZ));
     }
 
     @Test
     public void test_empty_multipolygon() {
-        test_empty(MultiPolygon.createEmpty());
+        test_empty(multipolygon(crsZ));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -134,11 +137,11 @@ public class TestJTS {
 
     @Test
     public void test_from_with_srid() {
-        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(0, c(1, 2)));
+        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, c(1, 2)));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 
-        geometry = JTS.to(polygon(0, ring(c(0, 0), c(1,0), c(1,1), c(0,1), c(0,0))));
+        geometry = JTS.to(polygon(ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 
@@ -146,17 +149,18 @@ public class TestJTS {
 
     @Test
     public void test_to_with_srid() {
-        assertEquals(4326, JTS.to( point(4326, c(1.0, 2.0))).getSRID());
+        assertEquals(4326, JTS.to(point(WGS84, g(1.0, 2.0))).getSRID());
     }
 
     private void test_empty(Geometry empty) {
         com.vividsolutions.jts.geom.Geometry jts = JTS.to(empty);
         assertTrue(jts.isEmpty());
-        assertEquals(empty, JTS.from(jts));
+        assertEquals(empty, JTS.from(jts, empty.getCoordinateReferenceSystem()));
     }
 
 
     // Note that the d2DM and d3DM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
+    // We always need to use JTS.from(Geometry,CRS) because we use UNDEFINED 2D and 3D CRS's
     private void testInputs(WktWkbCodecTestBase testCases) {
         for (Integer testCase : testCases.getCases()) {
             String failureMsg = "Failure in testcase " + testCase;
@@ -167,7 +171,7 @@ public class TestJTS {
             if (jtsGeom == null) {
                 //some EWKT forms cannot be parse, so in this case we just check that the To/From methods are consistent
                 com.vividsolutions.jts.geom.Geometry jts = JTS.to(geolatteGeom);
-                assertEquals(geolatteGeom, JTS.from(jts));
+                assertEquals(String.format("Error for case %d", testCase), geolatteGeom, JTS.from(jts, geolatteGeom.getCoordinateReferenceSystem()));
                 continue;
             }
             if (com.vividsolutions.jts.geom.GeometryCollection.class.isInstance(jtsGeom)) {
@@ -185,11 +189,11 @@ public class TestJTS {
                 assertEquals(failureMsg, JTS.getCorrespondingGeolatteClass(jtsGeom.getClass()), geolatteGeom.getClass());
                 continue;
             }
-            assertEquals(failureMsg, geolatteGeom, JTS.from(jtsGeom));
+            assertEquals(failureMsg, geolatteGeom, JTS.from(jtsGeom, geolatteGeom.getCoordinateReferenceSystem()));
             //note: this can't be changed to an assertEquals: the c.v.j.g.Geometry.equals(Geometry) method must be called
             // not Object.equals(Object)
             assertTrue(failureMsg, jtsGeom.equals(JTS.to(geolatteGeom)));
-//            assertTrue(failureMsg, (geolatteGeom.getCrsId() == CrsId.UNDEFINED && jtsGeom.getSRID() < 1)
+//            assertTrue(failureMsg, (geolatteGeom.getCoordinateReferenceSystem() == CrsId.UNDEFINED && jtsGeom.getSRID() < 1)
 //                    || (geolatteGeom.getSRID() == jtsGeom.getSRID()));
         }
     }

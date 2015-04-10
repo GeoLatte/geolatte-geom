@@ -24,6 +24,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 
 /**
  * An encoder for WKB (Well-Known Binary) encoded <code>Geometries</code>.
@@ -40,5 +41,5 @@ public interface WkbEncoder {
      * @param byteOrder the bye-order for the WKB representation
      * @return a ByteBuffer containing the binary WKB representation of the specified geometry using the specified byte-order
      */
-    ByteBuffer encode(Geometry geometry, ByteOrder byteOrder);
+    <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder);
 }

@@ -21,81 +21,38 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.jts.JTS;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
- * A <code>GeometryCollection</code> that contains only <code>Polygon</code>s.
+ * A {@code GeometryCollection} of {@code Polygon}s.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/20/11
  */
-public class MultiPolygon extends GeometryCollection {
-
-    static final MultiPolygon EMPTY = new MultiPolygon(new Polygon[0]);
-
-    /**
-     * Constructs an empty <code>MultiPolygon</code>.
-     *
-     * @return an empty <code>MultiPolygon</code>.
-     */
-    public static MultiPolygon createEmpty() {
-        return EMPTY;
-    }
+public class MultiPolygon<P extends Position> extends GeometryCollection<P, Polygon<P>> implements Polygonal<P> {
 
     /**
      * Constructs a <code>MultiPolygon</code> from the specified array of <code>Polygon</code>s.
      *
      * @param polygons the element <code>Polygon</code>s for the constructed <code>MultiPolygon</code>
      */
-    public MultiPolygon(Polygon[] polygons) {
+//    @SafeVarargs
+    public MultiPolygon(Polygon<P>... polygons) {
         super(polygons);
     }
 
+    public MultiPolygon(CoordinateReferenceSystem<P> crs) {
+            super(crs);
+        }
+
     @Override
-    public Polygon getGeometryN(int num) {
-        return (Polygon) super.getGeometryN(num);
-    }
-
-    /**
-     * Returns the sum of the areas of all element <code>Polygon</code>s.
-     *
-     * @return the sum of the areas of all element <code>Polygon</code>s.
-     */
-    public double area() {
-        double totalArea = 0;
-        for (int i = 0; i < getNumGeometries(); i++) {
-            totalArea += getGeometryN(i).getArea();
-        }
-        return totalArea;
-    }
-
-    /**
-     * Returns the mathematical centroid for this <code>MultiPolygon</code>.
-     *
-     * @return the mathematical centroid for this <code>MultiPolygon</code>.
-     */
-    public Point centroid() {
-        if (this.isEmpty()) return Point.EMPTY;
-        return (Point) JTS.from(JTS.to(this).getCentroid());
-    }
-
-    /**
-     * Returns a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
-     *
-     * @return a <code>Point</code> guaranteed to be on this <code>MultiPolygon</code>.
-     */
-    public Point pointOnSurface() {
-        for (int i = 0; i < getNumGeometries(); i++) {
-            if (!getGeometryN(i).isEmpty()) {
-                return getGeometryN(i).getPointOnSurface();
-            }
-        }
-        return Point.EMPTY;
+    public Class<? extends Geometry> getComponentType() {
+        return Polygon.class;
     }
 
     @Override
     public GeometryType getGeometryType() {
-        return GeometryType.MULTI_POLYGON;
+        return GeometryType.MULTIPOLYGON;
     }
 
 }

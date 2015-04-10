@@ -22,8 +22,14 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
+import org.geolatte.geom.crs.Unit;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
@@ -35,22 +41,47 @@ import org.geolatte.geom.crs.CrsId;
  */
 class PostgisWkbDecoder extends AbstractWkbDecoder {
 
+
     @Override
     protected void prepare(ByteBuffer byteBuffer) {
         //do nothing
     }
 
-    @Override
-    protected DimensionalFlag determineDimensionalFlag(int typeCode) {
-        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
-        return DimensionalFlag.valueOf(hasZ, hasM);
-    }
 
     @Override
-    protected void readSridIfPresent(ByteBuffer byteBuffer, int typeCode) {
+    @SuppressWarnings("unchecked")
+    protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
+        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
+        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
+
+        // if set, just validate
+        if (crs != null) {
+            validateCrs(crs, hasM, hasZ);
+            return crs;
+        }
+
+        CoordinateReferenceSystem crsDeclared;
         if (hasSrid(typeCode)) {
-            setCrsId(CrsId.valueOf(byteBuffer.getInt()));
+            int srid = byteBuffer.getInt();
+            crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+
+        } else {
+            crsDeclared = CoordinateReferenceSystems.PROJECTED_2D_METER;
+        }
+
+        if (hasZ) {
+            crsDeclared = addVerticalSystem(crsDeclared, Unit.METER);
+        }
+        if (hasM) {
+            crsDeclared = addLinearSystem(crsDeclared, Unit.METER);
+        }
+        return (CoordinateReferenceSystem<P>)crsDeclared;
+    }
+
+    private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
+        if ( (hasM && ! hasMeasureAxis(crs)) ||
+                (hasZ && ! hasVerticalAxis(crs))) {
+            throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
         }
     }
 

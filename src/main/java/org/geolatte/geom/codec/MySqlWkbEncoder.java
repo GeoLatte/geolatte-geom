@@ -21,11 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.ByteOrder;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
-import org.geolatte.geom.crs.CrsId;
+import org.geolatte.geom.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -34,30 +30,30 @@ import org.geolatte.geom.crs.CrsId;
 class MySqlWkbEncoder extends AbstractWkbEncoder {
 
     @Override
-    public ByteBuffer encode(Geometry geometry, ByteOrder byteOrder) {
+    public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
         if (geometry == null || hasEmpty(geometry)) return null;
         //size is size for WKB + 4 bytes for the SRID
         ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, false) + 4);
         if (byteOrder != null) {
             output.setByteOrder(byteOrder);
         }
-        output.putInt(geometry.getCrsId() == CrsId.UNDEFINED ? 0 : geometry.getSRID());
+        output.putInt(geometry.getSRID() == -1 ? 0 : geometry.getSRID());
         writeGeometry(geometry, output);
         output.rewind();
         return output;
     }
 
     @Override
-    protected int sizeEmptyGeometry(Geometry geometry) {
+    protected  <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
         return 0;
     }
 
-    private boolean hasEmpty(Geometry geometry) {
+    private  <P extends Position> boolean hasEmpty(Geometry<P> geometry) {
         if (geometry.isEmpty()) {
             return true;
         }
         if (geometry instanceof GeometryCollection) {
-            for (Geometry part : (GeometryCollection) geometry) {
+            for (Geometry<P> part : (GeometryCollection<P, ?>) geometry) {
                 if (hasEmpty(part)) return true;
             }
         }

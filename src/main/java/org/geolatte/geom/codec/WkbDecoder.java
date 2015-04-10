@@ -23,10 +23,12 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A decoder for WKB (Well-Known Binary) encoded <code>Geometries</code>.
- *
+ * <p/>
  * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -36,9 +38,23 @@ public interface WkbDecoder {
 
     /**
      * Decodes a WKB encoded representation of a <code>Geometry</code>
+     *
      * @param byteBuffer the WKB encoded binary representation
      * @return the represented <code>Geometry</code>
      * @throws WkbDecodeException if the specified ByteBuffer is an illegal or unsupported WKB representation
      */
-    Geometry decode(ByteBuffer byteBuffer);
+    Geometry<?> decode(ByteBuffer byteBuffer);
+
+
+    /**
+     * Decodes a WKB encoded representation of a <code>Geometry</code>, assuming the specified
+     * {@code CoordinateReferenceSystem}
+     *
+     * @param byteBuffer the WKB encoded binary representation
+     * @param crs        the base coordinate reference system assumed for the wkt
+     * @param <P>        the Position type for the (base)
+     * @return the represented <code>Geometry</code>
+     * @throws WkbDecodeException if the specified ByteBuffer is an illegal or unsupported WKB representation
+     */
+    <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs);
 }

@@ -26,7 +26,7 @@ package org.geolatte.geom.codec;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public interface WktToken {
+interface WktToken {
 
 }
 
