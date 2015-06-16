@@ -23,7 +23,7 @@ This version is a complete redesign. The redesign is aimed at:
 
 ## The Coordinate Reference System model (crs package)
 
-The availability of the CRSRegistry, and the explicit modelling of coordinate reference systems,
+ The availability of the CRSRegistry, and the explicit modelling of coordinate reference systems,
  made it obvious that a better way was available for handling the different dimensions of a Geometry's coordinate space.
  In previous versions this dimensionality was specified with a DimensionalFlag. Having a complete model of the
  Coordinate Reference System, including it's coordinate space, means we no longer need this. Rather than
@@ -67,13 +67,6 @@ offset by the disadvantages of a bias to 2D planar coordinate systems, and a (by
 (Should complex operations really be part of the Geometry interface? What with alternative algorithm implementations?)
  
 Because of these misgivings, we will de-emphasize SFS compliance.
-
-## Open issues
-
-The design is not yet finished. Here are some open issues that require further attention:
-* Is the API for composing Coordinate Reference System sufficiently clear?
-* How to handle empty Geometries, and Positions?
-* How to handle cases where the Coordinate Reference System is not known?
 
 
 
