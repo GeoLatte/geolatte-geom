@@ -29,13 +29,13 @@ import java.sql.Struct;
  *         creation-date: Jul 1, 2010
  */
 class SDOPoint {
-	public double x;
+    public double x;
 
-	public double y;
+    public double y;
 
-	public double z = Double.NaN;
+    public double z = Double.NaN;
 
-    public SDOPoint (double x, double y) {
+    public SDOPoint(double x, double y) {
         this(x, y, Double.NaN);
     }
 
@@ -45,26 +45,24 @@ class SDOPoint {
         this.z = z;
     }
 
-	public SDOPoint(Struct struct) {
-		try {
-			final Object[] data = struct.getAttributes();
-			this.x = ( (Number) data[0] ).doubleValue();
-			this.y = ( (Number) data[1] ).doubleValue();
-			if ( data[2] != null ) {
-				this.z = ( (Number) data[1] ).doubleValue();
-			}
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException( e );
-		}
-	}
+    public SDOPoint(Struct struct) {
+        try {
+            final Object[] data = struct.getAttributes();
+            this.x = ((Number) data[0]).doubleValue();
+            this.y = ((Number) data[1]).doubleValue();
 
-	public String toString() {
-		final StringBuilder stb = new StringBuilder();
-		stb.append( "(" ).append( x ).append( "," ).append( y ).append( "," ).append(
-				z
-		).append( ")" );
-		return stb.toString();
-	}
+            if (data[2] != null) {
+                this.z = ((Number) data[2]).doubleValue();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String toString() {
+        final StringBuilder stb = new StringBuilder();
+        stb.append("(").append(x).append(",").append(y).append(",").append(z).append(")");
+        return stb.toString();
+    }
 
 }

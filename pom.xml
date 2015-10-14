@@ -1,23 +1,15 @@
-<!--
-  ~ This file is part of the GeoLatte project.
-  ~
-  ~     GeoLatte is free software: you can redistribute it and/or modify
-  ~     it under the terms of the GNU Lesser General Public License as published by
-  ~     the Free Software Foundation, either version 3 of the License, or
-  ~     (at your option) any later version.
-  ~
-  ~     GeoLatte is distributed in the hope that it will be useful,
-  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~     GNU Lesser General Public License for more details.
-  ~
-  ~     You should have received a copy of the GNU Lesser General Public License
-  ~     along with GeoLatte.  If not, see <http://www.gnu.org/licenses />.
-  ~
-  ~ Copyright (C) 2010 - 2011 and Ownership of code is shared by:
-  ~ Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
-  ~ Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
-  -->
+<!-- ~ This file is part of the GeoLatte project. ~ ~ GeoLatte is free software: 
+	you can redistribute it and/or modify ~ it under the terms of the GNU Lesser 
+	General Public License as published by ~ the Free Software Foundation, either 
+	version 3 of the License, or ~ (at your option) any later version. ~ ~ GeoLatte 
+	is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY; 
+	without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+	PURPOSE. See the ~ GNU Lesser General Public License for more details. ~ 
+	~ You should have received a copy of the GNU Lesser General Public License 
+	~ along with GeoLatte. If not, see <http://www.gnu.org/licenses />. ~ ~ Copyright 
+	(C) 2010 - 2011 and Ownership of code is shared by: ~ Qmino bvba - Romeinsestraat 
+	18 - 3001 Heverlee (http://www.qmino.com) ~ Geovise bvba - Generaal Eisenhowerlei 
+	9 - 2140 Antwerpen (http://www.geovise.com) -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -26,180 +18,180 @@
     <artifactId>geolatte-geom</artifactId>
     <name>geolatte-geom</name>
     <packaging>jar</packaging>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <description>
         This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL
         specification.
     </description>
-    <url>http://www.geolatte.org/confluence/display/geom</url>
+	<url>http://www.geolatte.org/confluence/display/geom</url>
 
-    <organization>
-        <name>geolatte.org</name>
-        <url>http://www.geolatte.org/</url>
-    </organization>
+	<organization>
+		<name>geolatte.org</name>
+		<url>http://www.geolatte.org/</url>
+	</organization>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
 
-    <licenses>
-        <license>
-            <name>LGPL 3.0</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>LGPL 3.0</name>
+			<url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <scm>
-        <connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
-        <url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
-        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
-    </scm>
+	<scm>
+		<connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
+		<url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
+		<developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
+	</scm>
 
-    <developers>
-        <developer>
-            <id>maesenka</id>
-            <name>Karel Maesen</name>
-            <email>karel@geovise.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>bertvh</id>
-            <name>Bert Vanhooff</name>
-            <email>bert.vanhooff@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>yvesv</id>
-            <name>Yves Vandewoude</name>
-            <email>yves.vandewoude@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>rigolepe</id>
-            <name>Peter Rigole</name>
-            <email>peter.rigole@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<id>maesenka</id>
+			<name>Karel Maesen</name>
+			<email>karel@geovise.com</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>bertvh</id>
+			<name>Bert Vanhooff</name>
+			<email>bert.vanhooff@qmino.com</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>yvesv</id>
+			<name>Yves Vandewoude</name>
+			<email>yves.vandewoude@qmino.com</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>rigolepe</id>
+			<name>Peter Rigole</name>
+			<email>peter.rigole@qmino.com</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Committer</role>
+			</roles>
+		</developer>
+	</developers>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <!--generate source artefacts -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!--generate source artefacts -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-                    <!-- generate javadoc artefacts -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
-                        <!--  doclint config removed for building with jdk < 8 (as in Travis) -->
-                        <!--<configuration>-->
-                        <!--<additionalparam>-Xdoclint:none</additionalparam>-->
-                        <!--</configuration>-->
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+					<!-- generate javadoc artefacts -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<!-- doclint config removed for building with jdk < 8 (as in Travis) -->
+						<!--<configuration> -->
+						<!--<additionalparam>-Xdoclint:none</additionalparam> -->
+						<!--</configuration> -->
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-                    <!-- GPG Signed components -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+					<!-- GPG Signed components -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 
-                    <!-- Sonatype release plugin -->
-                    <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.3</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
+					<!-- Sonatype release plugin -->
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.3</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
 
 
-                </plugins>
-            </build>
+				</plugins>
+			</build>
 
-        </profile>
-    </profiles>
-    <build>
-        <plugins>
-            <!-- generate compiled (binary) artefacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<!-- generate compiled (binary) artefacts -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
 
-            <!--generate source artefacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+			<!--generate source artefacts -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-            <!-- generate javadoc artefacts -->
+			<!-- generate javadoc artefacts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -230,99 +222,99 @@
             </plugin>
 
 
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 
-    <dependencies>
-        <!-- Runtime dependencies -->
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apfloat</groupId>
-            <artifactId>apfloat</artifactId>
-            <version>1.8.2</version>
-        </dependency>
+	<dependencies>
+		<!-- Runtime dependencies -->
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apfloat</groupId>
+			<artifactId>apfloat</artifactId>
+			<version>1.8.2</version>
+		</dependency>
 
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-lgpl</artifactId>
-            <version>1.5.2</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-lgpl</artifactId>
+			<version>1.5.2</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>org.apache.directory.studio</groupId>
-            <artifactId>org.apache.commons.collections</artifactId>
-            <version>3.2.1</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.apache.directory.studio</groupId>
+			<artifactId>org.apache.commons.collections</artifactId>
+			<version>3.2.1</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-            <version>1.6.1</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>1.6.1</version>
+			<scope>test</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
-            <version>1.1</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>OSGEO</id>
-            <url>http://download.osgeo.org/webdav/geotools</url>
-        </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>OSGEO</id>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
 </project>

@@ -24,6 +24,7 @@ package org.geolatte.geom.jts;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateSystem;
@@ -54,13 +55,18 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     @Override
     public CoordinateSequence create(int size, int dimension) {
-        throw new UnsupportedOperationException();
+        // This is causing problems when working with Geotools JTS class in
+        // transformation.
+        // This is just a quick fix in order to get this working...
+        if (dimension > 3)
+            throw new IllegalArgumentException("dimension must be <= 3");
+        return new CoordinateArraySequence(size, dimension);
     }
 
     @SuppressWarnings("unchecked")
-    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType, CoordinateReferenceSystem<P> crs) {
-        if (cs instanceof PositionSequence &&
-                ((PositionSequence) cs).getPositionClass().equals(posType)) {
+    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType,
+                                                                       CoordinateReferenceSystem<P> crs) {
+        if (cs instanceof PositionSequence && ((PositionSequence) cs).getPositionClass().equals(posType)) {
             return (PositionSequence<P>) cs;
         }
 
@@ -71,7 +77,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         for (int i = 0; i < cs.size(); i++) {
             psc[0] = cs.getOrdinate(i, 0);
             psc[1] = cs.getOrdinate(i, 1);
-            if(hasVerticalAxis(crs)) {
+            if (hasVerticalAxis(crs)) {
                 psc[2] = cs.getOrdinate(i, 2);
             }
             builder.add(psc);
@@ -81,7 +87,8 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     private CoordinateReferenceSystem<?> determineCRS(Coordinate[] coordinates) {
         boolean hasZ, hasM = false;
-        if (coordinates == null || coordinates.length == 0) return PROJECTED_2D_METER;
+        if (coordinates == null || coordinates.length == 0)
+            return PROJECTED_2D_METER;
         if (coordinates[0] instanceof DimensionalCoordinate) {
             hasM = !Double.isNaN(((DimensionalCoordinate) coordinates[0]).getM());
         }
@@ -97,8 +104,10 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         }
     }
 
-    private <P extends Position> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates, CoordinateReferenceSystem<P> crs) {
-        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(coordinates.length, crs.getPositionClass());
+    private <P extends Position> CoordinateSequence fromCoordinateArray(Coordinate[] coordinates,
+                                                                        CoordinateReferenceSystem<P> crs) {
+        PositionSequenceBuilder<P> builder =
+                PositionSequenceBuilders.fixedSized(coordinates.length, crs.getPositionClass());
 
         double[] ordinates = new double[crs.getCoordinateDimension()];
         for (Coordinate co : coordinates) {
@@ -112,13 +121,12 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         ordinates[0] = co.x;
         ordinates[1] = co.y;
         boolean hasVerticalAxis = hasVerticalAxis(crs);
-        if (hasVerticalAxis){
+        if (hasVerticalAxis) {
             ordinates[2] = co.z;
         }
         if (hasMeasureAxis(crs)) {
             int idxM = hasVerticalAxis ? 3 : 2;
-            ordinates[idxM] = (co instanceof DimensionalCoordinate) ?
-                    ((DimensionalCoordinate) co).m : Double.NaN;
+            ordinates[idxM] = (co instanceof DimensionalCoordinate) ? ((DimensionalCoordinate) co).m : Double.NaN;
         }
     }
 
