@@ -1,22 +1,16 @@
 /*
- * This file is part of Hibernate Spatial, an extension to the
- *  hibernate ORM solution for spatial (geographic) data.
- *
- *  Copyright © 2007-2012 Geovise BVBA
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * This file is part of Hibernate Spatial, an extension to the hibernate ORM
+ * solution for spatial (geographic) data. Copyright © 2007-2012 Geovise BVBA
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version. This library is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+ * General Public License for more details. You should have received a copy of
+ * the GNU Lesser General Public License along with this library; if not, write
+ * to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.geolatte.geom.codec.db.oracle;
@@ -25,8 +19,7 @@ import java.sql.SQLException;
 import java.sql.Struct;
 
 /**
- * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jul 1, 2010
+ * @author Karel Maesen, Geovise BVBA creation-date: Jul 1, 2010
  */
 class SDOPoint {
 	public double x;
@@ -35,35 +28,38 @@ class SDOPoint {
 
 	public double z = Double.NaN;
 
-    public SDOPoint (double x, double y) {
-        this(x, y, Double.NaN);
-    }
+	public SDOPoint(double x, double y) {
+		this(x, y, Double.NaN);
+	}
 
-    public SDOPoint(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+	public SDOPoint(double x, double y, double z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
 
 	public SDOPoint(Struct struct) {
 		try {
 			final Object[] data = struct.getAttributes();
-			this.x = ( (Number) data[0] ).doubleValue();
-			this.y = ( (Number) data[1] ).doubleValue();
-			if ( data[2] != null ) {
-				this.z = ( (Number) data[1] ).doubleValue();
+			this.x = ((Number) data[0]).doubleValue();
+			this.y = ((Number) data[1]).doubleValue();
+
+			if (data[2] != null) {
+				/*
+				 * GEOGRAT-CM: This was simply wrong and already fixed in
+				 * Hibernate-Spatial 4.3.1-Snapshot.
+				 */
+				this.z = ((Number) data[2]).doubleValue();
 			}
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException( e );
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
+	@Override
 	public String toString() {
 		final StringBuilder stb = new StringBuilder();
-		stb.append( "(" ).append( x ).append( "," ).append( y ).append( "," ).append(
-				z
-		).append( ")" );
+		stb.append("(").append(x).append(",").append(y).append(",").append(z).append(")");
 		return stb.toString();
 	}
 
