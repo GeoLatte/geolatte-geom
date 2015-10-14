@@ -1,4 +1,4 @@
-[![Build Status](http://teamcity.geolatte.org/app/rest/builds/buildType:\(id:bt2\)/statusIcon)](http://teamcity.geolatte.org/viewType.html?buildTypeId=bt2&guest=1)
+[![Build Status](https://travis-ci.org/GeoLatte/geolatte-geom.svg?branch=master)](https://travis-ci.org/GeoLatte/geolatte-geom)
 
 # Geolatte-geom
 
