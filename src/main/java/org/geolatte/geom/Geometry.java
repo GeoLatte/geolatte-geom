@@ -21,10 +21,11 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.codec.Wkb;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.io.Serializable;
+import java.io.*;
 import java.lang.reflect.Array;
 
 /**
@@ -34,6 +35,9 @@ import java.lang.reflect.Array;
  */
 
 public abstract class Geometry<P extends Position> implements Serializable {
+
+
+    private static final long serialVersionUID = 6884205871950410215L;
 
     private static GeometryEquality geomEq = new GeometryPointEquality();
 
@@ -253,6 +257,28 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * @param visitor
      */
     public abstract void accept(GeometryVisitor<P> visitor);
+
+    private void readObject(ObjectInputStream in) throws IOException {
+        throw new InvalidObjectException("Require WKB serialization");
+    }
+
+    protected Object writeReplace() throws ObjectStreamException {
+        ByteBuffer buffer = Wkb.toWkb(this);
+        return new SerializationProxy(buffer);
+    }
+
+    //see Effective Java, 2ed, Item 78
+    private static class SerializationProxy implements Serializable {
+        private final byte[] buffer;
+        SerializationProxy(ByteBuffer buffer) {
+            this.buffer = buffer.toByteArray();
+        }
+
+        private Object readResolve() throws ObjectStreamException {
+            return Wkb.fromWkb(ByteBuffer.from(this.buffer));
+        }
+
+    }
 
     private static class EnvelopeVisitor<P extends Position> implements PositionVisitor<P> {
 
