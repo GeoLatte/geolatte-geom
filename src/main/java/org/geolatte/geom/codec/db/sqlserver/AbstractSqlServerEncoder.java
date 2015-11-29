@@ -36,8 +36,11 @@ abstract class AbstractSqlServerEncoder implements Encoder<SqlServerGeometry> {
     @SuppressWarnings("unchecked")
     public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 		SqlServerGeometry nativeGeom = new SqlServerGeometry();
-		int srid = geom.getSRID();
-		nativeGeom.setSrid( srid < 0 ? 0 : srid );
+
+		if( geom.getSRID() > 0 ) {
+			nativeGeom.setCoordinateReferenceSystem(geom.getCoordinateReferenceSystem());
+		}
+
 		nativeGeom.setIsValid();
 
 		if ( CoordinateReferenceSystems.hasMeasureAxis(geom.getCoordinateReferenceSystem()) ) {
@@ -91,6 +94,7 @@ abstract class AbstractSqlServerEncoder implements Encoder<SqlServerGeometry> {
 	protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
 		nativeGeom.setNumberOfPoints( coordinates.size() );
 		nativeGeom.allocateMValueArray();
+		nativeGeom.allocateZValueArray();
 		for ( int i = 0; i < coordinates.size(); i++ ) {
 			setCoordinate( nativeGeom, i, coordinates);
 		}

@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class Decoders {
 
-	final private static List<Decoder> DECODERS = new ArrayList<Decoder>();
+	final private static List<AbstractSqlServerDecoder> DECODERS = new ArrayList<AbstractSqlServerDecoder>();
 
 	static {
 		//Decoders
@@ -78,7 +78,7 @@ public class Decoders {
 	 * @return
 	 */
 	public static Decoder decoderFor(OpenGisType type) {
-		for ( Decoder decoder : DECODERS ) {
+		for ( AbstractSqlServerDecoder decoder : DECODERS ) {
 			if ( decoder.accepts( type ) ) {
 				return decoder;
 			}

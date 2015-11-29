@@ -45,6 +45,8 @@ public class SqlServerGeometry {
 
 	public static final byte SUPPORTED_VERSION = 1;
 
+	private static CoordinateReferenceSystem<?> DEFAULT_CRS = CoordinateReferenceSystems.mkProjected(0, Unit.METER);
+
 	private static final byte hasZValuesMask = 1;
 	private static final byte hasMValuesMask = 2;
 	private static final byte isValidMask = 4;
@@ -52,8 +54,8 @@ public class SqlServerGeometry {
 	private static final byte isSingleLineSegment = 16;
 
 	private ByteBuffer buffer;
-	private Integer srid;
-    private CoordinateReferenceSystem<?> crs;
+	private Integer srid = 0;
+    private CoordinateReferenceSystem<?> crs = DEFAULT_CRS;
     private byte version;
 	private byte serializationPropertiesByte;
 	private int numberOfPoints;
@@ -137,6 +139,11 @@ public class SqlServerGeometry {
 		}
 	}
 
+	void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
+		this.crs = crs;
+		this.srid = crs.getCrsId().getCode();
+	}
+
 	boolean isParentShapeOf(int parent, int child) {
 		return getShape( child ).parentOffset == parent;
 	}
@@ -190,16 +197,15 @@ public class SqlServerGeometry {
 	}
 
     CoordinateReferenceSystem<?> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
-        CoordinateReferenceSystem<C2D> defaultCrs = CoordinateReferenceSystems.PROJECTED_2D_METER;
-        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, defaultCrs);
-        if (hasZValues) {
-            crs = CoordinateReferenceSystems.addVerticalSystem(crs, Unit.METER);
-        }
-        if (hasMValues) {
-            crs = CoordinateReferenceSystems.addLinearSystem(crs, Unit.METER);
-        }
-        return (CoordinateReferenceSystem<?>)crs;
-    }
+		CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, DEFAULT_CRS);
+		if (hasZValues) {
+			crs = CoordinateReferenceSystems.addVerticalSystem(crs, Unit.METER);
+		}
+		if (hasMValues) {
+			crs = CoordinateReferenceSystems.addLinearSystem(crs, Unit.METER);
+		}
+		return (CoordinateReferenceSystem<?>) crs;
+	}
 
 	PositionSequence<?> coordinateRange(IndexRange range) {
         crs = getCRS(getSrid(), hasZValues(), hasMValues());
@@ -435,11 +441,11 @@ public class SqlServerGeometry {
 	}
 
 	void setSrid(Integer srid) {
-		this.srid = ( srid == null ) ? -1 : srid;
+		this.srid = ( srid == null ) ? 0 : srid;
 	}
 
 	Integer getSrid() {
-		return srid != -1 ? srid : null;
+		return srid;
 	}
 
 	boolean hasZValues() {

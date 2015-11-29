@@ -46,11 +46,13 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         } else {
             PositionFactory<C> factory = null;
             for (PositionSequence<C> seq : children) {
+                if (seq.isEmpty()) continue;
+
                 if (seq == null) {
                     throw new IllegalArgumentException("No null entries allowed in children array.");
                 } else {
                     if (factory != null && !factory.equals(seq.getPositionFactory())) {
-                        throw new IllegalArgumentException("All child sequences must have the same Coordinate Reference Systeml");
+                        throw new IllegalArgumentException("All child sequences must have the same Coordinate Reference System");
                     }
                     factory = seq.getPositionFactory();
                 }

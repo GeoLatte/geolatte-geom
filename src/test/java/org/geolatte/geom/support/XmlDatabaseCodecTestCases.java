@@ -32,6 +32,7 @@ public class XmlDatabaseCodecTestCases {
         testCase.srid = srid;
         testCase.geometry = geometry;
         testCase.dbRepresentation = dbRepresentation;
+        testCases.put(key, testCase);
     }
 
     /**

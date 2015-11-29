@@ -57,10 +57,10 @@ class PolygonSqlServerDecoder extends AbstractSqlServerDecoder {
 		for ( int figureIdx = figureRange.start, i = 1; figureIdx < figureRange.end; figureIdx++ ) {
 			IndexRange pntIndexRange = nativeGeom.getPointsForFigure( figureIdx );
 			if ( nativeGeom.isFigureInteriorRing( figureIdx ) ) {
-				rings.set(i++,toLinearRing( nativeGeom, pntIndexRange));
+				rings.add(i++,toLinearRing( nativeGeom, pntIndexRange));
 			}
 			else {
-				rings.set(0, toLinearRing( nativeGeom, pntIndexRange));
+				rings.add(0, toLinearRing( nativeGeom, pntIndexRange));
 			}
 		}
         LinearRing<?>[] ringArr = (LinearRing<?>[])new LinearRing[rings.size()];

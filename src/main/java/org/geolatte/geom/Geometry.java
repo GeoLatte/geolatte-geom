@@ -24,6 +24,8 @@ package org.geolatte.geom;
 import org.geolatte.geom.codec.Wkb;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -98,7 +100,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     @SuppressWarnings("unchecked")
     protected static <T extends Position> PositionSequence<T> nestPositionSequences(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {
-            return null;
+            return new NestedPositionSequence<T>((PositionSequence<T>[])new PositionSequence[0]);
         }
         PositionSequence<T>[] sequences = (PositionSequence<T>[]) (new PositionSequence[geometries.length]);
         int i = 0;
@@ -111,7 +113,8 @@ public abstract class Geometry<P extends Position> implements Serializable {
     @SuppressWarnings("unchecked")
     protected static <T extends Position> CoordinateReferenceSystem<T> getCrs(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {
-            throw new IllegalArgumentException("Expecting non-null, non-empty array of Geometry.");
+            return (CoordinateReferenceSystem<T>)CrsRegistry.getCoordinateReferenceSystemForEPSG(-1,
+                    CoordinateReferenceSystems.PROJECTED_2D_METER);
         }
         return geometries[0].getCoordinateReferenceSystem();
     }

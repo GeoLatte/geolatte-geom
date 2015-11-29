@@ -30,6 +30,7 @@ public class TestSqlServerCodec {
 
         runTest(new CodecTest() {
             void run(Integer id, String wkt, int srid, Geometry expected, ByteBuffer bytes) {
+//                System.out.println(wkt);
                 assertTrue(String.format("%d: encoding fails for ewkt srid=%d;%s", id, srid, wkt),
                         geometricEquality.equals(expected, Decoders.decode(bytes.toByteArray())));
             }
@@ -39,8 +40,10 @@ public class TestSqlServerCodec {
 
     @Test
     public void testDecoding() {
+
         runTest(new CodecTest() {
             void run(Integer id, String wkt, int srid, Geometry geom, ByteBuffer expected) {
+//                System.out.println(String.format("%d: decoding for ewkt srid=%d;%s", id, srid, wkt));
                 byte[] bytes = Encoders.encode(geom);
                 ByteBuffer encoded = ByteBuffer.from(bytes);
                 assertTrue(String.format("%d: decoding fails for ewkt srid=%d;%s", id, srid, wkt),

@@ -34,6 +34,13 @@ import java.util.List;
  */
 public class CoordinateReferenceSystems {
 
+    public static ProjectedCoordinateReferenceSystem mkProjected(int srid, LinearUnit unit) {
+        return new ProjectedCoordinateReferenceSystem(CrsId.valueOf(srid), "Generic 2D Projected",
+                mkGeographic(Unit.DEGREE), Projection.UNKNOWN, new ArrayList<CrsParameter>(),
+                new CartesianCoordinateSystem2D(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, unit), new
+                        StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)));
+    }
+
     /**
      * Creates a generic projected coordinate reference system using the specified units of length for coordinates.
      * <p/>
@@ -43,10 +50,7 @@ public class CoordinateReferenceSystems {
      * @return a {@code CoordinateReferenceSystem} with the specified length units
      */
     public static ProjectedCoordinateReferenceSystem mkProjected(LinearUnit unit) {
-        return new ProjectedCoordinateReferenceSystem(CrsId.UNDEFINED, "Generic 2D Projected",
-                mkGeographic(Unit.DEGREE), Projection.UNKNOWN, new ArrayList<CrsParameter>(),
-                new CartesianCoordinateSystem2D(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, unit), new
-                StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)));
+        return mkProjected(CrsId.UNDEFINED.getCode(), unit);
     }
 
     /**

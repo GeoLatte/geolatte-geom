@@ -43,7 +43,7 @@ import static org.geolatte.geom.Geometries.*;
 class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDecoder {
 
     private final static PostgisWktVariant WKT_GEOM_TOKENS = new PostgisWktVariant();
-    private final static Pattern SRID_RE = Pattern.compile("^SRID=(\\d+);", Pattern.CASE_INSENSITIVE);
+    private final static Pattern SRID_RE = Pattern.compile("^SRID=(.*);", Pattern.CASE_INSENSITIVE);
 
     private String wktString;
     private CoordinateReferenceSystem<?> crs;
