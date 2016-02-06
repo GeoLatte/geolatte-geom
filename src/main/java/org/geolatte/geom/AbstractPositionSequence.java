@@ -167,7 +167,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
 
     @Override
     public void setOrdinate(int i, int ordinateIndex, double value) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("setOrdinate() method is not supported (PositionSequences are immutable).");
     }
 
     @Override
