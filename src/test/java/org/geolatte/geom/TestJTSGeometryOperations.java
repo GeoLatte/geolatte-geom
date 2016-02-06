@@ -180,7 +180,27 @@ public class TestJTSGeometryOperations {
         assertEquals(pg1, ops.symmetricDifference(pg1, new Polygon<C2D>(crs)));
         assertEquals(pg2, ops.symmetricDifference(new Polygon<C2D>(crs), pg2));
     }
- 
+
+    @Test
+    public void testReverse() {
+        LineString<C2D> l = linestring(crs, c(0, 0), c(1, 0), c(1, 3));
+        assertEquals(linestring(crs, (c(1, 3)), c(1, 0), c(0, 0)), ops.reverse(l));
+        assertEquals(l, ops.reverse(ops.reverse(l)));
+
+        LineString<C2D> l2 = linestring(crs, c(1, 10), c(3, 30), c(5, 40));
+        MultiLineString<C2D> ml = new MultiLineString(l, l2);
+
+        MultiLineString<C2D> expectedMl = new MultiLineString(ops.reverse(l2), ops.reverse(l));
+        assertEquals(expectedMl, ops.reverse(ml));
+        assertEquals(ml, ops.reverse(ops.reverse(ml)));
+
+        Polygon<C2D> p = polygon(crs, ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)));
+        assertEquals(polygon(crs, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0))), ops.reverse(p));
+
+        GeometryCollection<C2D, Geometry<C2D>> coll = geometrycollection(l, p, ml);
+        assertEquals(geometrycollection(ops.reverse(ml), ops.reverse(p), ops.reverse(l)), ops.reverse(coll));
+
+    }
 
     //TODO -- fix these unit tests (they no longer belong in this class).
 

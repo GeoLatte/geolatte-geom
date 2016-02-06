@@ -76,6 +76,16 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
     }
 
     /**
+     * Returns the components
+     *
+     * @return an array containing all component objects
+     */
+    @Override
+    public G[] components() {
+        return (G[]) Arrays.copyOf(this.geometries, this.geometries.length);
+    }
+
+    /**
      * Returns the <code>Geometry</code> element at the specified (zero-based) position in this <code>GeometryCollection</code>.
      *
      * @param num the position in the collection of the requested <code>Geometry</code>

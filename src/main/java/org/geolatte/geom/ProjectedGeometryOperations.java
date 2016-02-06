@@ -52,7 +52,17 @@ public interface ProjectedGeometryOperations {
      * @return a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
     <P extends C2D> Geometry<P> boundary(final Geometry<P> geometry);
-    
+
+
+    /**
+     * Creates a <code>Geometry</code> with the positions of the input <code>Geometry</code> in reverse order.
+     *
+     * @param geometry the <code>Geometry</code> to reverse
+     * @return a <code>Geometry</code> with the same positions as the specified input <code>Geometry</code> but in reverse order
+     */
+    <P extends C2D, G extends Geometry<P>> G reverse (final G geometry);
+
+
     /**
      * Checks if the specified <code>Geometry</code>s intersect.
      *

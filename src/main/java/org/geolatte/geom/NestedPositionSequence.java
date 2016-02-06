@@ -71,7 +71,7 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
     }
 
     public PositionSequence<P>[] getChildren() {
-        return this.children;
+        return Arrays.copyOf(this.children, this.children.length);
     }
 
     @Override
@@ -115,6 +115,29 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
     public void accept(LLAPositionVisitor visitor) {
         for (PositionSequence<P> child : getChildren()) {
             child.accept(visitor);
+        }
+    }
+
+    /**
+     * Creates a new <code>PositionSequence</code> with positions in reverse order.
+     *
+     * @return
+     */
+    @Override
+    public PositionSequence<P> reverse() {
+        PositionSequence<P>[] childrenCopy =  this.getChildren();
+        for (int i = 0; i < childrenCopy.length; i++){
+            childrenCopy[i] = childrenCopy[i].reverse();
+        }
+        reverseInPlace(childrenCopy);
+        return new NestedPositionSequence<P>(childrenCopy);
+    }
+
+    private void reverseInPlace(PositionSequence<P>[] arr ) {
+        for (int i = 0; i < arr.length/2; i++) {
+            PositionSequence<P> h = arr[i];
+            arr[i] = arr[arr.length - 1 -i];
+            arr[arr.length - 1 -i] = h;
         }
     }
 

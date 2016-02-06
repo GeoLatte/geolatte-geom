@@ -43,4 +43,11 @@ public interface Complex<P extends Position, G extends Geometry<P>> extends Iter
      */
     public Class<? extends Geometry> getComponentType();
 
+    /**
+     * Returns the components
+     * @return an array containing all component objects
+     *
+     */
+    public G[] components();
+
 }
