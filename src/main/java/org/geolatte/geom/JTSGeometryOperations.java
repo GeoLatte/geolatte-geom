@@ -32,6 +32,10 @@ import com.vividsolutions.jts.operation.relate.RelateOp;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * An implementation of {@code ProjectedGeometryOperations} that delegates to the corresponding JTS operations.
  *
@@ -72,6 +76,41 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
         final BoundaryOp boundaryOp = new BoundaryOp(JTS.to(geometry));
         final CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
         return JTS.from(boundaryOp.getBoundary(), crs);
+    }
+
+    /**
+     * Creates a <code>Geometry</code> having as coordinates the coordinates of the input <code>Geometry</code> in reverse order.
+     *
+     * @param geometry the <code>Geometry</code> to reverse
+     * @return a <code>Geometry</code> with the same coordinates as the specified input <code>Geometry</code> but in reverse order
+     */
+    @Override
+    public <P extends C2D, G extends Geometry<P>> G reverse(G geometry) {
+        PositionSequence<P> pos = geometry.getPositions().reverse();
+        if (geometry instanceof Simple) {
+            return (G)Geometries.mkGeometry((Class<? extends Simple>)geometry.getClass(), pos, geometry.getCoordinateReferenceSystem());
+        } else {
+            Complex<P, ?> complex = (Complex<P, ?>) geometry;
+            Geometry<P>[] geoms = complex.components();
+            reverseOrder(reverseAll(geoms));
+            return (G)Geometries.mkGeometry((Class<? extends Complex>)geometry.getClass(), geoms);
+        }
+    }
+
+    private <P extends C2D> Geometry<P>[] reverseAll(Geometry<P>[] components) {
+        for (int i = 0; i < components.length; i++) {
+            components[i] = reverse(components[i]);
+        }
+        return components;
+    }
+
+    private <P extends C2D> Geometry<P>[]  reverseOrder(Geometry<P>[] components) {
+        for (int i = 0; i < components.length / 2; i++) {
+            Geometry<P> h = components[i];
+            components[i] = components[components.length - 1 - i];
+            components[components.length - 1 - i] = h;
+        }
+        return components;
     }
 
     @Override

@@ -187,4 +187,14 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
     public Class<? extends Geometry> getComponentType() {
         return LinearRing.class;
     }
+
+    /**
+     * Returns the components
+     *
+     * @return an array containing all component objects
+     */
+    @Override
+    public LinearRing<P>[] components() {
+        return Arrays.copyOf(this.rings, this.rings.length);
+    }
 }

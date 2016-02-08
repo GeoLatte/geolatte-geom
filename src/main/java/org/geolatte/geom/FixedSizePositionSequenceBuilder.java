@@ -47,7 +47,8 @@ class FixedSizePositionSequenceBuilder<P extends Position> extends AbstractPosit
     @Override
     public PositionSequence<P> toPositionSequence() {
         if (index != coordinates.length) {
-            throw new IllegalStateException("PointSequence not filled to capacity.");
+            throw new IllegalStateException("PointSequence not filled to capacity. Index at " + index + " and not at "
+                    + coordinates.length );
         }
         return new PackedPositionSequence<P>(factory, this.coordinates);
     }

@@ -64,6 +64,22 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
         }
     }
 
+    /**
+     * Creates a new <code>PositionSequence</code> with positions in reverse order.
+     *
+     * @return
+     */
+    @Override
+    public PositionSequence<P> reverse() {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(size(), getPositionClass());
+        double[] coords = new double[getCoordinateDimension()];
+        for (int i = size() - 1; i >= 0 ; i--) {
+            getCoordinates(i, coords);
+            builder.add(coords);
+        }
+        return builder.toPositionSequence();
+    }
+
     @Override
     public int size() {
         return this.coordinates.length / getCoordinateDimension();

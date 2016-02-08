@@ -38,69 +38,79 @@ public interface ProjectedGeometryOperations {
     public final ProjectedGeometryOperations Default = new JTSGeometryOperations();
 
     /**
-     * Creates an operation to test the simplicity of the specified <code>Geometry</code>.
+     * Tests the simplicity of the specified <code>Geometry</code>.
      *
      * @param geometry the <code>Geometry</code> to test for simplicity.
-     * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code> is simple.
+     * @return True iff the specified <code>Geometry</code> is simple.
      */
     <P extends C2D> boolean isSimple(final Geometry<P> geometry);
 
     /**
-     * Creates an operation to calculate the boundary of the specified <code>Geometry</code>.
+     * Calculates the boundary of the specified <code>Geometry</code>.
      *
      * @param geometry the <code>Geometry</code> for which to calculate the boundary.
-     * @return a <code>GeometryOperation</code> that calculates a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
+     * @return a <code>Geometry</code> representing the boundary of the specified <code>Geometry</code>.
      */
     <P extends C2D> Geometry<P> boundary(final Geometry<P> geometry);
 
+
     /**
-     * Creates an operation to check if the specified <code>Geometry</code>s intersect.
+     * Creates a <code>Geometry</code> with the positions of the input <code>Geometry</code> in reverse order.
+     *
+     * @param geometry the <code>Geometry</code> to reverse
+     * @return a <code>Geometry</code> with the same positions as the specified input <code>Geometry</code> but in reverse order
+     */
+    <P extends C2D, G extends Geometry<P>> G reverse (final G geometry);
+
+
+    /**
+     * Checks if the specified <code>Geometry</code>s intersect.
      *
      * @param geometry the first <code>Geometry</code> operand of the intersection test
      * @param other    the second <code>Geometry</code> operand of the intersection test
-     * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially intersect
+     * @return true iff the specified <code>Geometry</code>s spatially intersect
      */
     <P extends C2D> boolean intersects(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to check if the specified <code>Geometry</code>s touch.
+     * Checks if the specified <code>Geometry</code>s touch.
      *
      * @param geometry the first <code>Geometry</code> operand of the touch test
      * @param other    the second <code>Geometry</code> operand of the touch test
-     * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially touch
+     * @return true iff the specified <code>Geometry</code>s spatially touch
      */
     <P extends C2D> boolean touches(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to check if the specified <code>Geometry</code>s cross.
+     * Checks if the specified <code>Geometry</code>s cross.
      *
      * @param geometry the first <code>Geometry</code> operand of the cross test
      * @param other    the second <code>Geometry</code> operand of the cross test
-     * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially cross
+     * @return true iff the specified <code>Geometry</code>s spatially cross
      */
     <P extends C2D> boolean crosses(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to check if the first specified <code>Geometry</code> spatially
+     * Checks if the first specified <code>Geometry</code> spatially
      * contains the second.
      *
      * @param geometry the first <code>Geometry</code> operand of the containment test
      * @param other    the second <code>Geometry</code> operand of the containment test
-     * @return a <code>GeometryOperation</code> that checks if the first specified <code>Geometry</code> spatially contains the second
+     * @return true iff the first specified <code>Geometry</code> spatially contains the second
      */
     <P extends C2D> boolean contains(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to check if the specified <code>Geometry</code>s overlap.
+     * Checks if the specified <code>Geometry</code>s overlap.
      *
      * @param geometry the first <code>Geometry</code> operand of the overlap test
      * @param other    the second <code>Geometry</code> operand of the overlap test
-     * @return a <code>GeometryOperation</code> that checks if the specified <code>Geometry</code>s spatially overlap
+     * @return true iff the specified <code>Geometry</code>s spatially overlap
      */
     <P extends C2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to check if the specified <code>Geometry</code>s are spatially related by testing
+     * Checks if the specified <code>Geometry</code>s are spatially related by testing
      * for intersections between the interior, boundary and exterior of the two geometric objects as specified by
      * the values in the intersection pattern matrix. This returns false if all the tested intersections are empty except
      * exterior (this) intersect exterior (another).
@@ -108,24 +118,24 @@ public interface ProjectedGeometryOperations {
      * @param geometry the first <code>Geometry</code> operand of the relates test
      * @param other    the second <code>Geometry</code> operand of the relates test
      * @param matrix   the intersection pattern matrix
-     * @return a <code>GeometryOperation</code> that checks if this instance intersects the specifed other <code>Geometry</code>
+     * @return true iff this instance intersects the specifed other <code>Geometry</code>
      */
     <P extends C2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix);
 
 
     /**
-     * Returns an operation to calculate the shortest distance between any two points in the two <code>Geometry</code>s in the
+     * Calculates the shortest distance between any two points in the two <code>Geometry</code>s in the
      * coordinate reference system of this <code>Geometry</code>. Only the X/Y-coordinates are used in the distance
      * calculation; M- and Z-coordinates are ignored.
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
-     * @return a <code>GeometryOperation</code> that calculates the shortest distance between the two specified <code>Geometries</code>
+     * @return the shortest distance between the two specified <code>Geometries</code>
      */
     <P extends C2D> double distance(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Returns an operation to calculate a <code>Geometry</code> that represents all points whose distance from the specified
+     * Calculates a <code>Geometry</code> that represents all points whose distance from the specified
      * <code>Geometry</code> is less than or equal the specified distance.
      * <p/>
      * <p>Calculations are in the <code>CoordinateReferenceSystem</code> of this
@@ -134,57 +144,56 @@ public interface ProjectedGeometryOperations {
      *
      * @param geometry the <code>Geometry</code> for which to calculate the buffer
      * @param distance the buffer distance
-     * @return a <code>GeometryOperation</code> that calculates a 2D <code>Geometry</code> representing the
-     * buffer of the specified <code>Geometry</code> with the specified distance.
+     * @return a 2D <code>Geometry</code> representing the buffer of the specified <code>Geometry</code> with the specified distance.
      */
     <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance);
 
     /**
-     * Returns an operation to calculate the convex hull of the specified <code>Geometry</code>.
+     * Calculates the convex hull of the specified <code>Geometry</code>.
      *
      * @param geometry the <code>Geometry</code> for which to calculate the convex hull.
-     * @return a <code>GeometryOperation</code> that calculates the convex hull for the specified <code>Geometry</code>.
+     * @return the convex hull for the specified <code>Geometry</code>.
      */
     <P extends C2D> Geometry<P> convexHull(final Geometry<P> geometry);
 
     /**
-     * Returns an operation to calculate the point set intersection of the specified <code>Geometry</code>s.
+     * Calculates the point set intersection of the specified <code>Geometry</code>s.
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
-     * @return a <code>GeometryOperation</code> that calculates the point set intersection between the two specified <code>Geometries</code>
+     * @return a <code>Geometry</code> representing the point set intersection between the two specified <code>Geometries</code>
      */
     <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Returns an operation to calculate the point set union of the specified <code>Geometry</code>s.
+     * Calculates the point set union of the specified <code>Geometry</code>s.
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
-     * @return a <code>GeometryOperation</code> that calculates the point set union between the two specified <code>Geometries</code>
+     * @return a <code>Geometry</code> representing the point set union between the two specified <code>Geometries</code>
      */
     <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Returns an operation to calculate the point set difference of the specified <code>Geometry</code>s.
+     * Calculates the point set difference of the specified <code>Geometry</code>s.
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
-     * @return a <code>GeometryOperation</code> that calculates the point set difference between the two specified <code>Geometries</code>
+     * @return a <code>Geometry</code> representing the point set difference between the two specified <code>Geometries</code>
      */
     <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Returns an operation to calculate the point set symmetric difference of the specified <code>Geometry</code>s.
+     * Calculates the point set symmetric difference of the specified <code>Geometry</code>s.
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
-     * @return a <code>GeometryOperation</code> that calculates the point set symmetric difference between the two specified <code>Geometries</code>
+     * @return a <code>Geometry</code> representing the point set symmetric difference between the two specified <code>Geometries</code>
      */
     <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
-     * Creates an operation to determine the length of the specified {@code Geometry}.
+     * Calculates the length of the specified {@code Geometry}.
      *
      * @param geometry the Geometry
      * @return the length of the specified Geometry
@@ -192,7 +201,7 @@ public interface ProjectedGeometryOperations {
     <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry);
 
     /**
-     * Creates an operation to determine the area of the specified {@code Geometry}.
+     * Calculates the area of the specified {@code Geometry}.
      *
      * @param geometry the Geometry
      * @return the area of the specified Geometry
@@ -200,7 +209,7 @@ public interface ProjectedGeometryOperations {
     <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
 
     /**
-     * Creates an operation that calculates a centroid for the specified {@code Geometry}.
+     * Calculates a centroid for the specified {@code Geometry}.
      *
      * @param geometry the Geometry
      * @param <G>      Polygonal  Geometry
