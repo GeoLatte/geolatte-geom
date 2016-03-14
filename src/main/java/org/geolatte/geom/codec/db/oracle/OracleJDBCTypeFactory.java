@@ -44,6 +44,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 	private final Method structDescriptorCreator;
 	private final Method arrayDescriptorCreator;
 	private final Constructor<?> numberConstructor;
+	private final Constructor<?> doubleConstructor;
 	private final Constructor<?> arrayConstructor;
 	private final Constructor<?> structConstructor;
 	private final ConnectionFinder connectionFinder;
@@ -68,6 +69,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 		Class<?> structClass = findClass( "oracle.sql.STRUCT" );
 
 		numberConstructor = findConstructor( numberClass, java.lang.Integer.TYPE );
+		doubleConstructor = findConstructor( numberClass, java.lang.Double.TYPE );
 		arrayConstructor = findConstructor( arrayClass, arrayDescriptorClass, Connection.class, Object.class );
 		structConstructor = findConstructor( structClass, structDescriptorClass, Connection.class, Object[].class );
 	}
@@ -228,7 +230,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 	
 	private Object createNumber(Double obj) {
         try {
-            return numberConstructor.newInstance( obj );
+            return doubleConstructor.newInstance( obj );
         }
         catch ( InvocationTargetException e ) {
             throw new RuntimeException( "Error creating oracle NUMBER", e );
