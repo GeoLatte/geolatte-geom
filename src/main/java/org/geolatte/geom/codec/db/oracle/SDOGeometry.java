@@ -35,6 +35,7 @@ import java.util.List;
 public class SDOGeometry {
 
 	private static final String SQL_TYPE_NAME = "MDSYS.SDO_GEOMETRY";
+	private static final String SQL_POINT_TYPE_NAME = "MDSYS.SDO_POINT_TYPE";
 	final private SDOGType gtype;
 	final private int srid;
 	final private SDOPoint point;
@@ -57,6 +58,10 @@ public class SDOGeometry {
 	public static String getTypeName() {
 		return SQL_TYPE_NAME;
 	}
+	
+	public static String getPointTypeName() {
+        return SQL_POINT_TYPE_NAME;
+    }
 
 	static String arrayToString(Object array) {
 		if ( array == null || java.lang.reflect.Array.getLength( array ) == 0 ) {
