@@ -88,8 +88,18 @@ public class NumericalMethods {
         if (positions.size() < 3) return true;
         Position p0 = positions.getPositionN(0);
         Position p1 = positions.getPositionN(1);
-        Position p2 = positions.getPositionN(2);
-        return isCounterClockwise(p0, p1, p2);
+        double det = 0;
+        int positionsSize = positions.size();
+        int i = 2;
+        while(i < positionsSize && det == 0) {
+            Position p2 = positions.getPositionN(i);
+            det = deltaDeterminant(p0, p1, p2);
+            i++;
+        }
+        if (det == 0) {
+            throw new IllegalArgumentException("Positions are collinear in 2D");
+        }
+        return det > 0;
     }
 
     public static boolean collinear(Position p0, Position p1, Position p2) {
