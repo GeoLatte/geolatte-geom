@@ -14,7 +14,7 @@ interoperable with JTS but offers the following additional features:
 * geodetic operations (length, distance and area calculations)
 
 
-# Redesign van 0.x naar 1.0
+# Redesign 0.x to 1.0
 
 This version is a complete redesign. The redesign is aimed at:
 * increasing the level of type-safety in the API;
