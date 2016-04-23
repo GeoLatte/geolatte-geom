@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import com.vividsolutions.jts.geom.CoordinateSequence;
+
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -90,6 +92,21 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
     }
 
     @Override
+    public void setOrdinate(int position, int ordinateIndex, double value) {
+        int childOffset = position;
+        for (PositionSequence<P> pChild : getChildren()) {
+            CoordinateSequence child = (CoordinateSequence)pChild;
+            if (childOffset < child.size()) {
+                child.setOrdinate(childOffset, ordinateIndex, value);
+                return;
+            } else {
+                childOffset -= child.size();
+            }
+        }
+        throw new ArrayIndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", position, size()));
+    }
+
+    @Override
     public void getCoordinates(int position, double[] coordinates) {
         int childOffset = position;
         for (PositionSequence<P> child : getChildren()) {
@@ -103,6 +120,8 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         throw new ArrayIndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", position, size()));
 
     }
+
+
 
     @Override
     public void accept(PositionVisitor<P> visitor) {

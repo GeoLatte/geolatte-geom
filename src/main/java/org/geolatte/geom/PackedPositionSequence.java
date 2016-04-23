@@ -97,6 +97,12 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
     }
 
     @Override
+    public void setOrdinate(int index, int ordinateIndex, double value) {
+        int dim = getCoordinateDimension();
+        this.coordinates[index * dim + ordinateIndex] = value;
+    }
+
+    @Override
     public void getCoordinates(int position, double[] coordinates) {
         int dim = getCoordinateDimension();
         if(coordinates.length < dim) {
