@@ -18,9 +18,13 @@ public class CompoundCoordinateReferenceSystem<P extends Position> extends Coord
     private final List<SingleCoordinateReferenceSystem<?>> components;
 
 
-    protected CompoundCoordinateReferenceSystem(String name, SingleCoordinateReferenceSystem<?>... components) {
+    public CompoundCoordinateReferenceSystem(String name, SingleCoordinateReferenceSystem<?>... components) {
+        this(components[0].getCrsId(), name, components);
+    }
+
+    public CompoundCoordinateReferenceSystem(CrsId crsId, String name, SingleCoordinateReferenceSystem<?>... components) {
         //TODO this is problematic: combineCS() result needs to be cast to make CompoundCRS into a CRS<P>!
-        super(components[0].getCrsId(), name, (CoordinateSystem<P>) combineCS(components));
+        super(crsId, name, (CoordinateSystem<P>) combineCS(components));
         this.components = Arrays.asList(components);
     }
 
@@ -53,5 +57,12 @@ public class CompoundCoordinateReferenceSystem<P extends Position> extends Coord
         return true;
     }
 
+    public SingleCoordinateReferenceSystem<?> headCs() {
+        return components.get(0);
+    }
+
+    public SingleCoordinateReferenceSystem<?> tailCs() {
+        return components.get(1);
+    }
 
 }

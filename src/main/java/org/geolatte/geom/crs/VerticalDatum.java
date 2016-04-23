@@ -17,7 +17,7 @@ public class VerticalDatum extends CrsIdentifiable {
      * @param crsId
      * @param name
      */
-    protected VerticalDatum(CrsId crsId, String name, int datumtype) {
+    public VerticalDatum(CrsId crsId, String name, int datumtype) {
         super(crsId, name);
         this.datumType = datumtype;
     }

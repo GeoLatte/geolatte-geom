@@ -44,6 +44,10 @@ class WktTextToken implements WktToken {
     public String getText() {
         return text;
     }
+
+    public String toString() {
+        return text;
+    }
 }
 
 

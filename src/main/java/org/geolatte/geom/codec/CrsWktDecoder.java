@@ -79,13 +79,16 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
             return decodeGeographicCrs();
         } else if (currentToken == CrsWktVariant.GEOCCS) {
             return decodeGeocentricCrs();
+        } else if (currentToken == CrsWktVariant.COMPD_CS) {
+            return decodeCompoundCrs();
+        } else if (currentToken == CrsWktVariant.VERT_CS) {
+            return decodeVertCS();
         }
-        throw new WktDecodeException("Expected Wkt Token PROJCS, GEOGCS or GEOCCS");
+        throw new WktDecodeException("Expected Wkt Token PROJCS, GEOGCS, GEOCCS or COMPD_CS. Received  " + currentToken);
     }
 
     /**
-     * Implementation to decode Geocentric CRS.
-     * Currently not used in Postgis and also not implemented here!
+e     * Currently not used in Postgis and also not implemented here!
      *
      * @throws UnsupportedConversionException Geocentric CRS is currently not implemented
      */
@@ -139,11 +142,47 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
             parameters = decodeOptionalParameters();
             unit = decodeUnit(true);
         }
-        CrsId crsId = decodeOptionalAuthority(srid);
         CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
+        CrsId crsId = decodeOptionalAuthority(srid);
+        matchesCloseList();
         return new ProjectedCoordinateReferenceSystem(crsId, crsName, geogcs, projection, parameters,
                 new CartesianCoordinateSystem2D((StraightLineAxis)twinAxes[0], (StraightLineAxis)twinAxes[1]));
     }
+
+    private <P extends Position> CompoundCoordinateReferenceSystem<P> decodeCompoundCrs() {
+        String crsName = decodeName();
+        matchesElementSeparator();
+        SingleCoordinateReferenceSystem<?> head = (SingleCoordinateReferenceSystem<?>)decode();
+        matchesElementSeparator();
+        SingleCoordinateReferenceSystem<?> tail = (SingleCoordinateReferenceSystem<?>)decode();
+        CrsId cr = decodeOptionalAuthority(srid);
+        return new CompoundCoordinateReferenceSystem<P>(cr, crsName, head, tail);
+    }
+
+    private VerticalCoordinateReferenceSystem decodeVertCS() {
+        String crsName = decodeName();
+        matchesElementSeparator();
+        VerticalDatum vdatum = decodeVertDatum();
+        matchesElementSeparator();
+        LinearUnit unit =(LinearUnit) decodeUnit(true);
+        matchesElementSeparator();
+        VerticalStraightLineAxis axis = (VerticalStraightLineAxis)decodeAxis(unit, VerticalCoordinateReferenceSystem.class);
+        CrsId id = decodeOptionalAuthority();
+        return new VerticalCoordinateReferenceSystem(id, crsName, vdatum, axis);
+    }
+
+    private VerticalDatum decodeVertDatum() {
+        if (currentToken != CrsWktVariant.VERT_DATUM) {
+            throw new WktDecodeException("Expected VERT_DATUM keyword, found " + currentToken.toString());
+        }
+        String name = decodeName();
+        matchesElementSeparator();
+        int type = decodeInt();
+        CrsId authority = decodeOptionalAuthority(srid);
+        matchesCloseList();
+        return new VerticalDatum(authority, name, type);
+    }
+
 
     private List<CrsParameter> decodeOptionalParameters() {
         List<CrsParameter> parameters = new ArrayList<CrsParameter>();
@@ -257,6 +296,10 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
             return new StraightLineAxis(name, direction, (LinearUnit)unit);
         }
 
+        if (VerticalCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
+            return new VerticalStraightLineAxis(name, direction, (LinearUnit) unit);
+        }
+
         throw new IllegalStateException("Can't create default for CrsRegistry of type " + crsClass.getCanonicalName());
 
     }
@@ -329,26 +372,22 @@ public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem>
         return new Ellipsoid(crsId, ellipsoidName, semiMajorAxis, inverseFlattening);
     }
 
+    private CrsId decodeOptionalAuthority() {
+        return decodeOptionalAuthority(CrsId.UNDEFINED.getCode());
+    }
+
     private CrsId decodeOptionalAuthority(int srid) {
         matchesElementSeparator();
         if (currentToken != CrsWktVariant.AUTHORITY) {
-            return CrsId.valueOf(srid);
+            return new CrsId("EPSG", srid);
         }
-
         nextToken();
         matchesOpenList();
         String authority = decodeText();
         matchesElementSeparator();
-        String value = decodeText();
+        int value = decodeInt();
         matchesCloseList();
-        if (authority.equals("EPSG")) {
-            try {
-                return new CrsId("EPSG", Integer.parseInt(value));
-            } catch (NumberFormatException e) {
-                throw new WktDecodeException("Expected EPSG integer code, received " + value);
-            }
-        }
-        return CrsId.valueOf(srid);
+        return new CrsId(authority, value);
     }
 
     private String decodeName() {

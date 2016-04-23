@@ -42,20 +42,23 @@ public class TestCrsWktDecoder {
     private static final String WKT_4326_SPHEROID_NO_AUTHORITY = "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"4326\"]]";
 
     //Lambert 72
-    private static final String WKT_31370 = "PROJCS[\"Belge 1972 / Belgian Lambert 72\",GEOGCS[\"Belge 1972\",DATUM[\"Reseau_National_Belge_1972\",SPHEROID[\"International 1924\",6378388,297,AUTHORITY[\"EPSG\",\"7022\"]],TOWGS84[106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1],AUTHORITY[\"EPSG\",\"6313\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4313\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",51.16666723333333],PARAMETER[\"standard_parallel_2\",49.8333339],PARAMETER[\"latitude_of_origin\",90],PARAMETER[\"central_meridian\",4.367486666666666],PARAMETER[\"false_easting\",150000.013],PARAMETER[\"false_northing\",5400088.438],AUTHORITY[\"EPSG\",\"31370\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
+    private static final String WKT_31370 = "PROJCS[\"Belge 1972 / Belgian Lambert 72\",GEOGCS[\"Belge 1972\",DATUM[\"Reseau_National_Belge_1972\",SPHEROID[\"International 1924\",6378388,297,AUTHORITY[\"EPSG\",\"7022\"]],TOWGS84[-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747],AUTHORITY[\"EPSG\",\"6313\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4313\"]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",51.16666723333333],PARAMETER[\"standard_parallel_2\",49.8333339],PARAMETER[\"latitude_of_origin\",90],PARAMETER[\"central_meridian\",4.367486666666666],PARAMETER[\"false_easting\",150000.013],PARAMETER[\"false_northing\",5400088.438],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"31370\"]]";
 
-    private static final String WKT_3031 = "PROJCS[\"WGS 84 / Antarctic Polar Stereographic\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-71],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],AUTHORITY[\"EPSG\",\"3031\"],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]";
+    private static final String WKT_3031 = "PROJCS[\"WGS 84 / Antarctic Polar Stereographic\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-71],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"3031\"]]";
 
     private static final String WKT_3409 = "PROJCS[\"unnamed\",GEOGCS[\"unnamed ellipse\",DATUM[\"unknown\",SPHEROID[\"unnamed\",6371228,0]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433]],PROJECTION[\"Lambert_Azimuthal_Equal_Area\"],PARAMETER[\"latitude_of_center\",-90],PARAMETER[\"longitude_of_center\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"Meter\",1],AUTHORITY[\"EPSG\",\"3409\"]]";
 
+    private static final String WKT_6190 = "COMPD_CS[\"Belge 1972 / Belgian Lambert 72 + Ostend height\",PROJCS[\"Belge 1972 / Belgian Lambert 72\",GEOGCS[\"Belge 1972\",DATUM[\"Reseau_National_Belge_1972\",SPHEROID[\"International 1924\",6378388,297,AUTHORITY[\"EPSG\",\"7022\"]],TOWGS84[-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747],AUTHORITY[\"EPSG\",\"6313\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4313\"]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"standard_parallel_1\",51.16666723333333],PARAMETER[\"standard_parallel_2\",49.8333339],PARAMETER[\"latitude_of_origin\",90],PARAMETER[\"central_meridian\",4.367486666666666],PARAMETER[\"false_easting\",150000.013],PARAMETER[\"false_northing\",5400088.438],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"31370\"]],VERT_CS[\"Ostend height\",VERT_DATUM[\"Ostend\",2005,AUTHORITY[\"EPSG\",\"5110\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"5710\"]],AUTHORITY[\"EPSG\",\"6190\"]]";
+
+    private static final String WKT_5710 = "VERT_CS[\"Ostend height\",VERT_DATUM[\"Ostend\",2005,AUTHORITY[\"EPSG\",\"5110\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"5710\"]]";
 
     @Test
     public void testDecodeWGS84() {
         CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem system = decoder.decode(WKT_4326, 4326);
         assertNotNull(system);
-        assertTrue (system instanceof Geographic2DCoordinateReferenceSystem);
-        Geographic2DCoordinateReferenceSystem geoCRS = (Geographic2DCoordinateReferenceSystem)system;
+        assertTrue(system instanceof Geographic2DCoordinateReferenceSystem);
+        Geographic2DCoordinateReferenceSystem geoCRS = (Geographic2DCoordinateReferenceSystem) system;
         assertEquals("WGS 84", geoCRS.getName());
 
         //verify the datum
@@ -76,7 +79,7 @@ public class TestCrsWktDecoder {
         //verify the angular units
         assertTrue(geoCRS.getUnit().isAngular());
         assertEquals(0.01745329251994328, geoCRS.getUnit().getConversionFactor(), Math.ulp(1));
-        assertEquals(Unit.DEGREE,geoCRS.getUnit());
+        assertEquals(Unit.DEGREE, geoCRS.getUnit());
 
         //verify the Axis
         assertEquals(new GeodeticLongitudeCSAxis("Lon", Unit.DEGREE), geoCRS.getAxis(0));
@@ -92,8 +95,8 @@ public class TestCrsWktDecoder {
         CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem system = decoder.decode(WKT_4326_SPHEROID_NO_AUTHORITY, 4326);
         assertNotNull(system);
-        assertTrue (system instanceof Geographic2DCoordinateReferenceSystem);
-        Geographic2DCoordinateReferenceSystem geoCRS = (Geographic2DCoordinateReferenceSystem)system;
+        assertTrue(system instanceof Geographic2DCoordinateReferenceSystem);
+        Geographic2DCoordinateReferenceSystem geoCRS = (Geographic2DCoordinateReferenceSystem) system;
 
         //verify the ellipsoid
         Ellipsoid ellipsoid = geoCRS.getDatum().getEllipsoid();
@@ -112,18 +115,18 @@ public class TestCrsWktDecoder {
     }
 
     @Test
-    public void testDecodeLambert72(){
+    public void testDecodeLambert72() {
         CrsWktDecoder decoder = new CrsWktDecoder();
         CoordinateReferenceSystem<?> system = decoder.decode(WKT_31370, 31370);
         assertNotNull(system);
-        assertTrue (system instanceof ProjectedCoordinateReferenceSystem);
-        ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem)system;
+        assertTrue(system instanceof ProjectedCoordinateReferenceSystem);
+        ProjectedCoordinateReferenceSystem projCRS = (ProjectedCoordinateReferenceSystem) system;
 
         //check the geo-CrsRegistry
         assertEquals(4313, projCRS.getGeographicCoordinateSystem().getCrsId().getCode());
         Geographic2DCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
-        double[] expected = new double[]{106.869,-52.2978,103.724,-0.33657,0.456955,-1.84218,1};
-        for (int i = 0 ; i < expected.length; i++ ){
+        double[] expected = new double[]{-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747};
+        for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], geoCRS.getDatum().getToWGS84()[i], Math.ulp(100d));
         }
 
@@ -131,42 +134,67 @@ public class TestCrsWktDecoder {
         assertEquals(new Projection(CrsId.UNDEFINED, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
         List<CrsParameter> parameters = projCRS.getParameters();
         List<CrsParameter> expectedParameters = new ArrayList<CrsParameter>();
-        expectedParameters.add ( new CrsParameter("standard_parallel_1",51.16666723333333));
-        expectedParameters.add ( new CrsParameter("standard_parallel_2",49.8333339));
-        expectedParameters.add ( new CrsParameter("latitude_of_origin",90));
-        expectedParameters.add ( new CrsParameter("central_meridian",4.367486666666666));
-        expectedParameters.add ( new CrsParameter("false_easting",150000.013));
-        expectedParameters.add ( new CrsParameter("false_northing",5400088.438));
+        expectedParameters.add(new CrsParameter("standard_parallel_1", 51.16666723333333));
+        expectedParameters.add(new CrsParameter("standard_parallel_2", 49.8333339));
+        expectedParameters.add(new CrsParameter("latitude_of_origin", 90));
+        expectedParameters.add(new CrsParameter("central_meridian", 4.367486666666666));
+        expectedParameters.add(new CrsParameter("false_easting", 150000.013));
+        expectedParameters.add(new CrsParameter("false_northing", 5400088.438));
         assertArrayEquals(expectedParameters.toArray(), parameters.toArray());
 
         //check the authority
         assertEquals(31370, projCRS.getCrsId().getCode());
 
         //check the axes
-        assertEquals(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER) , projCRS.getCoordinateSystem().getAxis(0));
-        assertEquals(new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER) , projCRS.getCoordinateSystem().getAxis(1));
+        assertEquals(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, Unit.METER), projCRS.getCoordinateSystem().getAxis(0));
+        assertEquals(new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, Unit.METER), projCRS.getCoordinateSystem().getAxis(1));
 
     }
 
     @Test
     public void testDecodeWKT3031() {
         CrsWktDecoder decoder = new CrsWktDecoder();
-        ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3031, 3031);
+        ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem) decoder.decode(WKT_3031, 3031);
         assertNotNull(system);
-        assertEquals(new StraightLineAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.METER) , system.getCoordinateSystem().getAxis(0));
-        assertEquals(new StraightLineAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.METER) , system.getCoordinateSystem().getAxis(1));
+        assertEquals(new StraightLineAxis("Easting", CoordinateSystemAxisDirection.EAST, Unit.METER), system.getCoordinateSystem().getAxis(0));
+        assertEquals(new StraightLineAxis("Northing", CoordinateSystemAxisDirection.NORTH, Unit.METER), system.getCoordinateSystem().getAxis(1));
     }
 
 
     @Test
     public void testDecodeWKT3409() {
         CrsWktDecoder decoder = new CrsWktDecoder();
-        ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem)decoder.decode(WKT_3409, 3409);
+        ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem) decoder.decode(WKT_3409, 3409);
         assertNotNull(system);
 //        assertEquals(new CoordinateSystemAxis("Easting", CoordinateSystemAxisDirection.UNKNOWN_LINEAR, Unit.METER) , system.getDimensionalFlag().getAxis(0));
 //        assertEquals(new CoordinateSystemAxis("Northing", CoordinateSystemAxisDirection.UNKNOWN_LINEAR, Unit.METER) , system.getDimensionalFlag().getAxis(1));
     }
 
+    @Test
+    public void testVertCS() {
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        VerticalCoordinateReferenceSystem system = (VerticalCoordinateReferenceSystem) decoder.decode(WKT_5710, 5710);
+        assertNotNull(system);
+        assertEquals(2005, system.getDatum().getDatumType());
+        assertEquals(LinearUnit.METER, system.getUnit());
+        assertEquals(5710, system.getCrsId().getCode());
+    }
+
+    @Test
+    public void testDecodeCompoundCS() {
+
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        CompoundCoordinateReferenceSystem<?> system = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_6190, 6190);
+        assertNotNull(system);
+        assertEquals(new CrsId("EPSG", 6190), system.getCrsId());
+        CoordinateReferenceSystem<?> lambert = new CrsWktDecoder().decode(WKT_31370, 31370);
+        CoordinateReferenceSystem<?> vertical = new CrsWktDecoder().decode(WKT_5710, 5710);;
+
+        assertEquals(lambert, system.headCs());
+        assertEquals(vertical, system.tailCs());
+
+
+    }
 
 
 }

@@ -17,7 +17,7 @@ public class VerticalCoordinateReferenceSystem extends SingleCoordinateReference
      * @param crsId the authority and authority c
      * @param name
      */
-    protected VerticalCoordinateReferenceSystem(CrsId crsId, String name, VerticalDatum datum, VerticalStraightLineAxis axis) {
+    public VerticalCoordinateReferenceSystem(CrsId crsId, String name, VerticalDatum datum, VerticalStraightLineAxis axis) {
         super(crsId, name, new OneDimensionCoordinateSystem<V>(axis, V.class));
         this.datum = datum;
     }
@@ -26,5 +26,12 @@ public class VerticalCoordinateReferenceSystem extends SingleCoordinateReference
         return datum;
     }
 
+    public VerticalStraightLineAxis getVerticalAxis() {
+        return (VerticalStraightLineAxis)getCoordinateSystem().getAxis(0);
+    }
+
+    public LinearUnit getUnit() {
+        return getVerticalAxis().getUnit();
+    }
 
 }

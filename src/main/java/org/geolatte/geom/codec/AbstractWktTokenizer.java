@@ -40,7 +40,14 @@ abstract class AbstractWktTokenizer {
         return this.currentPos < wkt.length();
     }
 
+    // this is just temporarily for testing
     WktToken nextToken() {
+        WktToken token = inner();
+//        System.out.println("NEXT TOKEN: " + token);
+        return token;
+    }
+
+    private WktToken inner() {
         if (!moreTokens()) {
             return variant.end();
         }

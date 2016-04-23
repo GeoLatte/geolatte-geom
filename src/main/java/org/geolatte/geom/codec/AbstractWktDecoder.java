@@ -70,6 +70,28 @@ abstract class AbstractWktDecoder<T> {
         throw new WktDecodeException("Expected text token, received " + currentToken.toString());
     }
 
+    protected int decodeInt() {
+        if (currentToken instanceof WktNumberToken) {
+            double num = ((WktNumberToken) currentToken).getNumber();
+            nextToken();
+            try {
+                return (int)num;
+            } catch (Exception e) {
+                throw new WktDecodeException("Expected Integer, received " + currentToken.toString());
+            }
+        } else if (currentToken instanceof WktTextToken) {
+            String text = ((WktTextToken) currentToken).getText();
+            nextToken();
+            try {
+                return Integer.parseInt(text);
+            } catch (NumberFormatException e) {
+                throw new WktDecodeException("Expected Integer, received " + currentToken.toString());
+            }
+        }
+        throw new WktDecodeException("Expected text token, received " + currentToken.toString());
+    }
+
+
     /**
      * Advances the decoding to the next token.
      */

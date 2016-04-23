@@ -37,6 +37,9 @@ class CrsWktVariant extends WktVariant {
     public static final WktKeywordToken PROJECTION = new WktKeywordToken("PROJECTION");
     public static final WktKeywordToken GEOGCS = new WktKeywordToken("GEOGCS");
     public static final WktKeywordToken GEOCCS = new WktKeywordToken("GEOCCS");
+    public static final WktKeywordToken VERT_CS = new WktKeywordToken("VERT_CS");
+    public static final WktKeywordToken VERT_DATUM = new WktKeywordToken("VERT_DATUM");
+    public static final WktKeywordToken COMPD_CS = new WktKeywordToken("COMPD_CS");
     public static final WktKeywordToken DATUM = new WktKeywordToken("DATUM");
     public static final WktKeywordToken SPHEROID = new WktKeywordToken("SPHEROID");
     public static final WktKeywordToken PRIMEM = new WktKeywordToken("PRIMEM");
@@ -78,6 +81,9 @@ class CrsWktVariant extends WktVariant {
         set.add(PARAMETER);
         set.add(UNIT);
         set.add(TOWGS84);
+        set.add(COMPD_CS);
+        set.add(VERT_CS);
+        set.add(VERT_DATUM);
         KEYWORDS = Collections.unmodifiableSet(set);
     }
 

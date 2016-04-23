@@ -59,6 +59,15 @@ public class TestCrsWktWordMatcher {
     }
 
     @Test
+    public void testMatchingCompd_cs(){
+        String test = " COMPD_CS  ";
+        WktToken token = matcher.matchKeyword(test, 1, 9);
+        assertNotNull(token);
+        assertEquals(CrsWktVariant.COMPD_CS, token);
+    }
+
+
+    @Test
     public void testNoMatchingWordThrowsException() {
         String test = "BLABLA";
 

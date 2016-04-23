@@ -20,5 +20,9 @@ public class VerticalStraightLineAxis extends StraightLineAxis {
             throw new IllegalArgumentException("Only UP and DOWN directions allowed");
     }
 
+    @Override
+    public LinearUnit getUnit() {
+        return (LinearUnit)super.getUnit();
+    }
 }
 
