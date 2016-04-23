@@ -56,6 +56,7 @@ class CrsWktVariant extends WktVariant {
     public static final WktKeywordToken PARAMETER = new WktKeywordToken("PARAMETER");
     public static final WktKeywordToken UNIT = new WktKeywordToken("UNIT");
     public static final WktKeywordToken TOWGS84 = new WktKeywordToken("TOWGS84");
+    public static final WktKeywordToken EXTENSION = new WktKeywordToken("EXTENSION");
 
     private final static Set<WktKeywordToken> KEYWORDS;
 
@@ -84,6 +85,7 @@ class CrsWktVariant extends WktVariant {
         set.add(COMPD_CS);
         set.add(VERT_CS);
         set.add(VERT_DATUM);
+        set.add(EXTENSION);
         KEYWORDS = Collections.unmodifiableSet(set);
     }
 

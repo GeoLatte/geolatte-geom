@@ -52,6 +52,11 @@ public class TestCrsWktDecoder {
 
     private static final String WKT_5710 = "VERT_CS[\"Ostend height\",VERT_DATUM[\"Ostend\",2005,AUTHORITY[\"EPSG\",\"5110\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"5710\"]]";
 
+    private static final String WKT_WITH_EXTENSION = "COMPD_CS[\"WGS 84 / World Mercator +  EGM2008 height\",PROJCS[\"WGS 84 / World Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"3395\"]],VERT_CS[\"EGM2008 geoid height\",VERT_DATUM[\"EGM2008 geoid\",2005,EXTENSION[\"PROJ4_GRIDS\",\"egm08_25.gtx\"],AUTHORITY[\"EPSG\",\"1027\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"3855\"]],AUTHORITY[\"EPSG\",\"6893\"]]";
+
+    private static final String WKT_WITH_EXT_2 = "COMPD_CS[\"WGS 84 / Pseudo-Mercator +  EGM2008 geoid height\",PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],AUTHORITY[\"EPSG\",\"3857\"]],VERT_CS[\"EGM2008 geoid height\",VERT_DATUM[\"EGM2008 geoid\",2005,EXTENSION[\"PROJ4_GRIDS\",\"egm08_25.gtx\"],AUTHORITY[\"EPSG\",\"1027\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"3855\"]],AUTHORITY[\"EPSG\",\"6871\"]]";
+
+
     @Test
     public void testDecodeWGS84() {
         CrsWktDecoder decoder = new CrsWktDecoder();
@@ -125,7 +130,7 @@ public class TestCrsWktDecoder {
         //check the geo-CrsRegistry
         assertEquals(4313, projCRS.getGeographicCoordinateSystem().getCrsId().getCode());
         Geographic2DCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
-        double[] expected = new double[]{-106.8686,52.2978,-103.7239,0.3366,-0.457,1.8422,-1.2747};
+        double[] expected = new double[]{-106.8686, 52.2978, -103.7239, 0.3366, -0.457, 1.8422, -1.2747};
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], geoCRS.getDatum().getToWGS84()[i], Math.ulp(100d));
         }
@@ -188,13 +193,30 @@ public class TestCrsWktDecoder {
         assertNotNull(system);
         assertEquals(new CrsId("EPSG", 6190), system.getCrsId());
         CoordinateReferenceSystem<?> lambert = new CrsWktDecoder().decode(WKT_31370, 31370);
-        CoordinateReferenceSystem<?> vertical = new CrsWktDecoder().decode(WKT_5710, 5710);;
+        CoordinateReferenceSystem<?> vertical = new CrsWktDecoder().decode(WKT_5710, 5710);
+        ;
 
         assertEquals(lambert, system.headCs());
         assertEquals(vertical, system.tailCs());
 
 
     }
+
+    @Test
+    public void testDecodeCompoundCSWithExtension() {
+
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        CompoundCoordinateReferenceSystem<?> system = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_WITH_EXTENSION, 6893);
+        assertNotNull(system);
+
+        CrsWktDecoder decoder2 = new CrsWktDecoder();
+        CompoundCoordinateReferenceSystem<?> system2 = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_WITH_EXT_2, 6893);
+        assertNotNull(system2);
+
+
+    }
+
+
 
 
 }

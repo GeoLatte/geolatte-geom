@@ -178,9 +178,10 @@ e     * Currently not used in Postgis and also not implemented here!
         String name = decodeName();
         matchesElementSeparator();
         int type = decodeInt();
+        VerticalDatumExtension extension = decodeOptionalExtension();
         CrsId authority = decodeOptionalAuthority(srid);
         matchesCloseList();
-        return new VerticalDatum(authority, name, type);
+        return new VerticalDatum(authority, name, type, extension);
     }
 
 
@@ -374,6 +375,20 @@ e     * Currently not used in Postgis and also not implemented here!
 
     private CrsId decodeOptionalAuthority() {
         return decodeOptionalAuthority(CrsId.UNDEFINED.getCode());
+    }
+
+    private VerticalDatumExtension decodeOptionalExtension(){
+        matchesElementSeparator();
+        if (currentToken != CrsWktVariant.EXTENSION) {
+            return null;
+        }
+        nextToken();
+        matchesOpenList();
+        String prop = decodeText();
+        matchesElementSeparator();
+        String val = decodeText();
+        matchesCloseList();
+        return new VerticalDatumExtension(prop, val);
     }
 
     private CrsId decodeOptionalAuthority(int srid) {
