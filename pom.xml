@@ -18,7 +18,7 @@
     <artifactId>geolatte-geom</artifactId>
     <name>geolatte-geom</name>
     <packaging>jar</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <description>
         This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL
         specification.
