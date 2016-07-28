@@ -74,13 +74,24 @@ public class TestJTS {
     }
 
     @Test
-    public void test_measured_2d() {
+    public void test_measured_3d() {
         PostgisTestCases testCases = new PostgisTestCases();
         Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_3DM);
         com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
         Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
+    }
+
+    @Test
+    public void test_measured_2d() {
+        PostgisTestCases testCases = new PostgisTestCases();
+        Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_2DM);
+        com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
+        Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
+        DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
+        assertEquals(dc.getM(), 2, Math.ulp(2));
+        assertTrue(Double.isNaN(dc.getZ()));
     }
 
     @Test
