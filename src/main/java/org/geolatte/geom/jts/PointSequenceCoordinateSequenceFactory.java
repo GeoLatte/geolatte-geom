@@ -29,6 +29,7 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateSystem;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
@@ -40,7 +41,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/22/11
  */
-class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactory {
+class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactory, Serializable {
 
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
