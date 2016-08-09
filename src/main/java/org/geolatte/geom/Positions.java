@@ -169,7 +169,13 @@ public class Positions {
 
 		@Override
 		public C2DM mkPosition(double... coordinates) {
-			return coordinates.length == 0 ? new C2DM() : new C2DM( coordinates[0], coordinates[1], coordinates[2] );
+			/*
+             * In some cases we do not have a measure coordinate, e.g. when creating an envelope.
+			 * In this case we are using 0.0 as measure.
+			 */
+			return coordinates.length == 0 ? new C2DM() : new C2DM(
+					coordinates[0], coordinates[1],
+					coordinates.length > 2 ? coordinates[2] : 0.0);
 		}
 
 		@Override
@@ -242,9 +248,15 @@ public class Positions {
 
 		@Override
 		public C3DM mkPosition(double... coordinates) {
+			/*
+             * In some cases we do not have 3 coordinates and a measure,
+		     * but only two coordinates, e.g. when creating an envelope.
+			 * In this case we are using 0.0 as z coordinate and 0.0 as measure.
+			 */
 			return coordinates.length == 0 ? new C3DM() : new C3DM(
-					coordinates[0], coordinates[1], coordinates[2],
-					coordinates[3]
+					coordinates[0], coordinates[1],
+					coordinates.length > 2 ? coordinates[2] : 0.0,
+					coordinates.length > 3 ? coordinates[3] : 0.0
 			);
 		}
 
