@@ -18,7 +18,7 @@
     <artifactId>geolatte-geom</artifactId>
     <name>geolatte-geom</name>
     <packaging>jar</packaging>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <description>
         This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL
         specification.
@@ -236,11 +236,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apfloat</groupId>
-			<artifactId>apfloat</artifactId>
-			<version>1.8.2</version>
 		</dependency>
 
 		<!-- Test dependencies -->
