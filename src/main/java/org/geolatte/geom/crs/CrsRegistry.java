@@ -116,6 +116,16 @@ public class CrsRegistry {
         return crs != null ? crs : fallback;
     }
 
+    /**
+     * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
+     *
+     * @param epsgCode the (possibly pseudo) EPSG code for the {@code CoordinateReferenceSystem}
+     * @param crs the {@code CoordinateReferenceSystem} to register
+     */
+    public static void registerCoordinateReferenceSystem(int epsgCode, CoordinateReferenceSystem<?> crs) {
+        crsMap.put(Integer.valueOf(epsgCode),  crs);
+    }
+
     public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(epsgCode);
         if (crs == null) return null;
