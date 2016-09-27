@@ -54,8 +54,11 @@ public class TestCrsWktDecoder {
 
     private static final String WKT_WITH_EXTENSION = "COMPD_CS[\"WGS 84 / World Mercator +  EGM2008 height\",PROJCS[\"WGS 84 / World Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH],AUTHORITY[\"EPSG\",\"3395\"]],VERT_CS[\"EGM2008 geoid height\",VERT_DATUM[\"EGM2008 geoid\",2005,EXTENSION[\"PROJ4_GRIDS\",\"egm08_25.gtx\"],AUTHORITY[\"EPSG\",\"1027\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"3855\"]],AUTHORITY[\"EPSG\",\"6893\"]]";
 
+    private static final String WKT_PROJCS_WITH_EXTENSION = "PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],AUTHORITY[\"EPSG\",\"3857\"]]";
+
     private static final String WKT_WITH_EXT_2 = "COMPD_CS[\"WGS 84 / Pseudo-Mercator +  EGM2008 geoid height\",PROJCS[\"WGS 84 / Pseudo-Mercator\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Mercator_1SP\"],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],EXTENSION[\"PROJ4\",\"+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs\"],AUTHORITY[\"EPSG\",\"3857\"]],VERT_CS[\"EGM2008 geoid height\",VERT_DATUM[\"EGM2008 geoid\",2005,EXTENSION[\"PROJ4_GRIDS\",\"egm08_25.gtx\"],AUTHORITY[\"EPSG\",\"1027\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"3855\"]],AUTHORITY[\"EPSG\",\"6871\"]]";
 
+    private static final String WKT_4362 = "GEOCCS[\"NAD83(HARN) (geocentric)\",DATUM[\"NAD83_High_Accuracy_Reference_Network\",SPHEROID[\"GRS 1980\",6378137,298.257222101,AUTHORITY[\"EPSG\",\"7019\"]],AUTHORITY[\"EPSG\",\"6152\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Geocentric X\",OTHER],AXIS[\"Geocentric Y\",OTHER],AXIS[\"Geocentric Z\",NORTH],AUTHORITY[\"EPSG\",\"4362\"]]";
 
     @Test
     public void testDecodeWGS84() {
@@ -203,6 +206,15 @@ public class TestCrsWktDecoder {
     }
 
     @Test
+    public void testDecodePROJCSWithExtension(){
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        ProjectedCoordinateReferenceSystem system = (ProjectedCoordinateReferenceSystem) decoder.decode(WKT_PROJCS_WITH_EXTENSION, 3857);
+        assertNotNull(system);
+        assertEquals("PROJ4", system.getExtension().getName());
+        assertEquals("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs", system.getExtension().getValue());
+    }
+
+    @Test
     public void testDecodeCompoundCSWithExtension() {
 
         CrsWktDecoder decoder = new CrsWktDecoder();
@@ -212,10 +224,17 @@ public class TestCrsWktDecoder {
         CrsWktDecoder decoder2 = new CrsWktDecoder();
         CompoundCoordinateReferenceSystem<?> system2 = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_WITH_EXT_2, 6893);
         assertNotNull(system2);
-
-
     }
 
+    @Test
+    public void testDecode4362(){
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        GeocentricCartesianCoordinateReferenceSystem system = (GeocentricCartesianCoordinateReferenceSystem) decoder.decode(WKT_4362, 4362);
+        assertNotNull(system);
+        assertEquals("NAD83(HARN) (geocentric)", system.getName());
+        assertEquals("GRS 1980", system.getDatum().getEllipsoid().getName());
+        assertEquals(0.0, system.getPrimeMeridian().getLongitude(), 0.00001);
+    }
 
 
 

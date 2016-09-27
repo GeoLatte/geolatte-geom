@@ -21,13 +21,11 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.C3D;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A decoder for <code>CoordinateReferenceSystem</code> definitions in WKT.
@@ -93,8 +91,22 @@ e     * Currently not used in Postgis and also not implemented here!
      *
      * @throws UnsupportedConversionException Geocentric CRS is currently not implemented
      */
-    private CoordinateReferenceSystem<C3D> decodeGeocentricCrs() {
-        throw new UnsupportedConversionException("Currently not implemented");
+    private GeocentricCartesianCoordinateReferenceSystem decodeGeocentricCrs() {
+        String crsName = decodeName();
+        matchesElementSeparator();
+        Datum datum = decodeDatum();
+        matchesElementSeparator();
+        PrimeMeridian primem = decodePrimem();
+        matchesElementSeparator();
+        Unit unit = decodeUnit(true);
+        CoordinateSystemAxis[] axes = decodeOptionalAxes(3, unit, GeocentricCartesianCoordinateReferenceSystem.class);
+        CrsId cr = decodeOptionalAuthority(srid);
+        matchesCloseList();
+        GeocentricCartesianCoordinateReferenceSystem system = new GeocentricCartesianCoordinateReferenceSystem(cr, crsName,
+                datum, primem,
+                new CartesianCoordinateSystem3D((StraightLineAxis)axes[0], (StraightLineAxis)axes[1], (VerticalStraightLineAxis) axes[2])
+        );
+        return system;
     }
 
     /**
@@ -110,7 +122,7 @@ e     * Currently not used in Postgis and also not implemented here!
         PrimeMeridian primem = decodePrimem();
         matchesElementSeparator();
         Unit unit = decodeUnit(false);
-        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, Geographic2DCoordinateReferenceSystem.class);
+        CoordinateSystemAxis[] twinAxes = decodeOptionalAxes(2, unit, Geographic2DCoordinateReferenceSystem.class);
         CrsId cr = decodeOptionalAuthority(srid);
         matchesCloseList();
         Geographic2DCoordinateReferenceSystem system = new Geographic2DCoordinateReferenceSystem(cr, crsName, new
@@ -143,7 +155,7 @@ e     * Currently not used in Postgis and also not implemented here!
             parameters = decodeOptionalParameters();
             unit = decodeUnit(true);
         }
-        CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
+        CoordinateSystemAxis[] twinAxes = decodeOptionalAxes(2, unit, ProjectedCoordinateReferenceSystem.class);
         Extension extension = decodeOptionalExtension();
         CrsId crsId = decodeOptionalAuthority(srid);
         matchesCloseList();
@@ -221,16 +233,18 @@ e     * Currently not used in Postgis and also not implemented here!
         return new Projection(crsId, name);
     }
 
-    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] decodeOptionalTwinAxis(Unit unit, Class<T> crsClass) {
+    private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] decodeOptionalAxes(int num, Unit unit, Class<T> crsClass) {
         matchesElementSeparator();
         if (currentToken != CrsWktVariant.AXIS) {
             return defaultCRS(unit, crsClass);
         }
-        CoordinateSystemAxis[] twinAxes = new CoordinateSystemAxis[2];
-        twinAxes[0] = decodeAxis(unit, crsClass);
-        matchesElementSeparator();
-        twinAxes[1] = decodeAxis(unit, crsClass);
-        return twinAxes;
+        CoordinateSystemAxis[] axes = new CoordinateSystemAxis[num];
+
+        for (int i = 0; i < num; i++) {
+            if (i > 0) matchesElementSeparator();
+            axes[i] = decodeAxis(unit, crsClass);
+        }
+        return axes;
     }
 
     private <T extends CoordinateReferenceSystem> CoordinateSystemAxis[] defaultCRS(Unit unit, Class<T> crsClass) {
@@ -286,17 +300,25 @@ e     * Currently not used in Postgis and also not implemented here!
             //this fixes problems with some polar projection systems.
             if (direction == CoordinateSystemAxisDirection.UNKNOWN) {
                 if (name.equalsIgnoreCase("X") || name.equalsIgnoreCase("Easting")) {
-                    return new StraightLineAxis(name, direction, 0, (LinearUnit) unit);
+                    return new StraightLineAxis(name, direction, 0, unit);
                 } else {
-                    return new StraightLineAxis(name, direction, 1, (LinearUnit) unit);
+                    return new StraightLineAxis(name, direction, 1, unit);
                 }
 
             }
             return new StraightLineAxis(name, direction, (LinearUnit) unit);
         }
 
+        //here we normalize based on the name, because usage of direction in Postgis can't be relied on
         if (GeocentricCartesianCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
-            return new StraightLineAxis(name, direction, (LinearUnit)unit);
+            String normalizedName = name.toUpperCase();
+            if (normalizedName.equalsIgnoreCase("GEOCENTRIC X")) {
+                return new StraightLineAxis(name, CoordinateSystemAxisDirection.GeocentricX, (LinearUnit) unit);
+            } else if (normalizedName.equalsIgnoreCase("GEOCENTRIC Y")) {
+                return new StraightLineAxis(name, CoordinateSystemAxisDirection.GeocentricY, (LinearUnit) unit);
+            } else {
+                return new VerticalStraightLineAxis(name, CoordinateSystemAxisDirection.GeocentricZ, (LinearUnit) unit);
+            }
         }
 
         if (VerticalCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {

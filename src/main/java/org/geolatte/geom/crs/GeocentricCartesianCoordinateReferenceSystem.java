@@ -37,6 +37,9 @@ import org.geolatte.geom.C3D;
  */
 public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<C3D>  {
 
+    private final Datum datum;
+    private final PrimeMeridian primePeridian;
+
     /**
      * Constructs a <code>CoordinateReferenceSystem</code>.
      *
@@ -45,9 +48,18 @@ public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordina
      * @param crs  the 3D-coordinate system for this
      * @throws IllegalArgumentException if less than two {@link CoordinateSystemAxis CoordinateSystemAxes} are passed.
      */
-    public GeocentricCartesianCoordinateReferenceSystem(CrsId crsId, String name, CartesianCoordinateSystem3D crs) {
+    public GeocentricCartesianCoordinateReferenceSystem(CrsId crsId, String name, Datum datum, PrimeMeridian primeMeridian, CartesianCoordinateSystem3D crs) {
         super(crsId, name, crs);
+        this.primePeridian = primeMeridian;
+        this.datum = datum;
     }
 
-    //TODO -- finalize implementation (now postponed because not available in postgis refsys file)
+    public Datum getDatum() {
+        return this.datum;
+    }
+
+    public PrimeMeridian getPrimeMeridian(){
+        return this.primePeridian;
+    }
+
 }
