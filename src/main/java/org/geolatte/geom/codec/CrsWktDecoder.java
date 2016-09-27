@@ -27,6 +27,7 @@ import org.geolatte.geom.crs.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A decoder for <code>CoordinateReferenceSystem</code> definitions in WKT.
@@ -143,10 +144,11 @@ e     * Currently not used in Postgis and also not implemented here!
             unit = decodeUnit(true);
         }
         CoordinateSystemAxis[] twinAxes = decodeOptionalTwinAxis(unit, ProjectedCoordinateReferenceSystem.class);
+        Extension extension = decodeOptionalExtension();
         CrsId crsId = decodeOptionalAuthority(srid);
         matchesCloseList();
         return new ProjectedCoordinateReferenceSystem(crsId, crsName, geogcs, projection, parameters,
-                new CartesianCoordinateSystem2D((StraightLineAxis)twinAxes[0], (StraightLineAxis)twinAxes[1]));
+                new CartesianCoordinateSystem2D((StraightLineAxis)twinAxes[0], (StraightLineAxis)twinAxes[1]), extension);
     }
 
     private <P extends Position> CompoundCoordinateReferenceSystem<P> decodeCompoundCrs() {
@@ -178,7 +180,7 @@ e     * Currently not used in Postgis and also not implemented here!
         String name = decodeName();
         matchesElementSeparator();
         int type = decodeInt();
-        VerticalDatumExtension extension = decodeOptionalExtension();
+        Extension extension = decodeOptionalExtension();
         CrsId authority = decodeOptionalAuthority(srid);
         matchesCloseList();
         return new VerticalDatum(authority, name, type, extension);
@@ -377,7 +379,7 @@ e     * Currently not used in Postgis and also not implemented here!
         return decodeOptionalAuthority(CrsId.UNDEFINED.getCode());
     }
 
-    private VerticalDatumExtension decodeOptionalExtension(){
+    private Extension decodeOptionalExtension(){
         matchesElementSeparator();
         if (currentToken != CrsWktVariant.EXTENSION) {
             return null;
@@ -388,7 +390,7 @@ e     * Currently not used in Postgis and also not implemented here!
         matchesElementSeparator();
         String val = decodeText();
         matchesCloseList();
-        return new VerticalDatumExtension(prop, val);
+        return new Extension(prop, val);
     }
 
     private CrsId decodeOptionalAuthority(int srid) {

@@ -3,12 +3,12 @@ package org.geolatte.geom.crs;
 /**
  * Created by Karel Maesen, Geovise BVBA on 23/04/16.
  */
-public class VerticalDatumExtension {
+public class Extension {
 
     private final String name;
     private final String value;
 
-    public VerticalDatumExtension(String name, String value) {
+    public Extension(String name, String value) {
         this.name = name;
         this.value = value;
     }

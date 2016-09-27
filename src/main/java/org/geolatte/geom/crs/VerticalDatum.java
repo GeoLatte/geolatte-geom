@@ -10,7 +10,7 @@ public class VerticalDatum extends CrsIdentifiable {
             "Vertical", 0);
 
     private final int datumType;
-    private final VerticalDatumExtension extension;
+    private final Extension extension;
 
     /**
      * Constructs an instance.
@@ -28,7 +28,7 @@ public class VerticalDatum extends CrsIdentifiable {
      * @param name
      * @param datumtype
      */
-    public VerticalDatum(CrsId crsId, String name, int datumtype, VerticalDatumExtension extension) {
+    public VerticalDatum(CrsId crsId, String name, int datumtype, Extension extension) {
         super(crsId, name);
         this.datumType = datumtype;
         this.extension = extension;
@@ -38,7 +38,7 @@ public class VerticalDatum extends CrsIdentifiable {
         return this.datumType;
     }
 
-    public VerticalDatumExtension getExtension() {
+    public Extension getExtension() {
         return this.extension;
     }
 

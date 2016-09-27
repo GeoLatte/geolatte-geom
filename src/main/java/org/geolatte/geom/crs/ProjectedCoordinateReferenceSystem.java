@@ -24,7 +24,9 @@ package org.geolatte.geom.crs;
 import org.geolatte.geom.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A projected <code>CoordinateReferenceSystem</code>.
@@ -43,6 +45,7 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
     private final Projection projection;
     private final Geographic2DCoordinateReferenceSystem geoCRS;
     private final List<CrsParameter> parameters;
+    private final Extension extension;
 
     /**
      * Constructs a <code>ProjectedCoordinateReferenceSystem</code>.
@@ -58,11 +61,32 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
     public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
                                               CartesianCoordinateSystem2D crs) {
+        this(crsId, name, geoCRS, projection, parameters, crs, null);
+    }
+
+
+    /**
+     * Constructs a <code>ProjectedCoordinateReferenceSystem</code>.
+     *
+     *
+     * @param crsId      the <code>CrsId</code> that identifies this <code>CoordinateReferenceSystem</code> uniquely
+     * @param name       the commonly used name for this <code>CoordinateReferenceSystem</code>
+     * @param geoCRS     the <code>GeographicCoordinateReferenceSystem</code> for this projection
+     * @param projection the map projection method
+     * @param parameters the projection parameters for the projection method
+     * @param crs        the 2D cartesian coordinate system for this coordinate reference system
+     * @param extension the optional extension key-value pair for this <code>CoordinateReferenceSystem</code>
+     */
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
+                                              Projection projection, List<CrsParameter> parameters,
+                                              CartesianCoordinateSystem2D crs, Extension extension) {
         super(crsId, name, crs);
         this.geoCRS = geoCRS;
         this.projection = projection;
         this.parameters = parameters;
+        this.extension = extension;
     }
+
 
     /**
      * Returns the projection parameters
@@ -89,6 +113,14 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
      */
     public Projection getProjection() {
         return projection;
+    }
+
+    /**
+     * Returns an extension value by key
+     * @return the extension object, if any
+     */
+    public Extension getExtension() {
+        return extension;
     }
 
     @Override
