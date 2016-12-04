@@ -1,5 +1,8 @@
 package org.geolatte.geom.codec.db.oracle;
 
+import org.geolatte.geom.C3D;
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.crs.*;
 import org.junit.Test;
 
@@ -65,4 +68,15 @@ public class TestSdoGeometryPointDecoder {
 
     }
 
+    @Test
+    public void testPointUnknown3DDecoding(){
+        //maxvalue as epsg-code because this is very unlikely ever to be a valid EPSG code
+        SDOGeometry sdo = sdoGeometry(4301, Integer.MAX_VALUE, null,new int[]{ 1, 1, 1} , new Double[]{12d, 14d, 4d, 3d});
+        CoordinateReferenceSystem crs = CoordinateReferenceSystems.mkProjected(Integer.MAX_VALUE, LinearUnit.METER);
+        crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
+        crs = CoordinateReferenceSystems.addLinearSystem(crs, LinearUnit.METER);
+        Geometry<?> geom = Decoders.decode(sdo);
+        assertEquals(point( crs, c(12, 14, 3, 4)), geom);
+        assertEquals(Integer.MAX_VALUE, geom.getSRID());
+    }
 }
