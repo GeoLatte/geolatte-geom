@@ -190,7 +190,9 @@ public class TestJTSGeometryOperations {
         LineString<C2D> l2 = linestring(crs, c(1, 10), c(3, 30), c(5, 40));
         MultiLineString<C2D> ml = new MultiLineString(l, l2);
 
-        MultiLineString<C2D> expectedMl = new MultiLineString(ops.reverse(l2), ops.reverse(l));
+        LineString<C2D> rev2 = ops.reverse(l2);
+        LineString<C2D> rev1 = ops.reverse(l);
+        MultiLineString<C2D> expectedMl = new MultiLineString(rev2, rev1);
         assertEquals(expectedMl, ops.reverse(ml));
         assertEquals(ml, ops.reverse(ops.reverse(ml)));
 
