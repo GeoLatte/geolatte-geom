@@ -36,6 +36,7 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
@@ -117,7 +118,16 @@ public class CrsRegistry {
         return crs != null ? crs : fallback;
     }
 
-    //TODO -- if we move to Java 1.8 we can use crsMap.computIfAbsent to efficiently calculate a fallback CRS with the user-provided srid
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Projected 2D system and register
+     * this on-the-fly.
+     *
+     * @param epsgCode the code to look up
+     * @return a CoordinateReferenceSystem with the specified epsg code
+     */
+    public static CoordinateReferenceSystem<?> ifAbsentReturnProjected2D(int epsgCode) {
+        return crsMap.computeIfAbsent(epsgCode, key -> CoordinateReferenceSystems.mkProjected(key, LinearUnit.METER));
+    }
 
     /**
      * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.

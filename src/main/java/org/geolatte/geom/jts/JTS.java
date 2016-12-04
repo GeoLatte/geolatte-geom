@@ -22,17 +22,8 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import org.geolatte.geom.*;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.*;
 
 import java.util.HashMap;
@@ -128,8 +119,7 @@ public class JTS {
         }
         Coordinate testCo = jtsGeometry.getCoordinate();
         boolean is3D = !(testCo == null || Double.isNaN(testCo.z));
-        CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(jtsGeometry.getSRID(),
-                CoordinateReferenceSystems.PROJECTED_2D_METER);
+        CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(jtsGeometry.getSRID());
         if (is3D) {
             crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
         }

@@ -44,16 +44,7 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
 
         final int srid = nativeGeom.getSRID();
 
-        CoordinateReferenceSystem<?> crs;
-        if (CrsRegistry.hasCoordinateReferenceSystemForEPSG(srid)) {
-            crs = CrsRegistry
-                    .getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-        } else {
-            //create on-the-fly a new coordinate reference system, and add this to the registry
-            crs = CoordinateReferenceSystems.mkProjected(srid, LinearUnit.METER);
-            CrsRegistry.registerCoordinateReferenceSystem(crs);
-        }
-
+        CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(srid);
 
         if (getVerticalDimension(nativeGeom) > 0) {
             crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
