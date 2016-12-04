@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.G2D;
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.G2D;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.CrsWktDecoder;
 import org.geolatte.geom.codec.WktDecodeException;
@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
@@ -47,7 +48,7 @@ import java.util.Map;
 public class CrsRegistry {
 
     final private static Logger LOGGER = LoggerFactory.getLogger(CrsRegistry.class);
-    final private static Map<Integer, CoordinateReferenceSystem<? extends Position>> crsMap = new HashMap<Integer, CoordinateReferenceSystem<? extends Position>>(4000);
+    final private static ConcurrentHashMap<Integer, CoordinateReferenceSystem<? extends Position>> crsMap = new ConcurrentHashMap<Integer, CoordinateReferenceSystem<? extends Position>>(4000);
     final private static Map<Integer, CrsId> crsIdMap = new HashMap<Integer, CrsId>(4000);
     final private static String DELIM = "\\|";
 
@@ -99,13 +100,13 @@ public class CrsRegistry {
         } catch (RuntimeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s) -- inconsistent coordinate system. \n%s", srid, tokens[2], e.getMessage()));
         }
-
     }
 
     /**
      * returns the <code>CoordinateReferenceSystem</code> for the specified EPSG code.
      *
      * @param epsgCode the EPSG code
+     * @param fallback the coordinate
      * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
      * no such system is registered.
      */
@@ -116,14 +117,25 @@ public class CrsRegistry {
         return crs != null ? crs : fallback;
     }
 
+    //TODO -- if we move to Java 1.8 we can use crsMap.computIfAbsent to efficiently calculate a fallback CRS with the user-provided srid
+
     /**
      * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
      *
-     * @param epsgCode the (possibly pseudo) EPSG code for the {@code CoordinateReferenceSystem}
-     * @param crs the {@code CoordinateReferenceSystem} to register
+     * @param crs      the {@code CoordinateReferenceSystem} to register
      */
-    public static void registerCoordinateReferenceSystem(int epsgCode, CoordinateReferenceSystem<?> crs) {
-        crsMap.put(Integer.valueOf(epsgCode),  crs);
+    public static void registerCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
+        crsMap.put(crs.getCrsId().getCode(), crs);
+    }
+
+    /**
+     * Determine if the registry contains the {@code CoordinateReferenceSystem} identified by its SRID
+     *
+     * @param epsgCode the SRID to look up
+     * @return true iff the registry has a corresponding {@code CoordinateReferenceSystem}
+     */
+    public static boolean hasCoordinateReferenceSystemForEPSG(int epsgCode) {
+        return crsMap.containsKey(epsgCode);
     }
 
     public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
