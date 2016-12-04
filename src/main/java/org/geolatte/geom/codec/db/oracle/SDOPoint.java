@@ -29,20 +29,24 @@ import java.sql.Struct;
  *         creation-date: Jul 1, 2010
  */
 class SDOPoint {
-    public double x;
+    public Double x;
 
-    public double y;
+    public Double y;
 
-    public double z = Double.NaN;
+    public Double z = null;
 
-    public SDOPoint(double x, double y) {
-        this(x, y, Double.NaN);
+    public SDOPoint(Double x, Double y) {
+        this(x, y, null);
     }
 
-    public SDOPoint(double x, double y, double z) {
+    public SDOPoint(Double x, Double y, Double z) {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public SDOPoint(Double[] ordinates){
+        this(ordinates[0], ordinates[1], ordinates.length > 2 ? ordinates[2] : null);
     }
 
     public SDOPoint(Struct struct) {
@@ -65,4 +69,24 @@ class SDOPoint {
         return stb.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SDOPoint sdoPoint = (SDOPoint) o;
+
+        if (!x.equals(sdoPoint.x)) return false;
+        if (!y.equals(sdoPoint.y)) return false;
+        return z != null ? z.equals(sdoPoint.z) : sdoPoint.z == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = x.hashCode();
+        result = 31 * result + y.hashCode();
+        result = 31 * result + (z != null ? z.hashCode() : 0);
+        return result;
+    }
 }

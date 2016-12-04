@@ -11,7 +11,7 @@ public class SDOGeometryHelper {
     public static SDOGeometry sdoGeometry(Integer gtype, int srid, SDOPoint sdoPoint, int[] elemInfo, Double[] ordinates ) {
 
         ElemInfo info = elemInfo == null ? null : new ElemInfo(toBigDecimalArray(elemInfo));
-        Ordinates o = ordinates == null ? new Ordinates(new Double[0]) : new Ordinates(ordinates);
+        Ordinates o = ordinates == null ? null : new Ordinates(ordinates);
 
         SDOGeometry result = new SDOGeometry(
                 SDOGType.parse(gtype),
