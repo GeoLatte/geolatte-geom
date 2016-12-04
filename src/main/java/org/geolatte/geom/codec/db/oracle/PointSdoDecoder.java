@@ -20,13 +20,15 @@ public class PointSdoDecoder extends AbstractSDODecoder {
     protected Geometry<?> internalDecode(SDOGeometry nativeGeom) {
         CoordinateReferenceSystem<? extends Position> crs = getCoordinateReferenceSystem(nativeGeom);
 
-        Double[] ordinates = nativeGeom.getOrdinates().getOrdinateArray();
-        if (ordinates.length == 0) {
+        Double[] ordinates;
+        if (nativeGeom.getOrdinates() == null) {
             if (nativeGeom.getDimension() == 2) {
                 ordinates = new Double[]{nativeGeom.getPoint().x, nativeGeom.getPoint().y};
             } else {
                 ordinates = new Double[]{nativeGeom.getPoint().x, nativeGeom.getPoint().y, nativeGeom.getPoint().z};
             }
+        } else {
+            ordinates = nativeGeom.getOrdinates().getOrdinateArray();
         }
         return new Point(convertOrdinateArray(ordinates, nativeGeom, crs), crs);
     }

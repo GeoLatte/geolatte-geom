@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class CircularArcLinearizerTest {
 
-    private static final int SAMPLE_SIZE = 1000;
+    private static final int SAMPLE_SIZE = 100;
     private static final double EPSILON = 0.0001d;
 
     CircleGenerator cgen = new CircleGenerator(-100, 100, 100);
