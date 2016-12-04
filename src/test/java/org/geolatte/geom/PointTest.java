@@ -151,6 +151,14 @@ public class PointTest {
         Point<C2D> empty3 = new Point<C2D>(crs);
         assertEquals(empty1, empty3);
     }
+
+    @Test
+    public void testEnvelope() {
+        assertEquals(new Envelope<C2D>(1, 2, 1, 2, crs), point2D.getEnvelope());
+        assertEquals(new Envelope<C3D>(1, 2, 1, 2, crsZ), point3D.getEnvelope());
+        assertEquals(new Envelope<C2DM>(1, 2, 1, 2, crsM), point2DM.getEnvelope());
+        assertEquals(new Envelope<C3DM>(1, 2, 1, 2, crsZM), point3DM.getEnvelope());
+    }
 }
 
 
