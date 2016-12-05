@@ -8,11 +8,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Karel Maesen, Geovise BVBA on 04/12/16.
  */
 public class TestFeatures {
-
-    @Test
-    public void testFeaturesUseSdoPointDefault(){
-        assertFalse(Features.useSdoPointType());
-    }
+    
 
     @Test
     public void testFeaturesSdoPointSettoTrue(){
@@ -20,6 +16,8 @@ public class TestFeatures {
         assertTrue(Features.useSdoPointType());
         System.setProperty(Features.USE_SDO_POINT, "1");
         assertTrue(Features.useSdoPointType());
+        //reset to default
+        System.setProperty(Features.USE_SDO_POINT, "false");
     }
 
     @Test
