@@ -9,6 +9,7 @@ import org.junit.Test;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.codec.db.oracle.SDOGeometryHelper.sdoGeometry;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
@@ -69,4 +70,26 @@ public class TestSdoPointEncoder {
         System.setProperty(Features.USE_SDO_POINT, "false");
     }
 
+    @Test
+    public void testEmptyPointDecoding() {
+        Point<G2D> emptyPoint = new Point<G2D>(wgs84);
+
+        assertTrue(emptyPoint.isEmpty());
+        SDOGeometry sdoGeometry = Encoders.encode(emptyPoint);
+        Geometry<?> geom = Decoders.decode(sdoGeometry);
+        assert (geom.isEmpty());
+    }
+
+
+        @Test
+        public void testEmptyPointDecodingUsingSDOPoint() {
+            System.setProperty(Features.USE_SDO_POINT, "true");
+            Point<G2D> emptyPoint = new Point<G2D>(wgs84);
+
+            assertTrue(emptyPoint.isEmpty());
+            SDOGeometry sdoGeometry = Encoders.encode(emptyPoint);
+            Geometry<?> geom = Decoders.decode(sdoGeometry);
+            assert (geom.isEmpty());
+            System.setProperty(Features.USE_SDO_POINT, "false");
+        }
 }

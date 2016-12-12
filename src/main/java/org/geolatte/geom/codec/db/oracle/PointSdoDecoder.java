@@ -21,7 +21,7 @@ public class PointSdoDecoder extends AbstractSDODecoder {
         CoordinateReferenceSystem<? extends Position> crs = getCoordinateReferenceSystem(nativeGeom);
 
         Double[] ordinates;
-        if (nativeGeom.getOrdinates() == null) {
+        if (nativeGeom.getPoint() != null) {
             if (nativeGeom.getDimension() == 2) {
                 ordinates = new Double[]{nativeGeom.getPoint().x, nativeGeom.getPoint().y};
             } else {

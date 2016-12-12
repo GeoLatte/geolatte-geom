@@ -72,6 +72,10 @@ class Ordinates {
 		return a;
 	}
 
+	public boolean isEmpty() {
+		return ordinates.length == 0;
+	}
+
 	public String toString() {
 		return SDOGeometry.arrayToString( this.ordinates );
 	}

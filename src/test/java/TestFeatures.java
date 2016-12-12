@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Karel Maesen, Geovise BVBA on 04/12/16.
  */
 public class TestFeatures {
-    
+
 
     @Test
     public void testFeaturesSdoPointSettoTrue(){

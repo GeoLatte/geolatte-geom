@@ -1,11 +1,14 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Features;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.Position;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoPointEncoder extends AbstractSDOEncoder{
+public class SdoPointEncoder extends AbstractSDOEncoder {
 
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
@@ -20,8 +23,8 @@ public class SdoPointEncoder extends AbstractSDOEncoder{
 
         final Double[] coord = convertPositionSequence(geom.getPositions());
 
-        if ( Features.useSdoPointType() && !isLrs ) {
-            return new SDOGeometry (
+        if (Features.useSdoPointType() && !isLrs && !geom.isEmpty()) {
+            return new SDOGeometry(
                     new SDOGType(dim, lrsDim, TypeGeometry.POINT),
                     geom.getSRID(),
                     new SDOPoint(coord), null, null
