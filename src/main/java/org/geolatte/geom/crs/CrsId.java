@@ -27,7 +27,7 @@ public class CrsId {
     final private int code;
 
     /**
-     * Creates an instance from a <code>String</code> of the form "[<authority>:]<code>.
+     * Creates an instance from a <code>String</code> of the form "[&lt;authority&gt;:]&lt;code&gt;".
      *
      * <p>If the "authority" prefix is missing, then the authority will be assumed to be EPSG.</p>
      *
