@@ -381,4 +381,12 @@ public class PackedPointSequenceTest {
         Assert.assertEquals(testSeq3DM, testSeq3DM.clone());
     }
 
+    @Test
+    public void testCloneReturnsIndependentCopy() {
+        PositionSequence clone = testSeq2D.clone();
+        ((CoordinateSequence)testSeq2D).setOrdinate(0, 0, 3);
+        Assert.assertFalse(testSeq2D.equals(clone));
+    }
+
+
 }

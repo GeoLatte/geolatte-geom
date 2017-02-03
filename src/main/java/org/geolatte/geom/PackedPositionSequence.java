@@ -93,7 +93,7 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
 
     @Override
     public PositionSequence<P> clone() {
-        return this; //this is valid since a PackedPointSequence is immutable.
+        return new PackedPositionSequence<>(getPositionFactory(), Arrays.copyOf(this.coordinates, this.coordinates.length));
     }
 
     @Override
