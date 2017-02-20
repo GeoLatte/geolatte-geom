@@ -22,13 +22,22 @@
 package org.geolatte.geom.jts;
 
 import com.vividsolutions.jts.geom.*;
-import org.geolatte.geom.C2D;
-import org.geolatte.geom.Position;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011 (original code)
@@ -36,16 +45,15 @@ import java.util.NoSuchElementException;
  */
 public class JTS {
 
-    private static final GeometryFactory jtsGeometryFactory;
-
     private static final PointSequenceCoordinateSequenceFactory pscsFactory = new
             PointSequenceCoordinateSequenceFactory();
 
     private static final Map<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>> JTS2GLClassMap =
             new HashMap<Class<? extends Geometry>, Class<? extends org.geolatte.geom.Geometry>>();
 
+    private static final ConcurrentHashMap<Integer, GeometryFactory> geometryFactories = new ConcurrentHashMap<>();
+
     static {
-        jtsGeometryFactory = new GeometryFactory(new PointSequenceCoordinateSequenceFactory());
 
         //define the class mapping JTS -> Geolatte
         JTS2GLClassMap.put(Point.class, org.geolatte.geom.Point.class);
@@ -57,10 +65,6 @@ public class JTS {
         JTS2GLClassMap.put(MultiLineString.class, org.geolatte.geom.MultiLineString.class);
         JTS2GLClassMap.put(MultiPolygon.class, org.geolatte.geom.MultiPolygon.class);
 
-    }
-
-    public static GeometryFactory geometryFactory() {
-        return jtsGeometryFactory;
     }
 
     /**
@@ -94,7 +98,7 @@ public class JTS {
      * @throws IllegalArgumentException when the jtsGeometryClass parameter is null.
      * @throws NoSuchElementException   when no corresponding class can be found.
      */
-    public static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry>
+    static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry>
                                                                                                     jtsGeometryClass) {
         if (jtsGeometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
         Class<? extends org.geolatte.geom.Geometry> corresponding = JTS2GLClassMap.get(jtsGeometryClass);
@@ -163,30 +167,48 @@ public class JTS {
      * Primary factory method that converts a geolatte geometry into an equivalent jts geometry
      *
      * @param geometry the geolatte geometry to start from
+     * @param gFact the GeometryFactory to use for creating the JTS Geometry
      * @return the equivalent JTS geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry) {
+    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry, GeometryFactory gFact) {
         if (geometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
         if (geometry instanceof org.geolatte.geom.Point) {
-            return to((org.geolatte.geom.Point<P>) geometry);
+            return to((org.geolatte.geom.Point<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.LineString) {
-            return to((org.geolatte.geom.LineString<P>) geometry);
+            return to((org.geolatte.geom.LineString<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.MultiPoint) {
-            return to((org.geolatte.geom.MultiPoint<P>) geometry);
+            return to((org.geolatte.geom.MultiPoint<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.Polygon) {
-            return to((org.geolatte.geom.Polygon<P>) geometry);
+            return to((org.geolatte.geom.Polygon<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.MultiLineString) {
-            return to((org.geolatte.geom.MultiLineString<P>) geometry);
+            return to((org.geolatte.geom.MultiLineString<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.MultiPolygon) {
-            return to((org.geolatte.geom.MultiPolygon<P>) geometry);
+            return to((org.geolatte.geom.MultiPolygon<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.GeometryCollection) {
-            return to((org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>) geometry);
+            return to((org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>) geometry, gFact);
         } else {
             throw new JTSConversionException();
         }
+    }
+
+    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry) {
+        if (geometry == null) {
+            throw new IllegalArgumentException("Null object passed.");
+        }
+        GeometryFactory gFact = geometryFactory(geometry.getSRID());
+        return to(geometry, gFact);
+    }
+
+
+    private static GeometryFactory geometryFactory(int srid) {
+        return geometryFactories.computeIfAbsent(srid, id -> buildGeometryFactory(id));
+    }
+
+    private static GeometryFactory buildGeometryFactory(int srid) {
+        return new GeometryFactory(new PrecisionModel(), srid, pscsFactory);
     }
 
     /**
@@ -347,80 +369,58 @@ public class JTS {
     ///  Helpermethods: geolatte --> jts
     ///
 
-    private static <P extends Position> Polygon to(org.geolatte.geom.Polygon<P> polygon) {
-        LinearRing shell = to(polygon.getExteriorRing());
+    private static <P extends Position> Polygon to(org.geolatte.geom.Polygon<P> polygon, GeometryFactory gFact) {
+        LinearRing shell = to(polygon.getExteriorRing(), gFact);
         LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
         for (int i = 0; i < holes.length; i++) {
-            holes[i] = to(polygon.getInteriorRingN(i));
+            holes[i] = to(polygon.getInteriorRingN(i), gFact);
         }
-        Polygon pg = geometryFactory().createPolygon(shell, holes);
-        copySRID(polygon, pg);
-        return pg;
+        return gFact.createPolygon(shell, holes);
     }
 
-    private static <P extends Position> Point to(org.geolatte.geom.Point<P> point) {
-        Point pnt = geometryFactory().createPoint(sequenceOf(point));
-        copySRID(point, pnt);
-        return pnt;
+    private static <P extends Position> Point to(org.geolatte.geom.Point<P> point, GeometryFactory gFact) {
+        return gFact.createPoint(sequenceOf(point));
     }
 
-    private static <P extends Position> LineString to(org.geolatte.geom.LineString<P> lineString) {
-        LineString ls = geometryFactory().createLineString(sequenceOf(lineString));
-        copySRID(lineString, ls);
-        return ls;
+    private static <P extends Position> LineString to(org.geolatte.geom.LineString<P> lineString, GeometryFactory gFact) {
+        return gFact.createLineString(sequenceOf(lineString));
     }
 
-    private static <P extends Position> LinearRing to(org.geolatte.geom.LinearRing<P> linearRing) {
-        LinearRing lr = geometryFactory().createLinearRing(sequenceOf(linearRing));
-        copySRID(linearRing, lr);
-        return lr;
+    private static <P extends Position> LinearRing to(org.geolatte.geom.LinearRing<P> linearRing, GeometryFactory gFact) {
+        return gFact.createLinearRing(sequenceOf(linearRing));
     }
 
-    private static <P extends Position> MultiPoint to(org.geolatte.geom.MultiPoint<P> multiPoint) {
+    private static <P extends Position> MultiPoint to(org.geolatte.geom.MultiPoint<P> multiPoint, GeometryFactory gFact) {
         Point[] points = new Point[multiPoint.getNumGeometries()];
         for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-            points[i] = to(multiPoint.getGeometryN(i));
+            points[i] = to(multiPoint.getGeometryN(i), gFact);
         }
-        MultiPoint mp = geometryFactory().createMultiPoint(points);
-        copySRID(multiPoint, mp);
-        return mp;
+        return gFact.createMultiPoint(points);
     }
 
-    private static <P extends Position> MultiLineString to(org.geolatte.geom.MultiLineString<P> multiLineString) {
+    private static <P extends Position> MultiLineString to(org.geolatte.geom.MultiLineString<P> multiLineString, GeometryFactory gFact) {
         LineString[] lineStrings = new LineString[multiLineString.getNumGeometries()];
         for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-            lineStrings[i] = to(multiLineString.getGeometryN(i));
+            lineStrings[i] = to(multiLineString.getGeometryN(i), gFact);
         }
-        MultiLineString mls = geometryFactory().createMultiLineString(lineStrings);
-        copySRID(multiLineString, mls);
-        return mls;
+        return gFact.createMultiLineString(lineStrings);
     }
 
-    private static <P extends Position> MultiPolygon to(org.geolatte.geom.MultiPolygon<P> multiPolygon) {
+    private static <P extends Position> MultiPolygon to(org.geolatte.geom.MultiPolygon<P> multiPolygon, GeometryFactory gFact) {
         Polygon[] polygons = new Polygon[multiPolygon.getNumGeometries()];
         for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-            polygons[i] = to(multiPolygon.getGeometryN(i));
+            polygons[i] = to(multiPolygon.getGeometryN(i), gFact);
         }
-        MultiPolygon mp = geometryFactory().createMultiPolygon(polygons);
-        copySRID(multiPolygon, mp);
-        return mp;
+        return gFact.createMultiPolygon(polygons);
     }
 
     private static <P extends Position> GeometryCollection to(org.geolatte.geom.GeometryCollection<P, org.geolatte
-            .geom.Geometry<P>> collection) {
+            .geom.Geometry<P>> collection, GeometryFactory gFact) {
         Geometry[] geoms = new Geometry[collection.getNumGeometries()];
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             geoms[i] = to(collection.getGeometryN(i));
         }
-        GeometryCollection gc = geometryFactory().createGeometryCollection(geoms);
-        copySRID(collection, gc);
-        return gc;
-    }
-
-    private static void copySRID(org.geolatte.geom.Geometry source, Geometry target) {
-        CrsId crsId = source.getCoordinateReferenceSystem().getCrsId();
-        int srid = crsId == CrsId.UNDEFINED ? 0 : crsId.getCode();
-        target.setSRID(srid);
+        return gFact.createGeometryCollection(geoms);
     }
 
     private static CoordinateSequence sequenceOf(org.geolatte.geom.Geometry geometry) {
