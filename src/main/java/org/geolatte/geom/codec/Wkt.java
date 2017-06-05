@@ -42,7 +42,8 @@ public class Wkt {
         //the PostGIS EWKT dialect (versions 1.0 to 1.5).
         POSTGIS_EWKT_1,
         MYSQL_WKT,
-        HANA_EWKT
+        HANA_EWKT,
+        DB2_WKT
     }
 
     private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKT_1;
@@ -57,6 +58,7 @@ public class Wkt {
         ENCODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktEncoder.class);
         ENCODERS.put(Dialect.MYSQL_WKT, PostgisWktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
         ENCODERS.put(Dialect.HANA_EWKT, HANAWktEncoder.class);
+        ENCODERS.put(Dialect.DB2_WKT, DB2WktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
     }
 
 

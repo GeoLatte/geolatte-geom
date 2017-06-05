@@ -5,7 +5,7 @@ package org.geolatte.geom.codec.db.db2;
  */
 public class Db2DecodeException extends RuntimeException{
 
-    Db2DecodeException(Throwable cause){
+    public Db2DecodeException(Throwable cause){
         super(cause);
     }
 }

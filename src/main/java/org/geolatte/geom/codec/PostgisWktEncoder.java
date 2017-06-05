@@ -42,7 +42,6 @@ class PostgisWktEncoder implements WktEncoder {
     private static final int MAX_FRACTIONAL_DIGITS = 24;
     private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
-
     private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
     private final NumberFormat formatter;
 
@@ -72,13 +71,17 @@ class PostgisWktEncoder implements WktEncoder {
         return result();
     }
 
+    protected boolean skipSrid(){
+        return false;
+    }
+
     private void prepare() {
         builder = new StringBuffer();
         inGeometryCollection = false;
     }
 
     private <P extends Position> void addSridIfValid(Geometry<P> geometry) {
-        if (geometry.getSRID() < 1) {
+        if (geometry.getSRID() < 1 || skipSrid()) {
             return;
         }
         builder.append("SRID=")
