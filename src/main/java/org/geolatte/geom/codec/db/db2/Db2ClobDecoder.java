@@ -47,7 +47,7 @@ public class Db2ClobDecoder implements Decoder<Clob> {
             } while (read >= 0);
 
         } catch (IOException | SQLException ex) {
-            throw new Db2DecodeException(ex);
+            throw new RuntimeException(ex);
         } finally {
             try {
                 if (in != null) {
