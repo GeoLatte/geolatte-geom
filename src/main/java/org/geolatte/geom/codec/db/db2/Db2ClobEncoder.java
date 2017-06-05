@@ -8,7 +8,7 @@ import org.geolatte.geom.codec.db.Encoder;
 /**
  * Created by Karel Maesen, Geovise BVBA on 04/06/17.
  */
-public class Db2Encoder implements Encoder<String> {
+public class Db2ClobEncoder implements Encoder<String> {
 
 
     @Override
