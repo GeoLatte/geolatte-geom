@@ -1,5 +1,8 @@
 package org.geolatte.geom.cga;
 
+import java.util.stream.IntStream;
+
+import org.geolatte.geom.LinearRing;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 
@@ -101,6 +104,33 @@ public class NumericalMethods {
         }
         return det > 0;
     }
+
+    /**
+     * Determines whether the specified {@code LinearRing} is counter-clockwise.
+     *
+     * <p> Orientation is determined by calculating the signed area of the given ring
+     * and using the sign to determine the orientation
+     * <p>The specified Ring is assumed to be valid.
+     *
+     * @param ring a {@code LinearRing}
+     * @return true if the positions of the ring describe it counter-clockwise
+     */
+    public static boolean isCounterClockwise(LinearRing<?> ring) {
+        return IntStream.range(1, ring.getNumPositions()).parallel().boxed().
+                map(idx -> shoelaceStep(idx, ring)).
+                reduce((a, b) -> a + b).
+                filter(orientation -> orientation != 0).
+                orElseThrow(() -> new IllegalArgumentException("Ring is collinear in 2D"))
+                > 0;
+    }
+
+    private static double shoelaceStep(Integer idx, LinearRing<?> ring) {
+        double[] c0 = ring.getPositionN(idx - 1).toArray(null);
+        double[] c1 = ring.getPositionN(idx).toArray(null);
+        double weightedOrientation = determinant(c0[0], c0[1], c1[0], c1[1]);
+        return weightedOrientation;
+    }
+
 
     public static boolean collinear(Position p0, Position p1, Position p2) {
         double det = deltaDeterminant(p0, p1, p2);
