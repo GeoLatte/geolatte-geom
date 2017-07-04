@@ -42,7 +42,8 @@ public class Wkb {
     public enum Dialect {
         //the PostGIS EWKB dialect (versions 1.0 to 1.6).
         POSTGIS_EWKB_1,
-        MYSQL_WKB
+        MYSQL_WKB,
+        HANA_EWKB
     }
 
     private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_1;
@@ -53,8 +54,10 @@ public class Wkb {
     static {
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbDecoder.class);
         DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
+        DECODERS.put(Dialect.HANA_EWKB, HANAWkbDecoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
         ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);
+        ENCODERS.put(Dialect.HANA_EWKB, HANAWkbEncoder.class);
     }
 
 
