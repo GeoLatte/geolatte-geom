@@ -1,13 +1,19 @@
 package org.geolatte.geom.codec.db.oracle;
 
-
-import org.geolatte.geom.*;
-import org.geolatte.geom.codec.db.Encoder;
+import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
+import static org.geolatte.geom.cga.NumericalMethods.isCounterClockwise;
 
 import java.util.Stack;
 
-import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
-import static org.geolatte.geom.cga.NumericalMethods.isCounterClockwise;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.LLAPositionVisitor;
+import org.geolatte.geom.LinearRing;
+import org.geolatte.geom.Measured;
+import org.geolatte.geom.Polygon;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.codec.db.Encoder;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
@@ -40,14 +46,16 @@ abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
             PositionSequence<?> positionSequence;
             if (i == 0) {
                 et = ElementType.EXTERIOR_RING_STRAIGHT_SEGMENTS;
-                positionSequence = polygon.getExteriorRing().getPositions();
-                if (!isCounterClockwise(positionSequence)) {
+                LinearRing<?> exteriorRing = polygon.getExteriorRing();
+                positionSequence = exteriorRing.getPositions();
+                if (!isCounterClockwise(exteriorRing)) {
                     positionSequence = reverse(positionSequence);
                 }
             } else {
                 et = ElementType.INTERIOR_RING_STRAIGHT_SEGMENTS;
-                positionSequence = polygon.getInteriorRingN(i - 1).getPositions();
-                if (isCounterClockwise(positionSequence)) {
+                LinearRing<?> interiorRing = polygon.getInteriorRingN(i - 1);
+                positionSequence = interiorRing.getPositions();
+                if (isCounterClockwise(interiorRing)) {
                     positionSequence = reverse(positionSequence);
                 }
             }

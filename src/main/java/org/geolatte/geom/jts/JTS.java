@@ -172,7 +172,7 @@ public class JTS {
      * @throws IllegalArgumentException when a null object is passed
      */
     public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry, GeometryFactory gFact) {
-        if (geometry == null) {
+        if (geometry == null || gFact == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
         if (geometry instanceof org.geolatte.geom.Point) {
