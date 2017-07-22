@@ -38,6 +38,16 @@ public class GeographicToGeocentric implements Transformation {
     }
 
     @Override
+    public int inCoordinateDimension() {
+        return 3;
+    }
+
+    @Override
+    public int outCoordinateDimension() {
+        return 3;
+    }
+
+    @Override
     public void forward(double[] inCoordinate, double[] outCoordinate) {
         double phi = toRadians(inCoordinate[1]);
         double lon = toRadians(inCoordinate[0] - primeMerid);

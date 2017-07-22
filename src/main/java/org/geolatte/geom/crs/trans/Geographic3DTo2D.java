@@ -27,6 +27,16 @@ public class Geographic3DTo2D implements Transformation   {
     }
 
     @Override
+    public int inCoordinateDimension() {
+        return 3;
+    }
+
+    @Override
+    public int outCoordinateDimension() {
+        return 2;
+    }
+
+    @Override
     public void forward(double[] inCoordinate, double[] outCoordinate) {
         System.arraycopy(inCoordinate, 0, outCoordinate, 0, 2);
     }

@@ -9,6 +9,10 @@ public interface Transformation {
 
     boolean isReversible();
 
+    int inCoordinateDimension();
+
+    int outCoordinateDimension();
+
     void forward(double[] inCoordinate, double[] outCoordinate);
 
     void reverse(double[] inCoordinate, double[] outCoordinate);

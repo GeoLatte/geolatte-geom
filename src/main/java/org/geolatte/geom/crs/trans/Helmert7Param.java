@@ -24,7 +24,7 @@ public class Helmert7Param implements Transformation {
     final private double m;
 
 
-    public static Helmert7Param formToWGS84Params(double[] params) {
+    public static Helmert7Param fromTOWGS84(double[] params) {
         return new Helmert7Param(params[0],params[1],params[2],params[3],params[4],params[5],params[6]);
     }
 
@@ -57,6 +57,16 @@ public class Helmert7Param implements Transformation {
     @Override
     public boolean isReversible() {
         return true;
+    }
+
+    @Override
+    public int inCoordinateDimension() {
+        return 3;
+    }
+
+    @Override
+    public int outCoordinateDimension() {
+        return 3;
     }
 
     @Override

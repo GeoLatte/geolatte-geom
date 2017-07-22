@@ -2,6 +2,8 @@ package org.geolatte.geom.crs.trans;
 
 import org.junit.Test;
 
+import java.util.function.BiConsumer;
+
 import static org.junit.Assert.assertEquals;
 
 /**
