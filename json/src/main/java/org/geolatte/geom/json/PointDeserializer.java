@@ -29,11 +29,8 @@ public class PointDeserializer<P extends Position> extends AbstractGeometryDeser
 
 
     @Override
-    public Point<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode root = getRoot(p);
-        GeometryType type = getType(root);
-        canHandle(type);
-
+    public Point<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        JsonNode root = checkRoot(p);
 
         SinglePositionCoordinatesHolder holder = getCoordinatesArrayAsSinglePosition(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
@@ -42,7 +39,7 @@ public class PointDeserializer<P extends Position> extends AbstractGeometryDeser
             return Geometries.mkEmptyPoint(crs);
         }
 
-        P pos = toPosition(holder, crs);
+        P pos = holder.toPosition(crs);
         return Geometries.mkPoint(pos, crs);
     }
 

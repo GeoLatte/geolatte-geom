@@ -2,10 +2,7 @@ package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.geolatte.geom.G3D;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
@@ -38,6 +35,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
 //        addDeserializer(Geometry.class, new GeometryDeserializer<Geometry>(this, Geometry.class));
         addDeserializer(Point.class, new PointDeserializer<>( new Context(defaultCrs, this.features)));
+        addDeserializer(LineString.class, new LineStringDeserializer<>( new Context(defaultCrs, this.features)));
 //        addDeserializer(LineString.class, new GeometryDeserializer<LineString>(this, LineString.class));
 //        addDeserializer(MultiPoint.class, new GeometryDeserializer<MultiPoint>(this, MultiPoint.class));
 //        addDeserializer(MultiLineString.class, new GeometryDeserializer<MultiLineString>(this, MultiLineString.class));

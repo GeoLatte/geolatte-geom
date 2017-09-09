@@ -16,6 +16,8 @@ public class GeoJsonStrings {
 
 
     //LineStrings
-
+    static String emptyLineString = "{\"type\":\"LineString\",\"coordinates\":[]}";
+    static String simpleLineString = "{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0],[3.0,4.0]]}";
+    static String lineStringWithCrs = "{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[[1.0,2.0],[3.0,4.0]]}";
 
 }

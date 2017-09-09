@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public class PointDeserialisationTest extends GeoJsonTest{
+public class PointDeserializationTest extends GeoJsonTest{
 
 
 
