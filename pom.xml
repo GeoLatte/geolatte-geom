@@ -15,16 +15,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.geolatte</groupId>
-    <artifactId>geolatte-geom</artifactId>
-    <name>geolatte-geom</name>
-    <packaging>jar</packaging>
-    <version>1.2.0-SNAPSHOT</version>
+    <artifactId>geolatte</artifactId>
+    <name>geolatte</name>
+    <packaging>pom</packaging>
+    <version>${project.version}</version>
 
-    <description>
-        This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL
-        specification.
-    </description>
-	<url>http://www.geolatte.org/confluence/display/geom</url>
+	<modules>
+		<module>geom</module>
+		<module>json</module>
+	</modules>
+
 
 	<organization>
 		<name>geolatte.org</name>
@@ -32,6 +32,7 @@
 	</organization>
 
 	<properties>
+        <project.version>1.2.0-SNAPSHOT</project.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -226,68 +227,7 @@
 		</plugins>
 	</build>
 
-	<dependencies>
-		<!-- Runtime dependencies -->
-		<dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
-			<version>1.13</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
-		</dependency>
 
-		<!-- Test dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-lgpl</artifactId>
-			<version>1.5.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.directory.studio</groupId>
-			<artifactId>org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>dom4j</groupId>
-			<artifactId>dom4j</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>jaxen</groupId>
-			<artifactId>jaxen</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
 
 	<distributionManagement>
 		<snapshotRepository>
