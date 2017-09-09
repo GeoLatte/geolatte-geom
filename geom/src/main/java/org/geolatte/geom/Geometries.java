@@ -58,6 +58,18 @@ public class Geometries {
         return new LineString<P>(crs);
     }
 
+
+    /**
+     * Creates an empty {@code Polygon} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code Polygon}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code POPLYGON} with the specified coordinate reference system
+     */
+    public static <P extends Position> Polygon<P> mkEmptyPolygon(CoordinateReferenceSystem<P> crs) {
+        return new Polygon<P>(crs);
+    }
+
     /**
      * Creates a {@code Point} from a Position and coordinate reference system
      *

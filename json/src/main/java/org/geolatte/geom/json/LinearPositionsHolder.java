@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
-class PositionSequenceCoordinatesHolder extends CoordinatesHolder {
+class LinearPositionsHolder extends Holder {
 
-    final private List<SinglePositionCoordinatesHolder> spcs = new ArrayList<>();
+    final private List<PointHolder> spcs = new ArrayList<>();
 
-    void push(SinglePositionCoordinatesHolder holder) {
+    void push(PointHolder holder) {
         spcs.add(holder);
     }
 
@@ -27,7 +27,7 @@ class PositionSequenceCoordinatesHolder extends CoordinatesHolder {
 
     @Override
     int getCoordinateDimension() {
-        return spcs.stream().mapToInt(CoordinatesHolder::getCoordinateDimension).max().orElse(0);
+        return spcs.stream().mapToInt(Holder::getCoordinateDimension).max().orElse(0);
     }
 
     <P extends Position> PositionSequence<P> toPositionSequence(CoordinateReferenceSystem<P> crs) {

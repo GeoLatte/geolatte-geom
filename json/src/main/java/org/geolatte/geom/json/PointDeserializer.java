@@ -1,17 +1,10 @@
 package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsId;
 
 import java.io.IOException;
 
@@ -32,7 +25,7 @@ public class PointDeserializer<P extends Position> extends AbstractGeometryDeser
     public Point<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode root = checkRoot(p);
 
-        SinglePositionCoordinatesHolder holder = getCoordinatesArrayAsSinglePosition(root);
+        PointHolder holder = getCoordinatesArrayAsSinglePosition(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
         if (holder.isEmpty()) {

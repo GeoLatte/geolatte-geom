@@ -3,16 +3,14 @@ package org.geolatte.geom.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.Position;
-import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
 
 import static org.geolatte.geom.GeometryType.LINESTRING;
 import static org.geolatte.geom.GeometryType.POINT;
+import static org.geolatte.geom.GeometryType.POLYGON;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
@@ -20,6 +18,7 @@ import static org.geolatte.geom.GeometryType.POINT;
 public class GeometrySerializer<P extends Position> extends JsonSerializer<Geometry<P>> {
 
     final private Context<P> context;
+
     public GeometrySerializer(Context<P> context) {
         this.context = context;
     }
@@ -37,30 +36,41 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         gen.writeStartObject();
         gen.writeStringField("type", geometry.getGeometryType().getCamelCased());
         writeCrs(gen, geometry.getCoordinateReferenceSystem());
-        writeCoords(gen, geometry.getGeometryType(), geometry.getPositions());
+        writeCoords(gen, geometry.getGeometryType(), geometry);
         gen.writeEndObject();
 
     }
 
-    private void writeCoords(JsonGenerator gen, GeometryType type, PositionSequence<P> positions) throws IOException {
+    private void writeCoords(JsonGenerator gen, GeometryType type, Geometry<P> geom) throws IOException {
         gen.writeFieldName("coordinates");
-        double[] buf = new double[positions.getCoordinateDimension()];
-        if (positions.isEmpty()) {
+        double[] buf = new double[geom.getCoordinateDimension()];
+        if (geom.isEmpty()) {
             gen.writeStartArray();
             gen.writeEndArray();
             return;
         }
         if (type == POINT) {
-            writePosition(gen, positions.getPositionN(0), buf);
+            writePosition(gen, geom.getPositionN(0), buf);
         }
         if (type == LINESTRING) {
+            writeLinear(gen, geom, buf);
+        }
+        if (type == POLYGON) {
             gen.writeStartArray();
-
-            for (P pos : positions) {
-                writePosition(gen, pos, buf);
+            for(Geometry<P> c : ((Complex)geom).components()) {
+                writeLinear(gen, c, buf);
             }
             gen.writeEndArray();
         }
+    }
+
+    private void writeLinear(JsonGenerator gen, Geometry<P> geom, double[] buf) throws IOException {
+        gen.writeStartArray();
+
+        for (P pos : geom.getPositions()) {
+            writePosition(gen, pos, buf);
+        }
+        gen.writeEndArray();
     }
 
 

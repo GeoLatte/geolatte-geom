@@ -4,12 +4,8 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import org.geolatte.geom.crs.Unit;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 
 /**
  * A Jackson databind Module for Geolatte Geometries.
@@ -22,29 +18,22 @@ public class GeolatteGeomModule extends SimpleModule {
     private final Features features = new Features();
 
 
-
     public GeolatteGeomModule() {
         this(WGS84);
     }
 
+    @SuppressWarnings("unchecked")
     public <P extends Position> GeolatteGeomModule(CoordinateReferenceSystem<P> defaultCrs) {
 
         super("GeolatteGeomModule", new Version(1, 0, 0, "", "org.geolatte", "geolatte-json"));
 
-        addSerializer(Geometry.class, new GeometrySerializer<>(new Context(defaultCrs, this.features)));
+        Context<P> ctxt = new Context<>(defaultCrs, this.features);
+        addSerializer(Geometry.class, new GeometrySerializer(ctxt)); //use raw to get this compiled
 
 //        addDeserializer(Geometry.class, new GeometryDeserializer<Geometry>(this, Geometry.class));
-        addDeserializer(Point.class, new PointDeserializer<>( new Context(defaultCrs, this.features)));
-        addDeserializer(LineString.class, new LineStringDeserializer<>( new Context(defaultCrs, this.features)));
-//        addDeserializer(LineString.class, new GeometryDeserializer<LineString>(this, LineString.class));
-//        addDeserializer(MultiPoint.class, new GeometryDeserializer<MultiPoint>(this, MultiPoint.class));
-//        addDeserializer(MultiLineString.class, new GeometryDeserializer<MultiLineString>(this, MultiLineString.class));
-//        addDeserializer(Polygon.class, new GeometryDeserializer<Polygon>(this, Polygon.class));
-//        addDeserializer(MultiPolygon.class, new GeometryDeserializer<MultiPolygon>(this, MultiPolygon.class));
-//        addDeserializer(GeometryCollection.class, new GeometryDeserializer<GeometryCollection>(this, GeometryCollection.class));
-//        addDeserializer(Feature.class, new FeatureDeserializer(this));
-//        addDeserializer(FeatureCollection.class, new FeatureCollectionDeserializer(this));
-
+        addDeserializer(Point.class, new PointDeserializer<>(ctxt));
+        addDeserializer(LineString.class, new LineStringDeserializer<>(ctxt));
+        addDeserializer(Polygon.class, new PolygonDeserializer<>(ctxt));
     }
 
     public void setFeature(Feature feature, boolean value) {

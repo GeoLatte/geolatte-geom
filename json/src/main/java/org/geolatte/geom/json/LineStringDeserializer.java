@@ -20,7 +20,7 @@ public class LineStringDeserializer<P extends Position> extends AbstractGeometry
     @Override
     public LineString<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         JsonNode root = checkRoot(p);
-        PositionSequenceCoordinatesHolder holder = getCoordinatesArrayAsPositionSequence(root);
+        LinearPositionsHolder holder = getCoordinatesArrayAsLinear(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
         if (holder.isEmpty()) {

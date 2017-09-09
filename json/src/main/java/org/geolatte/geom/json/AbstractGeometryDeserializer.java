@@ -13,7 +13,6 @@ import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LinearUnit;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem;
@@ -55,24 +54,40 @@ public abstract class AbstractGeometryDeserializer<P extends Position, G extends
         return this.context.getDefaultCrs();
     }
 
-    protected SinglePositionCoordinatesHolder getCoordinatesArrayAsSinglePosition(JsonNode root) throws GeoJsonProcessingException {
+    protected PointHolder getCoordinatesArrayAsSinglePosition(JsonNode root) throws GeoJsonProcessingException {
         JsonNode coordinates = root.get("coordinates");
         return toSinglePositionCoordinatesHolder(coordinates);
     }
 
-    protected PositionSequenceCoordinatesHolder getCoordinatesArrayAsPositionSequence(JsonNode root) throws GeoJsonProcessingException {
+    protected LinearPositionsHolder getCoordinatesArrayAsLinear(JsonNode root) throws GeoJsonProcessingException {
         JsonNode coordinates = root.get("coordinates");
+        return toLinearPositionsHolder(coordinates);
+    }
+
+    private LinearPositionsHolder toLinearPositionsHolder(JsonNode coordinates) throws GeoJsonProcessingException {
         if (!coordinates.isArray()) {
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
-        PositionSequenceCoordinatesHolder holder = new PositionSequenceCoordinatesHolder();
+        LinearPositionsHolder holder = new LinearPositionsHolder();
         for( int i = 0; i < coordinates.size(); i++) {
             holder.push(toSinglePositionCoordinatesHolder(coordinates.get(i)));
         }
         return holder;
     }
 
-    protected SinglePositionCoordinatesHolder toSinglePositionCoordinatesHolder(JsonNode coordinates) throws GeoJsonProcessingException {
+    protected LinearPositionsListHolder getCoordinatesArrayAsPolygonal(JsonNode root) throws GeoJsonProcessingException {
+        JsonNode coordinates = root.get("coordinates");
+        if (!coordinates.isArray()) {
+            throw new GeoJsonProcessingException("Parser expects coordinate as array");
+        }
+        LinearPositionsListHolder holder = new LinearPositionsListHolder();
+        for( int i = 0; i < coordinates.size(); i++) {
+            holder.push(toLinearPositionsHolder(coordinates.get(i)));
+        }
+        return holder;
+    }
+
+    protected PointHolder toSinglePositionCoordinatesHolder(JsonNode coordinates) throws GeoJsonProcessingException {
         if (!coordinates.isArray()) {
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
@@ -84,7 +99,7 @@ public abstract class AbstractGeometryDeserializer<P extends Position, G extends
         for (int i = 0; i < coordinates.size() && i < coDim; i++) {
             co[i] = coordinates.get(i).asDouble();
         }
-        return new SinglePositionCoordinatesHolder(co);
+        return new PointHolder(co);
     }
 
     protected boolean isFeatureSet(Feature f) {

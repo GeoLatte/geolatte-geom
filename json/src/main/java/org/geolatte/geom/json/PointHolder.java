@@ -9,11 +9,11 @@ import java.util.Arrays;
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
-class SinglePositionCoordinatesHolder extends CoordinatesHolder {
+class PointHolder extends Holder {
 
     final private double[] coordinates;
 
-    public SinglePositionCoordinatesHolder(double[] coordinates) {
+    public PointHolder(double[] coordinates) {
         this.coordinates = coordinates;
     }
 
