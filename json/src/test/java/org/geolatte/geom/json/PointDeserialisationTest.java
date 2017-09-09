@@ -3,38 +3,22 @@ package org.geolatte.geom.json;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LinearUnit;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 
 import static org.geolatte.geom.builder.DSL.*;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
+import static org.geolatte.geom.json.Crss.*;
+import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public class PointTest {
+public class PointDeserialisationTest {
 
-    private String emptyPointText = " {\"type\":\"Point\",\"coordinates\":[]}";
-    private String pointText = "{\"type\":\"Point\",\"coordinates\":[1,2]}";
-    private String pointText3D = "{\"type\":\"Point\",\"coordinates\":[1,2,3]}";
-    private String pointTextWithCrs = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[1,2]}";
-    private String pointTextWithCrs3D = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[1,2,3]}";
-    private String pointTextWithCrs34D = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[1,2,3,4]}";
-    private String pointTextWithCrsAndBbox = " {\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"bbox\":[1.000000000000000,2.000000000000000,1.000000000000000,2.000000000000000],\"coordinates\":[1,2]}";
-
-    private static CoordinateReferenceSystem<G3D> wgs3D = addVerticalSystem(
-            WGS84, G3D.class, LinearUnit.METER
-    );
-
-    private static CoordinateReferenceSystem<C2D> lambert72 = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-    private static CoordinateReferenceSystem<C3D> lambert72Z = addVerticalSystem(lambert72, C3D.class, LinearUnit.METER);
-    private static CoordinateReferenceSystem<C3DM> lambert72ZM = addLinearSystem(lambert72, C3DM.class, LinearUnit.METER);
 
 
     private ObjectMapper mapper;
@@ -137,7 +121,6 @@ public class PointTest {
         Point<?> expected = new Point(WGS84);
         assertEquals(expected, pnt);
     }
-
 
 
 }
