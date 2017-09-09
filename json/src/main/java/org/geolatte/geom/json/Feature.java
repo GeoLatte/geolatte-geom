@@ -5,7 +5,8 @@ package org.geolatte.geom.json;
  */
 public enum Feature {
 
-    FORCE_DEFAULT_CRS_DIMENSION(false);
+    FORCE_DEFAULT_CRS_DIMENSION(false),
+    SUPPRESS_CRS_SERIALIZATION(false);
 
     boolean isSetByDefault;
 

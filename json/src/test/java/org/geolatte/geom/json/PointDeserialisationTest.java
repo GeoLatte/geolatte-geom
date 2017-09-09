@@ -17,17 +17,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public class PointDeserialisationTest {
+public class PointDeserialisationTest extends GeoJsonTest{
 
 
 
-    private ObjectMapper mapper;
-
-    @Before
-    public void setUp() {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new GeolatteGeomModule());
-    }
 
     @Test
     public void testDeserializePointText() throws IOException {

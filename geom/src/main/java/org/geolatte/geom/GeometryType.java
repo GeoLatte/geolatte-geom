@@ -28,21 +28,31 @@ package org.geolatte.geom;
  */
 public enum GeometryType {
 
-    POINT,
-    CURVE,
-    SURFACE,
-    GEOMETRYCOLLECTION,
-    LINE_STRING,
+    POINT("Point"),
+    CURVE("Curve"),
+    SURFACE("Surface"),
+    GEOMETRYCOLLECTION("GeometryCollection"),
+    LINE_STRING("LineString"),
 //    LINE,
-    LINEARRING,
-    POLYGON,
+    LINEARRING("LinearRing"),
+    POLYGON("Polygon"),
 //    POLYHEDRAL_SURFACE,
 //    MULTI_SURFACE,
 //    MULTI_CURVE,
-    MULTIPOINT,
+    MULTIPOINT("MultiPoint"),
 //    TIN,
-    MULTIPOLYGON,
-    MULTILINESTRING
+    MULTIPOLYGON("MultiPolygon"),
+    MULTILINESTRING("MultiLineString");
+
+    private GeometryType(String camelCased){
+        this.camelCased = camelCased;
+    };
+
+    private String camelCased; //and consistent with GeoJson spec RFC 7946
+
+    public String getCamelCased() {
+        return this.camelCased;
+    }
 
 
 }

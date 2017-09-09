@@ -6,10 +6,11 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-class Context<P extends Position> {
+public class Context<P extends Position> {
 
     private final CoordinateReferenceSystem<P> defaultCRS;
     private final Features features;
+
     Context(CoordinateReferenceSystem<P> defaultCRS,Features features) {
         this.features = features;
         this.defaultCRS =defaultCRS;

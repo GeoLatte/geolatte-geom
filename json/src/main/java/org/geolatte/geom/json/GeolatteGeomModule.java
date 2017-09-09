@@ -3,6 +3,7 @@ package org.geolatte.geom.json;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.geolatte.geom.G3D;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -33,15 +34,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
         super("GeolatteGeomModule", new Version(1, 0, 0, "", "org.geolatte", "geolatte-json"));
 
-//        addSerializer(MultiLineString.class, new MultiLineStringSerializer(this));
-//        addSerializer(LineString.class, new LineStringSerializer(this));
-//        addSerializer(Point.class, new PointSerializer(this));
-//        addSerializer(MultiPoint.class, new MultiPointSerializer(this));
-//        addSerializer(Polygon.class, new PolygonSerializer(this));
-//        addSerializer(Feature.class, new FeatureSerializer(this));
-//        addSerializer(MultiPolygon.class, new MultiPolygonSerializer(this));
-//        addSerializer(Geometry.class, new AnyGeometrySerializer());
-//        addSerializer(GeometryCollection.class, new GeometryCollectionSerializer(this));
+        addSerializer(Geometry.class, new GeometrySerializer<>(new Context(defaultCrs, this.features)));
 
 //        addDeserializer(Geometry.class, new GeometryDeserializer<Geometry>(this, Geometry.class));
         addDeserializer(Point.class, new PointDeserializer<>( new Context(defaultCrs, this.features)));
