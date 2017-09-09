@@ -23,7 +23,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Unit;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
@@ -91,7 +90,7 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.LINESTRING_2D);
         Geometry geom = decode(byteBuffer);
         assertNotNull(geom);
-        assertEquals(GeometryType.LINE_STRING, geom.getGeometryType());
+        assertEquals(GeometryType.LINESTRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_2D), geom);
         testEncoding(byteBuffer, geom);
     }

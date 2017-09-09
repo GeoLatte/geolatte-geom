@@ -132,7 +132,7 @@ public class TestWktTokenizer {
         WktTokenizer tokens = new WktTokenizer(wkt, words, crs);
         assertTrue(tokens.moreTokens());
         WktGeometryToken token = (WktGeometryToken) (tokens.nextToken());
-        assertEquals(GeometryType.LINE_STRING, token.getType());
+        assertEquals(GeometryType.LINESTRING, token.getType());
         assertFalse(token.isMeasured());
         assertTrue(tokens.moreTokens());
         assertEquals(tokens.nextToken(), words.getOpenList());

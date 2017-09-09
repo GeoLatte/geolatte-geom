@@ -53,8 +53,8 @@ class PostgisWktVariant extends WktVariant {
         //register the geometry tokens
         add(GeometryType.POINT, false, "POINT");
         add(GeometryType.POINT, true, "POINTM");
-        add(GeometryType.LINE_STRING, true, "LINESTRINGM");
-        add(GeometryType.LINE_STRING, false, "LINESTRING");
+        add(GeometryType.LINESTRING, true, "LINESTRINGM");
+        add(GeometryType.LINESTRING, false, "LINESTRING");
         add(GeometryType.POLYGON, false, "POLYGON");
         add(GeometryType.POLYGON, true, "POLYGONM");
         add(GeometryType.MULTIPOINT, true, "MULTIPOINTM");
@@ -102,7 +102,7 @@ class PostgisWktVariant extends WktVariant {
     private boolean sameGeometryType(WktGeometryToken token, Geometry geometry) {
         //TODO Need better handling for difference WKT/Geometry types. See comment above .
         return token.getType() == geometry.getGeometryType() ||
-                (token.getType().equals(GeometryType.LINE_STRING) &&
+                (token.getType().equals(GeometryType.LINESTRING) &&
                 geometry.getGeometryType().equals(GeometryType.LINEARRING));
     }
 

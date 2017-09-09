@@ -100,7 +100,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         switch (type) {
             case POINT:
                 return decodePointText(crs);
-            case LINE_STRING:
+            case LINESTRING:
                 return decodeLineStringText(crs);
             case POLYGON:
                 return decodePolygonText(crs);

@@ -137,10 +137,10 @@ public class LineStringTest {
 
     @Test
     public void testGetGeometryType() {
-        assertEquals(GeometryType.LINE_STRING, linestr2d.getGeometryType());
-        assertEquals(GeometryType.LINE_STRING, emptyLine.getGeometryType());
-        assertEquals(GeometryType.LINE_STRING, simpleClosed.getGeometryType());
-        assertEquals(GeometryType.LINE_STRING, line2d.getGeometryType());
+        assertEquals(GeometryType.LINESTRING, linestr2d.getGeometryType());
+        assertEquals(GeometryType.LINESTRING, emptyLine.getGeometryType());
+        assertEquals(GeometryType.LINESTRING, simpleClosed.getGeometryType());
+        assertEquals(GeometryType.LINESTRING, line2d.getGeometryType());
     }
 
     @Test

@@ -10,7 +10,7 @@ import org.geolatte.geom.Position;
 public class SdoLineStringEncoder extends AbstractSDOEncoder {
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
-        return GeometryType.LINE_STRING.equals(geom.getGeometryType());
+        return GeometryType.LINESTRING.equals(geom.getGeometryType());
     }
 
     @Override

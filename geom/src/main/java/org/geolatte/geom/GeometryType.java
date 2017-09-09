@@ -32,7 +32,7 @@ public enum GeometryType {
     CURVE("Curve"),
     SURFACE("Surface"),
     GEOMETRYCOLLECTION("GeometryCollection"),
-    LINE_STRING("LineString"),
+    LINESTRING("LineString"),
 //    LINE,
     LINEARRING("LinearRing"),
     POLYGON("Polygon"),

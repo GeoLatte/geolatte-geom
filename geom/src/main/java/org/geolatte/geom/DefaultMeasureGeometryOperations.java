@@ -81,7 +81,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         if (geometry == null) throw new IllegalArgumentException("Geometry parameter must not be NULL");
         if (positionTypeMarker == null)
             throw new IllegalArgumentException("PositionTypeMarker parameter must not be NULL");
-        if (geometry.getGeometryType() != GeometryType.LINE_STRING
+        if (geometry.getGeometryType() != GeometryType.LINESTRING
                 && geometry.getGeometryType() != GeometryType.MULTILINESTRING) {
             throw new IllegalArgumentException("Geometry parameter must be of type LineString or MultiLineString");
         }

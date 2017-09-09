@@ -40,12 +40,23 @@ public class Geometries {
      *
      * @param crs the coordinate reference system for the created {@code Point}
      * @param <P> the type of {@code Position}
-     * @return a {@code Point} with the specified position and coordinate reference system
+     * @return an empty {@code Point} with the specified coordinate reference system
      */
     public static <P extends Position> Point<P> mkEmptyPoint(CoordinateReferenceSystem<P> crs) {
         return new Point<P>(crs);
     }
 
+
+    /**
+     * Creates an empty {@code LineString} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code LineString}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code LineString} with the specified coordinate reference system
+     */
+    public static <P extends Position> LineString<P> mkEmptyLineString(CoordinateReferenceSystem<P> crs) {
+        return new LineString<P>(crs);
+    }
 
     /**
      * Creates a {@code Point} from a Position and coordinate reference system
