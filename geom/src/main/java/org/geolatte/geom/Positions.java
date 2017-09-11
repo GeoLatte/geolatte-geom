@@ -70,6 +70,14 @@ public class Positions {
 		return mkPosition( crs.getPositionClass(), coordinates );
 	}
 
+	public static <P extends Position> PositionSequence<P> collect(Class<P> positionType, P... positions) {
+		PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(positions.length, positionType);
+		for(P p : positions) {
+			builder.add(p);
+		}
+		return builder.toPositionSequence();
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <P extends Position> PositionFactory<P> getFactoryFor(Class<P> pClass) {
 		for ( PositionFactory<?> pFact : registeredFactories ) {

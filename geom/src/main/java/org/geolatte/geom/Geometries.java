@@ -23,6 +23,7 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,12 +65,22 @@ public class Geometries {
      *
      * @param crs the coordinate reference system for the created {@code Polygon}
      * @param <P> the type of {@code Position}
-     * @return an empty {@code POPLYGON} with the specified coordinate reference system
+     * @return an empty {@code Polygon} with the specified coordinate reference system
      */
     public static <P extends Position> Polygon<P> mkEmptyPolygon(CoordinateReferenceSystem<P> crs) {
         return new Polygon<P>(crs);
     }
 
+    /**
+     * Creates an empty {@code MultiPoint} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code MultiPoint}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code MultiPoint} with the specified coordinate reference system
+     */
+    public static <P extends Position> MultiPoint<P> mkEmptyMultiPoint(CoordinateReferenceSystem<P> crs) {
+        return new MultiPoint<>(crs);
+    }
     /**
      * Creates a {@code Point} from a Position and coordinate reference system
      *
@@ -132,6 +143,12 @@ public class Geometries {
     public static <P extends Position> MultiPoint<P> mkMultiPoint(List<Point<P>> points) {
         Point<P>[] pointArr = new Point[points.size()];
         return new MultiPoint<P>(points.toArray(pointArr));
+    }
+
+    public static <P extends Position> MultiPoint<P> mkMultiPoint(PositionSequence<P> positions, CoordinateReferenceSystem<P> crs) {
+        final List<Point<P>> points = new ArrayList<>(positions.size());
+        positions.forEach(p -> points.add( mkPoint(p, crs)) );
+        return mkMultiPoint(points);
     }
 
     public static <P extends Position> MultiLineString<P> mkMultiLineString(List<LineString<P>> lineStrings) {
@@ -215,5 +232,4 @@ public class Geometries {
         }
         throw new IllegalStateException("Unknown Geometry class");
     }
-
 }

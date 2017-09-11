@@ -333,6 +333,15 @@ public class DSL {
         return new MultiPointToken<P>(tokens);
     }
 
+    public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs) {
+        return Geometries.mkEmptyMultiPoint(crs);
+    }
+
+    public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, P... positions) {
+        PositionSequence<P> ps = Positions.collect(crs.getPositionClass(), positions);
+        return Geometries.mkMultiPoint(ps, crs);
+    }
+
     @SuppressWarnings("unchecked")
     public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, PointToken<P>... tokens) {
 
