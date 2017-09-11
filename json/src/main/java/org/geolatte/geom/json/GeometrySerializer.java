@@ -8,9 +8,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
 
-import static org.geolatte.geom.GeometryType.LINESTRING;
-import static org.geolatte.geom.GeometryType.POINT;
-import static org.geolatte.geom.GeometryType.POLYGON;
+import static org.geolatte.geom.GeometryType.*;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
@@ -52,7 +50,7 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         if (type == POINT) {
             writePosition(gen, geom.getPositionN(0), buf);
         }
-        if (type == LINESTRING) {
+        if (type == LINESTRING || type == MULTIPOINT) {
             writeLinear(gen, geom, buf);
         }
         if (type == POLYGON) {

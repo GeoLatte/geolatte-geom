@@ -34,6 +34,7 @@ public class GeolatteGeomModule extends SimpleModule {
         addDeserializer(Point.class, new PointDeserializer<>(ctxt));
         addDeserializer(LineString.class, new LineStringDeserializer<>(ctxt));
         addDeserializer(Polygon.class, new PolygonDeserializer<>(ctxt));
+        addDeserializer(MultiPoint.class, new MultiPointDeserializer<>(ctxt));
     }
 
     public void setFeature(Feature feature, boolean value) {
