@@ -32,4 +32,10 @@ public class GeoJsonStrings {
     static String multiPointWithCrs = "{\"type\":\"MultiPoint\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[[1.0,2.0],[3.0,4.0]]}";
 
 
+    //MultiLineStrings
+    static String emptyMultiLineString = "{\"type\":\"MultiLineString\",\"coordinates\":[]}";
+    static String multiLineString = "{\"type\":\"MultiLineString\",\"coordinates\":[[[1.0,1.0],[1.0,2.0]],[[3.0,4.0],[5.0,6.0]]]}";
+    static String multiLineStringWithCrs = "{\"type\":\"MultiLineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[[[1.0,1.0],[1.0,2.0]],[[3.0,4.0],[5.0,6.0]]]}";
+
+
 }

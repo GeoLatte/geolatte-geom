@@ -53,7 +53,7 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         if (type == LINESTRING || type == MULTIPOINT) {
             writeLinear(gen, geom, buf);
         }
-        if (type == POLYGON) {
+        if (type == POLYGON || type == MULTILINESTRING) {
             gen.writeStartArray();
             for(Geometry<P> c : ((Complex)geom).components()) {
                 writeLinear(gen, c, buf);
