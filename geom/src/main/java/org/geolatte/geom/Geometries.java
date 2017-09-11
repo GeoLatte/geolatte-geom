@@ -90,7 +90,19 @@ public class Geometries {
      * @return an empty {@code MultiLineString} with the specified coordinate reference system
      */
     public static <P extends Position> MultiLineString<P> mkEmptyMultiLineString(CoordinateReferenceSystem<P> crs) {
-        return new MultiLineString(crs);
+        return new MultiLineString<>(crs);
+    }
+
+
+    /**
+     * Creates an empty {@code MultiPolygon} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code MultiPolygon}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code MultiPolygon} with the specified coordinate reference system
+     */
+    public static <P extends Position> MultiPolygon<P> mkEmptyMultiPolygon(CoordinateReferenceSystem<P> crs) {
+        return new MultiPolygon<>(crs);
     }
 
     /**
@@ -244,4 +256,5 @@ public class Geometries {
         }
         throw new IllegalStateException("Unknown Geometry class");
     }
+
 }

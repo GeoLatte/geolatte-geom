@@ -77,12 +77,28 @@ public abstract class AbstractGeometryDeserializer<P extends Position, G extends
 
     protected LinearPositionsListHolder getCoordinatesArrayAsPolygonal(JsonNode root) throws GeoJsonProcessingException {
         JsonNode coordinates = root.get("coordinates");
+        return toLinearPositionsListHolder(coordinates);
+    }
+
+    protected LinearPositionsListHolder toLinearPositionsListHolder(JsonNode coordinates) throws GeoJsonProcessingException {
         if (!coordinates.isArray()) {
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
         LinearPositionsListHolder holder = new LinearPositionsListHolder();
         for( int i = 0; i < coordinates.size(); i++) {
             holder.push(toLinearPositionsHolder(coordinates.get(i)));
+        }
+        return holder;
+    }
+
+    protected PolygonListHolder getCoordinatesArrayAsPolygonList(JsonNode root) throws GeoJsonProcessingException {
+        JsonNode coordinates = root.get("coordinates");
+        if(!coordinates.isArray()) {
+            throw new GeoJsonProcessingException("Parser expects coordinate as array");
+        }
+        PolygonListHolder holder = new PolygonListHolder();
+        for(int i = 0; i < coordinates.size(); i++) {
+            holder.push(toLinearPositionsListHolder(coordinates.get(i)));
         }
         return holder;
     }

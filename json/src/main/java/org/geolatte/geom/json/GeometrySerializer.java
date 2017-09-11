@@ -54,12 +54,27 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
             writeLinear(gen, geom, buf);
         }
         if (type == POLYGON || type == MULTILINESTRING) {
-            gen.writeStartArray();
-            for(Geometry<P> c : ((Complex)geom).components()) {
-                writeLinear(gen, c, buf);
-            }
-            gen.writeEndArray();
+            writeListOfLinear(gen, (Complex) geom, buf);
         }
+        if(type == MULTIPOLYGON){
+            writeListOfPolygon(gen, (MultiPolygon) geom, buf);
+        }
+    }
+
+    private void writeListOfPolygon(JsonGenerator gen, MultiPolygon<P> geom, double[] buf) throws IOException {
+        gen.writeStartArray();
+        for(Polygon<P> c : geom.components()) {
+            writeListOfLinear(gen, c, buf);
+        }
+        gen.writeEndArray();
+    }
+
+    private void writeListOfLinear(JsonGenerator gen, Complex geom, double[] buf) throws IOException {
+        gen.writeStartArray();
+        for(Geometry<P> c : geom.components()) {
+            writeLinear(gen, c, buf);
+        }
+        gen.writeEndArray();
     }
 
     private void writeLinear(JsonGenerator gen, Geometry<P> geom, double[] buf) throws IOException {
