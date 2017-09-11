@@ -81,6 +81,18 @@ public class Geometries {
     public static <P extends Position> MultiPoint<P> mkEmptyMultiPoint(CoordinateReferenceSystem<P> crs) {
         return new MultiPoint<>(crs);
     }
+
+    /**
+     * Creates an empty {@code MultiLineString} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code MultiLineString}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code MultiLineString} with the specified coordinate reference system
+     */
+    public static <P extends Position> MultiLineString<P> mkEmptyMultiLineString(CoordinateReferenceSystem<P> crs) {
+        return new MultiLineString(crs);
+    }
+
     /**
      * Creates a {@code Point} from a Position and coordinate reference system
      *

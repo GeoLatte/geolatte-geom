@@ -356,10 +356,12 @@ public class DSL {
 
     }
 
+    @SuppressWarnings("unchecked")
     public static <P extends Position> MultiLineString<P> multilinestring(LineString<P> linestring, LineString<P>... linestrings) {
         return new MultiLineString<P>(combine(LineString.class, linestring, linestrings));
     }
 
+    @SuppressWarnings("unchecked")
     public static <P extends Position> MultiLineStringToken<P> multilinestring(LineStringToken<P>... tokens) {
         return new MultiLineStringToken<P>(tokens);
     }
@@ -375,10 +377,12 @@ public class DSL {
         return new MultiLineString<P>(linestrings);
     }
 
+    @SuppressWarnings("unchecked")
     public static <P extends Position> MultiPolygon<P> multipolygon(Polygon<P> polygon, Polygon<P>... polygons) {
         return new MultiPolygon<P>(combine(Polygon.class, polygon, polygons));
     }
 
+    @SuppressWarnings("unchecked")
     public static <P extends Position> MultiPolygonToken<P> multipolygon(PolygonToken<P>... tokens) {
         return new MultiPolygonToken<P>(tokens);
     }
