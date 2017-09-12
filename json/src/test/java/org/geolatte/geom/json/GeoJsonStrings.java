@@ -42,4 +42,8 @@ public class GeoJsonStrings {
     static String multiPolygon = "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[1.0,1.0],[1.0,2.0],[2.0,2.0],[2.0,1.0],[1.0,1.0]]],[[[3.0,3.0],[3.0,5.0],[5.0,5.0],[5.0,3.0],[3.0,3.0]]]]}";
     static String multiPolygonWithCrs = "{\"type\":\"MultiPolygon\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"coordinates\":[[[[1.0,1.0],[1.0,2.0],[2.0,2.0],[2.0,1.0],[1.0,1.0]]],[[[3.0,3.0],[3.0,5.0],[5.0,5.0],[5.0,3.0],[3.0,3.0]]]]}";
 
+    //
+    static String emptyGeometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[]}";
+    static String geometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1,1],[1,2]]},{\"type\":\"Point\",\"coordinates\":[5,6]}]}";
+    static String geometryCollectionWithCrs= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1,1],[1,2]]},{\"type\":\"Point\",\"coordinates\":[5,6]}]}";
 }

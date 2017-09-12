@@ -20,7 +20,7 @@ public class PolygonDeserializerTest extends GeoJsonTest {
     @Test
     public void testEmtpy() throws IOException {
         Polygon<?> rec = mapper.readValue(emptyPolygon, Polygon.class);
-        Polygon<?> exp = new Polygon(WGS84);
+        Polygon<?> exp = new Polygon<>(WGS84);
         assertEquals(exp, rec);
     }
 
