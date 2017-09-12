@@ -12,14 +12,18 @@ import java.io.IOException;
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
-public class LineStringDeserializer<P extends Position> extends AbstractGeometryDeserializer<P, LineString<P>> {
-    public LineStringDeserializer(Context context) {
+public class LineStringParser<P extends Position> extends AbstractGeometryParser<P, LineString<P>> {
+    public LineStringParser(Context context) {
         super(context);
     }
 
     @Override
-    public LineString<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode root = checkRoot(p);
+    public GeometryType forType() {
+        return GeometryType.LINESTRING;
+    }
+
+    @Override
+    public LineString<P> parse(JsonNode root) throws GeoJsonProcessingException {
         LinearPositionsHolder holder = getCoordinatesArrayAsLinear(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
@@ -29,11 +33,7 @@ public class LineStringDeserializer<P extends Position> extends AbstractGeometry
 
         PositionSequence<P> pos = holder.toPositionSequence(crs);
         return Geometries.mkLineString(pos, crs);
-
     }
 
-    @Override
-    public GeometryType forType() {
-        return GeometryType.LINESTRING;
-    }
+
 }

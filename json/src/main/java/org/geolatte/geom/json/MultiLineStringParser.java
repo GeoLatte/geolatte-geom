@@ -13,15 +13,19 @@ import java.util.List;
 /**
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.
  */
-public class MultiLineStringDeserializer<P extends Position> extends AbstractGeometryDeserializer<P, MultiLineString<P>> {
+public class MultiLineStringParser<P extends Position> extends AbstractGeometryParser<P, MultiLineString<P>> {
 
-    public MultiLineStringDeserializer(Context context) {
+    public MultiLineStringParser(Context context) {
         super(context);
     }
 
     @Override
-    public MultiLineString<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode root = checkRoot(p);
+    public GeometryType forType() {
+        return GeometryType.MULTILINESTRING;
+    }
+
+    @Override
+    public MultiLineString<P> parse(JsonNode root) throws GeoJsonProcessingException {
         LinearPositionsListHolder holder = getCoordinatesArrayAsPolygonal(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
@@ -31,12 +35,8 @@ public class MultiLineStringDeserializer<P extends Position> extends AbstractGeo
 
         List<LineString<P>> components = holder.toLineStrings(crs);
         return Geometries.mkMultiLineString(components);
-
     }
 
-    @Override
-    public GeometryType forType() {
-        return GeometryType.MULTILINESTRING;
-    }
+
 }
 

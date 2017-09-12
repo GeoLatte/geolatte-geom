@@ -31,12 +31,13 @@ public class GeolatteGeomModule extends SimpleModule {
         addSerializer(Geometry.class, new GeometrySerializer(ctxt)); //use raw to get this compiled
 
 //        addDeserializer(Geometry.class, new GeometryDeserializer<Geometry>(this, Geometry.class));
-        addDeserializer(Point.class, new PointDeserializer<>(ctxt));
-        addDeserializer(LineString.class, new LineStringDeserializer<>(ctxt));
-        addDeserializer(Polygon.class, new PolygonDeserializer<>(ctxt));
-        addDeserializer(MultiPoint.class, new MultiPointDeserializer<>(ctxt));
-        addDeserializer(MultiLineString.class, new MultiLineStringDeserializer<>(ctxt));
-        addDeserializer(MultiPolygon.class, new MultiPolygonDeserializer<>(ctxt));
+        addDeserializer(Point.class, new PointParser<>(ctxt));
+        addDeserializer(LineString.class, new LineStringParser<>(ctxt));
+        addDeserializer(Polygon.class, new PolygonParser<>(ctxt));
+        addDeserializer(MultiPoint.class, new MultiPointParser<>(ctxt));
+        addDeserializer(MultiLineString.class, new MultiLineStringParser<>(ctxt));
+        addDeserializer(MultiPolygon.class, new MultiPolygonParser<>(ctxt));
+        addDeserializer(GeometryCollection.class, new GeometryCollectionParser<>(ctxt));;
     }
 
     public void setFeature(Feature feature, boolean value) {

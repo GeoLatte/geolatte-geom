@@ -20,24 +20,23 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public abstract class AbstractGeometryDeserializer<P extends Position, G extends Geometry<P>> extends JsonDeserializer<G> {
+public abstract class AbstractGeometryParser<P extends Position, G extends Geometry<P>> extends JsonDeserializer<G>  {
     protected final Context<P> context;
 
-    public AbstractGeometryDeserializer(Context<P> context) {
+    public AbstractGeometryParser(Context<P> context) {
         this.context = context;
     }
 
-    @Override
-    public abstract G deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException;
-
-    protected JsonNode checkRoot(JsonParser p) throws IOException {
-        JsonNode root = getRoot(p);
-        GeometryType type = getType(root);
-        canHandle(type);
-        return root;
-    }
 
     public abstract GeometryType forType();
+
+    public abstract G parse(JsonNode root) throws GeoJsonProcessingException;
+
+
+    @Override
+    public G deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+        return parse(getRoot(p));
+    }
 
     protected JsonNode getRoot(JsonParser p) throws IOException {
         ObjectCodec oc = p.getCodec();

@@ -15,15 +15,19 @@ import java.io.IOException;
 /**
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.
  */
-public class MultiPolygonDeserializer<P extends Position> extends AbstractGeometryDeserializer<P, MultiPolygon<P>> {
+public class MultiPolygonParser<P extends Position> extends AbstractGeometryParser<P, MultiPolygon<P>> {
 
-    public MultiPolygonDeserializer(Context<P> ctxt) {
+    public MultiPolygonParser(Context<P> ctxt) {
         super(ctxt);
     }
 
     @Override
-    public MultiPolygon<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode root = checkRoot(p);
+    public GeometryType forType() {
+        return GeometryType.MULTIPOLYGON;
+    }
+
+    @Override
+    public MultiPolygon<P> parse(JsonNode root) throws GeoJsonProcessingException {
         PolygonListHolder holder = getCoordinatesArrayAsPolygonList(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
@@ -31,12 +35,6 @@ public class MultiPolygonDeserializer<P extends Position> extends AbstractGeomet
             return Geometries.mkEmptyMultiPolygon(crs);
         }
         return Geometries.mkMultiPolygon(holder.toPolygons(crs));
-    }
-
-
-    @Override
-    public GeometryType forType() {
-        return GeometryType.MULTIPOLYGON;
     }
 }
 

@@ -12,14 +12,18 @@ import java.io.IOException;
 /**
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.
  */
-public class MultiPointDeserializer<P extends Position> extends AbstractGeometryDeserializer<P, MultiPoint<P>> {
-    public MultiPointDeserializer(Context context) {
+public class MultiPointParser<P extends Position> extends AbstractGeometryParser<P, MultiPoint<P>> {
+    public MultiPointParser(Context context) {
         super(context);
     }
 
     @Override
-    public MultiPoint<P> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-        JsonNode root = checkRoot(p);
+    public GeometryType forType() {
+        return GeometryType.MULTIPOINT;
+    }
+
+    @Override
+    public MultiPoint<P> parse(JsonNode root) throws GeoJsonProcessingException {
         LinearPositionsHolder holder = getCoordinatesArrayAsLinear(root);
         CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
 
@@ -31,9 +35,5 @@ public class MultiPointDeserializer<P extends Position> extends AbstractGeometry
         return Geometries.mkMultiPoint(positions, crs);
     }
 
-    @Override
-    public GeometryType forType() {
-        return GeometryType.MULTIPOINT;
-    }
 
 }
