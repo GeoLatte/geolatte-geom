@@ -177,7 +177,7 @@ public class DSL {
      * @return a {@code Point} having the specified {@code Position} and {@code CoordinateReferenceSystem}
      */
     public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
-        return new Point<P>(p, crs);
+        return new Point<>(p, crs);
     }
 
     /**
@@ -232,11 +232,13 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return a {@code LinearRingToken} having the specified {@code Position}s
      */
+    @SafeVarargs
     public static <P extends Position> LinearRingToken<P> ring(P... positions) {
         return new LinearRingToken<P>(positions);
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     private static <P extends Position, G extends Geometry<P>> G[] combine(Class<G> resultType, G geometry, G... geometries) {
         Object[] allGeometries = (Object[]) Array.newInstance(resultType, geometries.length + 1);
         allGeometries[0] = geometry;
@@ -251,6 +253,8 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s.
      */
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
         return new GeometryCollection<P, Geometry<P>>(combine(Geometry.class, geometry, geometries));
     }
@@ -264,6 +268,7 @@ public class DSL {
      * @return the {@code GeometryCollection} of the specified constituent {@code Geometry}s and {@code CoordinateReferenceSystem}
      */
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
         if (tokens.length == 0) return new GeometryCollection<P, Geometry<P>>(crs);
         Geometry<P>[] parts = new Geometry[tokens.length];
@@ -281,6 +286,7 @@ public class DSL {
      * @param <P> the {@code Position} type
      * @return the {@code GeometryCollectionToken} of the specified constituent {@code GeometryToken}s
      */
+    @SafeVarargs
     public static <P extends Position> GeometryCollectionToken<P> geometrycollection(GeometryToken<P>... tokens) {
         return new GeometryCollectionToken<P>(tokens);
     }
@@ -294,6 +300,7 @@ public class DSL {
      * @return the {@code Polygon} defined by the specified outer and inner rings.
      */
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> Polygon<P> polygon(LinearRing<P> hull, LinearRing<P>... rings) {
         LinearRing<P>[] combined = combine(LinearRing.class, hull, rings);
         return new Polygon<P>(combined);
@@ -308,6 +315,7 @@ public class DSL {
      * @return the {@code Polygon} defined by the specified coordinate reference system and ring tokens
      */
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> Polygon<P> polygon(CoordinateReferenceSystem<P> crs, LinearRingToken<P>... tokens) {
         if (tokens.length == 0) {
             return new Polygon<P>(crs);
@@ -321,14 +329,18 @@ public class DSL {
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> PolygonToken<P> polygon(LinearRingToken<P>... tokens) {
         return new PolygonToken<P>(tokens);
     }
 
+    @SafeVarargs
+    @SuppressWarnings("unchecked")
     public static <P extends Position> MultiPoint<P> multipoint(Point<P> point, Point<P>... points) {
         return new MultiPoint<P>(combine(Point.class, point, points));
     }
 
+    @SafeVarargs
     public static <P extends Position> MultiPointToken<P> multipoint(PointToken<P>... tokens) {
         return new MultiPointToken<P>(tokens);
     }
@@ -337,12 +349,15 @@ public class DSL {
         return Geometries.mkEmptyMultiPoint(crs);
     }
 
+    @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, P... positions) {
         PositionSequence<P> ps = Positions.collect(crs.getPositionClass(), positions);
         return Geometries.mkMultiPoint(ps, crs);
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiPoint<P> multipoint(CoordinateReferenceSystem<P> crs, PointToken<P>... tokens) {
 
         if (tokens.length == 0) return new MultiPoint<P>(crs);
@@ -357,16 +372,19 @@ public class DSL {
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiLineString<P> multilinestring(LineString<P> linestring, LineString<P>... linestrings) {
         return new MultiLineString<P>(combine(LineString.class, linestring, linestrings));
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiLineStringToken<P> multilinestring(LineStringToken<P>... tokens) {
         return new MultiLineStringToken<P>(tokens);
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiLineString<P> multilinestring(CoordinateReferenceSystem<P> crs, LineStringToken<P>... tokens) {
         if (tokens.length == 0) return new MultiLineString<P>(crs);
         LineString<P>[] linestrings = new LineString[tokens.length];
@@ -378,16 +396,19 @@ public class DSL {
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiPolygon<P> multipolygon(Polygon<P> polygon, Polygon<P>... polygons) {
         return new MultiPolygon<P>(combine(Polygon.class, polygon, polygons));
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiPolygonToken<P> multipolygon(PolygonToken<P>... tokens) {
         return new MultiPolygonToken<P>(tokens);
     }
 
     @SuppressWarnings("unchecked")
+    @SafeVarargs
     public static <P extends Position> MultiPolygon<P> multipolygon(CoordinateReferenceSystem<P> crs, PolygonToken<P>... tokens) {
 
         if (tokens.length == 0) return new MultiPolygon<P>(crs);

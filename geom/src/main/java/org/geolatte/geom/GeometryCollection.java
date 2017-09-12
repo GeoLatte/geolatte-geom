@@ -44,6 +44,7 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
      *
      * @param geometries the <code>Geometry</code>s that are the elements of the constructed <code>GeometryCollection</code>.
      */
+    @SafeVarargs
     public GeometryCollection(G... geometries) {
         super(nestPositionSequences(geometries), getCrs(geometries));
         check(geometries);
@@ -81,6 +82,7 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
      * @return an array containing all component objects
      */
     @Override
+    @SuppressWarnings("unchecked")
     public G[] components() {
         return (G[]) Arrays.copyOf(this.geometries, this.geometries.length);
     }
