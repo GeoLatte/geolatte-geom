@@ -18,14 +18,9 @@ public class LineStringParser<P extends Position> extends AbstractGeometryParser
     }
 
     @Override
-    public GeometryType forType() {
-        return GeometryType.LINESTRING;
-    }
-
-    @Override
-    public LineString<P> parse(JsonNode root) throws GeoJsonProcessingException {
+    public LineString<P> parse(JsonNode root, CoordinateReferenceSystem<P> defaultCrs) throws GeoJsonProcessingException {
         LinearPositionsHolder holder = getCoordinatesArrayAsLinear(root);
-        CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
+        CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension(), defaultCrs);
 
         if (holder.isEmpty()) {
             return Geometries.mkEmptyLineString(crs);
@@ -34,6 +29,14 @@ public class LineStringParser<P extends Position> extends AbstractGeometryParser
         PositionSequence<P> pos = holder.toPositionSequence(crs);
         return Geometries.mkLineString(pos, crs);
     }
+
+    @Override
+    protected void canHandle(JsonNode root) throws GeoJsonProcessingException {
+        if (!getType(root).equals(GeometryType.LINESTRING)) {
+            throw new GeoJsonProcessingException(String.format("Can't parse %s with %s",  getType(root).getCamelCased(), getClass().getCanonicalName()));
+        }
+    }
+
 
 
 }

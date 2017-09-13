@@ -6,7 +6,9 @@ import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
@@ -20,34 +22,33 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public abstract class AbstractGeometryParser<P extends Position, G extends Geometry<P>> extends JsonDeserializer<G>  {
+public abstract class AbstractGeometryParser<P extends Position, G extends Geometry<P>> extends JsonDeserializer<G> {
     protected final Context<P> context;
 
     public AbstractGeometryParser(Context<P> context) {
         this.context = context;
     }
 
+    G parse(JsonNode root) throws GeoJsonProcessingException {
+        return parse(root, getDefaultCrs());
+    }
 
-    public abstract GeometryType forType();
-
-    public abstract G parse(JsonNode root) throws GeoJsonProcessingException;
-
+    public abstract G parse(JsonNode root, CoordinateReferenceSystem<P> crs) throws GeoJsonProcessingException;
 
     @Override
     public G deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
         return parse(getRoot(p));
     }
 
-    protected JsonNode getRoot(JsonParser p) throws IOException {
+    protected JsonNode getRoot(JsonParser p) throws IOException, GeoJsonProcessingException {
         ObjectCodec oc = p.getCodec();
-        return oc.readTree(p);
+        JsonNode root = oc.readTree(p);
+        canHandle(root);
+        return root;
     }
 
-    protected void canHandle(GeometryType type) throws GeoJsonProcessingException {
-        if (type != forType()) {
-            throw new GeoJsonProcessingException(String.format("Can't parse type %s with %s Deserializer", type, forType().toString()));
-        }
-    }
+
+    protected abstract void canHandle(JsonNode root) throws GeoJsonProcessingException;
 
     protected CoordinateReferenceSystem<P> getDefaultCrs() {
         return this.context.getDefaultCrs();
@@ -68,7 +69,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
         LinearPositionsHolder holder = new LinearPositionsHolder();
-        for( int i = 0; i < coordinates.size(); i++) {
+        for (int i = 0; i < coordinates.size(); i++) {
             holder.push(toSinglePositionCoordinatesHolder(coordinates.get(i)));
         }
         return holder;
@@ -84,7 +85,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
         LinearPositionsListHolder holder = new LinearPositionsListHolder();
-        for( int i = 0; i < coordinates.size(); i++) {
+        for (int i = 0; i < coordinates.size(); i++) {
             holder.push(toLinearPositionsHolder(coordinates.get(i)));
         }
         return holder;
@@ -92,11 +93,11 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
 
     protected PolygonListHolder getCoordinatesArrayAsPolygonList(JsonNode root) throws GeoJsonProcessingException {
         JsonNode coordinates = root.get("coordinates");
-        if(!coordinates.isArray()) {
+        if (!coordinates.isArray()) {
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
         PolygonListHolder holder = new PolygonListHolder();
-        for(int i = 0; i < coordinates.size(); i++) {
+        for (int i = 0; i < coordinates.size(); i++) {
             holder.push(toLinearPositionsListHolder(coordinates.get(i)));
         }
         return holder;
@@ -144,11 +145,11 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
     }
 
 
-
     @SuppressWarnings("unchecked")
-    protected CoordinateReferenceSystem<P> resolveCrs(JsonNode root, int coordinateDimension) throws GeoJsonProcessingException {
+    protected CoordinateReferenceSystem<P> resolveCrs(JsonNode root, int coordinateDimension, CoordinateReferenceSystem<P> defaultCrs)
+            throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
-        CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ? getDefaultCrs() :
+        CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ? defaultCrs :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
 
         int dimensionDifference = coordinateDimension - base.getCoordinateDimension();

@@ -8,8 +8,7 @@ import java.io.IOException;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import static org.geolatte.geom.json.GeoJsonStrings.emptyGeometryCollection;
-import static org.geolatte.geom.json.GeoJsonStrings.geometryCollection;
+import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -34,12 +33,25 @@ public class GeometryColllectionDeserializationTest extends GeoJsonTest {
         );
         assertEquals(expected, rec);
     }
-//
-//    @Test
-//    public void testDeserializeWithCRS() throws IOException {
-//        Polygon<?> rec = mapper.readValue(polygonWithCrs, Polygon.class);
-//        Polygon<?> expected = polygon(Crss.lambert72, ring(c(1, 1), c(1, 2), c(2, 2), c(2, 1), c(1, 1)));
-//        assertEquals(expected, rec);
-//    }
-//
+
+    @Test
+    public void testDeserializeWithCRS() throws IOException {
+        GeometryCollection<?, ?> rec = mapper.readValue(geometryCollectionWithCrs, GeometryCollection.class);
+        GeometryCollection<?, ?> expected = geometrycollection(
+                linestring(Crss.lambert72, c(1, 1), c(1, 2)),
+                point(Crss.lambert72, c(5, 6))
+        );
+        assertEquals(expected, rec);
+    }
+
+    @Test
+    public void testDeserializeWithCRS3D() throws IOException {
+        GeometryCollection<?, ?> rec = mapper.readValue(geometryCollectionWithCrs3D, GeometryCollection.class);
+        GeometryCollection<?, ?> expected = geometrycollection(Crss.lambert72Z,
+                linestring(c(1, 1,1), c(1, 2,3)),
+                point(c(5, 6,7))
+        );
+        assertEquals(expected, rec);
+    }
+
 }

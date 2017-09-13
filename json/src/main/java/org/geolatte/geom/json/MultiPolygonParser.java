@@ -22,19 +22,22 @@ public class MultiPolygonParser<P extends Position> extends AbstractGeometryPars
     }
 
     @Override
-    public GeometryType forType() {
-        return GeometryType.MULTIPOLYGON;
-    }
-
-    @Override
-    public MultiPolygon<P> parse(JsonNode root) throws GeoJsonProcessingException {
+    public MultiPolygon<P> parse(JsonNode root, CoordinateReferenceSystem<P> defaultCrs) throws GeoJsonProcessingException {
         PolygonListHolder holder = getCoordinatesArrayAsPolygonList(root);
-        CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension());
+        CoordinateReferenceSystem<P> crs = resolveCrs(root, holder.getCoordinateDimension(), defaultCrs);
 
         if (holder.isEmpty()) {
             return Geometries.mkEmptyMultiPolygon(crs);
         }
         return Geometries.mkMultiPolygon(holder.toPolygons(crs));
     }
+
+    @Override
+    protected void canHandle(JsonNode root) throws GeoJsonProcessingException {
+        if (!getType(root).equals(GeometryType.MULTIPOLYGON)) {
+            throw new GeoJsonProcessingException(String.format("Can't parse %s with %s",  getType(root).getCamelCased(), getClass().getCanonicalName()));
+        }
+    }
+
 }
 

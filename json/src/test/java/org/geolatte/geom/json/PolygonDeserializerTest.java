@@ -29,7 +29,6 @@ public class PolygonDeserializerTest extends GeoJsonTest {
     public void testDeserializeSimple() throws IOException {
         Polygon<?> rec = mapper.readValue(polygon, Polygon.class);
         Polygon<?> expected = polygon(WGS84, ring(g(1, 1), g(1, 2), g(2, 2), g(2, 1), g(1, 1)));
-
         assertEquals(expected, rec);
     }
 

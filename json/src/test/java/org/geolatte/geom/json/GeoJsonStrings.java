@@ -46,4 +46,5 @@ public class GeoJsonStrings {
     static String emptyGeometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[]}";
     static String geometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1,1],[1,2]]},{\"type\":\"Point\",\"coordinates\":[5,6]}]}";
     static String geometryCollectionWithCrs= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1,1],[1,2]]},{\"type\":\"Point\",\"coordinates\":[5,6]}]}";
+    static String geometryCollectionWithCrs3D= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1,1,1],[1,2,3]]},{\"type\":\"Point\",\"coordinates\":[5,6,7]}]}";
 }

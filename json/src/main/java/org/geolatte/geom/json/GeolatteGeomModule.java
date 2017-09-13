@@ -30,7 +30,7 @@ public class GeolatteGeomModule extends SimpleModule {
         Context<P> ctxt = new Context<>(defaultCrs, this.features);
         addSerializer(Geometry.class, new GeometrySerializer(ctxt)); //use raw to get this compiled
 
-//        addDeserializer(Geometry.class, new GeometryDeserializer<Geometry>(this, Geometry.class));
+        addDeserializer(Geometry.class, new GeometryParser<>(ctxt));
         addDeserializer(Point.class, new PointParser<>(ctxt));
         addDeserializer(LineString.class, new LineStringParser<>(ctxt));
         addDeserializer(Polygon.class, new PolygonParser<>(ctxt));
