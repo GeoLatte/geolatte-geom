@@ -93,7 +93,6 @@ public class Geometries {
         return new MultiLineString<>(crs);
     }
 
-
     /**
      * Creates an empty {@code MultiPolygon} for a coordinate reference system
      *
@@ -104,6 +103,19 @@ public class Geometries {
     public static <P extends Position> MultiPolygon<P> mkEmptyMultiPolygon(CoordinateReferenceSystem<P> crs) {
         return new MultiPolygon<>(crs);
     }
+
+
+    /**
+     * Creates an empty {@code GeometryCollection} for a coordinate reference system
+     *
+     * @param crs the coordinate reference system for the created {@code GeometryCollection}
+     * @param <P> the type of {@code Position}
+     * @return an empty {@code GeometryCollection} with the specified coordinate reference system
+     */
+    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkEmptyGeometryCollection(CoordinateReferenceSystem<P> crs) {
+        return new GeometryCollection<>(crs);
+    }
+
 
     /**
      * Creates a {@code Point} from a Position and coordinate reference system

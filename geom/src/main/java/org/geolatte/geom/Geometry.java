@@ -171,7 +171,9 @@ public abstract class Geometry<P extends Position> implements Serializable {
     }
 
     public Class<P> getPositionClass() {
-        return getPositions().getPositionClass();
+        return !getPositions().isEmpty() ?
+                getPositions().getPositionClass() :
+                this.crs.getPositionClass();
     }
 
     /**
