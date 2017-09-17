@@ -3,7 +3,6 @@ package org.geolatte.geom.json;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.*;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -111,7 +110,7 @@ public class PointDeserializationTest extends GeoJsonTest{
     @Test
     public void testDeserializeEmpptyPoint() throws IOException {
         Point<?> pnt = mapper.readValue(emptyPointText, Point.class);
-        Point<?> expected = new Point(WGS84);
+        Point<?> expected = new Point<>(WGS84);
         assertEquals(expected, pnt);
     }
 

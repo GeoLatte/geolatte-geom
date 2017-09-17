@@ -2,11 +2,11 @@ package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geolatte.geom.MultiPoint;
 import org.geolatte.geom.MultiPolygon;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
+import static org.geolatte.geom.builder.DSL.polygon;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.Crss.lambert72;
 import static org.geolatte.geom.json.Feature.SUPPRESS_CRS_SERIALIZATION;

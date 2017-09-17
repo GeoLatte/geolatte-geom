@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Point;
 import org.junit.Test;
 
-import static org.geolatte.geom.builder.DSL.c;
-import static org.geolatte.geom.builder.DSL.g;
-import static org.geolatte.geom.builder.DSL.point;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.Crss.lambert72Z;
 import static org.geolatte.geom.json.Crss.wgs3D;

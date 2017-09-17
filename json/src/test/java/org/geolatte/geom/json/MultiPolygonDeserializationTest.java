@@ -1,7 +1,6 @@
 package org.geolatte.geom.json;
 
 import org.geolatte.geom.MultiPolygon;
-import org.geolatte.geom.builder.DSL;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -11,7 +10,6 @@ import static org.geolatte.geom.builder.DSL.polygon;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.Crss.lambert72;
 import static org.geolatte.geom.json.GeoJsonStrings.*;
-import static org.geolatte.geom.json.GeoJsonStrings.polygon;
 import static org.junit.Assert.assertEquals;
 
 /**

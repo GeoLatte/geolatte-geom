@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Geometries;
@@ -8,12 +7,11 @@ import org.geolatte.geom.Polygon;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
-import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.polygon;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.Feature.SUPPRESS_CRS_SERIALIZATION;
-import static org.geolatte.geom.json.GeoJsonStrings.emptyPolygon;
+import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.geolatte.geom.json.GeoJsonStrings.polygon;
-import static org.geolatte.geom.json.GeoJsonStrings.polygonWithCrs;
 import static org.junit.Assert.assertEquals;
 
 /**

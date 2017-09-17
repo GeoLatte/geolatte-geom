@@ -31,12 +31,32 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
      */
     @Override
     public void serialize(Geometry<P> geometry, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        writeGeometry(gen, geometry, !context.isFeatureSet(Feature.SUPPRESS_CRS_SERIALIZATION));
+    }
+
+
+    private void writeGeometry(JsonGenerator gen, Geometry<P> geometry, boolean includeCrs) throws IOException {
         gen.writeStartObject();
         gen.writeStringField("type", geometry.getGeometryType().getCamelCased());
-        writeCrs(gen, geometry.getCoordinateReferenceSystem());
-        writeCoords(gen, geometry.getGeometryType(), geometry);
+        if(includeCrs) {
+            writeCrs(gen, geometry.getCoordinateReferenceSystem());
+        }
+        if (geometry.getGeometryType() != GEOMETRYCOLLECTION) {
+            writeCoords(gen, geometry.getGeometryType(), geometry);
+        } else {
+            GeometryCollection<P, Geometry<P>> gc = (GeometryCollection<P, Geometry<P>>) geometry;
+            writeGeometries(gen, gc.components());
+        }
         gen.writeEndObject();
+    }
 
+    private void writeGeometries(JsonGenerator gen, Geometry<P>[] geometries) throws IOException {
+        gen.writeFieldName("geometries");
+        gen.writeStartArray();
+        for(Geometry<P> g : geometries) {
+            writeGeometry(gen, g, false);
+        }
+        gen.writeEndArray();
     }
 
     private void writeCoords(JsonGenerator gen, GeometryType type, Geometry<P> geom) throws IOException {
@@ -92,9 +112,6 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
     }
 
     private void writeCrs(JsonGenerator gen, CoordinateReferenceSystem<P> crs) throws IOException {
-        if (context.isFeatureSet(Feature.SUPPRESS_CRS_SERIALIZATION)) {
-            return;
-        }
         gen.writeFieldName("crs");
         writeNamedCrs(gen, crs);
     }

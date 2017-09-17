@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiPoint;
 import org.junit.Test;
 

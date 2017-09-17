@@ -2,10 +2,7 @@ package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiLineString;
-import org.geolatte.geom.json.Crss;
-import org.geolatte.geom.json.GeoJsonTest;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;

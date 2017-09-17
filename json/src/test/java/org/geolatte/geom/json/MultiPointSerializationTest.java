@@ -2,7 +2,6 @@ package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiPoint;
 import org.junit.Test;
 
