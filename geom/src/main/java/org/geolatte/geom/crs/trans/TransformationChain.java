@@ -74,7 +74,7 @@ public class TransformationChain implements Transformation {
             return this;
         }
 
-        public Builder reverse(org.geolatte.geom.crs.trans.Transformation t) {
+        public Builder reverse(Transformation t) {
             transformations.add(new Step(t, Step.REVERSE));
             return this;
         }
@@ -84,7 +84,7 @@ public class TransformationChain implements Transformation {
         }
     }
 
-    private static class Step implements org.geolatte.geom.crs.trans.Transformation {
+    private static class Step implements Transformation {
 
         static final public int FORWARD = 1;
         static final public int REVERSE = 2;
