@@ -57,6 +57,20 @@ public class TestCrsId {
     }
 
     @Test
+    public void testParseURNSyntax() {
+        CrsId c = CrsId.valueOf("OGC", 26912);
+        assertEquals(c, CrsId.parse("urn:ogc:def:crs:OGC::26912"));
+    }
+
+
+    @Test
+    public void testtoUrn() {
+        CrsId c = CrsId.valueOf("OGC", 26912);
+        assertEquals("urn:ogc:def:crs:OGC::26912", c.toUrn());
+    }
+
+
+    @Test
     public void testValueOf(){
         assertEquals(CrsId.parse("epsg:4326"), CrsId.valueOf("EPSG", 4326));
         assertEquals(CrsId.parse("4326"), CrsId.valueOf(4326));

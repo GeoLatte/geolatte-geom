@@ -45,6 +45,8 @@ public class CrsId {
         authority = DEFAULT_AUTHORITY;
         if (tokens.length == 2) {
             authority = tokens[0];
+        } else if( tokens.length == 7) {
+            authority = tokens[4];
         }
         return valueOf(authority, code);
     }
@@ -125,6 +127,10 @@ public class CrsId {
     @Override
     public String toString() {
         return String.format("%S:%d", authority, code);
+    }
+
+    public String toUrn() {
+        return String.format("urn:ogc:def:crs:%s::%s", authority, code);
     }
 
     @Override
