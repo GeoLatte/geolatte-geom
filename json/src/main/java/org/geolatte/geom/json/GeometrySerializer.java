@@ -120,7 +120,11 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         gen.writeStartObject();
         gen.writeStringField("type", "name");
         gen.writeFieldName("properties");
-        writeCrsName(gen, crs.getCrsId().toString());
+        if (context.isFeatureSet(Feature.SERIALIZE_CRS_AS_URN)) {
+            writeCrsName(gen, crs.getCrsId().toUrn());
+        } else {
+            writeCrsName(gen, crs.getCrsId().toString());
+        }
         gen.writeEndObject();
     }
 

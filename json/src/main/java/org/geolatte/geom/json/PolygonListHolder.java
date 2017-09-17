@@ -1,6 +1,8 @@
 package org.geolatte.geom.json;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometries;
+import org.geolatte.geom.Polygon;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;

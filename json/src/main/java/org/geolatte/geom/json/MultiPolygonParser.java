@@ -1,16 +1,11 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.Geometries;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.MultiPolygon;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.

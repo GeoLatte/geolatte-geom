@@ -114,6 +114,15 @@ public class PointDeserializationTest extends GeoJsonTest{
         assertEquals(expected, pnt);
     }
 
+    @Test
+    public void testDeserializePointTextWithCrsURN() throws IOException {
+        TypeReference<Point<C2D>> typeRef = new TypeReference<Point<C2D>>() {
+        };
+        Point<C2D> pnt = mapper.readValue(pointTextWithUrnCrs, typeRef);
+        Point<C2D> expected = point(lambert72, c(1, 2));
+        assertEquals(expected, pnt);
+    }
+
 
 }
 

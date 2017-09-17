@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import static org.geolatte.geom.json.Crss.lambert72Z;
 import static org.geolatte.geom.json.Crss.lambert72ZM;
 import static org.geolatte.geom.json.GeoJsonStrings.multiLineString;
 import static org.geolatte.geom.json.GeoJsonStrings.pointTextWithCrs34D;

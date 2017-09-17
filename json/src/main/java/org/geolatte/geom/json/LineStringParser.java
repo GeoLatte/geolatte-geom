@@ -1,13 +1,8 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.

@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
