@@ -41,8 +41,8 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 class WktTokenizer extends AbstractWktTokenizer {
 
     private boolean isMeasured = false;
-    private final CoordinateReferenceSystem<?> baseCRS;
-    private final boolean forceToCRS;
+    protected final CoordinateReferenceSystem<?> baseCRS;
+    protected final boolean forceToCRS;
     private CoordinateReferenceSystem<?> targetCRS;
 
     /**

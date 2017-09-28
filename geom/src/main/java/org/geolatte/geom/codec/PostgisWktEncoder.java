@@ -204,14 +204,18 @@ class PostgisWktEncoder implements WktEncoder {
 
     private void addGeometryTag(Geometry geometry) {
         if (inGeometryCollection) {
-            builder.append(WKT_WORDS.wordFor(geometry, true));
+            builder.append(getWktWords().wordFor(geometry, true));
         } else {
-            builder.append(WKT_WORDS.wordFor(geometry, false));
+            builder.append(getWktWords().wordFor(geometry, false));
         }
     }
 
     private String result() {
         return builder.toString();
+    }
+    
+    protected PostgisWktVariant getWktWords() {
+    	return WKT_WORDS;
     }
 
 }

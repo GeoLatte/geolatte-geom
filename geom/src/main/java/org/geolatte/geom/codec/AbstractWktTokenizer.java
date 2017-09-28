@@ -121,7 +121,7 @@ abstract class AbstractWktTokenizer {
         }
     }
 
-    private WktToken readToken() {
+    protected WktToken readToken() {
         int endPos = this.currentPos;
         while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
             endPos++;
