@@ -13,6 +13,10 @@ class PointHolder extends Holder {
 
     final private double[] coordinates;
 
+    public PointHolder() {
+        this.coordinates = new double[0];
+    }
+
     public PointHolder(double[] coordinates) {
         this.coordinates = coordinates;
     }

@@ -20,7 +20,7 @@ public class LineStringSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeEmpty() throws JsonProcessingException {
 
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         LineString<?> ln = new LineString(WGS84);
         String rec = mapper.writeValueAsString(ln);
         assertEquals(emptyLineString,rec) ;
@@ -29,7 +29,7 @@ public class LineStringSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeSimple() throws JsonProcessingException {
 
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         LineString<?> ln = linestring(WGS84, g(1, 2), g(3, 4));
         String rec = mapper.writeValueAsString(ln);
         assertEquals(simpleLineString,rec) ;

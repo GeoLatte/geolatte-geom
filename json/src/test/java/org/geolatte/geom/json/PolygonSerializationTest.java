@@ -21,7 +21,7 @@ public class PolygonSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerializeEmpty() throws JsonProcessingException {
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         Polygon<?> p = Geometries.mkEmptyPolygon(WGS84);
         String rec = mapper.writeValueAsString(p);
         assertEquals(emptyPolygon, rec);
@@ -30,7 +30,7 @@ public class PolygonSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerializeSimple() throws JsonProcessingException {
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         Polygon<?> p = polygon(WGS84, ring(g(1, 1), g(1, 2), g(2, 2), g(2, 1), g(1, 1)));
         String rec = mapper.writeValueAsString(p);
         assertEquals(polygon, rec);

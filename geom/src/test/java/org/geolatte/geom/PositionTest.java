@@ -17,8 +17,8 @@ public class PositionTest {
                 new EllipsoidalCoordinateSystem2D(CoordinateSystemAxis.mkLatAxis(), CoordinateSystemAxis.mkLonAxis()));
 
         G2D pos = new G2D(5, 50);
-        double testLon = pos.getCoordinate(CoordinateSystemAxis.mkLonAxis(), crs);
-        double testLat = pos.getCoordinate(CoordinateSystemAxis.mkLatAxis(), crs);
+        double testLon = pos.getCoordinate(CoordinateSystemAxis.mkLonAxis());
+        double testLat = pos.getCoordinate(CoordinateSystemAxis.mkLatAxis());
         assertEquals(5, testLon, 0.00001);
         assertEquals(50, testLat, 0.0001);
 

@@ -56,7 +56,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
 
     protected PointHolder getCoordinatesArrayAsSinglePosition(JsonNode root) throws GeoJsonProcessingException {
         JsonNode coordinates = root.get("coordinates");
-        return toSinglePositionCoordinatesHolder(coordinates);
+        return toPointHolder(coordinates);
     }
 
     protected LinearPositionsHolder getCoordinatesArrayAsLinear(JsonNode root) throws GeoJsonProcessingException {
@@ -70,7 +70,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
         }
         LinearPositionsHolder holder = new LinearPositionsHolder();
         for (int i = 0; i < coordinates.size(); i++) {
-            holder.push(toSinglePositionCoordinatesHolder(coordinates.get(i)));
+            holder.push(toPointHolder(coordinates.get(i)));
         }
         return holder;
     }
@@ -103,15 +103,35 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
         return holder;
     }
 
-    protected PointHolder toSinglePositionCoordinatesHolder(JsonNode coordinates) throws GeoJsonProcessingException {
+    /**
+     * Reads the JSON array of numbers as a coordinate array.
+     *
+     * <p>
+     * We always assume that the coordinates are in normal order, consistent with RFC 7946. If a third coordinate value is provided, it will
+     * always be interpreted as elevation. A fourth coordinate value will always be interpreted as a measure value.
+     * </p>
+     *
+     * @param coordinates
+     * @return
+     * @throws GeoJsonProcessingException
+     */
+    protected PointHolder toPointHolder(JsonNode coordinates) throws GeoJsonProcessingException {
         if (!coordinates.isArray()) {
             throw new GeoJsonProcessingException("Parser expects coordinate as array");
         }
+
+        if (coordinates.size() == 0) {
+            return new PointHolder();
+        }
+
         int coDim = (context.isFeatureSet(Feature.FORCE_DEFAULT_CRS_DIMENSION)) ?
                 getDefaultCrs().getCoordinateDimension() :
                 coordinates.size();
 
+        if (coDim < 2) throw new GeoJsonProcessingException("Need at least 2 coordinate values in array");
+
         double[] co = new double[coDim];
+
         for (int i = 0; i < coordinates.size() && i < coDim; i++) {
             co[i] = coordinates.get(i).asDouble();
         }
@@ -149,7 +169,8 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
     protected CoordinateReferenceSystem<P> resolveCrs(JsonNode root, int coordinateDimension, CoordinateReferenceSystem<P> defaultCrs)
             throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
-        CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ? defaultCrs :
+        CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ||
+                context.isFeatureSet( Feature.FORCE_DEFAULT_CRS_DIMENSION ) ? defaultCrs :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
 
         int dimensionDifference = coordinateDimension - base.getCoordinateDimension();

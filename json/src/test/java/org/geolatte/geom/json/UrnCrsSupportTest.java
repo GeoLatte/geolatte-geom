@@ -20,7 +20,7 @@ public class UrnCrsSupportTest extends GeoJsonTest {
     @Test
     public void testSrializePointWithCrsInUrnFormat() throws IOException {
 
-        ObjectMapper mapper = createMapperWithFeature(Feature.SERIALIZE_CRS_AS_URN, true);
+        ObjectMapper mapper = createMapper(Feature.SERIALIZE_CRS_AS_URN, true);
         Point<?> pnt = point(lambert72, c(1, 2));
         assertEquals(pointTextWithUrnCrs, mapper.writeValueAsString(pnt));
     }

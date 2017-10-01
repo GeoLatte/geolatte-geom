@@ -22,7 +22,7 @@ public class PointSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeEmptyPoint() throws JsonProcessingException {
         Point<?> pnt = new Point(WGS84);
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
         assertEquals(emptyPointText, rec);
     }
@@ -30,7 +30,7 @@ public class PointSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeSimplePoint() throws JsonProcessingException {
         Point<?> pnt = point(WGS84, g(1, 2));
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
         assertEquals(GeoJsonStrings.pointText, rec);
     }
@@ -38,7 +38,7 @@ public class PointSerializationTest extends GeoJsonTest {
     @Test
     public void testSerializeSimplePoint3D() throws JsonProcessingException {
         Point<?> pnt = point(wgs3D, g(1, 2, 3));
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
         assertEquals(GeoJsonStrings.pointText3D, rec);
     }

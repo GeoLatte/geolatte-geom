@@ -123,6 +123,14 @@ public class PointDeserializationTest extends GeoJsonTest{
         assertEquals(expected, pnt);
     }
 
+    @Test
+    public void testForce3DMTo2DMPoint() throws IOException {
+        ObjectMapper mapper = createMapper(wgs2DM, Feature.FORCE_DEFAULT_CRS_DIMENSION, true);
+        Point<?> pnt = mapper.readValue(pointTextWithCrs3D, Point.class);
+        Point<?> expected = point(wgs2DM, gM(1, 2, 3.0));
+        assertEquals(expected, pnt);
+    }
+
 
 }
 

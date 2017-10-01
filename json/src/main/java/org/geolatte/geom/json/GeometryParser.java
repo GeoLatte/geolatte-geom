@@ -50,7 +50,7 @@ public class GeometryParser<P extends Position> extends AbstractGeometryParser<P
     public void resolve(DeserializationContext ctxt) throws JsonMappingException {
         for ( Map.Entry<GeometryType, Class<?>> kv : typeMap.entrySet()) {
             JavaType jtpe = ctxt.constructType(kv.getValue());
-            parsers.put(kv.getKey(), (AbstractGeometryParser<?,?>)ctxt.findRootValueDeserializer(jtpe));
+            parsers.put(kv.getKey(), (AbstractGeometryParser)ctxt.findRootValueDeserializer(jtpe));
         }
     }
 }

@@ -12,12 +12,12 @@ class Features {
 
     public boolean isFeatureSet(Feature feature) {
         Boolean override = overrides.get(feature);
-        return  override == null ? feature.isSetByDefault : override;
+        return  override == null ? feature.isSetByDefault() : override;
     }
 
 
     public void override(Feature feature, boolean value) {
-        if(feature.isSetByDefault != value) {
+        if(feature.isSetByDefault() != value) {
             overrides.put(feature, value);
         }
     }

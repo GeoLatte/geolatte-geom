@@ -87,14 +87,23 @@ abstract public class Position{
     /**
      * Gets the coordinate value for the specified axis
      *
+     *
      * @param axis the CoordinateSystemAxis for which to get the coordinate
      * @return the coordinate value for the specified axis
      * @throws IllegalArgumentException if the specified axis is not present in the {@code CoordinateReferenceSystem}
      *                                  of this instance
+     *
+     * @Deprecated Use {@code getCoordinate(CoordinateSystemAxis axis)}
+     *
      */
+    @Deprecated
     public double getCoordinate(CoordinateSystemAxis axis, CoordinateReferenceSystem<?> crs) {
         int idx = crs.getAxisIndex(axis);
         if (idx == -1) throw new IllegalArgumentException("Not an axis of this coordinate reference system.");
+        return getCoordinate(axis.getNormalOrder());
+    }
+
+    public double getCoordinate(CoordinateSystemAxis axis) {
         return getCoordinate(axis.getNormalOrder());
     }
 

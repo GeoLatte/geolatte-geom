@@ -18,7 +18,7 @@ public class GeometryCollectionSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerializeEmpty() throws JsonProcessingException {
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         GeometryCollection<?, ?> geom = new GeometryCollection<>(WGS84);
         String rec = mapper.writeValueAsString(geom);
         assertEquals(emptyGeometryCollection, rec);
@@ -27,7 +27,7 @@ public class GeometryCollectionSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerializeSimple() throws JsonProcessingException {
-        ObjectMapper mapper = createMapperWithFeature(SUPPRESS_CRS_SERIALIZATION, true);
+        ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         GeometryCollection<?, ?> geom = geometrycollection(
                 linestring(WGS84, g(1, 1), g(1, 2)),
                 point(WGS84, g(5, 6))
