@@ -22,6 +22,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CrsId;
 
 /**
  * The HANA EWKT representation differs from the Postgis EWKT representation in that HANA always requires an SRID to be
@@ -44,7 +45,7 @@ class HANAWktEncoder extends PostgisWktEncoder {
 			StringBuilder sb = new StringBuilder( wkt.length() + 16 );
 			sb.append( "SRID=" );
 			// Write the SRID, the HANA default SRID is 0
-			if ( geometry.getSRID() < 0 ) {
+			if ( geometry.getSRID() == CrsId.UNDEFINED.getCode() ) {
 				sb.append( 0 );
 			}
 			else {
