@@ -14,35 +14,34 @@
  *     You should have received a copy of the GNU Lesser General Public License
  *     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Copyright (C) 2010 - 2017 and Ownership of code is shared by:
+ * Copyright (C) 2010 - 2011 and Ownership of code is shared by:
  * Qmino bvba - Romeinsestraat 18 - 3001 Heverlee  (http://www.qmino.com)
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
+
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.GeometryType;
+
 /**
- * The HANA EWKT decoder is a variant of the Postgis EWKT decoder. The differences are that it uses a different
- * tokenizer and a different set of keywords.
- * 
+ * The HANA <code>WktGeometryToken</code> for the type of geometry.
+ *
  * @author Jonathan Bregler, SAP
  */
-class HANAWktDecoder extends PostgisWktDecoder {
+class HANAWktGeometryToken extends WktGeometryToken {
 
-	private final static HANAWktVariant WKT_GEOM_TOKENS = new HANAWktVariant();
+	private final boolean is3D;
 
-	public HANAWktDecoder() {
-		super( WKT_GEOM_TOKENS );
+	public HANAWktGeometryToken(String word, GeometryType tag, boolean measured, boolean is3D) {
+		super( word, tag, measured );
+		this.is3D = is3D;
 	}
 
-	@Override
-	protected void setTokenizer(AbstractWktTokenizer tokenizer) {
-		if ( tokenizer instanceof WktTokenizer ) {
-			WktTokenizer wktTokenizer = (WktTokenizer) tokenizer;
-			super.setTokenizer( new HANAWktTokenizer( wktTokenizer.wkt, WKT_GEOM_TOKENS, wktTokenizer.baseCRS, wktTokenizer.forceToCRS ) );
-		}
-		else {
-			throw new IllegalArgumentException( "The tokenizer must be an instance of " + WktTokenizer.class.getName() );
-		}
+	public boolean is3D() {
+		return is3D;
+	}
 
+	public String toString() {
+		return getType() + ( is3D() || isMeasured() ? " " : "" ) + ( is3D() ? "Z" : "" ) + ( isMeasured() ? "M" : "" );
 	}
 }

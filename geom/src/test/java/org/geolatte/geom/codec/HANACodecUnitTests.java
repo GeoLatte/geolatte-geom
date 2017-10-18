@@ -26,8 +26,8 @@ import static junit.framework.Assert.assertEquals;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+import org.geolatte.geom.support.HANAJDBCUnitTestInputs;
+import org.geolatte.geom.support.HANAJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.WktWkbCodecTestBase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
 
 	static final private Logger LOGGER = LoggerFactory.getLogger(HANACodecUnitTests.class);
 
-	PostgisJDBCWithSRIDTestInputs testCases = new PostgisJDBCWithSRIDTestInputs();
+	HANAJDBCWithSRIDTestInputs testCases = new HANAJDBCWithSRIDTestInputs();
 	WktDecoder wktDecoder = Wkt.newDecoder(Wkt.Dialect.HANA_EWKT);
 	WktEncoder wktEncoder = Wkt.newEncoder(Wkt.Dialect.HANA_EWKT);
 	WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.HANA_EWKB);
@@ -50,7 +50,7 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
 	
     @Test
     public void test_wkt_codec_without_srid() {
-    	PostgisJDBCUnitTestInputs testCases = new PostgisJDBCUnitTestInputs();
+    	HANAJDBCUnitTestInputs testCases = new HANAJDBCUnitTestInputs();
         for (Integer testCase : testCases.getCases()) {
             String wkt = addSRID(testCases.getWKT(testCase));
             Geometry geom = getWktDecoder().decode(wkt);
@@ -63,7 +63,7 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
 
     @Test
     public void test_wkb_codec_without_srid() {
-    	PostgisJDBCUnitTestInputs testCases = new PostgisJDBCUnitTestInputs();
+    	HANAJDBCUnitTestInputs testCases = new HANAJDBCUnitTestInputs();
         for (Integer testCase : testCases.getCases()) {
             ByteBuffer wkb = addSRID(testCases.getWKB(testCase));
             Geometry geom = getWkbDecoder().decode(wkb);

@@ -37,7 +37,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
  */
 class PostgisWktVariant extends WktVariant {
 
-    private static final WktEmptyGeometryToken EMPTY = new WktEmptyGeometryToken();
+    protected static final WktEmptyGeometryToken EMPTY = new WktEmptyGeometryToken();
 
     private final static List<WktGeometryToken> GEOMETRIES = new ArrayList<WktGeometryToken>();
 
@@ -99,7 +99,7 @@ class PostgisWktVariant extends WktVariant {
         return EMPTY;
     }
 
-    private boolean sameGeometryType(WktGeometryToken token, Geometry geometry) {
+    protected boolean sameGeometryType(WktGeometryToken token, Geometry geometry) {
         //TODO Need better handling for difference WKT/Geometry types. See comment above .
         return token.getType() == geometry.getGeometryType() ||
                 (token.getType().equals(GeometryType.LINESTRING) &&

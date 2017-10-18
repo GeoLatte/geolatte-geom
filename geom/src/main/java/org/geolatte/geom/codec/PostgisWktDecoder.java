@@ -51,6 +51,10 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
     public PostgisWktDecoder() {
         super(WKT_GEOM_TOKENS);
     }
+    
+    protected PostgisWktDecoder(WktVariant wktVariant) {
+        super(wktVariant);
+    }
 
 
     public Geometry<?> decode(String wkt) {
