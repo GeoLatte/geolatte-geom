@@ -99,7 +99,7 @@ public class JTS {
      * @throws NoSuchElementException   when no corresponding class can be found.
      */
     static Class<? extends org.geolatte.geom.Geometry> getCorrespondingGeolatteClass(Class<? extends Geometry>
-                                                                                                    jtsGeometryClass) {
+                                                                                             jtsGeometryClass) {
         if (jtsGeometryClass == null) throw new IllegalArgumentException("Null argument not allowed.");
         Class<? extends org.geolatte.geom.Geometry> corresponding = JTS2GLClassMap.get(jtsGeometryClass);
         if (corresponding == null) {
@@ -127,6 +127,14 @@ public class JTS {
         if (is3D) {
             crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
         }
+
+        // to translate measure, add Measure as LinearSystem
+        boolean hasM = testCo instanceof DimensionalCoordinate
+                && !Double.isNaN(((DimensionalCoordinate)testCo).m);
+        if (hasM) {
+            crs = CoordinateReferenceSystems.addLinearSystem(crs, LinearUnit.METER);
+        }
+
         return from(jtsGeometry, crs);
     }
 

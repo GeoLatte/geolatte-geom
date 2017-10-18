@@ -25,7 +25,10 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.Measured;
 import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
@@ -81,6 +84,9 @@ public class TestJTS {
         Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
+
+        Geometry<?> geom2 = JTS.from(jtsGeometry);
+        checkCoordinateDimension(geom2, 4, true);
     }
 
     @Test
@@ -92,6 +98,9 @@ public class TestJTS {
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
         assertTrue(Double.isNaN(dc.getZ()));
+
+        Geometry<?> geom2 = JTS.from(jtsGeometry);
+        checkCoordinateDimension(geom2, 3, true);
     }
 
     @Test
@@ -218,5 +227,25 @@ public class TestJTS {
         return jtsGeom;
     }
 
+    private void checkCoordinateDimension(Geometry<?> glGeom1, int expectedDimensions, boolean expectedMeasure) {
 
+        System.out.println(glGeom1);
+        System.out.println(glGeom1.getCoordinateDimension());
+        Assert.assertEquals("wrong CoordinateDimension", expectedDimensions, glGeom1.getCoordinateDimension());
+
+        Position pos = glGeom1.getPositionN(0);
+        Assert.assertEquals("wrong CoordinateDimension", expectedDimensions, pos.getCoordinateDimension());
+
+        boolean hasMeasure = (pos instanceof Measured);
+        Assert.assertEquals("wrong hasMeasure", expectedMeasure, hasMeasure);
+
+        PositionSequence<?> positionSequence = glGeom1.getPositions();
+        for (Position position : positionSequence) {
+            for (int i = 0; i < expectedDimensions; i++) {
+                final double coordinateN = position.getCoordinate(i);
+                final boolean isNaN = Double.isNaN(coordinateN);
+                Assert.assertFalse("missing value for idx " + i, isNaN);
+            }
+        }
+    }
 }
