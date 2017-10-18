@@ -20,6 +20,11 @@
     <packaging>pom</packaging>
     <version>1.2.0</version>
 
+	<description>
+		This geoLatte-geom project contains modules for working with geometries.
+	</description>
+	<url>https://github.com/geolatte/geolatte-geom</url>
+
 	<modules>
 		<module>geom</module>
 		<module>json</module>
@@ -32,7 +37,6 @@
 	</organization>
 
 	<properties>
-        <project.version>1.2.0-SNAPSHOT</project.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>

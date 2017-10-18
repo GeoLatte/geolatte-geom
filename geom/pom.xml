@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>org.geolatte</groupId>
 		<artifactId>geolatte</artifactId>
-		<version>1.2.0/version>
+		<version>1.2.0</version>
 	</parent>
     <artifactId>geolatte-geom</artifactId>
     <name>geolatte-geom</name>
@@ -28,7 +28,7 @@
         This geoLatte-geom library offers a geometry model that conforms to the OGC Simple Features for SQL
         specification.
     </description>
-	<url>http://www.geolatte.org/confluence/display/geom</url>
+	<url>https://github.com/geolatte/geolatte-geom</url>
 
 
 	<dependencies>
