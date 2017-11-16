@@ -492,4 +492,29 @@ public class GeogratTests {
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Point);
 	}
+	
+	@Test
+	public void testOracleRectangle() {
+		SDOGeometry sdo = SDOGeometryHelper.sdoGeometry(3003, 0, null, new int[] { 1, 1003, 3 },
+				new Double[] { 3559406.367, 5331451.466, 0.0, 3559407.369, 5331454.681, 0.0 });
+		@SuppressWarnings("unchecked")
+		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		Assert.assertTrue(jtsGeo.isValid());
+		Assert.assertTrue(jtsGeo instanceof Polygon);
+		Assert.assertTrue(jtsGeo.isRectangle());
+		Assert.assertEquals(JTS.JTS_USER_OBJECT_ORACLE_RECTANGLE, jtsGeo.getUserData());
+	}
+
+	@Test
+	public void testOraclePolygonContainingNotOnlyRectangle() {
+		SDOGeometry sdo = SDOGeometryHelper.sdoGeometry(2003, 0, null, new int[] { 1, 1003, 1, 19, 2003, 3 },
+				new Double[] { 2.0, 4.0, 4.0, 3.0, 10.0, 3.0, 13.0, 5.0, 13.0, 9.0, 11.0, 13.0, 5.0, 13.0, 2.0, 11.0,
+						2.0, 4.0, 7.0, 5.0, 10.0, 10.0 });
+		@SuppressWarnings("unchecked")
+		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		Assert.assertTrue(jtsGeo.isValid());
+		Assert.assertTrue(jtsGeo instanceof Polygon);
+		Assert.assertFalse(jtsGeo.isRectangle());
+		Assert.assertNull(jtsGeo.getUserData());
+	}
 }
