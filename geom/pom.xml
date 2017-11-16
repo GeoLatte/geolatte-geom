@@ -71,10 +71,11 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Commons collection as specified in original pom is broken for us -->
 		<dependency>
-			<groupId>org.apache.directory.studio</groupId>
-			<artifactId>org.apache.commons.collections</artifactId>
-			<version>3.2.1</version>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2</version>
 			<scope>test</scope>
 		</dependency>
 
