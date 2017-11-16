@@ -86,7 +86,11 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
             buffer[componentIdx] = oordinates[posIdx * dim + componentIdx]; //y
             if (zDim > 0) {
                 componentIdx++;
-                buffer[componentIdx] = oordinates[posIdx * dim + zDim];
+                /*
+                 * Z ordinate can be null! This is valid in ORACLE, but leads to an NPE because of autoboxing.
+                 */
+                Double zOrdinate = oordinates[posIdx * dim + zDim];
+                buffer[componentIdx] = zOrdinate == null ? Double.NaN : zOrdinate;
             }
             if (lrsDim > 0) {
                 componentIdx++;
