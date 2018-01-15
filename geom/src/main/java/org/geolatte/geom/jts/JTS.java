@@ -45,12 +45,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JTS {
 
-	/**
-	 * Set as value in {@link Geometry#setUserData(Object)} if geometry to convert to JTS is of type
-	 * {@link PolygonEnvelope}.
-	 */
-	public static final String JTS_USER_OBJECT_ORACLE_RECTANGLE = "oracleRectangle";
-	
     private static final PointSequenceCoordinateSequenceFactory pscsFactory = new
             PointSequenceCoordinateSequenceFactory();
 
@@ -389,15 +383,7 @@ public class JTS {
         for (int i = 0; i < holes.length; i++) {
             holes[i] = to(polygon.getInteriorRingN(i), gFact);
         }
-        final Polygon jtsPolygon = gFact.createPolygon(shell, holes);
-        
-        /*
-         * Save to user data if it was original stored as rectangle.
-         */
-        if (polygon instanceof PolygonEnvelope) {
-			jtsPolygon.setUserData(JTS_USER_OBJECT_ORACLE_RECTANGLE);
-		}
-        return jtsPolygon;
+        return gFact.createPolygon(shell, holes);
     }
 
     private static <P extends Position> Point to(org.geolatte.geom.Point<P> point, GeometryFactory gFact) {
