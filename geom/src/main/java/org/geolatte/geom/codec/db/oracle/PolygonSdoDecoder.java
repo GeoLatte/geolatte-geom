@@ -3,6 +3,7 @@ package org.geolatte.geom.codec.db.oracle;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.LinearRing;
 import org.geolatte.geom.Polygon;
+import org.geolatte.geom.PolygonEnvelope;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -42,7 +43,15 @@ public class PolygonSdoDecoder extends AbstractSDODecoder {
             }
             i += 1 + numCompounds;
         }
-        return new Polygon(rings);
+		/*
+		 * In a very special case implementor needs to know that a polygon just
+		 * represents a rectangle.
+		 */
+		if (info.getSize() == 1 && info.getElementType(0).isRect()) {
+			return new PolygonEnvelope(rings);
+		} else {
+			return new Polygon(rings);
+		}
 
     }
 }
