@@ -5,3 +5,7 @@ atlassian-ide-plugin.xml
 *.iws
 target
 javadoc/*
+**/.classpath
+**/.project
+**/.settings
+**/bin

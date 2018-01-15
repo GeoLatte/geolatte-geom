@@ -58,13 +58,16 @@ public class CircularArcLinearizer<P extends Position> {
         AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
         builder.add(p1);
         //TODO -- I'm not sure whether this actually works if the circle defined by the 3 positions is in clockwise direction
-        AddPointsBetweenPolarCoordinates(theta1, theta0 + 2 * Math.PI, p1, p0, angleIncr, builder);
+//        AddPointsBetweenPolarCoordinates(theta1, theta0 + 2 * Math.PI, p1, p0, angleIncr, builder, true);
+        AddPointsBetweenPolarCoordinates(theta1, theta0, p1, p0, angleIncr, builder);
         builder.add(p0);
         return builder.toPositionSequence();
     }
 
     /**
-     * Linearizes the arc segment defined by the three {@code Position}s specified in this instance's constructor
+     * Linearizes the arc segment defined by the three {@code Position}s specified in this instance's constructor.<br>
+     * Compared to {@link #linearizeCircle()} this is not using normalized direction angels, as direction of arc 
+     * will be lost in this case (Does not matter if working with a circle).
      *
      * @return a PositionSequence that approximates the arc segment
      */
@@ -86,12 +89,22 @@ public class CircularArcLinearizer<P extends Position> {
 
         //now we "walk" from theta, over theta1 to theta2 (or inversely)
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
-        builder.add(p0);
-        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
-        builder.add(p1);
-        AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
-        builder.add(p2);
-        return builder.toPositionSequence();
+        if (isCounterClockwise) {
+	        builder.add(p0);
+	        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
+	        builder.add(p1);
+	        AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
+	        builder.add(p2);
+	        return builder.toPositionSequence();
+        } else {
+        	// If clockwise, we have to do it reverse
+        	builder.add(p2);
+        	AddPointsBetweenPolarCoordinates(theta2, theta1, p2, p1, angleIncr, builder);
+        	builder.add(p1);
+        	AddPointsBetweenPolarCoordinates(theta1, theta0, p1, p0, angleIncr, builder);
+        	builder.add(p0);
+        	return builder.toPositionSequence().reverse();
+        }
 
     }
 
@@ -101,19 +114,26 @@ public class CircularArcLinearizer<P extends Position> {
                                                   PositionSequenceBuilder<P> builder) {
         int dim = p.getCoordinateDimension();
 
+        
+        // If working with arcs, we have to normalize theta1 that it always bigger than theta
+        // This is needed for computing steps only and only if arcs have not been normalized yet.
+        double normalizedTheta1 = theta1;
+	    while(normalizedTheta1 < theta) {
+	       	normalizedTheta1 += 2.0 * Math.PI;
+	    }
         //first a number of steps and angleIncrement such that we go in equal increment steps from theta to theta1
-        int steps = (int) Math.ceil(Math.abs(theta1 - theta) / maxAngleIncr);
-        double angleIncr = Math.abs(theta1 - theta) / (double) steps;
-
+        int steps = (int) Math.ceil(Math.abs(normalizedTheta1 - theta) / maxAngleIncr);
+        double angleIncr = Math.abs(normalizedTheta1 - theta) / (double) steps;
+        
         //determine increments for Z and M dimensions:
         double[] incr = new double[dim - 2];
         for (int i = 0; i < incr.length; i++) {
             incr[i] = (p1.getCoordinate(2 + i) - p.getCoordinate(2 + i)) / steps;
         }
 
-        //now find direction:
-        double sign = theta < theta1 ? 1d : -1d;
-
+        //now find direction (but only if working with normalized angles).
+        double sign = 1.0;
+        
         // we initialize the higher dimensions
         double[] buf = new double[dim];
         for (int i = 0; i < incr.length; i++) {
@@ -135,17 +155,13 @@ public class CircularArcLinearizer<P extends Position> {
     }
 
     //atan2 give the angular coordinate theta of the polar coordinates (r, theta)
-    //the angular coordinate ranges between -PI and PI, but to define the circular segment, we
-    //should normalize to [0 ,2*PI] if counterclockwise, and [0, -2*PI] if clockwise
+    //the angular coordinate ranges between -PI and PI.
     private double angleInDirection(Position p) {
         double x = (p.getCoordinate(0) - c.x);
         double y = (p.getCoordinate(1) - c.y);
-        double theta = atan2(y, x);
-        if (isCounterClockwise) {
-            return (theta >= 0) ? theta : 2 * Math.PI + theta;
-        } else {
-            return (theta <= 0) ? theta : theta - 2 * Math.PI;
-        }
+        return atan2(y, x);
     }
 
+
+    
 }
