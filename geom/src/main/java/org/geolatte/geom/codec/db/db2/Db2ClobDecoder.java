@@ -16,10 +16,21 @@ import java.sql.SQLException;
  */
 public class Db2ClobDecoder implements Decoder<Clob> {
 
+	final private Integer srid;
+
+	/**
+	 * The EPSG code that will be prepended before decoding.
+	 *
+	 * @param srid
+	 */
+	public Db2ClobDecoder(Integer srid) {
+		this.srid = srid;
+	}
+
     @Override
     public Geometry<?> decode(Clob clob) {
         String wkt = clobToString(clob);
-        return Wkt.fromWkt(wkt);
+        return Wkt.fromWkt(String.format("SRID=%d;%s", srid, wkt));
     }
 
     @Override
