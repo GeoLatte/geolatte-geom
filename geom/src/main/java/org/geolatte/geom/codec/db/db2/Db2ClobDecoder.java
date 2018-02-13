@@ -30,7 +30,12 @@ public class Db2ClobDecoder implements Decoder<Clob> {
     @Override
     public Geometry<?> decode(Clob clob) {
         String wkt = clobToString(clob);
-        return Wkt.fromWkt(String.format("SRID=%d;%s", srid, wkt));
+        if (wkt.substring(0,4).toUpperCase().startsWith("SRID")) {
+            return Wkt.fromWkt(wkt);
+        } else {
+        	return Wkt.fromWkt(String.format("SRID=%d;%s", srid, wkt));
+        }
+        
     }
 
     @Override

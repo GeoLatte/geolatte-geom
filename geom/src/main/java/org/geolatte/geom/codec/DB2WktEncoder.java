@@ -10,7 +10,7 @@ public class DB2WktEncoder extends PostgisWktEncoder {
 
 
     protected boolean skipSrid(){
-        return true;
+        return false;
     }
 
 
