@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.Wkt;
+import org.geolatte.geom.codec.WktDecoder;
 import org.geolatte.geom.codec.db.Decoder;
 
 /**
@@ -35,11 +36,12 @@ public class Db2ClobDecoder implements Decoder<Clob> {
 	@Override
 	public Geometry<?> decode(Clob clob) {
 		String wkt = clobToString( clob );
+		WktDecoder decoder = Wkt.newDecoder( Wkt.Dialect.DB2_WKT );
 		if ( wkt.substring( 0, 4 ).toUpperCase().startsWith( "SRID" ) ) {
-			return Wkt.fromWkt( wkt );
+			return decoder.decode( wkt );
 		}
 		else {
-			return Wkt.fromWkt( String.format( "SRID=%d;%s", srid, wkt ) );
+			return decoder.decode( String.format( "SRID=%d;%s", srid, wkt ) );
 		}
 
 	}

@@ -55,10 +55,11 @@ public class Wkt {
         DECODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktDecoder.class);
         DECODERS.put(Dialect.MYSQL_WKT, PostgisWktDecoder.class); // use also the PostgisWktDecoder since it can handle everything from Mysql
         DECODERS.put(Dialect.HANA_EWKT, HANAWktDecoder.class);
+        DECODERS.put(Dialect.DB2_WKT, Db2Decoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktEncoder.class);
         ENCODERS.put(Dialect.MYSQL_WKT, PostgisWktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
         ENCODERS.put(Dialect.HANA_EWKT, HANAWktEncoder.class);
-        ENCODERS.put(Dialect.DB2_WKT, DB2WktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
+        ENCODERS.put(Dialect.DB2_WKT, Db2WktEncoder.class);
     }
 
 
