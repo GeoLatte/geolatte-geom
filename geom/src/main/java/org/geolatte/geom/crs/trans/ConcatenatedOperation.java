@@ -19,7 +19,6 @@ public class ConcatenatedOperation implements CoordinateOperation {
     private void setupIntermediateBuffers(){
         this.buffers = new double[this.coordinateOperations.length + 1][];
         for( int idx = 0; idx < coordinateOperations.length-1; idx++) {
-            //is this safe?? If not, add explicit test when constructing the chain
             if (coordinateOperations[idx].outCoordinateDimension() != coordinateOperations[idx+1].inCoordinateDimension()) {
                 throw new IllegalArgumentException("Coordinate dimensions don't match at step " + idx);
             }
@@ -65,34 +64,6 @@ public class ConcatenatedOperation implements CoordinateOperation {
         }
     }
 
-    /**
-     * Creates a new {@code ConcatenatedOperation} from this instance by appending and the specified instance in the forward direction;
-     *
-     * @param operation the instance to append
-     * @return a new instance
-     */
-    public ConcatenatedOperation appendForward(CoordinateOperation operation) {
-        return new Builder().forward( this ).forward(operation).build();
-    }
-
-    /**
-     * Creates a new {@code ConcatenatedOperation} from this instance by appending and the specified instance in the reverse direction;
-     *
-     * @param operation the instance to append
-     * @return a new instance
-     */
-    public ConcatenatedOperation appendReverse(CoordinateOperation operation) {
-        return new Builder().forward( this ).reverse(operation).build();
-    }
-
-
-    /**
-     * Creates a new {@code ConcatenatedOperation} by reversing this instance
-     * @return a new {@code ConcatenatedOperation} by reversing this instance
-     */
-    public ConcatenatedOperation reverse() {
-        return new Builder().reverse(this).build();
-    }
 
     public static class Builder {
 
