@@ -20,8 +20,10 @@ public class ConcatenatedOperation implements CoordinateOperation {
         this.buffers = new double[this.coordinateOperations.length + 1][];
         for( int idx = 0; idx < coordinateOperations.length-1; idx++) {
             //is this safe?? If not, add explicit test when constructing the chain
-            int dim = Math.max( coordinateOperations[idx].outCoordinateDimension(), coordinateOperations[idx+1].inCoordinateDimension() );
-            this.buffers[idx+1] =new double[dim];
+            if (coordinateOperations[idx].outCoordinateDimension() != coordinateOperations[idx+1].inCoordinateDimension()) {
+                throw new IllegalArgumentException("Coordinate dimensions don't match at step " + idx);
+            }
+            this.buffers[idx+1] =new double[coordinateOperations[idx].outCoordinateDimension()];
         }
     }
 
@@ -61,6 +63,35 @@ public class ConcatenatedOperation implements CoordinateOperation {
             CoordinateOperation t = coordinateOperations[idx];
             t.reverse(buffers[idx+1], buffers[idx]);
         }
+    }
+
+    /**
+     * Creates a new {@code ConcatenatedOperation} from this instance by appending and the specified instance in the forward direction;
+     *
+     * @param operation the instance to append
+     * @return a new instance
+     */
+    public ConcatenatedOperation appendForward(CoordinateOperation operation) {
+        return new Builder().forward( this ).forward(operation).build();
+    }
+
+    /**
+     * Creates a new {@code ConcatenatedOperation} from this instance by appending and the specified instance in the reverse direction;
+     *
+     * @param operation the instance to append
+     * @return a new instance
+     */
+    public ConcatenatedOperation appendReverse(CoordinateOperation operation) {
+        return new Builder().forward( this ).reverse(operation).build();
+    }
+
+
+    /**
+     * Creates a new {@code ConcatenatedOperation} by reversing this instance
+     * @return a new {@code ConcatenatedOperation} by reversing this instance
+     */
+    public ConcatenatedOperation reverse() {
+        return new Builder().reverse(this).build();
     }
 
     public static class Builder {

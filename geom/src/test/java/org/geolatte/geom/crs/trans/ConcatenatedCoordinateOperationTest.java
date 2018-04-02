@@ -51,4 +51,76 @@ public class ConcatenatedCoordinateOperationTest {
         assertEquals(4, outCoordinate[0], 0.000001);
         assertEquals(50, outCoordinate[1], 0.000001);
     }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testThrowsExceptionWhenDimensionsDoNotMatch() {
+        CoordinateOperation testOp = new TrivialOp();
+        ConcatenatedOperation appended = chain.appendForward( testOp );
+    }
+
+    @Test
+    public void testAppendForward(){
+
+        CoordinateOperation testOp = new TrivialOp();
+
+        ConcatenatedOperation appended = chain.reverse().appendForward( testOp );
+        double[] inCoordinate = new double[]{4.00124343197523, 49.9994334980867, 0};
+        double[] outCoordinate = new double[3];
+
+        appended.forward(inCoordinate, outCoordinate);
+
+        assertEquals(5, outCoordinate[0], 0.000001);
+        assertEquals(51, outCoordinate[1], 0.000001);
+        assertEquals(-1, outCoordinate[2], 0.000001);
+
+    }
+
+    @Test
+    public void testAppendReverse(){
+
+        CoordinateOperation testOp = new TrivialOp();
+
+        ConcatenatedOperation appended = chain.appendReverse( testOp );
+        double[] inCoordinate = new double[]{4.0, 50};
+        double[] outCoordinate = new double[2];
+
+        appended.forward(inCoordinate, outCoordinate);
+
+        assertEquals(3.00124343197523, outCoordinate[0], 0.000001);
+        assertEquals(48.9994334980867, outCoordinate[1], 0.000001);
+
+    }
+
+    static class TrivialOp implements CoordinateOperation{
+
+        @Override
+        public boolean isReversible() {
+            return true;
+        }
+
+        @Override
+        public int inCoordinateDimension() {
+            return 2;
+        }
+
+        @Override
+        public int outCoordinateDimension() {
+            return 3;
+        }
+
+        @Override
+        public void forward(double[] inCoordinate, double[] outCoordinate) {
+            outCoordinate[0] = inCoordinate[0] + 1;
+            outCoordinate[1] = inCoordinate[1] + 1;
+            outCoordinate[2] = -1;
+        }
+
+        @Override
+        public void reverse(double[] inCoordinate, double[] outCoordinate) {
+            outCoordinate[0] = inCoordinate[0] - 1;
+            outCoordinate[1] = inCoordinate[1] - 1;
+        }
+    };
+
 }
