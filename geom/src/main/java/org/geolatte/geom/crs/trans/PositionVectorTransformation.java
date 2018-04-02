@@ -3,17 +3,14 @@ package org.geolatte.geom.crs.trans;
 import static org.geolatte.geom.DecimalDegree.secondsToRadians;
 
 /**
- * The 7-parameter Helmert Transformation.
+ * The Position Vector transformation ( a 7-parameter Helmert Transformation in the geocentric domain).
  *
- * This implements the EPSG 1033 method, and is used to
+ * This implements the EPSG 1033 method It is used to
  * perform the TOWGS84 transforms.
- *
- * NOTE THAT CURRENTLY ONLY THE POSITION FECTOR TRANSFORMATION
- * IS IMPLEMENTED
  *
  * Created by Karel Maesen, Geovise BVBA on 21/07/17.
  */
-public class Helmert7Param implements Transformation {
+public class PositionVectorTransformation implements Transformation, WithEpsgGOperationMethod {
 
     final private double tx;
     final private double ty;
@@ -24,8 +21,8 @@ public class Helmert7Param implements Transformation {
     final private double m;
 
 
-    public static Helmert7Param fromTOWGS84(double[] params) {
-        return new Helmert7Param(params[0],params[1],params[2],params[3],params[4],params[5],params[6]);
+    public static PositionVectorTransformation fromTOWGS84(double[] params) {
+        return new PositionVectorTransformation( params[0], params[1], params[2], params[3], params[4], params[5], params[6]);
     }
 
 
@@ -39,7 +36,7 @@ public class Helmert7Param implements Transformation {
      * @param rz Z-azis rotation in arc-seconds
      * @param ds scale correction in parts per million (ppm)
      */
-    public Helmert7Param(double tx, double ty, double tz, double rx, double ry, double rz, double ds) {
+    public PositionVectorTransformation(double tx, double ty, double tz, double rx, double ry, double rz, double ds) {
         this.tx = tx;
         this.ty = ty;
         this.tz = tz;
@@ -93,4 +90,10 @@ public class Helmert7Param implements Transformation {
         outCoordinate[2] = (1/m) * (ry*sx - rx*sy + sz) - tz;
 
     }
+
+    @Override
+    public String getMethodId() {
+        return "1033";
+    }
+
 }

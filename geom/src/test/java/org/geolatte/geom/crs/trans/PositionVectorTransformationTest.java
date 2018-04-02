@@ -2,16 +2,14 @@ package org.geolatte.geom.crs.trans;
 
 import org.junit.Test;
 
-import java.util.function.BiConsumer;
-
 import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 21/07/17.
  */
-public class Helmert7ParamTest {
+public class PositionVectorTransformationTest {
 
-    Helmert7Param wgs72Towgs84 = new Helmert7Param(0, 0, 4.5, 0, 0, 0.554, 0.219);
+    PositionVectorTransformation wgs72Towgs84 = new PositionVectorTransformation( 0, 0, 4.5, 0, 0, 0.554, 0.219);
 
     @Test
     public void testForward(){

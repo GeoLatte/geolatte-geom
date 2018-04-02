@@ -4,7 +4,6 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +24,7 @@ public class TransformationChainTest {
         chain = new TransformationChain.Builder()
                 .reverse(new Geographic3DTo2D())
                 .forward(new GeographicToGeocentric(bd72))
-                .forward(Helmert7Param.fromTOWGS84(bd72.getDatum().getToWGS84()))
+                .forward( PositionVectorTransformation.fromTOWGS84( bd72.getDatum().getToWGS84()))
                 .reverse(new GeographicToGeocentric(wgs84))
                 .build();
     }
