@@ -15,6 +15,7 @@ public class CoordinateOperationsTest {
 
     Geographic2DCoordinateReferenceSystem ed87 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4231);
     Geographic2DCoordinateReferenceSystem b50 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4809);
+    Geographic2DCoordinateReferenceSystem etrs89 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4258);
 
     @Test(expected = IllegalArgumentException.class)
     public void failWhenSourceCRSHasNoToWGS84() {
@@ -36,7 +37,6 @@ public class CoordinateOperationsTest {
 
     @Test
     public void testWGS84ToED87() {
-        //the European ED87 Geodetic CRS
 
         CoordinateOperation operation = positionVectorTransformation2D(WGS84, ed87);
         double[] in = new double[]{3, 50};
@@ -44,6 +44,34 @@ public class CoordinateOperationsTest {
         operation.forward(in, out);
         assertEquals(3.00128448068281, out[0], 0.000001);
         assertEquals(50.0008676608662, out[1], 0.000001);
+    }
+
+    @Test
+    public void testEtrsToED87() {
+        CoordinateOperation operation = positionVectorTransformation2D(etrs89, ed87);
+        double[] in = new double[]{3, 50};
+        double[] out = new double[2];
+        operation.forward(in, out);
+        assertEquals(3.00128448068279, out[0], 0.000001);
+        assertEquals(50.0008676599376, out[1], 0.000001);
+
+        operation.reverse(out, in);
+        assertEquals(3.0, in[0], 0.000001);
+        assertEquals(50.0, in[1], 0.000001);
+    }
+
+    @Test
+    public void testED87toETRS() {
+        CoordinateOperation operation = positionVectorTransformation2D(ed87, etrs89);
+        double[] in = new double[]{3, 50};
+        double[] out = new double[2];
+        operation.forward(in, out);
+        assertEquals(2.99871552530254, out[0], 0.000001);
+        assertEquals(49.9991323085471, out[1], 0.000001);
+
+        operation.reverse(out, in);
+        assertEquals(3.0, in[0], 0.000001);
+        assertEquals(50.0, in[1], 0.000001);
     }
 
 }
