@@ -1,15 +1,16 @@
 package org.geolatte.geom.crs.trans;
 
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import static java.lang.Math.*;
 
 
 /**
+ * The Geographic to Geocentric Coordinate conversion.
+ *
  * Created by Karel Maesen, Geovise BVBA on 20/07/17.
  */
-public class GeographicToGeocentric implements Transformation {
+public class GeographicToGeocentricConversion implements CoordinateOperation, WithEpsgGOperationMethod {
 
     final double eccentricity2;
     final double semiMajorAxis;
@@ -21,7 +22,7 @@ public class GeographicToGeocentric implements Transformation {
 
 
 
-    public GeographicToGeocentric(GeographicCoordinateReferenceSystem sourceCRS) {
+    public GeographicToGeocentricConversion(GeographicCoordinateReferenceSystem sourceCRS) {
 
         primeMerid = sourceCRS.getPrimeMeridian().getLongitude();
         semiMajorAxis = sourceCRS.getDatum().getEllipsoid().getSemiMajorAxis();
@@ -76,5 +77,10 @@ public class GeographicToGeocentric implements Transformation {
         outCoordinate[0] = toDegrees(lambda);
         outCoordinate[1] = toDegrees(phi);
         outCoordinate[2] = h;
+    }
+
+    @Override
+    public String getMethodId() {
+        return "9602";
     }
 }

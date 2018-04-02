@@ -1,23 +1,21 @@
 package org.geolatte.geom.crs.trans;
 
-import java.util.Arrays;
-
 /**
  * Converts between a Geographic 3D and a 2D system
  *
  * EPSG Method 9659
  * Created by Karel Maesen, Geovise BVBA on 20/07/17.
  */
-public class Geographic3DTo2D implements Transformation   {
+public class Geographic3DTo2DConversion implements CoordinateOperation, WithEpsgGOperationMethod   {
 
     final private double height;
 
-    public Geographic3DTo2D(double height) {
+    public Geographic3DTo2DConversion(double height) {
         this.height = height;
     }
 
 
-    public Geographic3DTo2D() {
+    public Geographic3DTo2DConversion() {
         this(0.0d);
     }
 
@@ -47,5 +45,9 @@ public class Geographic3DTo2D implements Transformation   {
         outCoordinate[2] = height;
     }
 
+    @Override
+    public String getMethodId() {
+        return "9659";
+    }
 }
 

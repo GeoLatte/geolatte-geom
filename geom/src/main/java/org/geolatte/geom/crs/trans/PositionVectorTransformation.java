@@ -10,7 +10,7 @@ import static org.geolatte.geom.DecimalDegree.secondsToRadians;
  *
  * Created by Karel Maesen, Geovise BVBA on 21/07/17.
  */
-public class PositionVectorTransformation implements Transformation, WithEpsgGOperationMethod {
+public class PositionVectorTransformation implements CoordinateOperation, WithEpsgGOperationMethod {
 
     final private double tx;
     final private double ty;

@@ -5,7 +5,7 @@ package org.geolatte.geom.crs.trans;
  *
  * Created by Karel Maesen, Geovise BVBA on 20/07/17.
  */
-public interface Transformation {
+public interface CoordinateOperation {
 
     boolean isReversible();
 

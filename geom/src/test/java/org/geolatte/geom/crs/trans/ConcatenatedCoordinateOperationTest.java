@@ -11,9 +11,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 22/07/17.
  */
-public class TransformationChainTest {
+public class ConcatenatedCoordinateOperationTest {
 
-    TransformationChain chain;
+    ConcatenatedOperation chain;
 
     @Before
     public void setUp(){
@@ -21,11 +21,11 @@ public class TransformationChainTest {
         GeographicCoordinateReferenceSystem bd72 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4313);
         GeographicCoordinateReferenceSystem wgs84 = CoordinateReferenceSystems.WGS84;
 
-        chain = new TransformationChain.Builder()
-                .reverse(new Geographic3DTo2D())
-                .forward(new GeographicToGeocentric(bd72))
+        chain = new ConcatenatedOperation.Builder()
+                .reverse(new Geographic3DTo2DConversion())
+                .forward(new GeographicToGeocentricConversion( bd72))
                 .forward( PositionVectorTransformation.fromTOWGS84( bd72.getDatum().getToWGS84()))
-                .reverse(new GeographicToGeocentric(wgs84))
+                .reverse(new GeographicToGeocentricConversion( wgs84))
                 .build();
     }
 

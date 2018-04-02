@@ -11,7 +11,7 @@ import static org.geolatte.geom.DecimalDegree.secondsToRadians;
  *
  * Created by Karel Maesen, Geovise BVBA on 02/04/2018.
  */
-public class CoordinateFrameRotation implements Transformation, WithEpsgGOperationMethod{
+public class CoordinateFrameRotation implements CoordinateOperation, WithEpsgGOperationMethod{
 
 	final private double tx;
 	final private double ty;
