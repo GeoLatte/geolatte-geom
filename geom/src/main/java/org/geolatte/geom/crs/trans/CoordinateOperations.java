@@ -32,6 +32,24 @@ public class CoordinateOperations {
 
     }
 
+    /**
+     * Returns the Position Vector transformation for the geographic 3D domain.
+     * <p>
+     * It first transforms from the source CRS to WGS84, and then from WGS84 to the target CRS.
+     * <p>
+     * This transformation uses EPSG method 1037
+     *
+     * @return a Transformation conforming to EPSG method 1037
+     */
+    static public CoordinateOperation positionVectorTransformation3D(GeographicCoordinateReferenceSystem source, GeographicCoordinateReferenceSystem target) {
+        CoordinateOperation datumTransformation = positionVectorTransformation(source.getDatum(), target.getDatum());
+        return new ConcatenatedOperation.Builder()
+                .forward(new GeographicToGeocentricConversion(source))
+                .forward(datumTransformation)
+                .reverse(new GeographicToGeocentricConversion(target))
+                .build();
+    }
+
     static public CoordinateOperation positionVectorTransformation(Datum source, Datum target) {
         if (source == target) {
             return new IdentityOp(3);
