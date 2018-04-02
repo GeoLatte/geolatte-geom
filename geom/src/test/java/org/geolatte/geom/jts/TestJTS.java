@@ -228,9 +228,6 @@ public class TestJTS {
     }
 
     private void checkCoordinateDimension(Geometry<?> glGeom1, int expectedDimensions, boolean expectedMeasure) {
-
-        System.out.println(glGeom1);
-        System.out.println(glGeom1.getCoordinateDimension());
         Assert.assertEquals("wrong CoordinateDimension", expectedDimensions, glGeom1.getCoordinateDimension());
 
         Position pos = glGeom1.getPositionN(0);
