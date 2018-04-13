@@ -174,7 +174,7 @@ public class Envelope<P extends Position> {
      * @return the set-theoretic intersection of this Envelope and the specified Envelope.
      * @throws IllegalArgumentException when the specified <code>Envelope</code> doesn't have the same coordinate reference system as this instance.
      */
-    public Envelope intersect(Envelope other) {
+    public Envelope<P> intersect(Envelope<P> other) {
         if (this.isEmpty() || other.isEmpty()) return mkEmpty();
         if (!this.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem()))
             throw new IllegalArgumentException("Envelopes have different CRS.");
@@ -209,7 +209,7 @@ public class Envelope<P extends Position> {
      * @return true iff this instance is contained within the specified <code>Envelope</code>
      * @throws IllegalArgumentException when the specified <code>Envelope</code> doesn't have the same coordinate reference system as this instance.
      */
-    public boolean within(Envelope other) {
+    public boolean within(Envelope<P> other) {
         if (isEmpty()) return true;
         if (other.isEmpty()) return false;
         if (!this.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem()))
@@ -264,7 +264,7 @@ public class Envelope<P extends Position> {
      * @return true iff this instance intersects with the other <code>Envelope</code>
      * @throws IllegalArgumentException when the specified <code>Envelope</code> doesn't have the same coordinate reference system as this instance.
      */
-    public boolean intersects(Envelope other) {
+    public boolean intersects(Envelope<P> other) {
         return !(isEmpty() || other.isEmpty()) &&
                 !(this.getMaxC0() < other.getMinC0() ||
                         this.getMinC0() > other.getMaxC0() ||
