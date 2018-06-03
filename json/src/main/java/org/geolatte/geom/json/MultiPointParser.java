@@ -8,8 +8,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.
  */
 public class MultiPointParser<P extends Position> extends AbstractGeometryParser<P, MultiPoint<P>> {
-    public MultiPointParser(Context context) {
-        super(context);
+    public MultiPointParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override

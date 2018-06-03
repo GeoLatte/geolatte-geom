@@ -2,7 +2,6 @@ package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.Point;
 
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class LineStringDeserializationTest extends GeoJsonTest {
 
     @Test
     public void testForce3DMTo2DMLineString() throws IOException {
-        ObjectMapper mapper = createMapper( wgs2DM, Feature.FORCE_DEFAULT_CRS_DIMENSION, true);
+        ObjectMapper mapper = createMapper( wgs2DM, Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
         LineString<?> pnt = mapper.readValue( lineString2DM, LineString.class);
         LineString<?> expected = linestring(wgs2DM, gM(1, 2, 3), gM(10, 20, 30));
         assertEquals(expected, pnt);

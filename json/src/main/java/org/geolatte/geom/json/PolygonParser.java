@@ -12,8 +12,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  */
 public class PolygonParser<P extends Position> extends AbstractGeometryParser<P, Polygon<P>> {
 
-    public PolygonParser(Context<P> ctxt) {
-        super(ctxt);
+    public PolygonParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override

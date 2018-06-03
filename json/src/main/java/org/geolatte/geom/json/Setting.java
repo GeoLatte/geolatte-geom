@@ -3,7 +3,7 @@ package org.geolatte.geom.json;
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public enum Feature {
+public enum Setting {
 
     /**
      *  Force the JSON strings to the CRS set as default for the {@code GeometryModule}.
@@ -25,7 +25,7 @@ public enum Feature {
 
     private boolean setByDefault;
 
-    Feature(boolean isSetByDefault) {
+    Setting(boolean isSetByDefault) {
         this.setByDefault = isSetByDefault;
     }
 

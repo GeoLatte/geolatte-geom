@@ -20,8 +20,8 @@ public class GeometryCollectionParser<P extends Position> extends AbstractGeomet
 
     private GeometryParser<P> geomParser;
 
-    public GeometryCollectionParser(Context<P> ctxt) {
-        super(ctxt);
+    public GeometryCollectionParser(CoordinateReferenceSystem<P> defaultCRS, Settings settings) {
+        super(defaultCRS, settings);
     }
 
 

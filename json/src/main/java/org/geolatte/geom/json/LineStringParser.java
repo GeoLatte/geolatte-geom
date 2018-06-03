@@ -8,8 +8,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
 public class LineStringParser<P extends Position> extends AbstractGeometryParser<P, LineString<P>> {
-    public LineStringParser(Context context) {
-        super(context);
+    public LineStringParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override

@@ -23,13 +23,16 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
 public abstract class AbstractGeometryParser<P extends Position, G extends Geometry<P>> extends JsonDeserializer<G> {
-    protected final Context<P> context;
 
-    public AbstractGeometryParser(Context<P> context) {
-        this.context = context;
+    private final CoordinateReferenceSystem<P> defaultCRS;
+    private final Settings settings;
+
+    protected AbstractGeometryParser(CoordinateReferenceSystem<P> defaultCRS, Settings settings) {
+        this.defaultCRS = defaultCRS;
+        this.settings = settings;
     }
 
-    G parse(JsonNode root) throws GeoJsonProcessingException {
+    private G parse(JsonNode root) throws GeoJsonProcessingException {
         return parse(root, getDefaultCrs());
     }
 
@@ -40,7 +43,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
         return parse(getRoot(p));
     }
 
-    protected JsonNode getRoot(JsonParser p) throws IOException, GeoJsonProcessingException {
+    private JsonNode getRoot(JsonParser p) throws IOException, GeoJsonProcessingException {
         ObjectCodec oc = p.getCodec();
         JsonNode root = oc.readTree(p);
         canHandle(root);
@@ -51,7 +54,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
     protected abstract void canHandle(JsonNode root) throws GeoJsonProcessingException;
 
     protected CoordinateReferenceSystem<P> getDefaultCrs() {
-        return this.context.getDefaultCrs();
+        return defaultCRS;
     }
 
     protected PointHolder getCoordinatesArrayAsSinglePosition(JsonNode root) throws GeoJsonProcessingException {
@@ -124,7 +127,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
             return new PointHolder();
         }
 
-        int coDim = (context.isFeatureSet(Feature.FORCE_DEFAULT_CRS_DIMENSION)) ?
+        int coDim = (settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION)) ?
                 getDefaultCrs().getCoordinateDimension() :
                 coordinates.size();
 
@@ -138,8 +141,8 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
         return new PointHolder(co);
     }
 
-    protected boolean isFeatureSet(Feature f) {
-        return context.isFeatureSet(f);
+    protected boolean isFeatureSet(Setting f) {
+        return settings.isSet(f);
     }
 
     protected GeometryType getType(JsonNode root) throws GeoJsonProcessingException {
@@ -170,7 +173,7 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
             throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
         CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ||
-                context.isFeatureSet( Feature.FORCE_DEFAULT_CRS_DIMENSION ) ? defaultCrs :
+                settings.isSet( Setting.FORCE_DEFAULT_CRS_DIMENSION ) ? defaultCrs :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
 
         int dimensionDifference = coordinateDimension - base.getCoordinateDimension();

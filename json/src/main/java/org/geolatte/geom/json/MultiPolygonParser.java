@@ -12,8 +12,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  */
 public class MultiPolygonParser<P extends Position> extends AbstractGeometryParser<P, MultiPolygon<P>> {
 
-    public MultiPolygonParser(Context<P> ctxt) {
-        super(ctxt);
+    public MultiPolygonParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override

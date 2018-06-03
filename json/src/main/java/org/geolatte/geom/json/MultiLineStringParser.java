@@ -11,8 +11,8 @@ import java.util.List;
  */
 public class MultiLineStringParser<P extends Position> extends AbstractGeometryParser<P, MultiLineString<P>> {
 
-    public MultiLineStringParser(Context context) {
-        super(context);
+    public MultiLineStringParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override

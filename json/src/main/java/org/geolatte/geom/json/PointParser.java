@@ -13,8 +13,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 public class PointParser<P extends Position> extends AbstractGeometryParser<P, Point<P>> {
 
 
-    public PointParser(Context<P> context) {
-        super(context);
+    public PointParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
 

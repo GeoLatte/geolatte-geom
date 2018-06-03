@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import static org.geolatte.geom.json.Feature.SUPPRESS_CRS_SERIALIZATION;
+import static org.geolatte.geom.json.Setting.SUPPRESS_CRS_SERIALIZATION;
 import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.junit.Assert.assertEquals;
 

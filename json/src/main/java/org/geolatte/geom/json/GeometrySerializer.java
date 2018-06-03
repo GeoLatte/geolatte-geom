@@ -15,11 +15,14 @@ import static org.geolatte.geom.GeometryType.*;
  */
 public class GeometrySerializer<P extends Position> extends JsonSerializer<Geometry<P>> {
 
-    final private Context<P> context;
+    final private CoordinateReferenceSystem<P> defaultCRS;
+    final private Settings settings;
 
-    public GeometrySerializer(Context<P> context) {
-        this.context = context;
+    public GeometrySerializer(CoordinateReferenceSystem<P> defaultCRS, Settings settings) {
+        this.defaultCRS = defaultCRS;
+        this.settings = settings;
     }
+
 
     /**
      * Method that can be called to ask implementation to serialize
@@ -31,7 +34,7 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
      */
     @Override
     public void serialize(Geometry<P> geometry, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        writeGeometry(gen, geometry, !context.isFeatureSet(Feature.SUPPRESS_CRS_SERIALIZATION));
+        writeGeometry(gen, geometry, !settings.isSet(Setting.SUPPRESS_CRS_SERIALIZATION));
     }
 
 
@@ -120,7 +123,7 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         gen.writeStartObject();
         gen.writeStringField("type", "name");
         gen.writeFieldName("properties");
-        if (context.isFeatureSet(Feature.SERIALIZE_CRS_AS_URN)) {
+        if (settings.isSet(Setting.SERIALIZE_CRS_AS_URN)) {
             writeCrsName(gen, crs.getCrsId().toUrn());
         } else {
             writeCrsName(gen, crs.getCrsId().toString());

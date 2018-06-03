@@ -9,7 +9,7 @@ import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.Crss.lambert72Z;
 import static org.geolatte.geom.json.Crss.wgs3D;
-import static org.geolatte.geom.json.Feature.SUPPRESS_CRS_SERIALIZATION;
+import static org.geolatte.geom.json.Setting.SUPPRESS_CRS_SERIALIZATION;
 import static org.geolatte.geom.json.GeoJsonStrings.emptyPointText;
 import static org.junit.Assert.assertEquals;
 

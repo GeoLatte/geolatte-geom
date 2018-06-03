@@ -31,8 +31,8 @@ public class GeometryParser<P extends Position> extends AbstractGeometryParser<P
 
     private Map<GeometryType, AbstractGeometryParser<?,?>> parsers = new HashMap<>();
 
-    public GeometryParser(Context<P> context) {
-        super(context);
+    public GeometryParser(CoordinateReferenceSystem<P> defaultCRS,Settings settings) {
+        super(defaultCRS, settings);
     }
 
     @Override
