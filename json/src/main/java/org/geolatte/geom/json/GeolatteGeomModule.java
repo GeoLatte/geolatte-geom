@@ -48,6 +48,7 @@ public class GeolatteGeomModule extends SimpleModule {
         dezers.put(MultiLineString.class, new MultiLineStringParser<>(defaultCrs,  settings));
         dezers.put(MultiPolygon.class, new MultiPolygonParser<>(defaultCrs,  settings));
         dezers.put(GeometryCollection.class, new GeometryCollectionParser<>(defaultCrs,  settings));
+        dezers.put(Feature.class, new FeatureDeserializer<>(defaultCrs, settings));
 
         dezers.forEach(this::addDeserializer);
     }

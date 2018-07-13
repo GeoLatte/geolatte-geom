@@ -3,7 +3,7 @@ package org.geolatte.geom.codec.db.oracle;
 /**
  * Created by Karel Maesen, Geovise BVBA on 04/12/16.
  */
-public class Features {
+public class Settings {
 
     final public static String USE_SDO_POINT = "GEOLATTE_USE_SDO_POINT_TYPE";
 

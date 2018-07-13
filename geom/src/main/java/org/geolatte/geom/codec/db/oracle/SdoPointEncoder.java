@@ -22,7 +22,7 @@ public class SdoPointEncoder extends AbstractSDOEncoder {
 
         final Double[] coord = convertPositionSequence(geom.getPositions());
 
-        if (Features.useSdoPointType() && !isLrs && !geom.isEmpty()) {
+        if (Settings.useSdoPointType() && !isLrs && !geom.isEmpty()) {
             return new SDOGeometry(
                     new SDOGType(dim, lrsDim, TypeGeometry.POINT),
                     geom.getSRID(),

@@ -51,4 +51,13 @@ public class GeoJsonStrings {
     static String geometryCollection = "{\"type\":\"GeometryCollection\",\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0],[1.0,2.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0]}]}";
     static String geometryCollectionWithCrs= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0],[1.0,2.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0]}]}";
     static String geometryCollectionWithCrs3D= "{\"type\":\"GeometryCollection\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}},\"geometries\":[{\"type\":\"LineString\",\"coordinates\":[[1.0,1.0,1.0],[1.0,2.0,3.0]]},{\"type\":\"Point\",\"coordinates\":[5.0,6.0,7.0]}]}";
+
+    // Features
+    static String feature = "{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[1.0,2.0]},\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
+
+
+    static String featureIntId = "{\"type\" : \"Feature\", \"id\": 1, \"geometry\":  {\"type\":\"Point\",\"coordinates\":[1.0,2.0]}, " +
+            "\"properties\": { \"a\" : 1 }}";
+
+
 }

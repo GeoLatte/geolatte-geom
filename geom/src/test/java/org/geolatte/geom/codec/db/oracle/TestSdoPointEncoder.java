@@ -47,7 +47,7 @@ public class TestSdoPointEncoder {
     @Test
     public void testPointEncoding3D(){
         Point<G3D> point = point(wgs84z, g(12, 14, 3));
-        System.setProperty(Features.USE_SDO_POINT, "true");
+        System.setProperty(Settings.USE_SDO_POINT, "true");
         SDOGeometry expected = sdoGeometry(3001, 4326, new SDOPoint(12d, 14d, 3d), null, null);
         assertEquals(expected, Encoders.encode(point));
     }
@@ -55,19 +55,19 @@ public class TestSdoPointEncoder {
     @Test
     public void testPointEncoding2D(){
         Point<G2D> point = point(wgs84, g(12, 14));
-        System.setProperty(Features.USE_SDO_POINT, "true");
+        System.setProperty(Settings.USE_SDO_POINT, "true");
         SDOGeometry expected = sdoGeometry(2001, 4326, new SDOPoint(12d, 14d), null, null);
         assertEquals(expected, Encoders.encode(point));
-        System.setProperty(Features.USE_SDO_POINT, "false");
+        System.setProperty(Settings.USE_SDO_POINT, "false");
     }
 
     @Test
     public void testPointEncoding4DIgnoresUseSDOPointFeature(){
         Point<G3DM> point = point(wgs84zm, g(12, 14,3d, 6d));
-        System.setProperty(Features.USE_SDO_POINT, "true");
+        System.setProperty(Settings.USE_SDO_POINT, "true");
         SDOGeometry expected = sdoGeometry(4401, 4326, null, new int[]{1, 1, 1}, new Double[]{12d, 14d, 3d, 6d});
         assertEquals(expected, Encoders.encode(point));
-        System.setProperty(Features.USE_SDO_POINT, "false");
+        System.setProperty(Settings.USE_SDO_POINT, "false");
     }
 
     @Test
@@ -83,13 +83,13 @@ public class TestSdoPointEncoder {
 
         @Test
         public void testEmptyPointDecodingUsingSDOPoint() {
-            System.setProperty(Features.USE_SDO_POINT, "true");
+            System.setProperty(Settings.USE_SDO_POINT, "true");
             Point<G2D> emptyPoint = new Point<G2D>(wgs84);
 
             assertTrue(emptyPoint.isEmpty());
             SDOGeometry sdoGeometry = Encoders.encode(emptyPoint);
             Geometry<?> geom = Decoders.decode(sdoGeometry);
             assert (geom.isEmpty());
-            System.setProperty(Features.USE_SDO_POINT, "false");
+            System.setProperty(Settings.USE_SDO_POINT, "false");
         }
 }
