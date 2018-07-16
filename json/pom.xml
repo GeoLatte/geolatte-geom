@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.geolatte</groupId>
         <artifactId>geolatte</artifactId>
-        <version>1.3.0</version>
+        <version>1.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>geolatte-geojson</artifactId>
     <description>

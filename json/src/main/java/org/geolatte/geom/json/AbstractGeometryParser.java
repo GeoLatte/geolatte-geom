@@ -12,12 +12,12 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LinearUnit;
 
 import java.io.IOException;
 
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.mkCoordinateReferenceSystem;
+import static org.geolatte.geom.crs.Unit.METER;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
@@ -173,21 +173,26 @@ public abstract class AbstractGeometryParser<P extends Position, G extends Geome
             throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
         CoordinateReferenceSystem<?> base = id.equals(CrsId.UNDEFINED) ||
-                settings.isSet( Setting.FORCE_DEFAULT_CRS_DIMENSION ) ? defaultCrs :
+                settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ? defaultCrs :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
 
-        int dimensionDifference = coordinateDimension - base.getCoordinateDimension();
-
-        if (dimensionDifference <= 0) {
+        if (coordinateDimension == 0) {
             return (CoordinateReferenceSystem<P>) base;
-        } else if (dimensionDifference == 1) {
-            return (CoordinateReferenceSystem<P>) addVerticalSystem(base, LinearUnit.METER);
-        } else {
-            return (CoordinateReferenceSystem<P>) addLinearSystem(
-                    addVerticalSystem(base, LinearUnit.METER),
-                    LinearUnit.METER
-            );
         }
 
+        if (coordinateDimension == 2) {
+            return (CoordinateReferenceSystem<P>) mkCoordinateReferenceSystem(base, null, null);
+        }
+
+        if (coordinateDimension == 3) {
+            if (hasMeasureAxis(base)) return (CoordinateReferenceSystem<P>) base;
+            return (CoordinateReferenceSystem<P>) mkCoordinateReferenceSystem(base, METER, null);
+        }
+
+        if (coordinateDimension == 4) {
+            return (CoordinateReferenceSystem<P>) mkCoordinateReferenceSystem(base, METER, METER);
+        }
+
+        throw new GeoJsonProcessingException("CoordinateDimension " + coordinateDimension + " less than 2 or larger than 4");
     }
 }

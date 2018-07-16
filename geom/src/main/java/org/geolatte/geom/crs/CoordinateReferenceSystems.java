@@ -30,13 +30,13 @@ import java.util.List;
  * Common coordinate reference systems.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 3/31/14
+ * creation-date: 3/31/14
  */
 public class CoordinateReferenceSystems {
 
     public static ProjectedCoordinateReferenceSystem mkProjected(int srid, LinearUnit unit) {
         return new ProjectedCoordinateReferenceSystem(CrsId.valueOf(srid), "Generic 2D Projected",
-                mkGeographic(Unit.DEGREE), Projection.UNKNOWN, new ArrayList<CrsParameter>(),
+                mkGeographic(Unit.DEGREE), Projection.UNKNOWN, new ArrayList<>(),
                 new CartesianCoordinateSystem2D(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, unit), new
                         StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)));
     }
@@ -58,13 +58,68 @@ public class CoordinateReferenceSystems {
      * <p/>
      * A generic system is one without a precisely defined datum or ellipsoid.
      *
+     * @param
      * @param unit the unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem}
      */
-    public static Geographic2DCoordinateReferenceSystem mkGeographic(AngularUnit unit) {
-        return new Geographic2DCoordinateReferenceSystem(CrsId.UNDEFINED, "Generic 2D Projected", new
+    public static GeographicCoordinateReferenceSystem mkGeographic(int srid, AngularUnit unit) {
+        return new Geographic2DCoordinateReferenceSystem(CrsId.valueOf(srid), "Generic 2D Geographic", new
                 EllipsoidalCoordinateSystem2D(new GeodeticLatitudeCSAxis("Lat", unit), new GeodeticLongitudeCSAxis
                 ("Lon", unit)));
+    }
+
+    public static GeographicCoordinateReferenceSystem mkGeographic(AngularUnit unit) {
+        return mkGeographic(CrsId.UNDEFINED.getCode(), unit);
+    }
+
+    /**
+     * Returns a {@code CoordinateReferenceSystem} derived from the specified @{code {@link CoordinateReferenceSystem}}
+     * but extended with the specified axis
+     *
+     * @param baseCrs      the base Coordinate Reference System
+     * @param verticalUnit the Unit for the Vertical axis (or null if not required)
+     * @param measureUnit  the Unit for measures (or null if not required)
+     * @return a {@code CoordinateReferenceSystem} with at least the specified dimension, and using the specified
+     * crs as base
+     */
+    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem(
+            CoordinateReferenceSystem<?> baseCrs, LinearUnit verticalUnit, LinearUnit measureUnit) {
+
+        CoordinateReferenceSystem<?> result = baseCrs;
+        if (verticalUnit != null &&
+                !hasVerticalAxis(baseCrs)) {
+            result = addVerticalSystem(result, verticalUnit);
+        }
+        if (measureUnit != null && !hasMeasureAxis(baseCrs)) {
+            result = addLinearSystem(result, measureUnit);
+        }
+        return result;
+    }
+
+    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem(
+            int epsgCode, LinearUnit verticalUnit, LinearUnit measureUnit) {
+
+        return mkCoordinateReferenceSystem(
+                CrsRegistry.getCoordinateReferenceSystemForEPSG(epsgCode, PROJECTED_2D_METER),
+                verticalUnit,
+                measureUnit
+        );
+
+    }
+
+    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem3D(
+            int epsgCode, LinearUnit verticalUnit) {
+        return mkCoordinateReferenceSystem(epsgCode, verticalUnit, null);
+    }
+
+    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem4D(
+            int epsgCode, LinearUnit verticalUnit, LinearUnit measureUnit) {
+        return mkCoordinateReferenceSystem(epsgCode, verticalUnit, measureUnit);
+    }
+
+    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem2DM(
+            int epsgCode, LinearUnit verticalUnit) {
+        return mkCoordinateReferenceSystem(epsgCode, null, verticalUnit);
     }
 
     /**
@@ -99,7 +154,7 @@ public class CoordinateReferenceSystems {
     @SuppressWarnings("unchecked")
     public static <P extends Position, R extends P> CompoundCoordinateReferenceSystem<R> combine
     (CoordinateReferenceSystem<P> base, SingleCoordinateReferenceSystem ods, Class<R> resultCSPtype) {
-        return (CompoundCoordinateReferenceSystem<R>)combine(base,ods);
+        return (CompoundCoordinateReferenceSystem<R>) combine(base, ods);
     }
 
     public static <P extends Position, R extends P> CompoundCoordinateReferenceSystem<R> addLinearSystem
@@ -119,11 +174,10 @@ public class CoordinateReferenceSystems {
         if (base instanceof CompoundCoordinateReferenceSystem) {
             List<SingleCoordinateReferenceSystem<?>> components = ((CompoundCoordinateReferenceSystem<P>) base)
                     .getComponents();
-            List<SingleCoordinateReferenceSystem<?>> nc = new ArrayList<SingleCoordinateReferenceSystem<?>>();
-            nc.addAll(components);
+            List<SingleCoordinateReferenceSystem<?>> nc = new ArrayList<SingleCoordinateReferenceSystem<?>>(components);
             nc.add(ods);
-            return new CompoundCoordinateReferenceSystem(base.getName() + "+" + ods.getName(), nc.toArray(new
-                    SingleCoordinateReferenceSystem[nc.size()]));
+            return new CompoundCoordinateReferenceSystem(base.getName() + "+" + ods.getName(), nc.toArray(
+                    new SingleCoordinateReferenceSystem[0]));
         } else if (base instanceof SingleCoordinateReferenceSystem) {
             SingleCoordinateReferenceSystem<P> single = (SingleCoordinateReferenceSystem<P>) base;
             return new CompoundCoordinateReferenceSystem(single.getName() + "+" + ods.getName(), single, ods);
@@ -167,13 +221,13 @@ public class CoordinateReferenceSystems {
     final public static CompoundCoordinateReferenceSystem<C3DM> PROJECTED_3DM_METER = addLinearSystem(PROJECTED_3D_METER,
             C3DM.class, Unit.METER);
 
-            /**
-             * The WGS 84 {@code GeographicCoordinateReferenceSystem}
-             */
+    /**
+     * The WGS 84 {@code GeographicCoordinateReferenceSystem}
+     */
     public static Geographic2DCoordinateReferenceSystem WGS84 = CrsRegistry
             .getGeographicCoordinateReferenceSystemForEPSG(4326);
 
-    public static <P extends Position> boolean hasAxisOrder(CoordinateReferenceSystem<P> crs, int order){
+    public static <P extends Position> boolean hasAxisOrder(CoordinateReferenceSystem<P> crs, int order) {
         CoordinateSystemAxis[] axes = crs.getCoordinateSystem().getAxes();
         for (CoordinateSystemAxis axis : axes) {
             if (axis.getNormalOrder() == order) {

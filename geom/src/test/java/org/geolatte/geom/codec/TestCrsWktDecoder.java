@@ -132,7 +132,7 @@ public class TestCrsWktDecoder {
 
         //check the geo-CrsRegistry
         assertEquals(4313, projCRS.getGeographicCoordinateSystem().getCrsId().getCode());
-        Geographic2DCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
+        GeographicCoordinateReferenceSystem geoCRS = projCRS.getGeographicCoordinateSystem();
         double[] expected = new double[]{-106.8686, 52.2978, -103.7239, 0.3366, -0.457, 1.8422, -1.2747};
         for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], geoCRS.getDatum().getToWGS84()[i], Math.ulp(100d));
@@ -141,7 +141,7 @@ public class TestCrsWktDecoder {
         //check the projection
         assertEquals(new Projection(CrsId.UNDEFINED, "Lambert_Conformal_Conic_2SP"), projCRS.getProjection());
         List<CrsParameter> parameters = projCRS.getParameters();
-        List<CrsParameter> expectedParameters = new ArrayList<CrsParameter>();
+        List<CrsParameter> expectedParameters = new ArrayList<>();
         expectedParameters.add(new CrsParameter("standard_parallel_1", 51.16666723333333));
         expectedParameters.add(new CrsParameter("standard_parallel_2", 49.8333339));
         expectedParameters.add(new CrsParameter("latitude_of_origin", 90));
@@ -197,10 +197,8 @@ public class TestCrsWktDecoder {
         assertEquals(new CrsId("EPSG", 6190), system.getCrsId());
         CoordinateReferenceSystem<?> lambert = new CrsWktDecoder().decode(WKT_31370, 31370);
         CoordinateReferenceSystem<?> vertical = new CrsWktDecoder().decode(WKT_5710, 5710);
-        ;
-
         assertEquals(lambert, system.headCs());
-        assertEquals(vertical, system.tailCs());
+        assertEquals(vertical, system.lastCs());
 
 
     }
@@ -221,7 +219,6 @@ public class TestCrsWktDecoder {
         CompoundCoordinateReferenceSystem<?> system = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_WITH_EXTENSION, 6893);
         assertNotNull(system);
 
-        CrsWktDecoder decoder2 = new CrsWktDecoder();
         CompoundCoordinateReferenceSystem<?> system2 = (CompoundCoordinateReferenceSystem<?>) decoder.decode(WKT_WITH_EXT_2, 6893);
         assertNotNull(system2);
     }

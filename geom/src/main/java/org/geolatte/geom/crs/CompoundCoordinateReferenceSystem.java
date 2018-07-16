@@ -61,8 +61,8 @@ public class CompoundCoordinateReferenceSystem<P extends Position> extends Coord
         return components.get(0);
     }
 
-    public SingleCoordinateReferenceSystem<?> tailCs() {
-        return components.get(1);
+    public SingleCoordinateReferenceSystem<?> lastCs() {
+        return components.get(components.size()-1);
     }
 
 }

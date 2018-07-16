@@ -130,6 +130,18 @@ public class CrsRegistry {
     }
 
     /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Geographic 2D system and register
+     * this on-the-fly.
+     *
+     * @param epsgCode the code to look up
+     * @return a CoordinateReferenceSystem with the specified epsg code
+     */
+    public static CoordinateReferenceSystem<?> ifAbsentReturnGeographic2D(int epsgCode) {
+        return crsMap.computeIfAbsent(epsgCode, key -> CoordinateReferenceSystems.mkGeographic(key, AngularUnit.RADIAN));
+    }
+
+
+    /**
      * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
      *
      * @param crs      the {@code CoordinateReferenceSystem} to register

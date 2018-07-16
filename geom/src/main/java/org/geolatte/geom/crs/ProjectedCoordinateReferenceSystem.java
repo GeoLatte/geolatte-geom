@@ -43,7 +43,7 @@ import java.util.Map;
 public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<C2D> {
 
     private final Projection projection;
-    private final Geographic2DCoordinateReferenceSystem geoCRS;
+    private final GeographicCoordinateReferenceSystem geoCRS;
     private final List<CrsParameter> parameters;
     private final Extension extension;
 
@@ -58,7 +58,7 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
      * @param parameters the projection parameters for the projection method
      * @param crs        the 2D cartesian coordinate system for this coordinate reference system
      */
-    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
                                               CartesianCoordinateSystem2D crs) {
         this(crsId, name, geoCRS, projection, parameters, crs, null);
@@ -77,7 +77,7 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
      * @param crs        the 2D cartesian coordinate system for this coordinate reference system
      * @param extension the optional extension key-value pair for this <code>CoordinateReferenceSystem</code>
      */
-    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, Geographic2DCoordinateReferenceSystem geoCRS,
+    public ProjectedCoordinateReferenceSystem(CrsId crsId, String name, GeographicCoordinateReferenceSystem geoCRS,
                                               Projection projection, List<CrsParameter> parameters,
                                               CartesianCoordinateSystem2D crs, Extension extension) {
         super(crsId, name, crs);
@@ -103,7 +103,7 @@ public class ProjectedCoordinateReferenceSystem extends SingleCoordinateReferenc
      *
      * @return
      */
-    public Geographic2DCoordinateReferenceSystem getGeographicCoordinateSystem() {
+    public GeographicCoordinateReferenceSystem getGeographicCoordinateSystem() {
         return geoCRS;
     }
 
