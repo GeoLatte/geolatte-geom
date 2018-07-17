@@ -1,8 +1,6 @@
 package org.geolatte.geom.json;
 
-import org.geolatte.geom.Geometries;
-import org.geolatte.geom.Polygon;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
@@ -30,9 +28,15 @@ class PolygonListHolder extends Holder {
         return spcs.stream().mapToInt(Holder::getCoordinateDimension).max().orElse(0);
     }
 
+    @Override
+    <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws GeoJsonProcessingException {
+
+        return isEmpty() ? Geometries.mkEmptyMultiPolygon(crs) : Geometries.mkMultiPolygon(toPolygons(crs));
+    }
+
     <P extends Position> List<Polygon<P>> toPolygons(CoordinateReferenceSystem<P> crs) {
         return spcs.stream().map(lph ->
-                Geometries.mkPolygon(lph.toLinearRings(crs))
+                lph.isEmpty() ? Geometries.mkEmptyPolygon(crs) : Geometries.mkPolygon(lph.toLinearRings(crs))
         ).collect(Collectors.toList());
     }
 

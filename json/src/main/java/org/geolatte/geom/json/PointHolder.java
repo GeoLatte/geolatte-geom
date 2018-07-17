@@ -1,7 +1,6 @@
 package org.geolatte.geom.json;
 
-import org.geolatte.geom.Position;
-import org.geolatte.geom.Positions;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.Arrays;
@@ -41,6 +40,11 @@ class PointHolder extends Holder {
                 this.getCoordinates();
         return Positions.mkPosition(crs.getPositionClass(), co);
 
+    }
+
+    <P extends Position> Point<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
+        if (isEmpty()) return Geometries.mkEmptyPoint(crs);
+        return Geometries.mkPoint(toPosition(crs), crs);
     }
 
     private double[] toDimension(double[] orig, int targetDim) {

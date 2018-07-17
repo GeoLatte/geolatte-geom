@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,17 +37,17 @@ public class GeolatteGeomModule extends SimpleModule {
 
 
         geometrySerializer = new GeometrySerializer(defaultCrs, settings);
-
+        GeometryDeserializer parser = new GeometryDeserializer(defaultCrs, settings);
         addSerializer(Geometry.class, geometrySerializer); //use raw to get this compiled
-        dezers.put(Geometry.class, new GeometryParser<>( defaultCrs,  settings));
-        dezers.put(Point.class, new PointParser<>(defaultCrs,  settings));
-        dezers.put(LineString.class, new LineStringParser<>(defaultCrs,  settings));
-        dezers.put(Polygon.class, new PolygonParser<>(defaultCrs,  settings));
-        dezers.put(MultiPoint.class, new MultiPointParser<>(defaultCrs,  settings));
-        dezers.put(MultiLineString.class, new MultiLineStringParser<>(defaultCrs,  settings));
-        dezers.put(MultiPolygon.class, new MultiPolygonParser<>(defaultCrs,  settings));
-        dezers.put(GeometryCollection.class, new GeometryCollectionParser<>(defaultCrs,  settings));
-        dezers.put(Feature.class, new FeatureDeserializer<>(defaultCrs, settings));
+        dezers.put(Geometry.class, parser);
+        dezers.put(Point.class, parser);
+        dezers.put(LineString.class, parser);
+        dezers.put(Polygon.class, parser);
+        dezers.put(MultiPoint.class, parser);
+        dezers.put(MultiLineString.class, parser);
+        dezers.put(MultiPolygon.class, parser);
+        dezers.put(GeometryCollection.class, parser);
+        dezers.put(Feature.class, new FeatureDeserializer(defaultCrs, settings));
 
         dezers.forEach(this::addDeserializer);
     }
