@@ -55,4 +55,9 @@ public class MultiPolygon<P extends Position> extends GeometryCollection<P, Poly
         return GeometryType.MULTIPOLYGON;
     }
 
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> MultiPolygon<Q> as(Class<Q> castToType){
+        return (MultiPolygon<Q>)this;
+    }
+
 }

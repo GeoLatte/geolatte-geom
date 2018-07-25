@@ -191,6 +191,11 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return Positions.mkPosition(getCoordinateReferenceSystem(), coords);
     }
 
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> Geometry<Q> as(Class<Q> castToType){
+        return (Geometry<Q>)this;
+    }
+
     /**
      * Returns the <code>PositionSequence</code> of this instance
      *

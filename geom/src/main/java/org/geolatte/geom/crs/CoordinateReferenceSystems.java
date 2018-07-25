@@ -26,6 +26,8 @@ import org.geolatte.geom.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
+
 /**
  * Common coordinate reference systems.
  *
@@ -107,19 +109,19 @@ public class CoordinateReferenceSystems {
 
     }
 
-    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem3D(
-            int epsgCode, LinearUnit verticalUnit) {
-        return mkCoordinateReferenceSystem(epsgCode, verticalUnit, null);
-    }
 
-    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem4D(
-            int epsgCode, LinearUnit verticalUnit, LinearUnit measureUnit) {
-        return mkCoordinateReferenceSystem(epsgCode, verticalUnit, measureUnit);
-    }
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> CoordinateReferenceSystem<P> mkCoordinateReferenceSystem(
+            CoordinateReferenceSystem<?> baseCrs, LinearUnit verticalUnit, LinearUnit measureUnit, Class<P> positionType) {
 
-    public static CoordinateReferenceSystem<?> mkCoordinateReferenceSystem2DM(
-            int epsgCode, LinearUnit verticalUnit) {
-        return mkCoordinateReferenceSystem(epsgCode, null, verticalUnit);
+        CoordinateReferenceSystem<?> crs = mkCoordinateReferenceSystem(baseCrs, verticalUnit, measureUnit);
+
+        if (crs.getPositionClass().equals(positionType)) {
+            return (CoordinateReferenceSystem<P>)crs;
+        }
+
+        throw new IllegalArgumentException(format("Invalid positionClass: %s not equals %s",
+                crs.getPositionClass().getName(), positionType.getName()));
     }
 
     /**
@@ -244,7 +246,7 @@ public class CoordinateReferenceSystems {
     public static GeographicCoordinateReferenceSystem ETRS89 = CrsRegistry
             .getGeographicCoordinateReferenceSystemForEPSG(4258);
 
-    
+
     public static <P extends Position> boolean hasAxisOrder(CoordinateReferenceSystem<P> crs, int order) {
         CoordinateSystemAxis[] axes = crs.getCoordinateSystem().getAxes();
         for (CoordinateSystemAxis axis : axes) {

@@ -57,6 +57,12 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> Point<Q> as(Class<Q> castToType){
+        return (Point<Q>)this;
+    }
+
+    @Override
     public int getDimension() {
         return 0;
     }

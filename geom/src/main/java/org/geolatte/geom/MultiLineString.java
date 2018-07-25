@@ -72,4 +72,10 @@ public class MultiLineString<P extends Position> extends GeometryCollection<P, L
     public Class<? extends Geometry> getComponentType() {
         return LineString.class;
     }
+
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> MultiLineString<Q> as(Class<Q> castToType){
+        return (MultiLineString<Q>)this;
+    }
+
 }
