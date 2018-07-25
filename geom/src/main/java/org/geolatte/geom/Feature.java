@@ -20,4 +20,8 @@ public interface Feature< P extends Position, ID> {
     default String getType(){
         return TYPE;
     }
+
+    default Object getProperty(String propertyName) {
+        return getProperties().get(propertyName);
+    }
 }
