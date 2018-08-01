@@ -5,6 +5,7 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.jts.JTS;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/08/2018.
  */
+@Ignore
 public class TestForIssue67 {
 
     private Connection conn;
