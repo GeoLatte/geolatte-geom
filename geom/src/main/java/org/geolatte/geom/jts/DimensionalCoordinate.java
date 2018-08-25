@@ -43,13 +43,12 @@ public class DimensionalCoordinate extends Coordinate {
         this.m = m;
     }
 
-    public double getZ(){
-        return  this.z;
-    }
-
+    @Override
     public double getM(){
         return this.m;
     }
 
+    @Override
+    public void setM(double m) { this.m = m; }
 
 }
