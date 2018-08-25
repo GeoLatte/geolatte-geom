@@ -100,7 +100,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         if (coordinates[0] instanceof DimensionalCoordinate) {
             hasM = !Double.isNaN(((DimensionalCoordinate) coordinates[0]).getM());
         }
-        hasZ = !Double.isNaN(coordinates[0].z);
+        hasZ = !Double.isNaN(coordinates[0].getZ());
         if (hasM && hasZ) {
             return PROJECTED_3DM_METER;
         } else if (hasM) {
@@ -126,15 +126,15 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     }
 
     private <P extends Position> void copy(Coordinate co, double[] ordinates, CoordinateReferenceSystem<P> crs) {
-        ordinates[0] = co.x;
-        ordinates[1] = co.y;
+        ordinates[0] = co.getX();
+        ordinates[1] = co.getY();
         boolean hasVerticalAxis = hasVerticalAxis(crs);
         if (hasVerticalAxis) {
-            ordinates[2] = co.z;
+            ordinates[2] = co.getZ();
         }
         if (hasMeasureAxis(crs)) {
             int idxM = hasVerticalAxis ? 3 : 2;
-            ordinates[idxM] = (co instanceof DimensionalCoordinate) ? ((DimensionalCoordinate) co).m : Double.NaN;
+            ordinates[idxM] = (co instanceof DimensionalCoordinate) ? ((DimensionalCoordinate) co).getM() : Double.NaN;
         }
     }
 
