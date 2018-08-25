@@ -58,8 +58,8 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         // This is causing problems when working with Geotools JTS class in
         // transformation.
         // This is just a quick fix in order to get this working...
-        if (dimension > 3)
-            throw new IllegalArgumentException("dimension must be <= 3");
+//        if (dimension > 3)
+//            throw new IllegalArgumentException("dimension must be <= 3");
         return new CoordinateArraySequence(size, dimension);
     }
 
