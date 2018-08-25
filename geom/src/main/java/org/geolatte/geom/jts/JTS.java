@@ -21,16 +21,16 @@
 
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.*;
 
@@ -117,7 +117,7 @@ public class JTS {
      * @return an equivalent geolatte geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Geometry<?> from(com.vividsolutions.jts.geom.Geometry jtsGeometry) {
+    public static org.geolatte.geom.Geometry<?> from(org.locationtech.jts.geom.Geometry jtsGeometry) {
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
@@ -179,7 +179,7 @@ public class JTS {
      * @return the equivalent JTS geometry
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry, GeometryFactory gFact) {
+    public static <P extends Position> org.locationtech.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry, GeometryFactory gFact) {
         if (geometry == null || gFact == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
@@ -202,7 +202,7 @@ public class JTS {
         }
     }
 
-    public static <P extends Position> com.vividsolutions.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry) {
+    public static <P extends Position> org.locationtech.jts.geom.Geometry to(org.geolatte.geom.Geometry<P> geometry) {
         if (geometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
@@ -226,7 +226,7 @@ public class JTS {
      * @return the corresponding geolatte Envelope.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static org.geolatte.geom.Envelope<C2D> from(com.vividsolutions.jts.geom.Envelope jtsEnvelope) {
+    public static org.geolatte.geom.Envelope<C2D> from(org.locationtech.jts.geom.Envelope jtsEnvelope) {
         if (jtsEnvelope == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
@@ -243,7 +243,7 @@ public class JTS {
      * @return the corresponding geolatte Envelope, having the CRS specified in the crsId parameter.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static <P extends Position> org.geolatte.geom.Envelope<P> from(com.vividsolutions.jts.geom.Envelope
+    public static <P extends Position> org.geolatte.geom.Envelope<P> from(org.locationtech.jts.geom.Envelope
                                                                                   jtsEnvelope,
                                                                           CoordinateReferenceSystem<P> crs) {
         if (jtsEnvelope == null) {
@@ -260,11 +260,11 @@ public class JTS {
      * @return the corresponding JTS Envelope.
      * @throws IllegalArgumentException when a null object is passed
      */
-    public static com.vividsolutions.jts.geom.Envelope to(org.geolatte.geom.Envelope<?> env) {
+    public static org.locationtech.jts.geom.Envelope to(org.geolatte.geom.Envelope<?> env) {
         if (env == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
-        return new com.vividsolutions.jts.geom.Envelope(env.lowerLeft().getCoordinate(0), env.upperRight()
+        return new org.locationtech.jts.geom.Envelope(env.lowerLeft().getCoordinate(0), env.upperRight()
                 .getCoordinate(0), env.lowerLeft().getCoordinate(1), env.upperRight().getCoordinate(1));
     }
 
@@ -367,7 +367,7 @@ public class JTS {
     /*
      * Converts a jts point into a geolatte point
      */
-    private static <P extends Position> org.geolatte.geom.Point<P> from(com.vividsolutions.jts.geom.Point jtsPoint,
+    private static <P extends Position> org.geolatte.geom.Point<P> from(org.locationtech.jts.geom.Point jtsPoint,
                                                                         CoordinateReferenceSystem<P> crs) {
         CoordinateSequence cs = jtsPoint.getCoordinateSequence();
         return new org.geolatte.geom.Point<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs), crs);

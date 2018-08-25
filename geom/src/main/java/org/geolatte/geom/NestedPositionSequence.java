@@ -21,7 +21,7 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 import java.util.Arrays;
 import java.util.Iterator;

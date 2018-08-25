@@ -1,6 +1,6 @@
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.junit.Test;
 
 import static org.geolatte.geom.CrsMock.*;

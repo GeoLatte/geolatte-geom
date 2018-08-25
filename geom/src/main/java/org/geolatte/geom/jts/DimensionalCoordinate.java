@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A <code>Coordinate</code> with an associated <code>DimensionalFlag</code>.
