@@ -90,16 +90,15 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     public org.locationtech.jts.geom.Coordinate getCoordinate(int i) {
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(i, c);
-        if (factory.hasMComponent() && factory.hasZComponent()) {
+        if (getCoordinateDimension() == 2) {
+            return toCoordinateXY(c);
+        } else if (factory.hasMComponent() && factory.hasZComponent()) {
             return toCoordinateXYZM(c);
         } else if (factory.hasZComponent()) {
             return toCoordinateXYZ(c);
-        } else if (factory.hasMComponent()) {
-            return toCoordinateXYM(c);
         } else {
-            return toCoordinateXY(c);
+            return toCoordinateXYM(c);
         }
-
     }
 
     private CoordinateXY toCoordinateXY(double[] c) {
