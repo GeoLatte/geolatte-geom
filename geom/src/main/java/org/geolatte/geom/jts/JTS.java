@@ -129,13 +129,17 @@ public class JTS {
         }
 
         // to translate measure, add Measure as LinearSystem
-        boolean hasM = testCo instanceof DimensionalCoordinate
-                && !Double.isNaN(((DimensionalCoordinate)testCo).m);
+        boolean hasM = isMeasuredCoordinate(testCo)
+                && !Double.isNaN(testCo.getM());
         if (hasM) {
             crs = CoordinateReferenceSystems.addLinearSystem(crs, LinearUnit.METER);
         }
 
         return from(jtsGeometry, crs);
+    }
+
+    private static boolean isMeasuredCoordinate(Coordinate testCo) {
+        return testCo instanceof CoordinateXYZM || testCo instanceof CoordinateXYM;
     }
 
     /**

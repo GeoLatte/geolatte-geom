@@ -95,12 +95,13 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     private CoordinateReferenceSystem<?> determineCRS(Coordinate[] coordinates) {
         boolean hasZ, hasM = false;
-        if (coordinates == null || coordinates.length == 0)
+        if (coordinates == null || coordinates.length == 0) {
             return PROJECTED_2D_METER;
-        if (coordinates[0] instanceof DimensionalCoordinate) {
-            hasM = !Double.isNaN(((DimensionalCoordinate) coordinates[0]).getM());
         }
+
+        hasM = !Double.isNaN( coordinates[0].getM());
         hasZ = !Double.isNaN(coordinates[0].getZ());
+
         if (hasM && hasZ) {
             return PROJECTED_3DM_METER;
         } else if (hasM) {
@@ -134,7 +135,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         }
         if (hasMeasureAxis(crs)) {
             int idxM = hasVerticalAxis ? 3 : 2;
-            ordinates[idxM] = (co instanceof DimensionalCoordinate) ? ((DimensionalCoordinate) co).getM() : Double.NaN;
+            ordinates[idxM] = co.getM();
         }
     }
 

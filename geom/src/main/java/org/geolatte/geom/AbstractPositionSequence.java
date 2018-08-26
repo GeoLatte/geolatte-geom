@@ -21,9 +21,8 @@
 
 package org.geolatte.geom;
 
-import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Envelope;
-import org.geolatte.geom.jts.DimensionalCoordinate;
 
 import java.io.Serializable;
 
@@ -77,10 +76,6 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return this.factory.getCoordinateDimension();
     }
 
-//    protected int[] getNormalizedOrderMapping() {
-//        return Arrays.copyOf(this.idxMap, this.idxMap.length);
-//    }
-
     /**
      * Clones a  PointCollection
      * <p/>
@@ -91,32 +86,51 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     @Override
     public abstract PositionSequence<P> clone();
 
-//    @Override
-//    public void getCoordinates(double[] coordinates, int i) {
-//        if (coordinates.length < this.dimensionalFlag.getCoordinateDimension())
-//            throw new IllegalArgumentException(String.format("Position array must be at least of length %d", this.dimensionalFlag.getCoordinateDimension()));
-//        coordinates[dimensionalFlag.X] = getX(i);
-//        coordinates[dimensionalFlag.Y] = getY(i);
-//        if (is3D() ) {
-//            coordinates[dimensionalFlag.Z]  = getZ(i);
-//        }
-//        if (isMeasured()){
-//            coordinates[dimensionalFlag.M] = getM(i);
-//        }
-//    }
-
 
     public org.locationtech.jts.geom.Coordinate getCoordinate(int i) {
-        DimensionalCoordinate co = new DimensionalCoordinate();
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(i, c);
-        int idx = 0;
-        co.x = c[idx++];
-        co.y = c[idx++];
-        if (factory.hasZComponent())
-            co.z = c[idx++];
-        if (factory.hasMComponent())
-            co.m = c[idx];
+        if (factory.hasMComponent() && factory.hasZComponent()) {
+            return toCoordinateXYZM(c);
+        } else if (factory.hasZComponent()) {
+            return toCoordinateXYZ(c);
+        } else if (factory.hasMComponent()) {
+            return toCoordinateXYM(c);
+        } else {
+            return toCoordinateXY(c);
+        }
+
+    }
+
+    private CoordinateXY toCoordinateXY(double[] c) {
+        CoordinateXY co = new CoordinateXY();
+        co.setX(c[0]);
+        co.setY(c[1]);
+        return co;
+    }
+
+    private CoordinateXYM toCoordinateXYM(double[] c) {
+        CoordinateXYM co = new CoordinateXYM();
+        co.setX(c[0]);
+        co.setY(c[1]);
+        co.setM(c[2]);
+        return co;
+    }
+
+    private Coordinate toCoordinateXYZ(double[] c) {
+        Coordinate co = new Coordinate();
+        co.setX(c[0]);
+        co.setY(c[1]);
+        co.setZ(c[2]);
+        return co;
+    }
+
+    private CoordinateXYZM toCoordinateXYZM(double[] c) {
+        CoordinateXYZM co = new CoordinateXYZM();
+        co.setX(c[0]);
+        co.setY(c[1]);
+        co.setZ(c[2]);
+        co.setM(c[3]);
         return co;
     }
 
@@ -165,7 +179,6 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         }
         throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
     }
-
 
     @Override
     public abstract void setOrdinate(int i, int ordinateIndex, double value);

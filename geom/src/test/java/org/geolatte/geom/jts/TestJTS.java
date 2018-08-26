@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.jts;
 
+import org.locationtech.jts.geom.CoordinateXYM;
+import org.locationtech.jts.geom.CoordinateXYZM;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.geolatte.geom.Geometry;
@@ -81,8 +83,8 @@ public class TestJTS {
         PostgisTestCases testCases = new PostgisTestCases();
         Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_3DM);
         org.locationtech.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
-        Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
-        DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
+        Assert.assertTrue(CoordinateXYZM.class.isInstance(jtsGeometry.getCoordinates()[0]));
+        CoordinateXYZM dc = (CoordinateXYZM) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
 
         Geometry<?> geom2 = JTS.from(jtsGeometry);
@@ -94,8 +96,8 @@ public class TestJTS {
         PostgisTestCases testCases = new PostgisTestCases();
         Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_2DM);
         org.locationtech.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
-        Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
-        DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
+        Assert.assertTrue(CoordinateXYM.class.isInstance(jtsGeometry.getCoordinates()[0]));
+        CoordinateXYM dc = (CoordinateXYM) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
         assertTrue(Double.isNaN(dc.getZ()));
 
