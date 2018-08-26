@@ -44,6 +44,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 	private final Method structDescriptorCreator;
 	private final Method arrayDescriptorCreator;
 	private final Constructor<?> numberConstructor;
+	private final Constructor<?> doubleConstructor;
 	private final Constructor<?> arrayConstructor;
 	private final Constructor<?> structConstructor;
 	private final ConnectionFinder connectionFinder;
@@ -68,6 +69,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 		Class<?> structClass = findClass( "oracle.sql.STRUCT" );
 
 		numberConstructor = findConstructor( numberClass, java.lang.Integer.TYPE );
+		doubleConstructor = findConstructor(numberClass, java.lang.Double.TYPE);
 		arrayConstructor = findConstructor( arrayClass, arrayDescriptorClass, Connection.class, Object.class );
 		structConstructor = findConstructor( structClass, structDescriptorClass, Connection.class, Object[].class );
 	}
@@ -117,9 +119,9 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 
         final Object structDescriptor = createStructDescriptor( SDOGeometry.getTypeName(), oracleConnection );
         final Object[] attributes = createDatumArray( 5 );
-        attributes[0] = createNumber( geom.getGType().intValue() );
+        attributes[0] = createInteger( geom.getGType().intValue() );
         if ( geom.getSRID() > 0 ) {
-            attributes[1] = createNumber( geom.getSRID() );
+            attributes[1] = createInteger( geom.getSRID() );
         }
         else {
             attributes[1] = null;
@@ -128,9 +130,9 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
             final Object pointStructDescriptor = createStructDescriptor( SDOGeometry.getPointTypeName(), oracleConnection );
             final Object[] pointAttributes = createDatumArray(3);
             SDOPoint sdoPnt = geom.getPoint();
-            pointAttributes[0] = sdoPnt.x;
-            pointAttributes[1] = sdoPnt.y;
-            pointAttributes[2] = sdoPnt.z;
+            pointAttributes[0] = createDouble(sdoPnt.x);
+            pointAttributes[1] = createDouble(sdoPnt.y);
+            pointAttributes[2] = createDouble(sdoPnt.z);
             attributes[2] = createStruct(pointStructDescriptor, oracleConnection, pointAttributes);
         } else {
             attributes[3] = createElemInfoArray( geom.getInfo(), oracleConnection );
@@ -211,9 +213,24 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 
 	}
 
-	private Object createNumber(int obj) {
+	private Object createInteger(int obj) {
 		try {
 			return numberConstructor.newInstance( obj );
+		}
+		catch ( InvocationTargetException e ) {
+			throw new RuntimeException( "Error creating oracle NUMBER", e );
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException( "Error creating oracle NUMBER", e );
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException( "Error creating oracle NUMBER", e );
+		}
+	}
+
+	private Object createDouble(Double obj) {
+		try {
+			return obj == null ? null : doubleConstructor.newInstance( obj );
 		}
 		catch ( InvocationTargetException e ) {
 			throw new RuntimeException( "Error creating oracle NUMBER", e );

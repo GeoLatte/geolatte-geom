@@ -91,8 +91,15 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
         return new PositionSequenceIterator<P>(this);
     }
 
+    /** @deprecated in {@link org.locationtech.jts.geom.CoordinateSequence }.*/
+    @Deprecated
     @Override
     public PositionSequence<P> clone() {
+        return new PackedPositionSequence<>(getPositionFactory(), Arrays.copyOf(this.coordinates, this.coordinates.length));
+    }
+
+    @Override
+    public PackedPositionSequence<P> copy() {
         return new PackedPositionSequence<>(getPositionFactory(), Arrays.copyOf(this.coordinates, this.coordinates.length));
     }
 

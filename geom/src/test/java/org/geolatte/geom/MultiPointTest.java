@@ -52,7 +52,7 @@ public class MultiPointTest {
 
     @Test
     public void testAsJTS() throws Exception {
-        com.vividsolutions.jts.geom.Geometry jtsMP = JTS.to(pnt1);
+        org.locationtech.jts.geom.Geometry jtsMP = JTS.to(pnt1);
         assertEquals(jtsMP.getNumGeometries(), pnt1.getNumGeometries());
         for (int i = 0; i < pnt1.getNumGeometries(); i++) {
             assertEquals(jtsMP.getGeometryN(i).getCoordinate().x, pnt1.getGeometryN(i).getPosition().getCoordinate(0), Math.ulp(100));

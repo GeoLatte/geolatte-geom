@@ -10,9 +10,9 @@ package org.geolatte.geom.codec.db.oracle;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Assert;
 import org.junit.Test;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  * @author Christian Marsch
@@ -28,7 +28,7 @@ public class GeogratTests {
 						5943936.628, 0.0, 3569204.323, 5943986.624, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Polygon);
 		Assert.assertTrue(!jtsGeo.isRectangle());
@@ -41,7 +41,7 @@ public class GeogratTests {
 						5942919.687, 0.0, 3571875.563, 5944981.37752, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Polygon);
 		Assert.assertTrue(jtsGeo.isRectangle());
@@ -54,7 +54,7 @@ public class GeogratTests {
 						5942919.687, 0.0, 3571875.563, 5944981.37752, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Polygon);
 		Assert.assertTrue(jtsGeo.isRectangle());
@@ -70,7 +70,7 @@ public class GeogratTests {
 								5944170.3853, 0.0, 3568643.2332, 5944170.1415, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 
 		Assert.assertTrue(jtsGeo instanceof LineString);
@@ -88,7 +88,7 @@ public class GeogratTests {
 								3569548.9692, 5943673.2351, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 
 		Assert.assertTrue(jtsGeo instanceof Polygon);
@@ -285,7 +285,7 @@ public class GeogratTests {
 				});
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 
 		Assert.assertTrue(jtsGeo instanceof Polygon);
@@ -346,7 +346,7 @@ public class GeogratTests {
 						5944765.8, 0.0, 3571074.1333, 5944777.273, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Polygon);
 		Assert.assertTrue(!jtsGeo.isRectangle());
@@ -475,7 +475,7 @@ public class GeogratTests {
 						5944401.744, 0.0, 3568981.326, 5944402.154, 0.0, 3568981.365, 5944402.176, 0.0 });
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Polygon);
 		Assert.assertTrue(!jtsGeo.isRectangle());
@@ -488,7 +488,7 @@ public class GeogratTests {
 				SDOGeometryHelper.sdoGeometry(3001, 0, new SDOPoint(33376662.068, 6019344.242, null), null, null);
 
 		@SuppressWarnings("unchecked")
-		com.vividsolutions.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
+		org.locationtech.jts.geom.Geometry jtsGeo = JTS.to(Decoders.decode(sdo));
 		Assert.assertTrue(jtsGeo.isValid());
 		Assert.assertTrue(jtsGeo instanceof Point);
 	}

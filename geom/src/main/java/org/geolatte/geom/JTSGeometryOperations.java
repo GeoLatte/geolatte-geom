@@ -21,14 +21,14 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.algorithm.ConvexHull;
-import com.vividsolutions.jts.operation.BoundaryOp;
-import com.vividsolutions.jts.operation.IsSimpleOp;
-import com.vividsolutions.jts.operation.buffer.BufferOp;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
-import com.vividsolutions.jts.operation.overlay.OverlayOp;
-import com.vividsolutions.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
-import com.vividsolutions.jts.operation.relate.RelateOp;
+import org.locationtech.jts.algorithm.ConvexHull;
+import org.locationtech.jts.operation.BoundaryOp;
+import org.locationtech.jts.operation.IsSimpleOp;
+import org.locationtech.jts.operation.buffer.BufferOp;
+import org.locationtech.jts.operation.distance.DistanceOp;
+import org.locationtech.jts.operation.overlay.OverlayOp;
+import org.locationtech.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+import org.locationtech.jts.operation.relate.RelateOp;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
@@ -194,7 +194,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
         if (geometry.isEmpty() || other.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
         checkNotGeometryCollection(geometry);
         checkNotGeometryCollection(other);
-        com.vividsolutions.jts.geom.Geometry intersection = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.INTERSECTION);
+        org.locationtech.jts.geom.Geometry intersection = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.INTERSECTION);
         return JTS.from(intersection, geometry.getCoordinateReferenceSystem());
     }
 
@@ -205,7 +205,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
         if (other.isEmpty()) return geometry;
         checkNotGeometryCollection(geometry);
         checkNotGeometryCollection(other);
-        com.vividsolutions.jts.geom.Geometry union = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.UNION);
+        org.locationtech.jts.geom.Geometry union = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.UNION);
         return JTS.from(union, geometry.getCoordinateReferenceSystem());
 
     }
@@ -217,7 +217,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
         if (other.isEmpty()) return geometry;
         checkNotGeometryCollection(geometry);
         checkNotGeometryCollection(other);
-        com.vividsolutions.jts.geom.Geometry difference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.DIFFERENCE);
+        org.locationtech.jts.geom.Geometry difference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.DIFFERENCE);
         return JTS.from(difference, geometry.getCoordinateReferenceSystem());
 
     }
@@ -229,7 +229,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
                 if (other.isEmpty()) return geometry;
                 checkNotGeometryCollection(geometry);
                 checkNotGeometryCollection(other);
-                com.vividsolutions.jts.geom.Geometry symDifference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.SYMDIFFERENCE);
+                org.locationtech.jts.geom.Geometry symDifference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.SYMDIFFERENCE);
                 return JTS.from(symDifference, geometry.getCoordinateReferenceSystem());
     }
 
