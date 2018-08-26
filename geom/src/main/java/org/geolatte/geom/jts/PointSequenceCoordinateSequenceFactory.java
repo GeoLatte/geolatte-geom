@@ -75,16 +75,16 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         Arrays.fill(psc, Double.NaN);
         PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(cs.size(), posType);
         for (int i = 0; i < cs.size(); i++) {
-            psc[0] = cs.getOrdinate(i, 0);
-            psc[1] = cs.getOrdinate(i, 1);
+            psc[0] = cs.getX(i);
+            psc[1] = cs.getY(i);
             if (hasVerticalAxis(crs)) {
-                psc[2] = cs.getOrdinate(i, 2);
+                psc[2] = cs.getZ(i);
             }
 
             // transfer measure values to position
             if (hasMeasureAxis(crs)) {
                 final int idxM = hasVerticalAxis(crs) ? 3 : 2;
-                final double mOrdinate = cs.getOrdinate(i, CoordinateSequence.M);
+                final double mOrdinate = cs.getM(i);
                 psc[idxM] = mOrdinate;
             }
 

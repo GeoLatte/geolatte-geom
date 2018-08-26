@@ -179,7 +179,6 @@ public class TestJTS {
     }
 
 
-    // Note that the d2DM and d3DM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
     // We always need to use JTS.from(Geometry,CRS) because we use UNDEFINED 2D and 3D CRS's
     private void testInputs(WktWkbCodecTestBase testCases) {
         for (Integer testCase : testCases.getCases()) {
