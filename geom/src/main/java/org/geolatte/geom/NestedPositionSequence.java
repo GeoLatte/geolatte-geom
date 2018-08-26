@@ -21,7 +21,7 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequence;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -86,8 +86,15 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         return this.size;
     }
 
+    /** @deprecated in {@link org.locationtech.jts.geom.CoordinateSequence }.*/
+    @Deprecated
     @Override
     public NestedPositionSequence<P> clone() {
+        return this; //this is correct since this object is immutable.
+    }
+
+    @Override
+    public NestedPositionSequence<P> copy() {
         return this; //this is correct since this object is immutable.
     }
 

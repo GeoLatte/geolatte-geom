@@ -98,12 +98,12 @@ public class SerializableTest {
 
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
         Geometry<C2D> geom = point(crs, c(3, 4));
-        com.vividsolutions.jts.geom.Point jtsPoint = (com.vividsolutions.jts.geom.Point) JTS.to(geom);
+        org.locationtech.jts.geom.Point jtsPoint = (org.locationtech.jts.geom.Point) JTS.to(geom);
         ObjectOutputStream outputStream = new ObjectOutputStream(byteOutput);
         outputStream.writeObject(jtsPoint);
 
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
-        com.vividsolutions.jts.geom.Point geomOut = (com.vividsolutions.jts.geom.Point) inputStream.readObject();
+        org.locationtech.jts.geom.Point geomOut = (org.locationtech.jts.geom.Point) inputStream.readObject();
 
         assertEquals(jtsPoint, geomOut);
     }
@@ -113,12 +113,12 @@ public class SerializableTest {
     public void testSerializeJtsLineString() throws Exception {
 
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        com.vividsolutions.jts.geom.LineString jts = (com.vividsolutions.jts.geom.LineString) JTS.to(linestring(crs, c(3, 4), c(5, 5)));
+        org.locationtech.jts.geom.LineString jts = (org.locationtech.jts.geom.LineString) JTS.to(linestring(crs, c(3, 4), c(5, 5)));
         ObjectOutputStream outputStream = new ObjectOutputStream(byteOutput);
         outputStream.writeObject(jts);
 
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
-        com.vividsolutions.jts.geom.LineString geomOut = (com.vividsolutions.jts.geom.LineString) inputStream.readObject();
+        org.locationtech.jts.geom.LineString geomOut = (org.locationtech.jts.geom.LineString) inputStream.readObject();
 
         assertEquals(jts, geomOut);
     }
@@ -127,14 +127,14 @@ public class SerializableTest {
     public void testSerializeJtsMultiLineString() throws Exception {
 
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        com.vividsolutions.jts.geom.MultiLineString jts = (com.vividsolutions.jts.geom.MultiLineString) JTS.to(
+        org.locationtech.jts.geom.MultiLineString jts = (org.locationtech.jts.geom.MultiLineString) JTS.to(
                 multilinestring(crs, linestring(c(1, 1), c(4, 4)), linestring(c(3, 4), c(5, 5)))
         );
         ObjectOutputStream outputStream = new ObjectOutputStream(byteOutput);
         outputStream.writeObject(jts);
 
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
-        com.vividsolutions.jts.geom.MultiLineString geomOut = (com.vividsolutions.jts.geom.MultiLineString) inputStream.readObject();
+        org.locationtech.jts.geom.MultiLineString geomOut = (org.locationtech.jts.geom.MultiLineString) inputStream.readObject();
 
         assertEquals(jts, geomOut);
     }
@@ -144,14 +144,14 @@ public class SerializableTest {
     public void testSerializeJtsPolygon() throws Exception {
 
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        com.vividsolutions.jts.geom.Polygon jts = (com.vividsolutions.jts.geom.Polygon) JTS.to(
+        org.locationtech.jts.geom.Polygon jts = (org.locationtech.jts.geom.Polygon) JTS.to(
                 polygon(crs, ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)))
         );
         ObjectOutputStream outputStream = new ObjectOutputStream(byteOutput);
         outputStream.writeObject(jts);
 
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(byteOutput.toByteArray()));
-        com.vividsolutions.jts.geom.Polygon geomOut = (com.vividsolutions.jts.geom.Polygon) inputStream.readObject();
+        org.locationtech.jts.geom.Polygon geomOut = (org.locationtech.jts.geom.Polygon) inputStream.readObject();
 
         assertEquals(jts, geomOut);
     }

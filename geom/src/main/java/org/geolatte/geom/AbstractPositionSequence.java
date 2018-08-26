@@ -21,8 +21,8 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Envelope;
 import org.geolatte.geom.jts.DimensionalCoordinate;
 
 import java.io.Serializable;
@@ -38,8 +38,8 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         this.factory = factory;
     }
 
-    private static com.vividsolutions.jts.geom.Coordinate[] toCoordinateArray(AbstractPositionSequence cseq) {
-        com.vividsolutions.jts.geom.Coordinate[] coordinates = new com.vividsolutions.jts.geom.Coordinate[cseq.size()];
+    private static org.locationtech.jts.geom.Coordinate[] toCoordinateArray(AbstractPositionSequence cseq) {
+        org.locationtech.jts.geom.Coordinate[] coordinates = new org.locationtech.jts.geom.Coordinate[cseq.size()];
         for (int i = 0; i < cseq.size(); i++) {
             coordinates[i] = cseq.getCoordinate(i);
 
@@ -106,7 +106,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
 //    }
 
 
-    public com.vividsolutions.jts.geom.Coordinate getCoordinate(int i) {
+    public org.locationtech.jts.geom.Coordinate getCoordinate(int i) {
         DimensionalCoordinate co = new DimensionalCoordinate();
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(i, c);
@@ -120,12 +120,12 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return co;
     }
 
-    public com.vividsolutions.jts.geom.Coordinate getCoordinateCopy(int i) {
+    public org.locationtech.jts.geom.Coordinate getCoordinateCopy(int i) {
         return getCoordinate(i);
     }
 
     @Override
-    public void getCoordinate(int index, com.vividsolutions.jts.geom.Coordinate coord) {
+    public void getCoordinate(int index, org.locationtech.jts.geom.Coordinate coord) {
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(index, c);
         coord.x = c[0];
@@ -171,7 +171,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     public abstract void setOrdinate(int i, int ordinateIndex, double value);
 
     @Override
-    public com.vividsolutions.jts.geom.Coordinate[] toCoordinateArray() {
+    public org.locationtech.jts.geom.Coordinate[] toCoordinateArray() {
         return toCoordinateArray(this);
     }
 

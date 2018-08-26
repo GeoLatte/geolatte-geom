@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryCollection;
 import org.geolatte.geom.Measured;
@@ -80,7 +80,7 @@ public class TestJTS {
     public void test_measured_3d() {
         PostgisTestCases testCases = new PostgisTestCases();
         Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_3DM);
-        com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
+        org.locationtech.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
         Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
@@ -93,7 +93,7 @@ public class TestJTS {
     public void test_measured_2d() {
         PostgisTestCases testCases = new PostgisTestCases();
         Geometry<?> geometry = testCases.getExpected(PostgisTestCases.LINESTRING_2DM);
-        com.vividsolutions.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
+        org.locationtech.jts.geom.Geometry jtsGeometry = JTS.to(geometry);
         Assert.assertTrue(DimensionalCoordinate.class.isInstance(jtsGeometry.getCoordinates()[0]));
         DimensionalCoordinate dc = (DimensionalCoordinate) jtsGeometry.getCoordinates()[0];
         assertEquals(dc.getM(), 2, Math.ulp(2));
@@ -151,13 +151,13 @@ public class TestJTS {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_null_arguments_from() {
-        JTS.from((com.vividsolutions.jts.geom.Geometry) null);
+        JTS.from((org.locationtech.jts.geom.Geometry) null);
 
     }
 
     @Test
     public void test_from_with_srid() {
-        com.vividsolutions.jts.geom.Geometry geometry = JTS.to(point(crs, c(1, 2)));
+        org.locationtech.jts.geom.Geometry geometry = JTS.to(point(crs, c(1, 2)));
         geometry.setSRID(4326);
         assertEquals(4326, JTS.from(geometry).getSRID());
 
@@ -173,32 +173,31 @@ public class TestJTS {
     }
 
     private void test_empty(Geometry empty) {
-        com.vividsolutions.jts.geom.Geometry jts = JTS.to(empty);
+        org.locationtech.jts.geom.Geometry jts = JTS.to(empty);
         assertTrue(jts.isEmpty());
         assertEquals(empty, JTS.from(jts, empty.getCoordinateReferenceSystem()));
     }
 
 
-    // Note that the d2DM and d3DM cases are ignored, because the JTS WKTReader cannot parse the relevant EWKT forms.
     // We always need to use JTS.from(Geometry,CRS) because we use UNDEFINED 2D and 3D CRS's
     private void testInputs(WktWkbCodecTestBase testCases) {
         for (Integer testCase : testCases.getCases()) {
             String failureMsg = "Failure in testcase " + testCase;
             String wkt = testCases.getWKT(testCase);
             Geometry geolatteGeom = wktDecoder.decode(wkt);
-            com.vividsolutions.jts.geom.Geometry jtsGeom = null;
+            org.locationtech.jts.geom.Geometry jtsGeom = null;
             jtsGeom = parseWKTtoJTS(wkt, jtsGeom);
             if (jtsGeom == null) {
                 //some EWKT forms cannot be parse, so in this case we just check that the To/From methods are consistent
-                com.vividsolutions.jts.geom.Geometry jts = JTS.to(geolatteGeom);
+                org.locationtech.jts.geom.Geometry jts = JTS.to(geolatteGeom);
                 assertEquals(String.format("Error for case %d", testCase), geolatteGeom, JTS.from(jts, geolatteGeom.getCoordinateReferenceSystem()));
                 continue;
             }
-            if (com.vividsolutions.jts.geom.GeometryCollection.class.isInstance(jtsGeom)) {
+            if (org.locationtech.jts.geom.GeometryCollection.class.isInstance(jtsGeom)) {
                 // JTS's equals method cannot handle GeometryCollection classes, so we just test
                 // if the types and number of items are equal
                 assertEquals(failureMsg, JTS.getCorrespondingGeolatteClass(jtsGeom.getClass()), geolatteGeom.getClass());
-                assertEquals(((com.vividsolutions.jts.geom.GeometryCollection) jtsGeom).getNumGeometries(),
+                assertEquals(((org.locationtech.jts.geom.GeometryCollection) jtsGeom).getNumGeometries(),
                         ((GeometryCollection) geolatteGeom).getNumGeometries());
                 continue;
             }
@@ -218,7 +217,7 @@ public class TestJTS {
         }
     }
 
-    private com.vividsolutions.jts.geom.Geometry parseWKTtoJTS(String wkt, com.vividsolutions.jts.geom.Geometry jtsGeom) {
+    private org.locationtech.jts.geom.Geometry parseWKTtoJTS(String wkt, org.locationtech.jts.geom.Geometry jtsGeom) {
         try {
             jtsGeom = jtsWktDecoder.read(wkt);
         } catch (ParseException e) {

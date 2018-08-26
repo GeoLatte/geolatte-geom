@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.jts;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A <code>Coordinate</code> with an associated <code>DimensionalFlag</code>.
@@ -43,13 +43,12 @@ public class DimensionalCoordinate extends Coordinate {
         this.m = m;
     }
 
-    public double getZ(){
-        return  this.z;
-    }
-
+    @Override
     public double getM(){
         return this.m;
     }
 
+    @Override
+    public void setM(double m) { this.m = m; }
 
 }

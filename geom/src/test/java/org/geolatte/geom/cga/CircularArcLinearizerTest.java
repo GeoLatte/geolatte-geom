@@ -18,9 +18,9 @@ import org.geolatte.geom.support.generator.Generator;
 import org.geolatte.geom.support.generator.StdGenerators;
 import org.junit.Test;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/03/15.
@@ -232,7 +232,7 @@ public class CircularArcLinearizerTest {
     	LineString<C2D> lineString = new LineString<>(result,coordinateRefSystem);
     	Geometry jtsGeometry = JTS.to(lineString);
     	
-    	com.vividsolutions.jts.geom.LineString intersectGeometry = new GeometryFactory().createLineString(new Coordinate[] {new Coordinate(20.0, 20.0), new Coordinate(40.0, 20.0)});
+    	org.locationtech.jts.geom.LineString intersectGeometry = new GeometryFactory().createLineString(new Coordinate[] {new Coordinate(20.0, 20.0), new Coordinate(40.0, 20.0)});
     	assertTrue(jtsGeometry.intersects(intersectGeometry));
     }
     
@@ -246,7 +246,7 @@ public class CircularArcLinearizerTest {
     	LineString<C2D> lineString = new LineString<>(result,coordinateRefSystem);
     	Geometry jtsGeometry = JTS.to(lineString);
     	
-    	com.vividsolutions.jts.geom.LineString intersectGeometry = new GeometryFactory().createLineString(new Coordinate[] {new Coordinate(20.0, 20.0), new Coordinate(40.0, 20.0)});
+    	org.locationtech.jts.geom.LineString intersectGeometry = new GeometryFactory().createLineString(new Coordinate[] {new Coordinate(20.0, 20.0), new Coordinate(40.0, 20.0)});
     	assertTrue(jtsGeometry.intersects(intersectGeometry));
     }
 }

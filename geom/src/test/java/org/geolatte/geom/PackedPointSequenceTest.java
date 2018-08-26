@@ -21,8 +21,8 @@
 
 package org.geolatte.geom;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
