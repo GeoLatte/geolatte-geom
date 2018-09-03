@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/07/2018.
  */
-class GeoJsonFeature<P extends Position, ID> implements Feature<P, ID> {
+public class GeoJsonFeature<P extends Position, ID> implements Feature<P, ID> {
 
 
     final private Geometry<P> geometry;
