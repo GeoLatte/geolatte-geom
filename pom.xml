@@ -118,10 +118,10 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.0.1</version>
+						<version>2.9.1</version>
 						<!-- doclint config removed for building with jdk < 8 (as in Travis) -->
-						<!--<configuration> -->
-						<!--<additionalparam>-Xdoclint:none</additionalparam> -->
+						<!--<configuration>-->
+						<!--<additionalparam>-Xdoclint:none</additionalparam>-->
 						<!--</configuration> -->
 						<executions>
 							<execution>
@@ -201,7 +201,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>2.9.1</version>
                 <configuration>
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
