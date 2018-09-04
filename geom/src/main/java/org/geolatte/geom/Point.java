@@ -59,6 +59,7 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
     @Override
     @SuppressWarnings("unchecked")
     public <Q extends Position> Point<Q> as(Class<Q> castToType){
+        checkCast(castToType);
         return (Point<Q>)this;
     }
 

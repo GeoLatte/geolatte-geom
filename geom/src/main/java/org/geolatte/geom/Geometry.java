@@ -30,6 +30,8 @@ import org.geolatte.geom.crs.CrsRegistry;
 import java.io.*;
 import java.lang.reflect.Array;
 
+import static java.lang.String.format;
+
 /**
  * The base class for <code>Geometry</code>s.
  *
@@ -191,8 +193,21 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return Positions.mkPosition(getCoordinateReferenceSystem(), coords);
     }
 
+    /**
+     * Checks whether a cast should succeed
+     * @param castToType
+     * @param <Q>
+     */
+    protected <Q extends Position> void checkCast(Class<Q> castToType) {
+        if (! castToType.isAssignableFrom(getPositionClass()) ) {
+            throw new ClassCastException(format("Can't cast a %s to a %s", getPositionClass().getName(),
+                    castToType.getName()));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public <Q extends Position> Geometry<Q> as(Class<Q> castToType){
+        checkCast(castToType);
         return (Geometry<Q>)this;
     }
 

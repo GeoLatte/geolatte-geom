@@ -125,6 +125,7 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     @Override
     @SuppressWarnings("unchecked")
     public <Q extends Position> LineString<Q> as(Class<Q> castToType){
+        checkCast(castToType);
         return (LineString<Q>)this;
     }
 

@@ -61,7 +61,7 @@ public class CastBehaviorTest {
         CoordinateReferenceSystem<C3D> crs3D = CoordinateReferenceSystems.mkCoordinateReferenceSystem(WEB_MERCATOR, Unit.METER, null, C3D.class);
         Point<?> pnt = point(crs3D, c(1, 2, 3));
         Point<C2DM> pntAs2Dm = pnt.as(C2DM.class);
-        assertEquals(1, pntAs2Dm.getPosition().getX(), epsilon);
+
     }
 
     @Test(expected = ClassCastException.class)
@@ -69,7 +69,16 @@ public class CastBehaviorTest {
 
         Point<?> pnt = point(WEB_MERCATOR, c(1, 2));
         Point<C3D> pntAs3D = pnt.as(C3D.class);
-        assertEquals(1, pntAs3D.getPosition().getX(), epsilon);
+
+    }
+
+
+    @Test(expected = ClassCastException.class)
+    public void testCast2DPlanarto2DGeographic(){
+
+        Point<?> pnt = point(WEB_MERCATOR, c(1, 2));
+        Point<G2D> pntAs2D = pnt.as(G2D.class);
+
     }
 
 
@@ -78,8 +87,7 @@ public class CastBehaviorTest {
         CoordinateReferenceSystem<C3D> crs3D = CoordinateReferenceSystems.mkCoordinateReferenceSystem(WEB_MERCATOR, Unit.METER, null, C3D.class);
         Point<?> pnt = point(crs3D, c(1, 2, 3));
         Point<G2D> pntAs2D = pnt.as(G2D.class);
-        assertEquals(1, pntAs2D.getPosition().getLon(), epsilon);
-        assertEquals(2, pntAs2D.getPosition().getLat(), epsilon);
+
     }
 
 

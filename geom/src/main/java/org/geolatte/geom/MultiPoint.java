@@ -63,6 +63,7 @@ public class MultiPoint<P extends Position> extends GeometryCollection<P, Point<
 
     @SuppressWarnings("unchecked")
     public <Q extends Position> MultiPoint<Q> as(Class<Q> castToType){
+        checkCast(castToType);
         return (MultiPoint<Q>)this;
     }
 

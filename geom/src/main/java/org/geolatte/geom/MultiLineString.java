@@ -75,6 +75,7 @@ public class MultiLineString<P extends Position> extends GeometryCollection<P, L
 
     @SuppressWarnings("unchecked")
     public <Q extends Position> MultiLineString<Q> as(Class<Q> castToType){
+        checkCast(castToType);
         return (MultiLineString<Q>)this;
     }
 
