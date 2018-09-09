@@ -375,7 +375,7 @@ e     * Currently not used in Postgis and also not implemented here!
         nextToken();
         double[] toWGS = new double[7];
         matchesOpenList();
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 7; i++) { //TODO -- what with 3-parameter variants?
             toWGS[i] = decodeNumber();
             matchesElementSeparator();
         }

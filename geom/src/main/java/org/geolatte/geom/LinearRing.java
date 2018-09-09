@@ -54,4 +54,11 @@ public class LinearRing<P extends Position> extends LineString<P> {
         if (isEmpty() || (isClosed() && getNumPositions() > 3)) return;
         throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed or contains < 4 points.");
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> LinearRing<Q> as(Class<Q> castToType){
+        checkCast(castToType);
+        return (LinearRing<Q>)this;
+    }
 }

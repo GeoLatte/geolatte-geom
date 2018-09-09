@@ -76,7 +76,7 @@ public class Datum extends CrsIdentifiable {
     }
 
     /**
-     * Returns the Bursa-Wolf transformation parameters to the WGS84 datum.
+     * Returns the parameters for the {@code PositionVectorTransformation} to the WGS84 datum.
      *
      * <p>If the parameters are not available for this <code>Datum</code>, than an array of size zero is returned.</p>
      *

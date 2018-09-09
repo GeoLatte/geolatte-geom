@@ -197,4 +197,11 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
     public LinearRing<P>[] components() {
         return Arrays.copyOf(this.rings, this.rings.length);
     }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> Polygon<Q> as(Class<Q> castToType){
+        checkCast(castToType);
+        return (Polygon<Q>)this;
+    }
 }
