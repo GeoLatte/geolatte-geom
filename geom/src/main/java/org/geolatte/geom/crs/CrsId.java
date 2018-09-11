@@ -131,6 +131,18 @@ public class CrsId {
         return String.format("urn:ogc:def:crs:%s::%s", authority, code);
     }
 
+    /**
+     * Creates an instance that identifies the crs identified by this {@code CrsId}, but
+     * extended with (optionally) a vertical or measure axis.
+     *
+     * @param zUnit the unit for the vertical axis (or null if there is no such axis)
+     * @param mUnit the unit for the measure axis (or null if there is no such axis)
+     * @return
+     */
+    public CrsId extend(LinearUnit zUnit, Unit mUnit) {
+        return zUnit == null && mUnit == null ? this : new CrsExtendedId(this, zUnit, mUnit);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

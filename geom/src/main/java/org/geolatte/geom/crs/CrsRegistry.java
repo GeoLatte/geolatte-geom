@@ -109,9 +109,24 @@ public class CrsRegistry {
     public static CoordinateReferenceSystem<?> getCoordinateReferenceSystemForEPSG(int epsgCode,
                                                                                    CoordinateReferenceSystem<?>
                                                                                            fallback) {
-        CoordinateReferenceSystem<?> crs = crsMap.get(CrsId.valueOf(epsgCode));
+        return getCoordinateReferenceSystem(CrsId.valueOf(epsgCode), fallback);
+    }
+
+    /**
+     * returns the <code>CoordinateReferenceSystem</code> for the specified {@code CrsId}
+     *
+     * @param crsId the identifier for the Coordinate Reference System
+     * @param fallback the coordinate
+     * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
+     * no such system is registered.
+     */
+    public static CoordinateReferenceSystem<?> getCoordinateReferenceSystem(CrsId crsId,
+                                                                            CoordinateReferenceSystem<?>
+                                                                                           fallback) {
+        CoordinateReferenceSystem<?> crs = crsMap.get(crsId);
         return crs != null ? crs : fallback;
     }
+
 
     /**
      * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Projected 2D system and register
@@ -137,13 +152,24 @@ public class CrsRegistry {
 
 
     /**
-     * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
+     * Registers a {@code CoordinateReferenceSystem} in the registry.
      *
      * @param crs      the {@code CoordinateReferenceSystem} to register
      */
     public static void registerCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
         crsMap.put(crs.getCrsId(), crs);
     }
+
+    /**
+     * Registers a {@code CoordinateReferenceSystem} in the registry under the specified (pseudo-)EPSG code.
+     *
+     * @param id       the {@code CrsId} under which to register this CoordinateReferenceSystem
+     * @param crs      the {@code CoordinateReferenceSystem} to register
+     */
+    public static void registerCoordinateReferenceSystem(CrsId id, CoordinateReferenceSystem<?> crs) {
+        crsMap.put(id, crs);
+    }
+
 
     /**
      * Determine if the registry contains the {@code CoordinateReferenceSystem} identified by its SRID
