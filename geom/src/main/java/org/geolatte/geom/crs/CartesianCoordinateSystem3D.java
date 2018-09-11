@@ -14,7 +14,7 @@ public class CartesianCoordinateSystem3D extends CoordinateSystem<C3D> {
     private final static List<Integer> REQUIRED_AXIS_NORMAL_ORDER = Arrays.asList(0, 1, 2);
 
     public CartesianCoordinateSystem3D(StraightLineAxis firstAxis, StraightLineAxis secondAxis,
-                                       VerticalStraightLineAxis thirdAxis) {
+                                       StraightLineAxis thirdAxis) {
         super(firstAxis, secondAxis, thirdAxis);
         checkAxes();
     }

@@ -23,6 +23,8 @@ package org.geolatte.geom.crs;
 
 import org.geolatte.geom.C3D;
 
+import java.util.Objects;
+
 /**
  * A geo-centric <code>CoordinateReferenceSystem</code>.
  *
@@ -62,4 +64,18 @@ public class GeocentricCartesianCoordinateReferenceSystem extends SingleCoordina
         return this.primePeridian;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        GeocentricCartesianCoordinateReferenceSystem that = (GeocentricCartesianCoordinateReferenceSystem) o;
+        return Objects.equals(datum, that.datum) &&
+                Objects.equals(primePeridian, that.primePeridian);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), datum, primePeridian);
+    }
 }

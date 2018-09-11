@@ -1,11 +1,13 @@
 package org.geolatte.geom.crs;
 
 /**
+ * Vertical Datum
+ *
+ * TODO - document the datum type and extension, and provide reference for this model
  * Created by Karel Maesen, Geovise BVBA on 29/11/14.
  */
 public class VerticalDatum extends CrsIdentifiable {
-
-
+    
     public static final VerticalDatum UNKNOWN_VERTICAL_DATUM = new VerticalDatum(CrsId.UNDEFINED, "Undefined " +
             "Vertical", 0);
 
