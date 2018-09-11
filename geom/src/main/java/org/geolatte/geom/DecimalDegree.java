@@ -2,6 +2,7 @@ package org.geolatte.geom;
 
 
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +75,7 @@ public class DecimalDegree {
         double min = Math.floor(mindd);
         double sec = Math.round( 6000 * (mindd - min)) / 100; //we multiply by 100 and then divide to get correct rounding tot two decimals
 
-        return format("%1$d° %2$d' %3$.2f''", (int)deg, (int)min, sec);
+        return format(Locale.ROOT, "%1$d° %2$d' %3$.2f''", (int)deg, (int)min, sec);
     }
 
     private static double fromDMS(int deg, int min, double sec, String NWSE) {
