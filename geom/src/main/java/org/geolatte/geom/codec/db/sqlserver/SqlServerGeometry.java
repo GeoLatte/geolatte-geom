@@ -22,10 +22,7 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
+import org.geolatte.geom.crs.*;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -45,7 +42,7 @@ public class SqlServerGeometry {
 
 	public static final byte SUPPORTED_VERSION = 1;
 
-	private static CoordinateReferenceSystem<?> DEFAULT_CRS = CoordinateReferenceSystems.mkProjected(0, Unit.METER);
+	private static CoordinateReferenceSystem<?> DEFAULT_CRS = CoordinateReferenceSystems.mkProjected(CrsId.valueOf(0), Unit.METER);
 
 	private static final byte hasZValuesMask = 1;
 	private static final byte hasMValuesMask = 2;

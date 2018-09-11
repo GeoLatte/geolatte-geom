@@ -83,7 +83,7 @@ public class TestCrsId {
     public void testValueOfReturnsIdenticalObjectForIdentialEPSGCodes(){
         CrsId id1 = CrsId.valueOf(4326);
         CrsId id2 = CrsId.valueOf(4326);
-        assertTrue(id1 == id2);
+        assertEquals(id1, id2);
     }
     
 
@@ -98,7 +98,7 @@ public class TestCrsId {
     public void testHashCode(){
         CrsId id1 = CrsId.valueOf(12);
         CrsId id2 = CrsId.valueOf(12);
-        assertTrue(id1.equals(id2));
+        assertEquals(id1, id2);
         assertEquals(id1.hashCode(), id2.hashCode());
     }
 

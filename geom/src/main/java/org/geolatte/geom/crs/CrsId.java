@@ -68,14 +68,12 @@ public class CrsId {
      * @return a <code>CrsId</code> for the specified authority and code.
      */
     public static CrsId valueOf(String authority, int code) {
-        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0 )) {
-            return CrsId.UNDEFINED;
-        }
-        CrsId result = null;
-        if (DEFAULT_AUTHORITY.equalsIgnoreCase(authority)) {
-            result = CrsRegistry.getCrsIdForEPSG(code);
-        }
-        return result == null ? new CrsId(authority, code) : result;
+        if (isUnknownEPSG(authority, code)) return CrsId.UNDEFINED;
+        return new CrsId(authority, code);
+    }
+
+    private static boolean isUnknownEPSG(String authority, int code) {
+        return DEFAULT_AUTHORITY.equalsIgnoreCase(authority) && (code <= 0);
     }
 
     /**

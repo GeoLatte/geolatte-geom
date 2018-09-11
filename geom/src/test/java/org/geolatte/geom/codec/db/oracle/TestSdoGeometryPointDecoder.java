@@ -72,7 +72,7 @@ public class TestSdoGeometryPointDecoder {
     public void testPointUnknown3DDecoding(){
         //maxvalue as epsg-code because this is very unlikely ever to be a valid EPSG code
         SDOGeometry sdo = sdoGeometry(4301, Integer.MAX_VALUE, null,new int[]{ 1, 1, 1} , new Double[]{12d, 14d, 4d, 3d});
-        CoordinateReferenceSystem crs = CoordinateReferenceSystems.mkProjected(Integer.MAX_VALUE, LinearUnit.METER);
+        CoordinateReferenceSystem crs = CoordinateReferenceSystems.mkProjected(CrsId.valueOf(Integer.MAX_VALUE), LinearUnit.METER);
         crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
         crs = CoordinateReferenceSystems.addLinearSystem(crs, LinearUnit.METER);
         Geometry<?> geom = Decoders.decode(sdo);

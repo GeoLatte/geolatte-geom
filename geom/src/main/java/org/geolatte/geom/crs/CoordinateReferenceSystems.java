@@ -36,8 +36,8 @@ import static java.lang.String.format;
  */
 public class CoordinateReferenceSystems {
 
-    public static ProjectedCoordinateReferenceSystem mkProjected(int srid, LinearUnit unit) {
-        return new ProjectedCoordinateReferenceSystem(CrsId.valueOf(srid), "Generic 2D Projected",
+    public static ProjectedCoordinateReferenceSystem mkProjected(CrsId srid, LinearUnit unit) {
+        return new ProjectedCoordinateReferenceSystem(srid, "Generic 2D Projected",
                 mkGeographic(Unit.DEGREE), Projection.UNKNOWN, new ArrayList<>(),
                 new CartesianCoordinateSystem2D(new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, unit), new
                         StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, unit)));
@@ -52,7 +52,7 @@ public class CoordinateReferenceSystems {
      * @return a {@code CoordinateReferenceSystem} with the specified length units
      */
     public static ProjectedCoordinateReferenceSystem mkProjected(LinearUnit unit) {
-        return mkProjected(CrsId.UNDEFINED.getCode(), unit);
+        return mkProjected(CrsId.UNDEFINED, unit);
     }
 
     /**
@@ -64,14 +64,14 @@ public class CoordinateReferenceSystems {
      * @param unit the unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem}
      */
-    public static GeographicCoordinateReferenceSystem mkGeographic(int srid, AngularUnit unit) {
-        return new Geographic2DCoordinateReferenceSystem(CrsId.valueOf(srid), "Generic 2D Geographic", new
+    public static GeographicCoordinateReferenceSystem mkGeographic(CrsId srid, AngularUnit unit) {
+        return new Geographic2DCoordinateReferenceSystem(srid, "Generic 2D Geographic", new
                 EllipsoidalCoordinateSystem2D(new GeodeticLatitudeCSAxis("Lat", unit), new GeodeticLongitudeCSAxis
                 ("Lon", unit)));
     }
 
     public static GeographicCoordinateReferenceSystem mkGeographic(AngularUnit unit) {
-        return mkGeographic(CrsId.UNDEFINED.getCode(), unit);
+        return mkGeographic(CrsId.UNDEFINED, unit);
     }
 
     /**
