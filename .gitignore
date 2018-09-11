@@ -8,4 +8,8 @@ javadoc/*
 **/.classpath
 **/.project
 **/.settings
-**/bin
+**/bin**/logs/
+**/project/*-shim.sbt
+**/project/project/
+**/project/target/
+**/target/
