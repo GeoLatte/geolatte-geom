@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
@@ -136,7 +137,7 @@ public class CrsRegistry {
      * @return a CoordinateReferenceSystem with the specified epsg code
      */
     public static CoordinateReferenceSystem<?> ifAbsentReturnProjected2D(int epsgCode) {
-        return crsMap.computeIfAbsent(CrsId.valueOf(epsgCode), key -> CoordinateReferenceSystems.mkProjected(key, LinearUnit.METER));
+        return computeIfAbsent(CrsId.valueOf(epsgCode), key -> CoordinateReferenceSystems.mkProjected(key, LinearUnit.METER));
     }
 
     /**
@@ -147,9 +148,28 @@ public class CrsRegistry {
      * @return a CoordinateReferenceSystem with the specified epsg code
      */
     public static CoordinateReferenceSystem<?> ifAbsentReturnGeographic2D(int epsgCode) {
-        return crsMap.computeIfAbsent(CrsId.valueOf(epsgCode), key -> CoordinateReferenceSystems.mkGeographic(key, AngularUnit.RADIAN));
+        return computeIfAbsent(CrsId.valueOf(epsgCode),  key -> CoordinateReferenceSystems.mkGeographic(key, AngularUnit.RADIAN));
     }
 
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Geographic 2D system and register
+     * this on-the-fly.
+     *
+     * @param epsgCode the code to look up
+     * @return a CoordinateReferenceSystem with the specified epsg code
+     */
+
+    /**
+     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new reference system and register
+     * it on-the-fly.
+     *
+     * @param crsId the {@code CrsId} for the Coordinate reference system
+     * @param buildCrs the function that builds a new Coordinate Reference System, if none is available in this Registry
+     * @return the current (existing or computed) coordinate reference system identified by the specified {@code CrsId} identifier
+     */
+    public static CoordinateReferenceSystem<?> computeIfAbsent(CrsId crsId, Function<? super CrsId, ? extends CoordinateReferenceSystem<? extends Position>> buildCrs) {
+        return crsMap.computeIfAbsent(crsId, buildCrs);
+    }
 
     /**
      * Registers a {@code CoordinateReferenceSystem} in the registry.

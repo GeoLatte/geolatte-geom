@@ -67,15 +67,17 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
         if (settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION)) return crs;
 
         if (coordinateDimension <= 2) {
-            return mkCoordinateReferenceSystem(crs, null, null);
+            return crs;
         }
 
         if (coordinateDimension == 3) {
-            return mkCoordinateReferenceSystem(crs, METER, null);
+            CrsId extId = crs.getCrsId().extend(METER, null);
+            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, null));
         }
 
         if (coordinateDimension == 4) {
-            return mkCoordinateReferenceSystem(crs, METER, METER);
+            CrsId extId = crs.getCrsId().extend(METER, METER);
+            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, METER));
         }
 
         throw new GeoJsonProcessingException("CoordinateDimension " + coordinateDimension + " less than 2 or larger than 4");
