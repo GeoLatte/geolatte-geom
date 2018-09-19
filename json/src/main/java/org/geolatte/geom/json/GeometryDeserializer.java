@@ -61,6 +61,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
         return defaultCRS;
     }
 
+    //TODO -- move this to CoordinateReferenceSystems : it's usefull in many deser cases
     private CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension)
             throws GeoJsonProcessingException {
 

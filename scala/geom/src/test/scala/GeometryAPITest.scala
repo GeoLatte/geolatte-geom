@@ -47,6 +47,15 @@ class GeometryAPITest extends FlatSpec {
     assertResult( new Point( new G3D( 2.0, 3.0, 4.0 ), crs ) )( p )
   }
 
+  "A 3D Geodetic Geometry" should "be easily constructed from an array of doubles" in {
+    implicit val crs: CoordinateReferenceSystem[G3D] = addVerticalSystem(
+      WGS84, classOf[G3D], Unit.METER
+    )
+    val p = point( Array(2.0, 3.0, 4.0) )
+    assertResult( new Point( new G3D( 2.0, 3.0, 4.0 ), crs ) )( p )
+  }
+
+
   "A 2DM linestring " should "be easily constructed form tuples " in {
     implicit val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem( WGS84, classOf[G2DM], Unit.METER )
     val l = lineString( (2.0, 3.0, 4.0), (20.0, 40.0, 30.0) )

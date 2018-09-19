@@ -51,6 +51,14 @@ class GeometryReaderCRS extends FlatSpec {
     assert( crs.isInstanceOf[JsError])
   }
 
+  "Given a CRs, a PositionReader" should "deserialize a length 2 Json Array of Double to a Position" in {
+
+    val json = Json.parse("[1.0, 2.0]")
+
+    val position = json.as[Position](PosReads(WGS84))
+    assertResult( new G2D(1.0, 2.0))(position)
+
+  }
 
 
 
