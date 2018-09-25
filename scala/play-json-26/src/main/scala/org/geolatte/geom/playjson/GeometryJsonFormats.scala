@@ -2,7 +2,7 @@ package org.geolatte.geom.playjson
 
 import org.geolatte.geom._
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, CrsId, CrsRegistry}
-import play.api.data.validation.ValidationError
+import org.geolatte.geom.syntax.ArrayToPosition
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -14,6 +14,8 @@ import scala.util.{Failure, Success, Try}
   *         creation-date: 7/31/13
   */
 object GeometryJsonFormats {
+
+  import org.geolatte.geom.syntax.GeometryImplicits._
 
   private def resolveCrs(id: CrsId): CoordinateReferenceSystem[_ <: Position]  =
     CrsRegistry.getCoordinateReferenceSystemForEPSG( id.getCode, null )
@@ -32,7 +34,7 @@ object GeometryJsonFormats {
 
   implicit val crsReads: Reads[CoordinateReferenceSystem[_ <: Position]] =
     crsIdReads.map( f => resolveCrs( f ) ).filter(
-      ValidationError( s"Unknown CoordinateReferenceSystem" )
+      JsonValidationError( s"Unknown CoordinateReferenceSystem" )
     )( _ != null )
 
   implicit val crsOptReads : Reads[Option[CoordinateReferenceSystem[_ <: Position]]] =
@@ -42,28 +44,24 @@ object GeometryJsonFormats {
     crsOptReads.map( _.getOrElse(defaultCrs))
 
 
-
-//  def posReads[P <: Position, Q <: P](crs: CoordinateReferenceSystem[P]) : Reads[Q] =
-//    __.read[Array[Double]].map(arr =>  arr.length match {
-//      case 2 =>
-//    })
+  object Helper extends ArrayToPosition
 
 
-//  def pntReads(crs: CoordinateReferenceSystem[_ <:Position]) : Reads[Point[_ <:Position]] =
-//    (__ \ "coordinates").read[Array[Double]]
-//      .map( arr =>
-//              Geometries.mkPoint( Positions.mkPosition(crs.getPositionClass, arr:_*),crs)
-//      )
-//
-//
-//  def mkGeometryReads(defaultCrs: CoordinateReferenceSystem[_ <: Position]) = (
-//    crsReadsOrDefault(defaultCrs) and
-//      (__ \ "type").read[String] and
-//      __.json.pick
-//  )((crs, tpe, js) =>
-//      tpe.toLowerCase match {
-//        case "point" => js.as[Point[_]]( pntReads( crs ) )
-//      })
+
+  def pntReads[Q <: Position](crs: CoordinateReferenceSystem[_]) : Reads[Point[Q]] =
+    __.read[Array[Double]]
+      .map( arr =>  {
+          val pF = Helper.selectFactory[Q](crs, arr.length)
+          Geometries.mkPoint( pF.make(arr), pF.crs)
+      })
+
+  def mkGeometryReads[ Q <: Position](defaultCrs: CoordinateReferenceSystem[_]): Reads[Geometry[Q]] = (
+    crsReadsOrDefault(defaultCrs) and
+      (__ \ "type").read[String] and
+      (__ \ "coordinates").json.pick
+  )( (crs, tpe, coordinates) => tpe.toLowerCase match {
+        case "point" => coordinates.as[Point[Q]](pntReads(crs))
+      })
 
 
 

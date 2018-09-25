@@ -2,14 +2,16 @@ package org.geolatte.geom.playjson
 
 import org.scalatest.FlatSpec
 import org.geolatte.geom._
-import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, CrsId}
+import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, CrsId, LinearUnit}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import CoordinateReferenceSystems.WGS84
 
 class GeometryReaderCRS extends FlatSpec {
 
-  import GeometryImplicits._
+  import org.geolatte.geom.syntax.GeometryImplicits._
   import GeometryJsonFormats._
+  import org.geolatte.geom.crs._
+
 
 
   "Crs objects" should "be parsed to CrsId" in {
@@ -51,12 +53,18 @@ class GeometryReaderCRS extends FlatSpec {
     assert( crs.isInstanceOf[JsError])
   }
 
-  "Given a CRs, a PositionReader" should "deserialize a length 2 Json Array of Double to a Position" in {
+  "Given a CRs, a GeometryReader" should "deserialize a Json Geometry " in {
 
-    val json = Json.parse("[1.0, 2.0]")
+    import org.geolatte.geom.syntax.CoordinateReferenceSystemSyntax._
 
-    val position = json.as[Position](PosReads(WGS84))
-    assertResult( new G2D(1.0, 2.0))(position)
+    val json = Json.parse(JsonFragments.jsonPoint)
+    val WGS84Z = WGS84.addVertical()
+    implicit val geomReads = mkGeometryReads[Position](WGS84)
+    val pnt = json.as[Geometry[Position]]
+
+    val expected = point(WGS84Z)(1.0, 2.0, 3.0)
+
+    assertResult( expected )(pnt)
 
   }
 
@@ -78,6 +86,14 @@ object JsonFragments {
       |    }
     """.stripMargin
 
+  val jsonPoint =
+    s"""
+       |{ "crs" : $crsObject,
+       |  "type" : "Point",
+       |  "coordinates": [1.0,2.0, 3.0]
+       |  }
+     """.stripMargin
+
   val invalidCrsObject =
     s"""
        |  {
@@ -98,5 +114,7 @@ object JsonFragments {
        |    }
        |
      """.stripMargin
+
+
 
 }

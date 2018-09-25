@@ -1,8 +1,12 @@
 //The package name can't be scala because of problems in intellij import resolution (scala package classes not found)
-package org.geolatte.geom
+package org.geolatte.geom.syntax
 
+import org.geolatte.geom._
 import org.geolatte.geom.builder.DSL
-import org.geolatte.geom.crs.CoordinateReferenceSystem
+import org.geolatte.geom.crs.CoordinateReferenceSystems.mkCoordinateReferenceSystem
+import org.geolatte.geom.crs.Unit.METER
+import org.geolatte.geom.crs._
+
 
 trait PositionBuilder[-T, +P] {
   def apply(t: T): P
@@ -12,11 +16,27 @@ trait PositionSeqBuilder[-T, +P] {
   def apply(t: Seq[T]): Seq[P]
 }
 
-sealed trait PositionType
+sealed trait PositionType {
 
-case object Geodetic extends PositionType
+  def getPositionType(pclass: Class[_]): PositionType =
+    if ( classOf[G2D].isAssignableFrom(pclass) ) Geodetic else Cartesian
 
-case object Cartesian extends PositionType
+  def unapply(pcl: Class[_]) : Boolean
+
+  def getPositionType(crs: CoordinateReferenceSystem[_]): PositionType =  getPositionType(crs.getPositionClass)
+
+  def unapply( crs : CoordinateReferenceSystem[_] ) : Boolean = unapply(crs.getPositionClass)
+}
+
+
+
+case object Geodetic extends PositionType {
+  def unapply( pClass: Class[_]) : Boolean = getPositionType(pClass) == Geodetic
+}
+
+case object Cartesian extends PositionType {
+  def unapply( pClass: Class[_]) : Boolean = getPositionType(pClass) == Cartesian
+}
 
 trait PositionBuilders {
 
@@ -183,26 +203,90 @@ trait GeometryOpsImplicit {
 }
 
 
-trait PositionHelpers {
+trait ArrayToPosition {
 
-  def getPositionType(crs: CoordinateReferenceSystem[_]): PositionType =
-    if ( crs.getPositionClass.isInstanceOf[G2D] ) {
-      Geodetic
+  case class PFactory[Q <: Position](crs: CoordinateReferenceSystem[Q], make: Array[Double] => Q)
+
+  import Positions._
+
+  private[this] def adjustCrs[Q <: Position](crs: CoordinateReferenceSystem[_], coordinateDimension: Int) : CoordinateReferenceSystem[Q]= {
+    val adjusted = if ( coordinateDimension == 3 ) {
+      val extId = crs.getCrsId.extend( METER, null )
+      CrsRegistry
+        .computeIfAbsent( extId,  (key: CrsId) => mkCoordinateReferenceSystem( crs, METER, null ))
+    } else  if ( coordinateDimension == 4 ) {
+      val extId = crs.getCrsId.extend( METER, METER )
+      CrsRegistry.computeIfAbsent( extId,  (key: CrsId) => mkCoordinateReferenceSystem( crs, METER, METER ))
+    } else {
+      crs
     }
-    else {
-      Cartesian
-    }
 
-  def toPosition[P <: Position, Q <: P](coordinates: Array[Double], crs: CoordinateReferenceSystem[P]) : Q = {
-
+    adjusted.asInstanceOf[CoordinateReferenceSystem[Q]]
   }
 
+  def selectFactory[Q <: Position](crs: CoordinateReferenceSystem[_], coordinateDimension: Int) : PFactory[Q] = {
+    val dimDiff = coordinateDimension - crs.getCoordinateDimension
+    if (dimDiff <= 0) {
+      val adjusted = crs.asInstanceOf[CoordinateReferenceSystem[Q]]
+      PFactory[Q](adjusted, (co : Array[Double]) => mkPosition(adjusted, co:_*))
+    } else {
+      val expandedCrs = adjustCrs[Q](crs, coordinateDimension)
+      PFactory[Q](expandedCrs, (co : Array[Double]) => mkPosition(expandedCrs, co:_*))
+    }
+  }
+
+}
+
+trait ExtendDim[B <: Position, Z <: Position, M <: Position] {
+}
+
+
+
+object ExtendDim {
+
+  implicit val g2D = new ExtendDim[G2D, G3D, G2DM]{}
+  implicit val g3D = new ExtendDim[G3D, G3D, G3DM]{}
+  implicit val g2DM = new ExtendDim[G2DM, G3DM, G2DM]{}
+  implicit val g3DM = new ExtendDim[G3DM, G3DM, G3DM]{}
+
+  implicit val c2D = new ExtendDim[C2D, C3D, C2DM]{}
+  implicit val c3D = new ExtendDim[C3D, C3D, C3DM]{}
+  implicit val c2DM = new ExtendDim[G2DM, C3DM, C2DM]{}
+  implicit val c3DM = new ExtendDim[C3DM, C3DM, C3DM]{}
+
+}
+
+
+trait CoordinateSystemExtender {
+
+  import ExtendDim._
+
+  def addVertical[B <: Position, BZ <: Position](crs : CoordinateReferenceSystem[B], unit : LinearUnit = org.geolatte.geom.crs.Unit.METER)(implicit w: ExtendDim[B, BZ, _])
+  : CoordinateReferenceSystem[BZ] = CoordinateReferenceSystems.addVerticalSystem(crs,  unit ).asInstanceOf[org.geolatte.geom.crs.CoordinateReferenceSystem[BZ]]
+
+  def addMeasure[B <: Position, BM <: Position](crs : CoordinateReferenceSystem[B], unit : LinearUnit = org.geolatte.geom.crs.Unit.METER)(implicit w: ExtendDim[B, _, BM])
+  : CoordinateReferenceSystem[BM] = CoordinateReferenceSystems.addLinearSystem(crs,  unit ).asInstanceOf[org.geolatte.geom.crs.CoordinateReferenceSystem[BM]]
+
+}
+
+object CoordinateReferenceSystemSyntax extends CoordinateSystemExtender {
+
+  self =>
+
+  implicit class CoordinateReferenceWrapper[B <: Position](crs: CoordinateReferenceSystem[B]) {
+    def addVertical[BZ <: Position](unit : LinearUnit = org.geolatte.geom.crs.Unit.METER)(implicit w: ExtendDim[B, BZ, _])
+    : CoordinateReferenceSystem[BZ] = self.addVertical(crs, unit)
+
+    def addMeasure[BM <: Position](unit : LinearUnit = org.geolatte.geom.crs.Unit.METER)(implicit w: ExtendDim[B, _, BM])
+    : CoordinateReferenceSystem[BM] = self.addMeasure(crs, unit)
+
+  }
 
 }
 
 object GeometryImplicits extends PositionBuilders
   with GeometryConstructors
   with GeometryOpsImplicit
-  with PositionHelpers
+
 
 
