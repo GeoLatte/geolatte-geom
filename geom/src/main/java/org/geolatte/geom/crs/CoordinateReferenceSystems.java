@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
+import static org.geolatte.geom.crs.Unit.METER;
 
 /**
  * Common coordinate reference systems.
