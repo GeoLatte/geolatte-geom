@@ -212,6 +212,7 @@ public class CrsRegistry {
 
     public static ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(CrsId.valueOf(epsgCode));
+        if (crs == null) return null;
         if (crs.getPositionClass().equals(C2D.class)) {
             return (ProjectedCoordinateReferenceSystem) crs;
         }
