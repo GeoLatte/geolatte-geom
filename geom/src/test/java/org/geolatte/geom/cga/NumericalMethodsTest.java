@@ -9,6 +9,7 @@ import java.util.LinkedList;
 
 import org.geolatte.geom.G2D;
 import org.geolatte.geom.LinearRing;
+import org.geolatte.geom.LineString;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
@@ -121,5 +122,14 @@ public class NumericalMethodsTest {
         LinearRing<? extends Position> ring =
                 ring(wgs84, g(500, 500), g(400, 400), g(300, 600), g(200, 200), g(300, 600), g(400,400), g(500, 500));
         NumericalMethods.isCounterClockwise(ring);
+    }
+
+    @Test
+    public void testCounterClockwiseLineString() throws ParseException {
+        LineString<G2D> cwLinestring  = linestring(wgs84, g(3, 51), g(4, 51), g(5, 51.5), g(4, 50),   g(3, 51));
+        LineString<G2D> ccwLinestring = linestring(wgs84, g(3, 51), g(4, 51), g(5, 51.5), g(4, 51.5), g(3, 51));
+
+        assertFalse(NumericalMethods.isCounterClockwise(cwLinestring.getPositions()));
+        assertTrue(NumericalMethods.isCounterClockwise(ccwLinestring.getPositions()));
     }
 }
