@@ -2,6 +2,7 @@ package org.geolatte.geom.cga;
 
 import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.builder.DSL.ring;
+import static org.geolatte.geom.builder.DSL.linestring;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
