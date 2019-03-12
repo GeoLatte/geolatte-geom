@@ -126,7 +126,7 @@ public class NumericalMethodsTest {
     }
 
     @Test
-    public void testCounterClockwiseLineString() throws ParseException {
+    public void testCounterClockwiseLineString() {
         LineString<G2D> cwLinestring  = linestring(wgs84, g(3, 51), g(4, 51), g(5, 51.5), g(4, 50),   g(3, 51));
         LineString<G2D> ccwLinestring = linestring(wgs84, g(3, 51), g(4, 51), g(5, 51.5), g(4, 51.5), g(3, 51));
 
