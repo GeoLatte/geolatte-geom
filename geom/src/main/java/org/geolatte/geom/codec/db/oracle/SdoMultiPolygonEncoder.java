@@ -25,7 +25,7 @@ public class SdoMultiPolygonEncoder extends AbstractSDOEncoder {
                 final Polygon<P> pg = multiPolygon.getGeometryN(i);
                 sdoGeom = addPolygon(sdoGeom, pg);
             } catch (Exception e) {
-                throw new RuntimeException("Found geometry that was not a geometry in MultiPolygon");
+                throw new RuntimeException("Found geometry that was not a geometry in MultiPolygon", e);
             }
         }
         return sdoGeom;

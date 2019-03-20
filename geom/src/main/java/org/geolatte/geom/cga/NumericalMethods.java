@@ -89,16 +89,11 @@ public class NumericalMethods {
      */
     public static boolean isCounterClockwise(PositionSequence<?> positions) {
         if (positions.size() < 3) return true;
-        Position p0 = positions.getPositionN(0);
-        Position p1 = positions.getPositionN(1);
-        double summedDet = 0;
-        for ( int i = 0;  i< positions.size() - 2; i++ ) {
-            summedDet += determinant(positions.getPositionN(i), positions.getPositionN(i+1));
-        }
-        if (summedDet == 0) {
-            throw new IllegalArgumentException("Positions are collinear in 2D");
-        }
-        return summedDet > 0;
+        return IntStream.range(1, positions.size()).parallel().boxed().
+                map(idx -> shoelaceStep(idx, positions)).
+                reduce((a, b) -> a + b).
+                filter(orientation -> orientation != 0).
+                orElseThrow(() -> new IllegalArgumentException("Ring is collinear in 2D")) > 0;
     }
 
     /**
@@ -112,19 +107,11 @@ public class NumericalMethods {
      * @return true if the positions of the ring describe it counter-clockwise
      */
     public static boolean isCounterClockwise(LinearRing<?> ring) {
-        return IntStream.range(1, ring.getNumPositions()).parallel().boxed().
-                map(idx -> shoelaceStep(idx, ring)).
-                reduce((a, b) -> a + b).
-                filter(orientation -> orientation != 0).
-                orElseThrow(() -> new IllegalArgumentException("Ring is collinear in 2D"))
-                > 0;
+      return isCounterClockwise(ring.getPositions());
     }
 
-    private static double shoelaceStep(Integer idx, LinearRing<?> ring) {
-        double[] c0 = ring.getPositionN(idx - 1).toArray(null);
-        double[] c1 = ring.getPositionN(idx).toArray(null);
-        double weightedOrientation = determinant(c0[0], c0[1], c1[0], c1[1]);
-        return weightedOrientation;
+    private static double shoelaceStep(Integer idx, PositionSequence<?> positions) {
+        return  determinant(positions.getPositionN(idx - 1), positions.getPositionN(idx));
     }
 
 
@@ -134,9 +121,9 @@ public class NumericalMethods {
     }
 
     public static double determinant(Position p0, Position p1) {
-        double[] d0 = p0.toArray(null);
-        double[] d1 = p1.toArray(null);
-        return determinant(d0[0], d1[0], d0[1], d1[1] );
+        double[] c0 = p0.toArray(null);
+        double[] c1 = p1.toArray(null);
+        return determinant(c0[0], c0[1], c1[0], c1[1]);
     }
     
     private static double deltaDeterminant(Position p0, Position p1, Position p2) {
