@@ -1,7 +1,6 @@
 package org.geolatte.geom.codec.db.oracle;
 
 import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
-import static org.geolatte.geom.cga.NumericalMethods.isCounterClockwise;
 
 import java.util.Stack;
 
@@ -13,6 +12,7 @@ import org.geolatte.geom.Polygon;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.cga.NumericalMethods;
 import org.geolatte.geom.codec.db.Encoder;
 
 /**
@@ -126,6 +126,16 @@ abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
             for (int i = 0; i < coordinate.length; i++) {
                 result[idx++] = toDouble(coordinate[i]);
             }
+        }
+    }
+
+    private boolean isCounterClockwise(LinearRing<?> ring) {
+        try {
+            return NumericalMethods.isCounterClockwise(ring);
+        } catch (IllegalArgumentException e){
+            //assume true when points are (nearly) collinear
+            // this can happen with very small rings or invalid rings.
+            return true;
         }
     }
 

@@ -11,9 +11,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
-import org.geolatte.geom.jts.JTS;
 import org.junit.Test;
-import org.locationtech.jts.algorithm.CGAlgorithms;
 
 /**
  * @author Stephan Psader, GAF AG, 2017
@@ -76,8 +74,7 @@ public class NumericalMethodsTest {
 
             LinearRing<? extends Position> ring = ring(wgs84, positionsArray);
 
-            //assertFalse(Wkt.toWkt(ring) , NumericalMethods.isCounterClockwise(ring));
-            assertEquals(CGAlgorithms.isCCW(JTS.to(ring).getCoordinates()),  NumericalMethods.isCounterClockwise(ring));
+            assertFalse(Wkt.toWkt(ring) , NumericalMethods.isCounterClockwise(ring));
         }
     }
 
