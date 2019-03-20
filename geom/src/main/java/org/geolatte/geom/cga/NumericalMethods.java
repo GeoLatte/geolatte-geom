@@ -80,8 +80,8 @@ public class NumericalMethods {
     /**
      * Determines whether the specified {@code PositionSequence} is counter-clockwise.
      * <p/>
-     * <p>Only the first three positions, are inspected to determine whether the sequence is counter-clockwise.
-     * In case are less than three positions in the sequence, the method returns true.</p>
+     * <p>This implements the <a href="https://en.wikipedia.org/wiki/Shoelace_formula">Shoelace algorithm</a>.
+     * In case there are less than three positions in the sequence, the method returns true.</p>
      *
      * @param positions a {@code PositionSequence}
      * @return true if the positions in the specified sequence are counter-clockwise, or if the sequence contains
@@ -91,18 +91,14 @@ public class NumericalMethods {
         if (positions.size() < 3) return true;
         Position p0 = positions.getPositionN(0);
         Position p1 = positions.getPositionN(1);
-        double det = 0;
-        int positionsSize = positions.size();
-        int i = 2;
-        while(i < positionsSize && det == 0) {
-            Position p2 = positions.getPositionN(i);
-            det = deltaDeterminant(p0, p1, p2);
-            i++;
+        double summedDet = 0;
+        for ( int i = 0;  i< positions.size() - 2; i++ ) {
+            summedDet += determinant(positions.getPositionN(i), positions.getPositionN(i+1));
         }
-        if (det == 0) {
+        if (summedDet == 0) {
             throw new IllegalArgumentException("Positions are collinear in 2D");
         }
-        return det > 0;
+        return summedDet > 0;
     }
 
     /**
@@ -137,6 +133,12 @@ public class NumericalMethods {
         return det == 0;
     }
 
+    public static double determinant(Position p0, Position p1) {
+        double[] d0 = p0.toArray(null);
+        double[] d1 = p1.toArray(null);
+        return determinant(d0[0], d1[0], d0[1], d1[1] );
+    }
+    
     private static double deltaDeterminant(Position p0, Position p1, Position p2) {
         double[] c0 = p0.toArray(null);
         double[] c1 = p1.toArray(null);

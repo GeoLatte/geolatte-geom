@@ -1,15 +1,14 @@
 package org.geolatte.geom.cga;
 
-import static org.geolatte.geom.builder.DSL.g;
-import static org.geolatte.geom.builder.DSL.ring;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 
-import org.geolatte.geom.G2D;
-import org.geolatte.geom.LinearRing;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import org.junit.Test;
@@ -20,6 +19,8 @@ import org.junit.Test;
 public class NumericalMethodsTest {
     GeographicCoordinateReferenceSystem<G2D> wgs84 =
             CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
+
+    CoordinateReferenceSystem<C2D> xy = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
     @Test
     public void testNotCounterClockwiseLinearRing() {
@@ -121,5 +122,14 @@ public class NumericalMethodsTest {
         LinearRing<? extends Position> ring =
                 ring(wgs84, g(500, 500), g(400, 400), g(300, 600), g(200, 200), g(300, 600), g(400,400), g(500, 500));
         NumericalMethods.isCounterClockwise(ring);
+    }
+
+    @Test
+    public void testCounterClockwiseLineString() {
+        LineString<C2D> cwLinestring  = linestring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, -1),   c(0, 0));
+        LineString<C2D> ccwLinestring = linestring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, 0.5), c(0, 0));
+
+        assertFalse(NumericalMethods.isCounterClockwise(cwLinestring.getPositions()));
+        assertTrue(NumericalMethods.isCounterClockwise(ccwLinestring.getPositions()));
     }
 }
