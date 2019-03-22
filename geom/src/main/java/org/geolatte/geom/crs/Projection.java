@@ -31,6 +31,11 @@ public class Projection {
 
     public final static Projection UNKNOWN = new Projection(CrsId.UNDEFINED, "unknown");
 
+    // To indicate a "No-op" projection which simply passes through the coordinates from source to target
+    // without transform
+    public final static Projection NOOP = new Projection(CrsId.UNDEFINED, "no-op");
+
+
     //TODO -- change this class to contain the CrsParameters -- and introducte superclass CrsIdentifiable
 
     private final CrsId crsId;

@@ -170,6 +170,17 @@ public class CoordinateReferenceSystems {
         return combine(base, mkVertical(unit), resultCSPtype);
     }
 
+    /**
+     * Turn a geographic CRS into a projected CRS, using a no-op projection
+     *
+     * @param original
+     * @return
+     */
+    public static <P extends Position> ProjectedCoordinateReferenceSystem  asProjected(CoordinateReferenceSystem<P> original) {
+        //we use WGS84 as the source geocrs, because it really doesn't matter with a no-op projection
+        return new ProjectedCoordinateReferenceSystem(original.getCrsId(), original.getName(), WGS84,
+                Projection.NOOP, new ArrayList<>(), CartesianCoordinateSystem2D.DEFAULT);
+    }
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> CompoundCoordinateReferenceSystem<?> combine

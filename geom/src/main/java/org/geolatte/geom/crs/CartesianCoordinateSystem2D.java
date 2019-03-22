@@ -1,6 +1,7 @@
 package org.geolatte.geom.crs;
 
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.Linear;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,8 +19,13 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
 
     private final static List<Integer> REQUIRED_AXIS_NORMAL_ORDER = Arrays.asList(0, 1);
 
+    public final static CartesianCoordinateSystem2D DEFAULT = new CartesianCoordinateSystem2D(
+            new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, LinearUnit.METER),
+            new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, LinearUnit.METER));
+
+
+
     /**
-     *
      * Constructs an instance
      *
      * @param first  the first axis
@@ -32,7 +38,7 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
 
     private void checkAxes() {
         List<Integer> order = getAxisNormalOrder();
-        if (! order.containsAll(REQUIRED_AXIS_NORMAL_ORDER) ) {
+        if (!order.containsAll(REQUIRED_AXIS_NORMAL_ORDER)) {
             throw new IllegalArgumentException("Require order 0 and 1 axes");
         }
     }
@@ -52,10 +58,10 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
     @Override
     public CoordinateSystem<? extends C2D> extend(CoordinateSystemAxis axis) {
         if (axis instanceof VerticalStraightLineAxis) {
-            return new CartesianCoordinateSystem3D((StraightLineAxis)getAxis(0), (StraightLineAxis)getAxis(1), (VerticalStraightLineAxis)axis);
+            return new CartesianCoordinateSystem3D((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1), (VerticalStraightLineAxis) axis);
         }
-        if (axis instanceof MeasureStraightLineAxis){
-            return new CartesianCoordinateSystem2DM((StraightLineAxis)getAxis(0), (StraightLineAxis)getAxis(1), (MeasureStraightLineAxis)axis);
+        if (axis instanceof MeasureStraightLineAxis) {
+            return new CartesianCoordinateSystem2DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1), (MeasureStraightLineAxis) axis);
         }
         throw new UnsupportedOperationException();
     }
