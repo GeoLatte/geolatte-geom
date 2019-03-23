@@ -200,9 +200,8 @@ public class TestWktTokenizer {
             double m = Math.random()*1000;
             int e = (int)(-20 + Math.random()*20);
 
-
-
-            String testValue = Double.valueOf(m) + "E" + e;
+            String testValue = Double.valueOf(m).toString();
+            if (!testValue.contains("E")) testValue += "E" + e;
             String wkt = testValue + " ";
             tokens = new WktTokenizer(wkt, words, crs);
 
