@@ -1,6 +1,7 @@
 package org.geolatte.geom.cga;
 
 import static org.geolatte.geom.builder.DSL.*;
+import static org.geolatte.geom.cga.NumericalMethods.orient2d;
 import static org.junit.Assert.*;
 
 import java.util.LinkedList;
@@ -126,10 +127,18 @@ public class NumericalMethodsTest {
 
     @Test
     public void testCounterClockwiseLineString() {
-        LineString<C2D> cwLinestring  = linestring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, -1),   c(0, 0));
-        LineString<C2D> ccwLinestring = linestring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, 0.5), c(0, 0));
+        LinearRing<C2D> cwLinestring  = ring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, -1),   c(0, 0));
+        LinearRing<C2D> ccwLinestring = ring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, 0.5), c(0, 0));
 
-        assertFalse(NumericalMethods.isCounterClockwise(cwLinestring.getPositions()));
-        assertTrue(NumericalMethods.isCounterClockwise(ccwLinestring.getPositions()));
+        assertFalse(NumericalMethods.isCounterClockwise(cwLinestring));
+        assertTrue(NumericalMethods.isCounterClockwise(ccwLinestring));
     }
+
+    @Test
+    public void testPolygonWithVerySmallPolygon() {
+        String smallpolygon = "POLYGON((-88.101304825 30.791176733, -88.101303916 30.791176749, -88.101304 30.791177, -88.101304825 30.791176733))";
+        Polygon<G2D> poly = (Polygon<G2D>)Wkt.fromWkt(smallpolygon, CoordinateReferenceSystems.WGS84);
+        assertTrue(orient2d(poly.getExteriorRing()) != 0.0d);
+    }
+
 }

@@ -1,10 +1,10 @@
 package org.geolatte.geom.cga;
 
-import java.util.stream.IntStream;
-
 import org.geolatte.geom.LinearRing;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
+
+import java.util.stream.IntStream;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/03/15.
@@ -78,22 +78,22 @@ public class NumericalMethods {
     }
 
     /**
-     * Determines whether the specified {@code PositionSequence} is counter-clockwise.
-     * <p/>
-     * <p>This implements the <a href="https://en.wikipedia.org/wiki/Shoelace_formula">Shoelace algorithm</a>.
-     * In case there are less than three positions in the sequence, the method returns true.</p>
+     * Determine the (signed) area of a linearring, using the the
+     * <a href="https://en.wikipedia.org/wiki/Shoelace_formula">Shoelace algorithm</a>.
      *
-     * @param positions a {@code PositionSequence}
-     * @return true if the positions in the specified sequence are counter-clockwise, or if the sequence contains
-     * less than three elements.
+     * @param ring
+     * @return
      */
-    public static boolean isCounterClockwise(PositionSequence<?> positions) {
-        if (positions.size() < 3) return true;
-        return IntStream.range(1, positions.size()).parallel().boxed().
-                map(idx -> shoelaceStep(idx, positions)).
+    public static double area(LinearRing<?> ring) {
+        return IntStream.range(1, ring.getPositions().size()).parallel().boxed().
+                map(idx -> shoelaceStep(idx, ring.getPositions())).
                 reduce((a, b) -> a + b).
                 filter(orientation -> orientation != 0).
-                orElseThrow(() -> new IllegalArgumentException("Ring is collinear in 2D")) > 0;
+                orElseThrow(() -> new IllegalArgumentException("Ring is collinear in 2D")) ;
+    }
+
+    private static double shoelaceStep(Integer idx, PositionSequence<?> positions) {
+        return  determinant(positions.getPositionN(idx - 1), positions.getPositionN(idx));
     }
 
     /**
@@ -107,13 +107,34 @@ public class NumericalMethods {
      * @return true if the positions of the ring describe it counter-clockwise
      */
     public static boolean isCounterClockwise(LinearRing<?> ring) {
-      return isCounterClockwise(ring.getPositions());
+        double res = orient2d(ring);
+        if (res == 0) {
+            throw new IllegalArgumentException("Positions are collinear in 2D");
+        }
+        return res > 0;
     }
 
-    private static double shoelaceStep(Integer idx, PositionSequence<?> positions) {
-        return  determinant(positions.getPositionN(idx - 1), positions.getPositionN(idx));
+    /**
+     * Determine the orientation of a {@code LinearRing}
+     *
+     * This uses Newell's method (see Graphics Gems III, V. 5)
+     *
+     * @param ring the linear ring
+     * @return +1 if the specified ring is clockwise, -1 if counterclockwise, 0 if all vertices are collinear
+     */
+    public static double orient2d(LinearRing<?> ring) {
+        return orient2d(ring.getPositions());
     }
 
+    private static double orient2d(PositionSequence<?> positions) {
+        double d = 0;
+        for (int i = 0; i < positions.size() - 1; i++) {
+            double[] p1 = positions.getPositionN(i).toArray(null);
+            double[] p2 = positions.getPositionN(i+1).toArray(null);
+            d += (p1[0] - p2[0]) * (p1[1] + p2[1]);
+        }
+        return Math.signum(d);
+    }
 
     public static boolean collinear(Position p0, Position p1, Position p2) {
         double det = deltaDeterminant(p0, p1, p2);
@@ -147,6 +168,5 @@ public class NumericalMethods {
             error = deltaA + deltaB;
         }
     }
-
 
 }

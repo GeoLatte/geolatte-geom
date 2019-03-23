@@ -72,6 +72,14 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     P getPositionN(int index);
 
+    default P first() {
+        return getPositionN(0);
+    }
+
+    default P last() {
+        return getPositionN(size()-1);
+    }
+
     /**
      * Accepts a <code>PositionVisitor</code>.
      * <p/>
