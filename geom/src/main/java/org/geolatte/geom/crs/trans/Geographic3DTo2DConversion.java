@@ -46,8 +46,8 @@ public class Geographic3DTo2DConversion implements CoordinateOperation, WithEpsg
     }
 
     @Override
-    public String getMethodId() {
-        return "9659";
+    public int getMethodId() {
+        return 9659;
     }
 }
 

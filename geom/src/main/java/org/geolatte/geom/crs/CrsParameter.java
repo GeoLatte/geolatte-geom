@@ -21,6 +21,10 @@
 
 package org.geolatte.geom.crs;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * A parameter in the <code>Projection</code> of a <code>ProjectedCoordinateReferenceSystem</code>.
  *
@@ -31,6 +35,14 @@ public class CrsParameter {
 
     private final String name;
     private final double value;
+
+    public static Map<String, CrsParameter> toMap(List<CrsParameter> params) {
+        Map<String, CrsParameter> map = new HashMap<>();
+        for ( CrsParameter p : params) {
+            map.put(p.getName(), p);
+        }
+        return map;
+    }
 
     /**
      * Constructs an instance with the given parameter name and value.

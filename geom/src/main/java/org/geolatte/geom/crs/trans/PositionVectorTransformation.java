@@ -92,8 +92,8 @@ public class PositionVectorTransformation implements CoordinateOperation, WithEp
     }
 
     @Override
-    public String getMethodId() {
-        return "1033";
+    public int getMethodId() {
+        return 1033;
     }
 
 }

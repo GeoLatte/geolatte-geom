@@ -1,9 +1,14 @@
 package org.geolatte.geom.crs.trans.projections;
 
 import org.geolatte.geom.DecimalDegree;
+import org.geolatte.geom.crs.CrsParameter;
 import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
+import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import org.geolatte.geom.crs.trans.CoordinateOperation;
 import org.geolatte.geom.crs.trans.WithEpsgGOperationMethod;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 
@@ -12,7 +17,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
  */
 public class PseudoMercator implements CoordinateOperation, WithEpsgGOperationMethod {
 
-    private final Geographic2DCoordinateReferenceSystem baseCrs;
+    private final GeographicCoordinateReferenceSystem baseCrs;
     private final double lonOfNO;
     private final double latOfNO;
     private final double falseE;
@@ -21,6 +26,14 @@ public class PseudoMercator implements CoordinateOperation, WithEpsgGOperationMe
     private final double a; // ellipsoid semi-major axis;
 
 
+    static CoordinateOperation fromCrsParameters(GeographicCoordinateReferenceSystem base, List<CrsParameter> params) {
+        Map<String, CrsParameter> map = CrsParameter.toMap(params);
+        double lonOfNO = map.get("central_meridian").getValue();
+        double latOfNO = 0; //no parameter indicated in PostGIS definition
+        double falseE = map.get("false_easting").getValue();
+        double falseN = map.get("false_northing").getValue();
+        return new PseudoMercator( base, latOfNO, lonOfNO, falseE, falseN);
+    }
 
     public PseudoMercator() {
         this(WGS84, 0, 0, 0, 0);
@@ -34,7 +47,7 @@ public class PseudoMercator implements CoordinateOperation, WithEpsgGOperationMe
      * @param falseE false Easting in meters
      * @param falseN false Northing in meters
      */
-    public PseudoMercator(Geographic2DCoordinateReferenceSystem baseCrs, double latOfNatOrigin, double lonOfNatOrigin, double falseE, double falseN){
+    public PseudoMercator(GeographicCoordinateReferenceSystem baseCrs, double latOfNatOrigin, double lonOfNatOrigin, double falseE, double falseN){
         this.baseCrs = baseCrs;
         this.latOfNO = latOfNatOrigin;
         this.lonOfNO = lonOfNatOrigin;
@@ -77,7 +90,7 @@ public class PseudoMercator implements CoordinateOperation, WithEpsgGOperationMe
     }
 
     @Override
-    public String getMethodId() {
-        return "1024";
+    public int getMethodId() {
+        return 1024;
     }
 }

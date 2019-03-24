@@ -1,15 +1,11 @@
 package org.geolatte.geom.crs.trans.projections;
 
-import org.geolatte.geom.DecimalDegree;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
 import org.junit.Test;
 
-import static java.lang.String.format;
-import static org.geolatte.geom.DecimalDegree.parseDMS;
 import static org.geolatte.geom.DecimalDegree.parseDMSLat;
 import static org.geolatte.geom.DecimalDegree.parseDMSLon;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**

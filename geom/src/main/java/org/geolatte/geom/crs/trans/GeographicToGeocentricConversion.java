@@ -80,7 +80,7 @@ public class GeographicToGeocentricConversion implements CoordinateOperation, Wi
     }
 
     @Override
-    public String getMethodId() {
-        return "9602";
+    public int getMethodId() {
+        return 9602;
     }
 }

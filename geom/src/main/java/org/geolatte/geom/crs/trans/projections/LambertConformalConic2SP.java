@@ -1,24 +1,26 @@
 package org.geolatte.geom.crs.trans.projections;
 
+import org.geolatte.geom.crs.CrsParameter;
 import org.geolatte.geom.crs.Ellipsoid;
 import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
-import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
-import org.geolatte.geom.crs.Projection;
+import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import org.geolatte.geom.crs.trans.CoordinateOperation;
 import org.geolatte.geom.crs.trans.WithEpsgGOperationMethod;
+
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Math.*;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 05/06/2018.
- *
+ * <p>
  * An implementation of the Lambert Conic Conformal (2SP) map projection. This uses the formulas as documented
  * in the EPSG document (373-07-02) for coordinate operation method 9802.
- *
  */
 public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGOperationMethod {
 
-    private final Geographic2DCoordinateReferenceSystem baseCrs;
+    private final GeographicCoordinateReferenceSystem baseCrs;
     private final double latOfFO;
     private final double lonOfFO;
     private final double lat1SP;
@@ -26,7 +28,7 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
     private final double eastingAtFO;
     private final double northingAtFO;
     private final double ecc; // eccentricity
-    private final double a ; // semi-major axis
+    private final double a; // semi-major axis
 
     //general parameters
     double m1;
@@ -39,7 +41,18 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
     double rF;
 
 
-    public LambertConformalConic2SP(Geographic2DCoordinateReferenceSystem baseCrs,
+    static LambertConformalConic2SP fromCrsParameters(GeographicCoordinateReferenceSystem baseCrs, List<CrsParameter> params) {
+        Map<String, CrsParameter> map = CrsParameter.toMap(params);
+        double latitudeOfFO = map.get("latitude_of_origin").getValue();
+        double longitudeOfFO = map.get("central_meridian").getValue();
+        double lat1SPDeg = map.get("standard_parallel_1").getValue();
+        double lat2SPDeg = map.get("standard_parallel_2").getValue();
+        double eastingAtFO = map.get("false_easting").getValue();
+        double northingAtFO = map.get("false_northing").getValue();
+        return new LambertConformalConic2SP(baseCrs, latitudeOfFO, longitudeOfFO, lat1SPDeg, lat2SPDeg, eastingAtFO, northingAtFO);
+    }
+
+    public LambertConformalConic2SP(GeographicCoordinateReferenceSystem baseCrs,
                                     double latitudeOfFO,
                                     double longitudeOfFO,
                                     double lat1SPDeg,
@@ -56,18 +69,18 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
         this.northingAtFO = northingAtFO;
         Ellipsoid ellipsoid = baseCrs.getDatum().getEllipsoid();
         double invFlat = ellipsoid.getInverseFlattening();
-        double flattening = 1/invFlat;
+        double flattening = 1 / invFlat;
         this.ecc = sqrt(2 * flattening - pow(flattening, 2));
-        this.a =  ellipsoid.getSemiMajorAxis();
+        this.a = ellipsoid.getSemiMajorAxis();
 
-        m1 = cos(this.lat1SP) / sqrt( 1 - pow(ecc,2)*pow(sin(this.lat1SP),2));
-        m2 = cos(this.lat2SP) / sqrt( 1 - pow(ecc,2)*pow(sin(this.lat2SP),2));
+        m1 = cos(this.lat1SP) / sqrt(1 - pow(ecc, 2) * pow(sin(this.lat1SP), 2));
+        m2 = cos(this.lat2SP) / sqrt(1 - pow(ecc, 2) * pow(sin(this.lat2SP), 2));
 
         t1 = t(this.lat1SP);
         t2 = t(this.lat2SP);
         tF = t(latOfFO);
         n = (log(m1) - log(m2)) / (log(t1) - log(t2));
-        F = m1/(n * pow(t1, n));
+        F = m1 / (n * pow(t1, n));
         rF = a * F * pow(tF, n);
     }
 
@@ -88,7 +101,7 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
 
 
     private double t(double phi) {
-        return tan( PI/4 - phi/2) / pow(( (1 - ecc*sin(phi))/(1+ecc*sin(phi)) ), ecc/2);
+        return tan(PI / 4 - phi / 2) / pow(((1 - ecc * sin(phi)) / (1 + ecc * sin(phi))), ecc / 2);
     }
 
     @Override
@@ -108,8 +121,8 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
         double N = inCoordinate[1];
         double rNN = this.rF - (N - northingAtFO);
         double rPrime = signum(n) * sqrt(pow(E - eastingAtFO, 2) + pow(rNN, 2));
-        double tPrime = pow( rPrime / (a*F), 1/n);
-        double thetaPrime = atan( (E - eastingAtFO) / rNN);
+        double tPrime = pow(rPrime / (a * F), 1 / n);
+        double thetaPrime = atan((E - eastingAtFO) / rNN);
 
         double phi = PI / 2 - 2 * atan(tPrime);
         double phi0;
@@ -117,9 +130,9 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
         do {
             iters++;
             phi0 = phi;
-            phi = PI / 2 - 2 * atan(tPrime * pow( (1-ecc*sin(phi0))/(1 + ecc*sin(phi0)), ecc/2));
-        } while ( (abs(phi - phi0) > 0.001) && iters < 5);
-        double lambda = thetaPrime/n + lonOfFO;
+            phi = PI / 2 - 2 * atan(tPrime * pow((1 - ecc * sin(phi0)) / (1 + ecc * sin(phi0)), ecc / 2));
+        } while ((abs(phi - phi0) > 0.001) && iters < 5);
+        double lambda = thetaPrime / n + lonOfFO;
 
         outCoordinate[0] = toDegrees(lambda);
         outCoordinate[1] = toDegrees(phi);
@@ -127,7 +140,7 @@ public class LambertConformalConic2SP implements CoordinateOperation, WithEpsgGO
     }
 
     @Override
-    public String getMethodId() {
-        return "9802";
+    public int getMethodId() {
+        return 9802;
     }
 }

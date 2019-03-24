@@ -9,6 +9,6 @@ public interface WithEpsgGOperationMethod {
 	 * Returns the EPSG code for the operation method
 	 * @return The EPSG Code for the operation method
 	 */
-	String getMethodId();
+	int getMethodId();
 
 }

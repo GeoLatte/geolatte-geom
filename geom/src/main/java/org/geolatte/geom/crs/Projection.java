@@ -36,7 +36,7 @@ public class Projection {
     public final static Projection NOOP = new Projection(CrsId.UNDEFINED, "no-op");
 
 
-    //TODO -- change this class to contain the CrsParameters -- and introducte superclass CrsIdentifiable
+    //TODO -- change this class to contain the CrsParameters -- and introduce superclass CrsIdentifiable
 
     private final CrsId crsId;
     private final String name;
@@ -44,6 +44,14 @@ public class Projection {
     public Projection(CrsId crsId, String name) {
         this.crsId = crsId;
         this.name = name;
+    }
+
+    public CrsId getCrsId() {
+        return crsId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

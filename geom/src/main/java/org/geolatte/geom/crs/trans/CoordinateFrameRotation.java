@@ -93,8 +93,8 @@ public class CoordinateFrameRotation implements CoordinateOperation, WithEpsgGOp
 	}
 
 	@Override
-	public String getMethodId() {
-		return "1032";
+	public int getMethodId() {
+		return 1032;
 	}
 
 }
