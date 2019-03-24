@@ -207,7 +207,7 @@ public class Geometries {
 
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Simple> geometryClass,
+    public static <P extends Position> Geometry<P> mkGeometry(Class<?> geometryClass,
                                                               PositionSequence<P> positions,
                                                               CoordinateReferenceSystem<P> crs) {
 
@@ -230,7 +230,7 @@ public class Geometries {
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position> Geometry<P> mkGeometry(Class<? extends Complex> geometryClass, Geometry<P>... parts) {
+    public static <P extends Position> Geometry<P> mkGeometry(Class<?> geometryClass, Geometry<P>... parts) {
         if (Polygon.class.isAssignableFrom(geometryClass)) {
             return new Polygon((LinearRing<P>[]) parts);
         }
@@ -250,7 +250,7 @@ public class Geometries {
 
     }
 
-    public static <Q extends Position> Geometry<Q> mkGeometry(Class<? extends Complex> geometryClass, CoordinateReferenceSystem<Q> crs) {
+    public static <Q extends Position> Geometry<Q> mkGeometry(Class<?> geometryClass, CoordinateReferenceSystem<Q> crs) {
         if (Polygon.class.isAssignableFrom(geometryClass)) {
             return new Polygon<Q>(crs);
         }
