@@ -1,5 +1,6 @@
 package org.geolatte.geom.crs.trans;
 
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.*;
 import org.geolatte.geom.crs.trans.projections.Projections;
 
@@ -69,18 +70,25 @@ public class CoordinateOperations {
 
     /**
      * Creates a transformation from source to target CRS's
+     *
      * @param sourceId the source CRS
      * @param targetId the target CRS
      * @return a CoordinateOperation whose forward operation transforms source to target
      * @throws UnsupportedTransformException when no transform could be determined
      */
     static public CoordinateOperation transform(CrsId sourceId, CrsId targetId) {
-
-        //TODO -- simplify this method and clean up
         CoordinateReferenceSystem<?> source = CrsRegistry.getCoordinateReferenceSystem(sourceId, null);
         CoordinateReferenceSystem<?> target = CrsRegistry.getCoordinateReferenceSystem(targetId, null);
         if (source == null) throw new UnsupportedCoordinateReferenceSystem(sourceId);
         if (target == null) throw new UnsupportedCoordinateReferenceSystem(targetId);
+        return transform(source, target);
+    }
+
+
+     static public <P extends Position, Q extends Position> CoordinateOperation transform(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("No null parameters accepted");
+        }
         ConcatenatedOperation.Builder builder = new ConcatenatedOperation.Builder();
         GeographicCoordinateReferenceSystem sourceGeodetic;
 
@@ -91,7 +99,7 @@ public class CoordinateOperations {
         } else if (source instanceof GeographicCoordinateReferenceSystem) {
             sourceGeodetic = ((GeographicCoordinateReferenceSystem)source);
         } else {
-            throw new UnsupportedTransformException(sourceId, targetId);
+            throw new UnsupportedTransformException(source.getCrsId(), target.getCrsId());
         }
 
         GeographicCoordinateReferenceSystem targetGeodetic;
@@ -109,7 +117,7 @@ public class CoordinateOperations {
             }
             builder.forward(forwardOp);
         } else {
-            throw new UnsupportedTransformException(sourceId, targetId);
+            throw new UnsupportedTransformException(source.getCrsId(), target.getCrsId());
         }
         return builder.build();
     }
