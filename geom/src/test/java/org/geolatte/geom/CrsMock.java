@@ -15,6 +15,11 @@ public class CrsMock {
     public static  CoordinateReferenceSystem<G2DM> WGS84_M = addLinearSystem(WGS84, G2DM.class, Unit.METER);
     public static  CoordinateReferenceSystem<G3DM> WGS84_ZM =addLinearSystem(WGS84_Z, G3DM.class, Unit.METER);
 
+    public static  CoordinateReferenceSystem<C2D> MERCATOR= CoordinateReferenceSystems.WEB_MERCATOR;
+    public static  CoordinateReferenceSystem<C3D> MERCATOR_Z = addVerticalSystem(MERCATOR, C3D.class, Unit.METER);
+    public static  CoordinateReferenceSystem<C2DM> MERCATOR_M = addLinearSystem(MERCATOR, C2DM.class, Unit.METER);
+    public static  CoordinateReferenceSystem<C3DM> MERCATOR_ZM =addLinearSystem(MERCATOR_Z, C3DM.class, Unit.METER);
+
     public static CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
     public static CoordinateReferenceSystem<C3D> crsZ = addVerticalSystem(crs, C3D.class, Unit.METER);
 

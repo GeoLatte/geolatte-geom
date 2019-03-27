@@ -61,4 +61,7 @@ public interface GeometryVisitor<P extends Position> {
      */
     public <G extends Geometry<P>> void visit(GeometryCollection<P,G> collection);
 
+    default public <G extends Geometry<P>> void endVisit(GeometryCollection<P,G> collection) {
+    }
+
 }

@@ -176,6 +176,7 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
     @Override
     public void accept(GeometryVisitor<P> visitor) {
         visitor.visit(this);
+        //TODO visit the individual rings
     }
 
     @Override

@@ -269,4 +269,48 @@ public class Geometries {
         throw new IllegalStateException("Unknown Geometry class");
     }
 
+    @SuppressWarnings("unchecked")
+    public static <P extends Position> Geometry<P> mkGeometry(Class<?> geometryClass, List<Geometry<P>> parts) {
+
+        if (Polygon.class.isAssignableFrom(geometryClass)) {
+            LinearRing<P>[] rings = (LinearRing<P>[]) (new LinearRing[parts.size()]);
+            int i = 0;
+            for (Geometry<P> part : parts) {
+                rings[i++] = (LinearRing)part;
+            }
+            return new Polygon(rings);
+        }
+
+        if (MultiLineString.class.isAssignableFrom(geometryClass)) {
+            LineString<P>[] ls = (LineString<P>[]) (new LineString[parts.size()]);
+            int i = 0;
+            for (Geometry<P> part : parts) {
+                ls[i++] = (LineString)part;
+            }
+            return new MultiLineString<P>(ls);
+        }
+        if (MultiPoint.class.isAssignableFrom(geometryClass)) {
+            Point<P>[] ps = (Point<P>[]) (new Point[parts.size()]);
+            int i = 0;
+            for (Geometry<P> part : parts) {
+                ps[i++] = (Point)part;
+            }
+            return new MultiPoint<P>(ps);
+        }
+        if (MultiPolygon.class.isAssignableFrom(geometryClass)) {
+            Polygon<P>[] ps = (Polygon<P>[]) (new Polygon[parts.size()]);
+            int i = 0;
+            for (Geometry<P> part : parts) {
+                ps[i++] = (Polygon)part;
+            }
+            return new MultiPolygon<P>(ps);
+        }
+
+        if (GeometryCollection.class.isAssignableFrom(geometryClass)) {
+            return new GeometryCollection<P, Geometry<P>>((parts.toArray( null )));
+        }
+
+        throw new IllegalStateException("Unknown Geometry class");
+
+    }
 }

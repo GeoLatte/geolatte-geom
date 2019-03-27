@@ -151,6 +151,7 @@ public class GeometryCollection<P extends Position, G extends Geometry<P>> exten
         for (G part : this) {
             part.accept(visitor);
         }
+        visitor.endVisit(this);
     }
 
     /**
