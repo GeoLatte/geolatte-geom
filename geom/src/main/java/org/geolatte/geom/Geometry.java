@@ -43,7 +43,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     private static final long serialVersionUID = 6884205871950410215L;
 
-    private static GeometryEquality geomEq = new GeometryPointEquality();
+    private static GeometryEquality geomEq = new GeometryPositionEquality();
 
     private final PositionSequence<P> positions;
     private final CoordinateReferenceSystem<P> crs;

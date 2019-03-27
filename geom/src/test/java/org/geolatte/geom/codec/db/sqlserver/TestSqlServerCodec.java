@@ -3,7 +3,7 @@ package org.geolatte.geom.codec.db.sqlserver;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryEquality;
-import org.geolatte.geom.GeometryPointEquality;
+import org.geolatte.geom.GeometryPositionEquality;
 import org.geolatte.geom.support.XmlDatabaseCodecTestCases;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class TestSqlServerCodec {
 
     static XmlDatabaseCodecTestCases testCases;
 
-    final GeometryEquality geometricEquality = new GeometryPointEquality();
+    final GeometryEquality geometricEquality = new GeometryPositionEquality();
 
     @BeforeClass
     public static void loadTestCases() {

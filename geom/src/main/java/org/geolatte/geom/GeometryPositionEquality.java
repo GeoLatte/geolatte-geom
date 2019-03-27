@@ -35,7 +35,7 @@ package org.geolatte.geom;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/12
  */
-public class GeometryPointEquality implements GeometryEquality {
+public class GeometryPositionEquality implements GeometryEquality {
 
 
     private final PositionSequenceEquality pointSeqEq;
@@ -46,15 +46,15 @@ public class GeometryPointEquality implements GeometryEquality {
      *
      * @param pointEq
      */
-    public GeometryPointEquality(PositionEquality pointEq) {
+    public GeometryPositionEquality(PositionEquality pointEq) {
         this.pointSeqEq = new PositionSequencePositionEquality(pointEq);
     }
 
-/**
+    /**
      * Constructs an instance that uses {@code ExactPositionEquality} to determine
      * whether the <code>Geometry</code>s have the same <code>Positions</code>s.
      */
-    public GeometryPointEquality() {
+    public GeometryPositionEquality() {
         ExactPositionEquality pointEquality = new ExactPositionEquality();
         this.pointSeqEq = new PositionSequencePositionEquality(pointEquality);
     }

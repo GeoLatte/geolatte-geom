@@ -136,7 +136,7 @@ public class PointTest {
 
     @Test
     public void testPointEquality() {
-        GeometryPointEquality eq2D = new GeometryPointEquality(new ExactPositionEquality());
+        GeometryPositionEquality eq2D = new GeometryPositionEquality(new ExactPositionEquality());
         assertTrue(point3DM.equals(point(crsZM, c(1, 2, 3, 4))));
         assertTrue(eq2D.equals(point2D, point(crs, c(1, 2))));
         assertFalse(point2D.equals(emptyPoint));

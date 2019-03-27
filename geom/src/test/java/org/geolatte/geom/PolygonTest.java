@@ -79,7 +79,7 @@ public class PolygonTest {
 
 
         assertTrue(polygon1.equals(polygon1));
-        assertTrue(new GeometryPointEquality().equals(null, null));
+        assertTrue(new GeometryPositionEquality().equals(null, null));
         assertFalse(polygon1.equals(null));
 
         assertTrue(polygon1.equals(polygon2));

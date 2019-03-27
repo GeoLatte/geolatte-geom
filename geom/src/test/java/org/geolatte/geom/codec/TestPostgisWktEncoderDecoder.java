@@ -314,7 +314,7 @@ public class TestPostgisWktEncoderDecoder {
         String wkt = testcases.getWKT(PostgisTestCases.POINT_SCIENTIFIC_NOTATION);
         Point pnt = (Point) decode(wkt);
         assertNotNull(pnt);
-        GeometryPointEquality eq = new GeometryPointEquality(
+        GeometryPositionEquality eq = new GeometryPositionEquality(
                 new WithinTolerancePositionEquality(0.00000001));
         assertTrue(eq.equals(testcases.getExpected(PostgisTestCases.POINT_SCIENTIFIC_NOTATION), pnt));
     }
