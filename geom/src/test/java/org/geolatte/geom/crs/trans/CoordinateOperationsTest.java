@@ -1,12 +1,10 @@
 package org.geolatte.geom.crs.trans;
 
-import org.geolatte.geom.DecimalDegree;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
 import org.junit.Test;
 
-import static org.geolatte.geom.DecimalDegree.DMS;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 import static org.geolatte.geom.crs.trans.CoordinateOperations.positionVectorTransformation2D;
 import static org.junit.Assert.assertEquals;

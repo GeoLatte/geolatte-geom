@@ -5,6 +5,7 @@ import org.geolatte.geom.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A compound {@code CoordinateReferenceSystem} that is constructed by adding additional CoordinateSystemAxes to a
@@ -63,6 +64,33 @@ public class CompoundCoordinateReferenceSystem<P extends Position> extends Coord
 
     public SingleCoordinateReferenceSystem<?> lastCs() {
         return components.get(components.size()-1);
+    }
+
+    public SingleCoordinateReferenceSystem<?> getBase() {
+        for (SingleCoordinateReferenceSystem<?> candidate: components){
+            if ( ! (candidate.getCoordinateSystem() instanceof OneDimensionCoordinateSystem)) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Compound CRS with no 2D base");
+    }
+
+    public Optional<VerticalCoordinateReferenceSystem> getVertical() {
+        for (SingleCoordinateReferenceSystem<?> candidate: components){
+            if (candidate instanceof VerticalCoordinateReferenceSystem) {
+                return Optional.of((VerticalCoordinateReferenceSystem)candidate);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<LinearCoordinateReferenceSystem> getLinear() {
+        for (SingleCoordinateReferenceSystem<?> candidate: components){
+            if (candidate instanceof LinearCoordinateReferenceSystem) {
+                return Optional.of((LinearCoordinateReferenceSystem)candidate);
+            }
+        }
+        return Optional.empty();
     }
 
 }

@@ -155,7 +155,7 @@ public class TestTransformVisitor {
     }
 
     @Test
-    @Ignore("Requires better compositionality of CompoundCRS")
+    //@Ignore("Requires better compositionality of CompoundCRS")
     public void testLineStringTransform3DTo3D() {
         LineString<G3D> line = linestring(WGS84_Z, g(5.32, 51.3, 10.0), g(4.89, 50.76, 12.0));
         TransformOperation<G3D, C3D> op = TransformOperations.from(WGS84_Z, MERCATOR_Z);

@@ -1,5 +1,7 @@
 package org.geolatte.geom.crs.trans;
 
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.G3D;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.*;
 import org.geolatte.geom.crs.trans.projections.Projections;
@@ -21,7 +23,7 @@ public class CoordinateOperations {
      *
      * @return a Transformation conforming to EPSG method 9606
      */
-    static public CoordinateOperation positionVectorTransformation2D(GeographicCoordinateReferenceSystem source, GeographicCoordinateReferenceSystem target) {
+    static public CoordinateOperation positionVectorTransformation2D(GeographicCoordinateReferenceSystem<G2D> source, GeographicCoordinateReferenceSystem<G2D> target) {
         CoordinateOperation datumTransformation = positionVectorTransformation(source.getDatum(), target.getDatum());
             return new ConcatenatedOperation.Builder()
                     .reverse(new Geographic3DTo2DConversion())
@@ -33,23 +35,23 @@ public class CoordinateOperations {
 
     }
 
-//    /**
-//     * Returns the Position Vector transformation for the geographic 3D domain.
-//     * <p>
-//     * It first transforms from the source CRS to WGS84, and then from WGS84 to the target CRS.
-//     * <p>
-//     * This transformation uses EPSG method 1037
-//     *
-//     * @return a Transformation conforming to EPSG method 1037
-//     */
-//    static public CoordinateOperation positionVectorTransformation3D(GeographicCoordinateReferenceSystem source, GeographicCoordinateReferenceSystem target) {
-//        CoordinateOperation datumTransformation = positionVectorTransformation(source.getDatum(), target.getDatum());
-//        return new ConcatenatedOperation.Builder()
-//                .forward(new GeographicToGeocentricConversion(source))
-//                .forward(datumTransformation)
-//                .reverse(new GeographicToGeocentricConversion(target))
-//                .build();
-//    }
+    /**
+     * Returns the Position Vector transformation for the geographic 3D domain.
+     * <p>
+     * It first transforms from the source CRS to WGS84, and then from WGS84 to the target CRS.
+     * <p>
+     * This transformation uses EPSG method 1037
+     *
+     * @return a Transformation conforming to EPSG method 1037
+     */
+    static public CoordinateOperation positionVectorTransformation3D(GeographicCoordinateReferenceSystem<G3D> source, GeographicCoordinateReferenceSystem<G3D> target) {
+        CoordinateOperation datumTransformation = positionVectorTransformation(source.getDatum(), target.getDatum());
+        return new ConcatenatedOperation.Builder()
+                .forward(new GeographicToGeocentricConversion(source))
+                .forward(datumTransformation)
+                .reverse(new GeographicToGeocentricConversion(target))
+                .build();
+    }
 
     static public CoordinateOperation positionVectorTransformation(Datum source, Datum target) {
         if (source == target) {
@@ -84,8 +86,7 @@ public class CoordinateOperations {
         return transform(source, target);
     }
 
-
-     static public <P extends Position, Q extends Position> CoordinateOperation transform(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
+    static public <P extends Position, Q extends Position> CoordinateOperation transform(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
         if (source == null || target == null) {
             throw new IllegalArgumentException("No null parameters accepted");
         }

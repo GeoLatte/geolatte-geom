@@ -9,9 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.geolatte.geom.crs.CoordinateSystemAxisDirection.*;
-import static org.geolatte.geom.crs.Unit.DEGREE;
-import static org.geolatte.geom.crs.Unit.METER;
-import static org.geolatte.geom.crs.Unit.UNKNOWN_LINEAR;
+import static org.geolatte.geom.crs.Unit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -37,21 +35,21 @@ public class TestCrsIdenttity {
     }
 
     @Test
-    public void testDiffGeogarphic3DMConstructors(){
+    public void testDiffGeogarphic3DMConstructors() {
         GeographicCoordinateReferenceSystem<G3D> crs1 = getG3DGeographicCoordinateReferenceSystem();
         Geographic3DCoordinateReferenceSystem crs2 = getG3DGeographicCoordinateReferenceSystemAlt();
         assertTrue(!crs1.equals(crs2));
     }
 
     @Test
-    public void testIdentGeocentric(){
+    public void testIdentGeocentric() {
         GeocentricCartesianCoordinateReferenceSystem gcc1 = getGeocentricCartesianCoordinateReferenceSystem();
         GeocentricCartesianCoordinateReferenceSystem gcc2 = getGeocentricCartesianCoordinateReferenceSystem();
         assertEquals(gcc1, gcc2);
     }
 
     @Test
-    public void testDiffGeocentric(){
+    public void testDiffGeocentric() {
         Ellipsoid ecs = new Ellipsoid(CrsId.parse("EPSG:201"), "ellipsoid", 60000.1, 0.123);
         Datum datum = new Datum(CrsId.parse("EPSG:5"), ecs, "datum1", new double[]{1.0, 3.0, 4.0});
         PrimeMeridian primeMeridian = new PrimeMeridian(CrsId.parse("EPSG:51"), "pmem", 4.0);
@@ -62,21 +60,21 @@ public class TestCrsIdenttity {
 
 
     @Test
-    public void testIdentLinearCrs(){
+    public void testIdentLinearCrs() {
         LinearCoordinateReferenceSystem lrs1 = getLinearCoordinateReferenceSystem();
         LinearCoordinateReferenceSystem lrs2 = getLinearCoordinateReferenceSystem();
         assertEquals(lrs1, lrs2);
     }
 
     @Test
-    public void testdiffLinearCrs(){
+    public void testdiffLinearCrs() {
         LinearCoordinateReferenceSystem lrs1 = getLinearCoordinateReferenceSystem();
         LinearCoordinateReferenceSystem lrs2 = getLinearCoordinateReferenceSystem(UNKNOWN_LINEAR);
         assertTrue(!lrs1.equals(lrs2));
     }
 
     @Test
-    public void testVerticalCrs(){
+    public void testVerticalCrs() {
         VerticalCoordinateReferenceSystem vcrs1 = getVerticalCoordinateReferenceSystem();
         VerticalCoordinateReferenceSystem vcrs2 = getVerticalCoordinateReferenceSystem();
         assertEquals(vcrs1, vcrs2);
@@ -84,21 +82,21 @@ public class TestCrsIdenttity {
     }
 
     @Test
-    public void testProjectedCrs(){
+    public void testProjectedCrs() {
         ProjectedCoordinateReferenceSystem pcrs1 = getProjectedCoordinateReferenceSystem();
         ProjectedCoordinateReferenceSystem pcrs2 = getProjectedCoordinateReferenceSystem();
         assertEquals(pcrs1, pcrs2);
     }
 
     @Test
-    public void testcompoundG2DCRS(){
+    public void testcompoundG2DCRS() {
         CompoundCoordinateReferenceSystem<G2DM> cplx1 = getCompoundGeodeticCoordinateReferenceSystem();
         CompoundCoordinateReferenceSystem<G2DM> cplx2 = getCompoundGeodeticCoordinateReferenceSystem();
         assertEquals(cplx1, cplx2);
     }
 
     @Test
-    public void testcompoundDiffG2DCRS(){
+    public void testcompoundDiffG2DCRS() {
         CompoundCoordinateReferenceSystem<G2DM> cplx1 = getCompoundGeodeticCoordinateReferenceSystem();
         CompoundCoordinateReferenceSystem<G2DM> cplx2 = getCompoundGeodeticCoordinateReferenceSystemAlt();
         assertTrue(!cplx1.equals(cplx2));
@@ -158,12 +156,12 @@ public class TestCrsIdenttity {
     }
 
 
-    private VerticalCoordinateReferenceSystem getVerticalCoordinateReferenceSystem(){
+    private VerticalCoordinateReferenceSystem getVerticalCoordinateReferenceSystem() {
         VerticalDatum vdatum = new VerticalDatum(CrsId.parse("EPSG:1"), "vdat", 1, new Extension("key", "val"));
         return new VerticalCoordinateReferenceSystem(CrsId.parse("EPSG:-1"), "elevation", vdatum, new VerticalStraightLineAxis("h", UP, METER));
     }
 
-    private ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystem(){
+    private ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystem() {
 
         Projection projection = new Projection(CrsId.parse("EPSG:200"), "some projection");
 
@@ -176,12 +174,19 @@ public class TestCrsIdenttity {
     }
 
 
-    private CompoundCoordinateReferenceSystem<G2DM> getCompoundGeodeticCoordinateReferenceSystem(){
-        return new CompoundCoordinateReferenceSystem<>(CrsId.parse("EPSG:101"), "cplx", getGeographic2DCoordinateReferenceSystem(), getVerticalCoordinateReferenceSystem(), getLinearCoordinateReferenceSystem());
+    private CompoundCoordinateReferenceSystem<G2DM> getCompoundGeodeticCoordinateReferenceSystem() {
+        return new CompoundCoordinateReferenceSystem<>(CrsId.parse("EPSG:101"),
+                "cplx", getGeographic2DCoordinateReferenceSystem(),
+                getVerticalCoordinateReferenceSystem(),
+                getLinearCoordinateReferenceSystem());
     }
 
-    private CompoundCoordinateReferenceSystem<G2DM> getCompoundGeodeticCoordinateReferenceSystemAlt(){
-        return new CompoundCoordinateReferenceSystem<>(CrsId.parse("EPSG:101"), "cplx", getGeographic2DCoordinateReferenceSystem(), getVerticalCoordinateReferenceSystem(), getLinearCoordinateReferenceSystem(UNKNOWN_LINEAR));
+    private CompoundCoordinateReferenceSystem<G2DM> getCompoundGeodeticCoordinateReferenceSystemAlt() {
+        return new CompoundCoordinateReferenceSystem<>(CrsId.parse("EPSG:101"),
+                "cplx",
+                getGeographic2DCoordinateReferenceSystem(),
+                getVerticalCoordinateReferenceSystem(),
+                getLinearCoordinateReferenceSystem(UNKNOWN_LINEAR));
     }
 
 }
