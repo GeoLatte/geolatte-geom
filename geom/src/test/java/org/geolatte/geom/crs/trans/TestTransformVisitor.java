@@ -9,15 +9,14 @@ import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WEB_MERCATOR;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
-import static org.junit.Assert.assertTrue;
+
+import static org.geolatte.geom.AssertHelpers.assertEquals;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 2019-03-27.
  */
 public class TestTransformVisitor {
 
-
-    static private GeometryEquality eq = new ApproximateGeometryEquality(0.05);
 
     private CoordinateReferenceSystem<G2D> source = WGS84;
     private CoordinateReferenceSystem<C2D> target = WEB_MERCATOR;
@@ -261,10 +260,4 @@ public class TestTransformVisitor {
 
     //TODO -- add test for  linear axis in feet, not meters
 
-
-    private static <P extends Position> void assertEquals(Geometry<P> g1, Geometry<P> g2) {
-        assertTrue(String.format("\nExpected:\t %s\nReceived:\t %s",
-                g1 == null ? "<null>" : Wkt.toWkt(g1),
-                g2 == null ? "<null>" : Wkt.toWkt(g2)), eq.equals(g1, g2));
-    }
 }
