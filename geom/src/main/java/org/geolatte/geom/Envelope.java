@@ -75,7 +75,6 @@ public class Envelope<P extends Position> {
         this.lowerLeft = Positions.mkPosition(crs, lowerLeft);
         this.upperRight = Positions.mkPosition(crs, upperRight);
 
-
     }
 
     /**
@@ -122,6 +121,15 @@ public class Envelope<P extends Position> {
      */
     public P lowerRight() {
         return Positions.mkPosition(getCoordinateReferenceSystem(), upperRight.getCoordinate(0), lowerLeft.getCoordinate(1));
+    }
+
+    /**
+     * Returns the lowerleft and upperright coordinates in 2D for this envelope.
+     *
+     * @return [ll.x, ll.y, ur.x, ur.y] for Cartesian envelopes; [ll.lon, ll.lat, ur.lon, ur.lat] for Geographic envelopes
+     */
+    public double[] toArray(){
+        return new double[]{lowerLeft.getCoordinate(0), lowerLeft.getCoordinate(1), upperRight.getCoordinate(0), upperRight.getCoordinate(1)};
     }
 
     public String toString() {
