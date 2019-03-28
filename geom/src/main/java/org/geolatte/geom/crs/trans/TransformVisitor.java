@@ -20,6 +20,13 @@ public class TransformVisitor<P extends Position, Q extends Position> implements
         this.operation = op;
     }
 
+    /**
+     * Reset state for a new visit
+     */
+    public void reset(){
+        transformed.clear();
+    }
+    
     @Override
     public void visit(Point<P> point) {
         if (point.isEmpty()) {
