@@ -1,13 +1,12 @@
 package org.geolatte.geom.crs;
 
-import org.geolatte.geom.Position;
 import org.geolatte.geom.V;
 
 /**
  *
  * Created by Karel Maesen, Geovise BVBA on 29/11/14.
  */
-public class VerticalCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<V> {
+public class VerticalCoordinateReferenceSystem extends SingleCoordinateReferenceSystem<V>  implements OneDimensionCoordinateReferenceSystem {
 
     private final VerticalDatum datum;
 
@@ -34,4 +33,8 @@ public class VerticalCoordinateReferenceSystem extends SingleCoordinateReference
         return getVerticalAxis().getUnit();
     }
 
+    @Override
+    public CoordinateSystemAxis getStraightLineAxis() {
+        return getVerticalAxis();
+    }
 }

@@ -20,78 +20,52 @@ class DefaultTransformOperation<P extends Position, Q extends Position> implemen
 
     final private CoordinateReferenceSystem<P> source;
     final private CoordinateReferenceSystem<Q> target;
-    final private CoordinateOperation op;
+    private CoordinateOperation op;
 
     DefaultTransformOperation(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
         this.source = source;
         this.target = target;
 
         SingleCoordinateReferenceSystem<?> sourceBase;
-        Optional<VerticalCoordinateReferenceSystem> sourceVertical = Optional.empty();
-        Optional<LinearCoordinateReferenceSystem> sourceLinear = Optional.empty();
+        VerticalCoordinateReferenceSystem sourceVertical = null;
+        LinearCoordinateReferenceSystem sourceLinear = null;
         if (source.isCompound()) {
             CompoundCoordinateReferenceSystem<P> cSource = (CompoundCoordinateReferenceSystem<P>) source;
             sourceBase = cSource.getBase();
-            sourceVertical = cSource.getVertical();
-            sourceLinear = cSource.getLinear();
+            sourceVertical = cSource.getVertical().orElse(null);
+            sourceLinear = cSource.getLinear().orElse(null);
         } else {
             sourceBase = (SingleCoordinateReferenceSystem<?>) source;
         }
 
         SingleCoordinateReferenceSystem<?> targetBase;
-        Optional<VerticalCoordinateReferenceSystem> targetVertical = Optional.empty();
-        Optional<LinearCoordinateReferenceSystem> targetLinear = Optional.empty();
+        VerticalCoordinateReferenceSystem targetVertical = null;
+        LinearCoordinateReferenceSystem targetLinear = null;
         if (target.isCompound()) {
             CompoundCoordinateReferenceSystem<P> cTarget = (CompoundCoordinateReferenceSystem<P>) target;
             targetBase = cTarget.getBase();
-            targetVertical = cTarget.getVertical();
-            targetLinear = cTarget.getLinear();
+            targetVertical = cTarget.getVertical().orElse(null);
+            targetLinear = cTarget.getLinear().orElse(null);
         } else {
             targetBase = (SingleCoordinateReferenceSystem<?>) target;
         }
-        CoordinateOperation baseOp = CoordinateOperations.transform(sourceBase, targetBase);
-        CoordinateOperation vBaseOp = extend(baseOp, sourceVertical.orElse(null), targetVertical.orElse(null));
+        op = CoordinateOperations.transform(sourceBase, targetBase);
 
-        this.op = vBaseOp;
+        if (targetVertical != null || sourceVertical != null) {
+            op = extend(op, sourceVertical, targetVertical);
+        }
+        if (targetLinear != null || sourceLinear != null) {
+            op = extend(op, sourceLinear, targetLinear);
+        }
 
     }
 
 
     private CoordinateOperation extend(final CoordinateOperation baseOp,
-                                       final VerticalCoordinateReferenceSystem sourceVertical,
-                                       final VerticalCoordinateReferenceSystem targetVertical ) {
+                                       final OneDimensionCoordinateReferenceSystem sourceVertical,
+                                       final OneDimensionCoordinateReferenceSystem targetVertical ) {
 
-
-        final VerticalCoordinateOperation vOp = new VerticalCoordinateOperation(sourceVertical, targetVertical, baseOp.inCoordinateDimension(), baseOp.outCoordinateDimension());
-
-        return new CoordinateOperation(){
-
-            @Override
-            public boolean isReversible() {
-                return true;
-            }
-
-            @Override
-            public int inCoordinateDimension() {
-                return vOp.inCoordinateDimension();
-            }
-
-            @Override
-            public int outCoordinateDimension() {
-                return vOp.outCoordinateDimension();
-            }
-
-            @Override
-            public void forward(double[] inCoordinate, double[] outCoordinate) {
-                baseOp.forward(inCoordinate, outCoordinate);
-                vOp.forward(inCoordinate, outCoordinate);
-            }
-
-            @Override
-            public void reverse(double[] inCoordinate, double[] outCoordinate) {
-
-            }
-        };
+        return new ExtendedCoordinateOperation(baseOp, sourceVertical, targetVertical);
     }
 
     @Override
@@ -111,20 +85,27 @@ class DefaultTransformOperation<P extends Position, Q extends Position> implemen
 }
 
 
-class VerticalCoordinateOperation implements CoordinateOperation {
-    private int sourceStart;
-    private int targetStart;
-    private VerticalCoordinateReferenceSystem sourceVertical;
-    private VerticalCoordinateReferenceSystem targetVertical;
+/**
+ * Extends a CoordinateOperation by the stacking an operation between  1-dimensional reference systems on top of this.
+ *
+ * Operations need to added according to normal form (first for Z-coordinate, then M-coordinate).
+ */
+class ExtendedCoordinateOperation implements CoordinateOperation {
+    private final CoordinateOperation baseOp;
+    private OneDimensionCoordinateReferenceSystem source;
+    private OneDimensionCoordinateReferenceSystem target;
+    private final int inCoDim;
+    private final int outCoDim;
     double convFactor = 1.0;
 
-    VerticalCoordinateOperation(VerticalCoordinateReferenceSystem sourceVertical, final VerticalCoordinateReferenceSystem targetVertical, int sourceStart, int targetStart) {
-        this.sourceVertical = sourceVertical;
-        this.targetVertical = targetVertical;
-        this.sourceStart = sourceStart;
-        this.targetStart = targetStart;
-        if(sourceVertical != null && targetVertical != null) {
-            convFactor = sourceVertical.getUnit().getConversionFactor() / targetVertical.getUnit().getConversionFactor();
+    ExtendedCoordinateOperation(CoordinateOperation baseOp, OneDimensionCoordinateReferenceSystem source, final OneDimensionCoordinateReferenceSystem target) {
+        this.baseOp = baseOp;
+        this.source = source;
+        this.target = target;
+        this.inCoDim =  (source != null) ? baseOp.inCoordinateDimension() +1 :  baseOp.inCoordinateDimension();
+        this.outCoDim = target != null ? baseOp.outCoordinateDimension() +1 : baseOp.outCoordinateDimension();
+        if(source != null && target != null) {
+            convFactor = source.getUnit().getConversionFactor() / target.getUnit().getConversionFactor();
         }
     }
 
@@ -135,35 +116,34 @@ class VerticalCoordinateOperation implements CoordinateOperation {
 
     @Override
     public int inCoordinateDimension() {
-        return sourceVertical != null ? sourceStart+1 :  sourceStart;
+        return inCoDim;
     }
 
     @Override
     public int outCoordinateDimension() {
-        return targetVertical != null ? targetStart+1 : targetStart;
+        return outCoDim;
     }
 
     @Override
     public void forward(double[] inCoordinate, double[] outCoordinate) {
-
-        if (sourceVertical == null && targetVertical != null) {
-            outCoordinate[targetStart] = 0d;
+        baseOp.forward(inCoordinate, outCoordinate);
+        if (source == null && target != null) {
+            outCoordinate[outCoDim - 1] = 0d;
         }
 
-        if (sourceVertical != null && targetVertical != null ) {
-            outCoordinate[targetStart] = convFactor * inCoordinate[sourceStart];
+        if (source != null && target != null ) {
+            outCoordinate[outCoDim - 1] = convFactor * inCoordinate[inCoDim -1];
         }
-
     }
 
     @Override
     public void reverse(double[] inCoordinate, double[] outCoordinate) {
-        if (targetVertical == null && sourceVertical != null) {
-            outCoordinate[sourceStart] = 0d;
+        if (target == null && source != null) {
+            outCoordinate[inCoDim - 1] = 0d;
         }
 
-        if (sourceVertical != null && targetVertical != null ) {
-            outCoordinate[sourceStart] = inCoordinate[targetStart] / convFactor;
+        if (source != null && target != null ) {
+            outCoordinate[inCoDim-1] = inCoordinate[outCoDim -1] / convFactor;
         }
     }
 }

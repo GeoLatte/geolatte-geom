@@ -3,7 +3,6 @@ package org.geolatte.geom.crs.trans;
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.geolatte.geom.CrsMock.*;
@@ -104,12 +103,11 @@ public class TestTransformVisitor {
         mls.accept(visitor);
         Geometry<C2D> projected = visitor.getTransformed();
         assertEquals(multilinestring(WEB_MERCATOR,
-                linestring(c(556597.453966367, 6446275.84101716),c(592219.691020215, 6692356.43526254)),
-                linestring(c(667916.944759642, 6621293.72274017),c(703539.181813488, 6872776.25367374))
+                linestring(c(556597.453966367, 6446275.84101716), c(592219.691020215, 6692356.43526254)),
+                linestring(c(667916.944759642, 6621293.72274017), c(703539.181813488, 6872776.25367374))
                 ),
                 projected);
     }
-
 
 
     @Test
@@ -155,7 +153,6 @@ public class TestTransformVisitor {
     }
 
     @Test
-    //@Ignore("Requires better compositionality of CompoundCRS")
     public void testLineStringTransform3DTo3D() {
         LineString<G3D> line = linestring(WGS84_Z, g(5.32, 51.3, 10.0), g(4.89, 50.76, 12.0));
         TransformOperation<G3D, C3D> op = TransformOperations.from(WGS84_Z, MERCATOR_Z);
@@ -168,6 +165,52 @@ public class TestTransformVisitor {
                 c(544352.309979108, 6578949.80039655, 12.0)
         ), projected);
     }
+
+
+    @Test
+    public void testLineStringTransform3DMTo3DM() {
+        LineString<G3DM> line = linestring(WGS84_ZM, g(5.32, 51.3, 10.0, 1.0), g(4.89, 50.76, 12.0, 1.0));
+        TransformOperation<G3DM, C3DM> op = TransformOperations.from(WGS84_ZM, MERCATOR_ZM);
+        TransformVisitor<G3DM, C3DM> visitor = new TransformVisitor<>(op);
+        line.accept(visitor);
+        Geometry<C3DM> projected = visitor.getTransformed();
+        assertEquals(linestring(
+                MERCATOR_ZM,
+                c((592219.691020215), 6674532.79847308, 10.0, 1.0),
+                c(544352.309979108, 6578949.80039655, 12.0, 1.0)
+        ), projected);
+    }
+
+    @Test
+    public void testLineStringTransform3DMTo3DMReverse() {
+        LineString<C3DM> line = linestring(
+                MERCATOR_ZM,
+                c((592219.691020215), 6674532.79847308, 10.0, 1.0),
+                c(544352.309979108, 6578949.80039655, 12.0, 1.0)
+        );
+        TransformOperation<C3DM, G3DM> op = TransformOperations.from(MERCATOR_ZM, WGS84_ZM);
+        TransformVisitor<C3DM, G3DM> visitor = new TransformVisitor<>(op);
+        line.accept(visitor);
+        Geometry<G3DM> projected = visitor.getTransformed();
+        assertEquals(linestring(WGS84_ZM, g(5.32, 51.3, 10.0, 1.0), g(4.89, 50.76, 12.0, 1.0)), projected);
+    }
+
+    @Test
+    public void testLineStringTransform3DTo3DReverse() {
+        LineString<C3D> line = linestring(
+                MERCATOR_Z,
+                c((592219.691020215), 6674532.79847308, 10.0),
+                c(544352.309979108, 6578949.80039655, 12.0));
+        TransformOperation<C3D, G3D> op = TransformOperations.from(MERCATOR_Z, WGS84_Z);
+        TransformVisitor<C3D, G3D> visitor = new TransformVisitor<>(op);
+        line.accept(visitor);
+        Geometry<G3D> projected = visitor.getTransformed();
+        assertEquals(
+                linestring(WGS84_Z, g(5.32, 51.3, 10.0), g(4.89, 50.76, 12.0))
+                , projected);
+    }
+
+    //TODO -- add test for  linear axis in feet, not meters
 
 
     private static <P extends Position> void assertEquals(Geometry<P> g1, Geometry<P> g2) {
