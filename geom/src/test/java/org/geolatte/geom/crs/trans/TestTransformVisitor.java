@@ -109,6 +109,28 @@ public class TestTransformVisitor {
                 projected);
     }
 
+    @Test
+    public void testNestedGeometryCollection() {
+        GeometryCollection<G2D, Geometry<G2D>> gc = geometrycollection(WGS84,
+                point(g(5, 50)),
+                multipoint(point(g(5, 50)), point(g(5.32, 51.4))),
+                linestring(g(5.32, 51.3), g(4.89, 50.76))
+        );
+        gc.accept(visitor);
+        Geometry<C2D> projected = visitor.getTransformed();
+        assertEquals(
+                geometrycollection(WEB_MERCATOR,
+                point(c(556597.453966367, 6446275.84101716)),
+                multipoint(
+                        point(c(556597.453966367, 6446275.84101716)),
+                        point(c(592219.691020215, 6692356.43526254))
+                ),
+                linestring(
+                        c((592219.691020215), 6674532.79847308),
+                        c(544352.309979108, 6578949.80039655)
+                )),
+                projected);
+    }
 
     @Test
     public void testLineStringTransform2DTo3D() {
@@ -151,6 +173,22 @@ public class TestTransformVisitor {
                 cM(544352.309979108, 6578949.80039655, 0)
         ), projected);
     }
+
+
+    @Test
+    public void testLineStringTransform2DTo3DM() {
+        LineString<G2D> line = linestring(WGS84, g(5.32, 51.3), g(4.89, 50.76));
+        TransformOperation<G2D, C3DM> op = TransformOperations.from(WGS84, MERCATOR_ZM);
+        TransformVisitor<G2D, C3DM> visitor = new TransformVisitor<>(op);
+        line.accept(visitor);
+        Geometry<C3DM> projected = visitor.getTransformed();
+        assertEquals(linestring(
+                MERCATOR_ZM,
+                c((592219.691020215), 6674532.79847308, 0, 0),
+                c(544352.309979108, 6578949.80039655, 0, 0)
+        ), projected);
+    }
+
 
     @Test
     public void testLineStringTransform3DTo3D() {
@@ -209,6 +247,7 @@ public class TestTransformVisitor {
                 linestring(WGS84_Z, g(5.32, 51.3, 10.0), g(4.89, 50.76, 12.0))
                 , projected);
     }
+
 
     //TODO -- add test for  linear axis in feet, not meters
 

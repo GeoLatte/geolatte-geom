@@ -307,7 +307,7 @@ public class Geometries {
         }
 
         if (GeometryCollection.class.isAssignableFrom(geometryClass)) {
-            return new GeometryCollection<P, Geometry<P>>((parts.toArray( null )));
+            return mkGeometryCollection(parts);
         }
 
         throw new IllegalStateException("Unknown Geometry class");
