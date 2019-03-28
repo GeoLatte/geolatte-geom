@@ -60,6 +60,12 @@ class DefaultTransformOperation<P extends Position, Q extends Position> implemen
 
     }
 
+    DefaultTransformOperation(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target, CoordinateOperation op){
+        this.op = op;
+        this.source = source;
+        this.target = target;
+    }
+
 
     private CoordinateOperation extend(final CoordinateOperation baseOp,
                                        final OneDimensionCoordinateReferenceSystem sourceVertical,
@@ -81,6 +87,11 @@ class DefaultTransformOperation<P extends Position, Q extends Position> implemen
     @Override
     public CoordinateOperation getOperation() {
         return this.op;
+    }
+
+    @Override
+    public TransformOperation<Q, P> reversed() {
+        return new DefaultTransformOperation<Q,P>(this.target, this.source, this.op.reversed());
     }
 }
 

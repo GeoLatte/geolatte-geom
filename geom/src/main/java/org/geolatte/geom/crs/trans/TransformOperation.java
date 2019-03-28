@@ -26,4 +26,7 @@ public interface TransformOperation<P extends Position, Q extends Position> {
         return Positions.mkPosition(getSource().getPositionClass(), out);
     }
 
+
+    TransformOperation<Q,P> reversed();
+
 }

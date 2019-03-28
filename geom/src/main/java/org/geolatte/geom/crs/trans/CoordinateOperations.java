@@ -58,7 +58,7 @@ public class CoordinateOperations {
             return new IdentityOp(3);
         } else if (WGS84.getDatum().equals(source)) {
             if(target.getToWGS84().length == 0) throw new IllegalArgumentException("Source and target datums must have a ToWGS84 parameters ");
-            return PositionVectorTransformation.fromTOWGS84(target.getToWGS84()).reverse();
+            return PositionVectorTransformation.fromTOWGS84(target.getToWGS84()).reversed();
         } else if (WGS84.getDatum().equals(target)) {
             if(source.getToWGS84().length == 0) throw new IllegalArgumentException("Source and target datums must have a ToWGS84 parameters ");
             return PositionVectorTransformation.fromTOWGS84(source.getToWGS84());

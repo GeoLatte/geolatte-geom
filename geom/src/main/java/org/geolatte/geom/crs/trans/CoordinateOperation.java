@@ -42,7 +42,7 @@ public interface CoordinateOperation {
      * Creates a new {@code CoordinateOperation} by reversing this instance
      * @return a new {@code CoordinateOperation} by reversing this instance
      */
-    default CoordinateOperation reverse() {
+    default CoordinateOperation reversed() {
         return new ConcatenatedOperation.Builder().reverse(this).build();
     }
 }

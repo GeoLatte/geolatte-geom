@@ -26,7 +26,11 @@ public class TransformVisitor<P extends Position, Q extends Position> implements
     public void reset(){
         transformed.clear();
     }
-    
+
+    public TransformVisitor<Q,P> reversed(){
+        return new TransformVisitor(this.operation.reversed());
+    }
+
     @Override
     public void visit(Point<P> point) {
         if (point.isEmpty()) {

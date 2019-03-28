@@ -64,7 +64,7 @@ public class ConcatenatedCoordinateOperationTest {
 
         CoordinateOperation testOp = new TrivialOp();
 
-        CoordinateOperation appended = chain.reverse().appendForward( testOp );
+        CoordinateOperation appended = chain.reversed().appendForward( testOp );
         double[] inCoordinate = new double[]{4.00124343197523, 49.9994334980867, 0};
         double[] outCoordinate = new double[3];
 

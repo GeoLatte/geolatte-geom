@@ -35,6 +35,16 @@ public class TestTransformVisitor {
     }
 
     @Test
+    public void testPointReverseTransform() {
+
+        Point<C2D> pnt = point(WEB_MERCATOR, c(556597.453966367, 6446275.84101716));
+        TransformVisitor<C2D, G2D> reversed = visitor.reversed();
+        pnt.accept(reversed);
+        Geometry<G2D> projected = reversed.getTransformed();
+        assertEquals(point(WGS84, g(5, 50)), projected);
+    }
+
+    @Test
     public void testEmptyPointTransform() {
 
         Point<G2D> pnt = Geometries.mkEmptyPoint(WGS84);
