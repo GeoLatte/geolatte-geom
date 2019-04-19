@@ -2,6 +2,8 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import static java.lang.String.format;
+
 /**
  * An envelope or bounding box implementation.
  *
@@ -279,6 +281,17 @@ public class Envelope<P extends Position> {
                         this.getMaxC1() < other.getMinC1() ||
                         this.getMinC1() > other.getMaxC1());
     }
+
+
+    @SuppressWarnings("unchecked")
+    public <Q extends Position> Envelope<Q> as(Class<Q> castToType){
+        if (! castToType.isAssignableFrom(this.crs.getPositionClass()) ) {
+            throw new ClassCastException(format("Can't cast a %s to a %s", this.crs.getPositionClass().getName(),
+                    castToType.getName()));
+        }
+        return (Envelope<Q>)this;
+    }
+
 
     @Override
     public boolean equals(Object o) {
