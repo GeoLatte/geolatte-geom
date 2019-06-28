@@ -1,12 +1,13 @@
 //The package name can't be scala because of problems in intellij import resolution (scala package classes not found)
 package org.geolatte.geom.syntax
 
-import org.geolatte.geom._
+import org.geolatte.{geom => jgeom}
+import jgeom.Position
 import org.geolatte.geom.builder.DSL
 import org.geolatte.geom.crs.CoordinateReferenceSystems.mkCoordinateReferenceSystem
 import org.geolatte.geom.crs.Unit.METER
 import org.geolatte.geom.crs._
-
+import org.geolatte.geom.types._
 
 trait PositionBuilder[-T, +P] {
   def apply(t: T): P
@@ -18,6 +19,7 @@ trait PositionSeqBuilder[-T, +P] {
 
 sealed trait PositionType {
 
+  import jgeom._
   def getPositionType(pclass: Class[_]): PositionType =
     if ( classOf[G2D].isAssignableFrom(pclass) ) Geodetic else Cartesian
 
@@ -44,7 +46,7 @@ trait PositionBuilders {
                                        (implicit pb: PositionBuilder[T, P]): PositionBuilder[T, P]
   = pb
 
-
+  import jgeom.{C2D, C3D, C2DM, C3DM, G2D, G2DM, G3D, G3DM}
   implicit val c2D: Class[C2D] = classOf[C2D]
   implicit val c3D: Class[C3D] = classOf[C3D]
   implicit val c2DM: Class[C2DM] = classOf[C2DM]
@@ -101,6 +103,7 @@ trait PositionBuilders {
 
 trait GeometryConstructors {
 
+
   import org.geolatte.geom.builder.DSL
 
   def point[P <: Position, T](crs: CoordinateReferenceSystem[P])
@@ -136,45 +139,56 @@ trait GeometryConstructors {
 
   def polygon[P <: Position](rings: LinearRing[P]*)(implicit crs: CoordinateReferenceSystem[P]): Polygon[P] =
     if ( rings.isEmpty ) {
-      new Polygon( crs )
+      new jgeom.Polygon( crs )
     }
     else {
-      DSL.polygon( rings.head, rings.tail: _* )
+      val (h,t) = castback[LinearRing[P], jgeom.LinearRing[P]](rings.head, rings.tail)
+      DSL.polygon( h, t: _* )
     }
 
   def multiLinestring[P <: Position](lines: LineString[P]*)
                                     (implicit crs: CoordinateReferenceSystem[P]): MultiLineString[P] =
     if ( lines.isEmpty ) {
-      new MultiLineString( crs )
+      new jgeom.MultiLineString( crs )
     }
     else {
-      DSL.multilinestring( lines.head, lines.tail: _* )
+      val (h,t) = castback[LineString[P], jgeom.LineString[P]](lines.head, lines.tail)
+      DSL.multilinestring( h, t: _* )
     }
 
   def multiPoint[P <: Position](points: Point[P]*)(implicit crs: CoordinateReferenceSystem[P]): MultiPoint[P] =
     if ( points.isEmpty ) {
-      new MultiPoint( crs )
+      new jgeom.MultiPoint( crs )
     }
     else {
-      DSL.multipoint( points.head, points.tail: _* )
+      val (h,t) = castback[Point[P], jgeom.Point[P]](points.head, points.tail)
+      DSL.multipoint( h, t: _* )
     }
 
   def multiPolygon[P <: Position](polygons: Polygon[P]*)(implicit crs: CoordinateReferenceSystem[P]): MultiPolygon[P] =
     if ( polygons.isEmpty ) {
-      new MultiPolygon( crs )
+      new jgeom.MultiPolygon( crs )
     }
     else {
-      DSL.multipolygon( polygons.head, polygons.tail: _* )
+      val (h,t) = castback[Polygon[P], jgeom.Polygon[P]](polygons.head, polygons.tail)
+      DSL.multipolygon( h, t: _* )
     }
 
   def geometrycollection[P <: Position](geometries: Geometry[P]*)
-                                       (implicit crs: CoordinateReferenceSystem[P]): GeometryCollection[P, Geometry[P]] =
+                                       (implicit crs: CoordinateReferenceSystem[P]): GeometryCollection[P] =
     if ( geometries.isEmpty ) {
-      new GeometryCollection( crs )
+      new jgeom.GeometryCollection[P, jgeom.Geometry[P]]( crs ).asInstanceOf[GeometryCollection[P]]
     }
     else {
-      DSL.geometrycollection( geometries.head, geometries.tail: _* )
+      val (h,t) = castback[Geometry[P], jgeom.Geometry[P]](geometries.head, geometries.tail)
+      DSL.geometrycollection( h , t: _* ).asInstanceOf[GeometryCollection[P]]
     }
+
+  private[this] def cb[I,O](in: I) : O = in.asInstanceOf[O]
+  private[this] def cbb[I,O](in: Seq[I]) : Seq[O] = in.asInstanceOf[Seq[O]]
+
+  private[this] def castback[I,O](head: I, tail: Seq[I]) : (O, Seq[O]) =
+    (cb(head), cb(tail))
 
 }
 
@@ -207,7 +221,7 @@ trait ArrayToPosition {
 
   case class PFactory[Q <: Position](crs: CoordinateReferenceSystem[Q], make: Array[Double] => Q)
 
-  import Positions._
+  import org.geolatte.geom.Positions._
 
   private[this] def adjustCrs[Q <: Position](crs: CoordinateReferenceSystem[_], coordinateDimension: Int) : CoordinateReferenceSystem[Q]= {
     val adjusted = if ( coordinateDimension == 3 ) {
@@ -244,6 +258,7 @@ trait ExtendDim[B <: Position, Z <: Position, M <: Position] {
 
 object ExtendDim {
 
+  import jgeom.{C2D, C3D, C2DM, C3DM, G2D, G2DM, G3D, G3DM}
   implicit val g2D = new ExtendDim[G2D, G3D, G2DM]{}
   implicit val g3D = new ExtendDim[G3D, G3D, G3DM]{}
   implicit val g2DM = new ExtendDim[G2DM, G3DM, G2DM]{}

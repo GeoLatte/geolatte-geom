@@ -1,6 +1,4 @@
 
-name := "geolatte-geom-scala"
-
 val geolatteGeomVersion = "1.4.0"
 
 val commonResolvers = Seq(
@@ -9,6 +7,7 @@ val commonResolvers = Seq(
 )
 
 val commonSettings = Seq(
+  organization := "org.geolatte",
   version := geolatteGeomVersion,
   scalaVersion := "2.12.6",
   resolvers ++= commonResolvers,
@@ -25,11 +24,13 @@ val commonDependencies = Seq(
 
 lazy val geom = (project in file( "geom" )).settings(
   commonSettings,
+  name := "geolatte-geom-scala",
   libraryDependencies ++= commonDependencies
 )
 
 lazy val playJson26 = (project in file ("play-json-26")).settings(
   commonSettings,
+  name := "geolatte-geom-playjson26",
   libraryDependencies ++=
     commonDependencies ++ Seq( 
       "com.typesafe.play" %% "play-json" % "2.6.0",
