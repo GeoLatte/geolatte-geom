@@ -21,6 +21,8 @@ package object types {
 
   //covariant re-definition of types
   type Feature[+P,ID] = geom.Feature[Position,ID]
+  type Envelope[+P]   = geom.Envelope[_ <: P]
+
   type Geometry[+P <: Position]   = geom.Geometry[_ <: P]
 
   type Point[+P <: Position] = geom.Point[ _ <: P]
@@ -32,6 +34,7 @@ package object types {
 
   type MultiLineString[+P <: Position] = geom.MultiLineString[ _ <: P]
   type MultiPolygon[+P <: Position] = geom.MultiPolygon[ _ <: P]
+
 
   type GeometryCollection[P <: Position] = geom.GeometryCollection[ _ <: P, Geometry[P]]
 
