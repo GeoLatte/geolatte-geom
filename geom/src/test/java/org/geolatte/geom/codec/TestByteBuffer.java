@@ -85,6 +85,17 @@ public class TestByteBuffer {
         }
     }
 
+    @Test
+    public void test_negative_byte() {
+        ByteBuffer bb = ByteBuffer.from("-A");
+        assertEquals(-10, bb.get());
+    }
+
+    @Test
+    public void test_positive_byte() {
+        ByteBuffer bb = ByteBuffer.from("+A");
+        assertEquals(10, bb.get());
+    }
 
     @Test
     public void test_toString() {
