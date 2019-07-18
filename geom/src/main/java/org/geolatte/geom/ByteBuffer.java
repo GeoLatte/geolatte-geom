@@ -75,7 +75,25 @@ public class ByteBuffer {
         int size = hexString.length() / 2; // this will drop the last char, if hexString is not even.
         java.nio.ByteBuffer buffer = java.nio.ByteBuffer.allocate(size);
         for (int i = 0; i < size * 2; i += 2) {
-            byte b = (byte) Integer.parseInt(hexString.substring(i, i + 2), 16);
+            final char firstLetterOrNumber = hexString.charAt(i);
+            final char secondLetterOrNumber = hexString.charAt(i + 1);
+
+            final byte firstDigit;
+            final byte secondDigit;
+            if (firstLetterOrNumber == '+') {
+                firstDigit = 0;
+                secondDigit = charToHex(secondLetterOrNumber);
+            }
+            else if (firstLetterOrNumber == '-'){
+                firstDigit = 0;
+                secondDigit = (byte)-charToHex(secondLetterOrNumber);
+
+            }else {
+                firstDigit = charToHex(firstLetterOrNumber);
+                secondDigit = charToHex(secondLetterOrNumber);
+            }
+
+            final byte b = (byte)((firstDigit << 4) | secondDigit);
             buffer.put(b);
         }
         buffer.rewind();
@@ -424,4 +442,26 @@ public class ByteBuffer {
         return true;
     }
 
+    private static byte charToHex(int letterOrNumber) {
+        final int number;
+        if (letterOrNumber <= '9'){
+            number = letterOrNumber - '0';
+            if (number < 0) throw numberFormatException(letterOrNumber);
+            return (byte) number;
+        } else {
+            // The letters 'A' - 'F' and 'a' - 'f' differ only at bit position 6.
+            // If bit 6 is zero, then it is uppercase
+            int letterCaseInsensitive = letterOrNumber & ~(1 << 5);
+            if (letterCaseInsensitive <= 'F') {
+                number = letterCaseInsensitive - 'A' + 10;
+                if (number < 10) throw numberFormatException(letterOrNumber);
+                return (byte) number;
+            }
+        }
+        throw numberFormatException(letterOrNumber);
+    }
+
+    private static NumberFormatException numberFormatException(int letterOrNumber) {
+        return new NumberFormatException((char)letterOrNumber +  " is not a hex digit");
+    }
 }
