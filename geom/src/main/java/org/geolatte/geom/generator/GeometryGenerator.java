@@ -23,7 +23,7 @@ public interface GeometryGenerator<P extends Position, G extends Geometry<P>> {
     }
 
     @SuppressWarnings("unchecked")
-    default GeometryGenerator<P, Geometry<P>> asGeometry() {
+    default GeometryGenerator<P, Geometry<P>> asGeometryGenerator() {
         return (GeometryGenerator<P, Geometry<P>>)this;
     }
 }

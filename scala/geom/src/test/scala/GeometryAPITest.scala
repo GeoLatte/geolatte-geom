@@ -6,7 +6,7 @@ import org.scalatest.FlatSpec
 class GeometryAPITest extends FlatSpec {
 
   import org.geolatte.geom
-  import org.geolatte.geom.types._
+  import org.geolatte.geom._
   import org.geolatte.geom.syntax.GeometryImplicits._
 
   "A 2D Cartesian Geometry" should "be easily constructed from a tuple of doubles" in {
@@ -73,7 +73,7 @@ class GeometryAPITest extends FlatSpec {
 
 class GeometryApi2Test extends FlatSpec {
   import org.geolatte.geom
-  import org.geolatte.geom.types._
+  import org.geolatte.geom._
   import org.geolatte.geom.syntax.GeometryImplicits._
 
   "We " should " easily create Point geometries for a given (non-implicit) CRS" in {
@@ -107,7 +107,7 @@ class GeometryApi2Test extends FlatSpec {
 
 class GeometryApiAsType extends FlatSpec {
 
-  import org.geolatte.geom.types._
+  import org.geolatte.geom._
   import org.geolatte.geom.syntax.GeometryImplicits._
 
   "We" should "be able to cast to a declared Position type" in {
