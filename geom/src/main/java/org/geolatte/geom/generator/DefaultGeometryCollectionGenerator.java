@@ -2,7 +2,7 @@ package org.geolatte.geom.generator;
 
 import org.geolatte.geom.Envelope;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.builder.DSL;
 
@@ -13,7 +13,7 @@ import static java.util.Arrays.asList;
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */
-class DefaultGeometryCollectionGenerator<P extends Position> extends AbstractGeometryGenerator<P, GeometryCollection<P, Geometry<P>>> {
+class DefaultGeometryCollectionGenerator<P extends Position> extends AbstractGeometryGenerator<P, AbstractGeometryCollection<P, Geometry<P>>> {
 
 
     private final int numGeoms;
@@ -32,7 +32,7 @@ class DefaultGeometryCollectionGenerator<P extends Position> extends AbstractGeo
     };
 
     @Override
-    public GeometryCollection<P, Geometry<P>> generate() {
+    public AbstractGeometryCollection<P, Geometry<P>> generate() {
         return DSL.geometrycollection(combined.generate(), combined.generateArray(numGeoms - 1));
     }
 }

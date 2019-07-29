@@ -239,7 +239,7 @@ public class DSL {
 
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    private static <P extends Position, G extends Geometry<P>> G[] combine(Class<G> resultType, G geometry, G... geometries) {
+    protected static <P extends Position, G extends Geometry<P>> G[] combine(Class<G> resultType, G geometry, G... geometries) {
         Object[] allGeometries = (Object[]) Array.newInstance(resultType, geometries.length + 1);
         allGeometries[0] = geometry;
         System.arraycopy(geometries, 0, allGeometries, 1, geometries.length);
@@ -255,8 +255,8 @@ public class DSL {
      */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
-        return new GeometryCollection<P, Geometry<P>>(combine(Geometry.class, geometry, geometries));
+    public static <P extends Position> GeometryCollection<P> geometrycollection(Geometry<P> geometry, Geometry<P>... geometries) {
+        return new GeometryCollection<>(combine(Geometry.class, geometry, geometries));
     }
 
     /**
@@ -269,14 +269,14 @@ public class DSL {
      */
     @SuppressWarnings("unchecked")
     @SafeVarargs
-    public static <P extends Position> GeometryCollection<P, Geometry<P>> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
-        if (tokens.length == 0) return new GeometryCollection<P, Geometry<P>>(crs);
+    public static <P extends Position> GeometryCollection<P> geometrycollection(CoordinateReferenceSystem<P> crs, GeometryToken<P>... tokens) {
+        if (tokens.length == 0) return new GeometryCollection<P>(crs);
         Geometry<P>[] parts = new Geometry[tokens.length];
         int idx = 0;
         for (GeometryToken t : tokens) {
             parts[idx++] = t.toGeometry(crs);
         }
-        return new GeometryCollection<P, Geometry<P>>(parts);
+        return new GeometryCollection<P>(parts);
     }
 
     /**
@@ -508,13 +508,13 @@ public class DSL {
 
         @Override
         @SuppressWarnings("unchecked")
-        GeometryCollection<P, Geometry<P>> toGeometry(CoordinateReferenceSystem<P> crs) {
+        AbstractGeometryCollection<P, Geometry<P>> toGeometry(CoordinateReferenceSystem<P> crs) {
             Geometry<P>[] parts = new Geometry[tokens.length];
 
             for (int i = 0; i < tokens.length; i++) {
                 parts[i] = tokens[i].toGeometry(crs);
             }
-            return new GeometryCollection<P, Geometry<P>>(parts);
+            return new GeometryCollection<>(parts);
         }
 
     }

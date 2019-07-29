@@ -49,7 +49,7 @@ public class CastBehaviorTest {
     @Test
     public void testCastMultiGeometry3DPlanarto2DGeographic(){
         CoordinateReferenceSystem<C3D> crs3D = CoordinateReferenceSystems.mkCoordinateReferenceSystem(WEB_MERCATOR, Unit.METER, null, C3D.class);
-        GeometryCollection<C3D, Geometry<C3D>> gc = geometrycollection(crs3D, point(c(1, 2, 3)), point(c(4,5,6)));
+        AbstractGeometryCollection<C3D, Geometry<C3D>> gc = geometrycollection(crs3D, point(c(1, 2, 3)), point(c(4,5,6)));
         Geometry<C2D> gc2D = gc.as(C2D.class);
         assertEquals(1, gc2D.getPositionN(0).getX(), epsilon);
         assertEquals(5, gc2D.getPositionN(1).getY(), epsilon);

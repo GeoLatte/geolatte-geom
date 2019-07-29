@@ -113,14 +113,14 @@ class PostgisWktEncoder implements WktEncoder {
                 break;
             case GEOMETRYCOLLECTION:
                 addStartList();
-                addGeometries((GeometryCollection<P, ?>) geometry, true);
+                addGeometries((AbstractGeometryCollection<P, ?>) geometry, true);
                 addEndList();
                 break;
             case MULTIPOINT:
             case MULTILINESTRING:
             case MULTIPOLYGON:
                 addStartList();
-                addGeometries((GeometryCollection<P, ?>) geometry, false);
+                addGeometries((AbstractGeometryCollection<P, ?>) geometry, false);
                 addEndList();
                 break;
             default:
@@ -128,7 +128,7 @@ class PostgisWktEncoder implements WktEncoder {
         }
     }
 
-    private <P extends Position, G extends Geometry<P>> void addGeometries(GeometryCollection<P,G> collection, boolean withTag) {
+    private <P extends Position, G extends Geometry<P>> void addGeometries(AbstractGeometryCollection<P,G> collection, boolean withTag) {
         inGeometryCollection = true;
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             if (i > 0) {

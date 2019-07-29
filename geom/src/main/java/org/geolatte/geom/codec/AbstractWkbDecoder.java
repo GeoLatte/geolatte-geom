@@ -115,11 +115,11 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkMultiPolygon(geometries);
     }
 
-    private <P extends Position> GeometryCollection<P, Geometry<P>>
+    private <P extends Position> AbstractGeometryCollection<P, Geometry<P>>
     decodeGeometryCollection(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
-            return new GeometryCollection<P, Geometry<P>>(crs);
+            return new GeometryCollection<>(crs);
         }
         List<Geometry<P>> geometries = new ArrayList<Geometry<P>>(numGeometries);
         for (int i = 0; i < numGeometries; i++) {

@@ -118,7 +118,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_geometrycollection() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.GEOM_COLL_2D_POINTS);
-        GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
+        AbstractGeometryCollection geom = (AbstractGeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.GEOMETRYCOLLECTION, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.GEOM_COLL_2D_POINTS), geom);
@@ -128,7 +128,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_empty_geometrycollection() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_GEOM_COLL);
-        GeometryCollection geom = (GeometryCollection) decode(byteBuffer);
+        AbstractGeometryCollection geom = (AbstractGeometryCollection) decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.GEOMETRYCOLLECTION, geom.getGeometryType());
         assertTrue(geom.isEmpty());

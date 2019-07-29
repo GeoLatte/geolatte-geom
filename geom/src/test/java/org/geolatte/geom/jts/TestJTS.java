@@ -26,7 +26,7 @@ import org.locationtech.jts.geom.CoordinateXYZM;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.Measured;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Position;
@@ -200,7 +200,7 @@ public class TestJTS {
                 // if the types and number of items are equal
                 assertEquals(failureMsg, JTS.getCorrespondingGeolatteClass(jtsGeom.getClass()), geolatteGeom.getClass());
                 assertEquals(((org.locationtech.jts.geom.GeometryCollection) jtsGeom).getNumGeometries(),
-                        ((GeometryCollection) geolatteGeom).getNumGeometries());
+                        ((AbstractGeometryCollection) geolatteGeom).getNumGeometries());
                 continue;
             }
             if (jtsGeom.isEmpty()) {

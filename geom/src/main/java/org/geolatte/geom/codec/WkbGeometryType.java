@@ -34,7 +34,7 @@ enum WkbGeometryType {
 
     POINT(1, Point.class),
 
-    GEOMETRY_COLLECTION(7, GeometryCollection.class),
+    GEOMETRY_COLLECTION(7, AbstractGeometryCollection.class),
 
     LINE_STRING(2, LineString.class),
 

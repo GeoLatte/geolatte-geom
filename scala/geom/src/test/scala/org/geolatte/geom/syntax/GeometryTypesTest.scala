@@ -8,15 +8,15 @@ import org.scalatest.Matchers._
   */
 class GeometryTypesTest extends FlatSpec {
 
-  import org.geolatte.geom.syntax.GeometryImplicits._
   import org.geolatte.geom.syntax.CoordinateReferenceSystemSyntax._
+  import org.geolatte.geom.syntax.GeometryImplicits._
 
   "A 3D Cartesian Point" should "be a assignable to a 2D Cartesian Point" in {
 
     val pZ: Point[C3D] = point(PROJECTED_3D_METER)(2.0, 3.0, 100.0)
 
 
-    val p: Point[C2D] = pZ
+    val p: Point[C2D] = pZ.castTo[C2D]
 
     p shouldBe a[Point[_]]
 
@@ -29,7 +29,7 @@ class GeometryTypesTest extends FlatSpec {
 
     val pZ: Point[C3D] = point(PROJECTED_3D_METER)(2.0, 3.0, 100.0)
 
-    val p: Geometry[C2D] = pZ
+    val p: Geometry[C2D] = pZ.castTo[C2D]
 
     p shouldBe a[Geometry[_]]
 
@@ -43,7 +43,7 @@ class GeometryTypesTest extends FlatSpec {
 
     val lZ: LineString[G3D] = lineString(WGS84.addVertical())((2.0, 3.0, 100.0), (3.0, 5.0, 102.0))
 
-    val l: Geometry[G2D] = lZ
+    val l: Geometry[G2D] = lZ.castTo[G2D]
 
     l shouldBe a[Geometry[_]]
 
@@ -57,7 +57,7 @@ class GeometryTypesTest extends FlatSpec {
 
     val lZ: LineString[G3D] = lineString(WGS84.addVertical())((2.0, 3.0, 100.0), (3.0, 5.0, 102.0))
 
-    val l: LineString[G2D] = lZ
+    val l: LineString[G2D] = lZ.castTo[G2D]
 
     l shouldBe a[Geometry[_]]
 

@@ -198,7 +198,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         }
 
         @Override
-        public <G extends Geometry<P>> void visit(GeometryCollection<P, G> collection) {
+        public <G extends Geometry<P>> void visit(AbstractGeometryCollection<P, G> collection) {
         }
 
     }

@@ -1,7 +1,6 @@
 package org.geolatte.geom.crs.trans;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.junit.Test;
 
@@ -120,7 +119,7 @@ public class TestTransformVisitor {
 
     @Test
     public void testNestedGeometryCollection() {
-        GeometryCollection<G2D, Geometry<G2D>> gc = geometrycollection(WGS84,
+        AbstractGeometryCollection<G2D, Geometry<G2D>> gc = geometrycollection(WGS84,
                 point(g(5, 50)),
                 multipoint(point(g(5, 50)), point(g(5.32, 51.4))),
                 linestring(g(5.32, 51.3), g(4.89, 50.76))

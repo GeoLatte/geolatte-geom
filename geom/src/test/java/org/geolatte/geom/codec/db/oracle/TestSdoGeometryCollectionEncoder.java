@@ -2,7 +2,7 @@ package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.G2D;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class TestSdoGeometryCollectionEncoder {
                 new Double[]{10. ,5. , 10. ,10. , 20. ,10. , 10. ,105. , 15. ,105. , 20. ,110. , 10. ,110.,
                         10., 105.});
 
-        GeometryCollection<G2D, Geometry<G2D>> geom = geometrycollection(wgs84, point(g(10, 5)), linestring(g(10, 10)
+        AbstractGeometryCollection<G2D, Geometry<G2D>> geom = geometrycollection(wgs84, point(g(10, 5)), linestring(g(10, 10)
                 , g(20, 10)), polygon(ring(g(10, 105), g(15, 105), g(20, 110), g(10, 110), g(10, 105))));
 
         assertEquals(expected, Encoders.encode(geom));

@@ -1,7 +1,6 @@
 package org.geolatte.geom.crs.trans;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -71,12 +70,12 @@ public class TransformVisitor<P extends Position, Q extends Position> implements
     }
 
     @Override
-    public <G extends Geometry<P>> void visit(GeometryCollection<P, G> collection) {
+    public <G extends Geometry<P>> void visit(AbstractGeometryCollection<P, G> collection) {
         transformed.push(null); //add NULL marker
     }
 
     @Override
-    public <G extends Geometry<P>> void endVisit(GeometryCollection<P, G> collection) {
+    public <G extends Geometry<P>> void endVisit(AbstractGeometryCollection<P, G> collection) {
         List<Geometry<Q>> parts = new ArrayList<>();
         while ( !transformed.isEmpty() ) {
             Geometry<Q> popped = transformed.pop();

@@ -76,7 +76,7 @@ public class MeasuredTestCases {
     MultiPoint<C2DM> expectedForD1C = (MultiPoint<C2DM>) Wkt.fromWkt("multipointm((7 6 6))");
 
     LineString<C2DM> caseD1D = (LineString<C2DM>) Wkt.fromWkt("linestringm(0 0 1, 2 2 3, 4 4 2)");
-    GeometryCollection<C2DM, Geometry<C2DM>> expectedForD1D = (GeometryCollection<C2DM, Geometry<C2DM>>) Wkt.fromWkt("geometrycollectionm (linestringm(0 0 1, 1 1 2), pointm(4 4 2))");
+    AbstractGeometryCollection<C2DM, Geometry<C2DM>> expectedForD1D = (AbstractGeometryCollection<C2DM, Geometry<C2DM>>) Wkt.fromWkt("geometrycollectionm (linestringm(0 0 1, 1 1 2), pointm(4 4 2))");
 
     MultiLineString<C2DM> caseD1E = (MultiLineString<C2DM>) Wkt.fromWkt("multilinestringm((1 0 0, 1 1 1, 1 2 2, 3 1 3), (4 5 3, 5 3 4, 9 5 5, 7 6 6))");
     MultiLineString<C2DM> expectedForD1E = (MultiLineString<C2DM>) Wkt.fromWkt("multilinestringm((1 2 2, 3 1 3),(4 5 3, 5 3 4))");

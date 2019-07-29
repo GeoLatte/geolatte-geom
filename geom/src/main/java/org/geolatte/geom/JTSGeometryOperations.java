@@ -32,10 +32,6 @@ import org.locationtech.jts.operation.relate.RelateOp;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * An implementation of {@code ProjectedGeometryOperations} that delegates to the corresponding JTS operations.
  *
@@ -55,7 +51,7 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
      * @param geom
      */
     private <P extends C2D> void checkNotGeometryCollection(Geometry<P> geom) {
-        if (GeometryCollection.class.equals(geom.getClass())) {
+        if (AbstractGeometryCollection.class.equals(geom.getClass())) {
             throw new IllegalArgumentException("GeometryCollection is not allowed");
         }
     }

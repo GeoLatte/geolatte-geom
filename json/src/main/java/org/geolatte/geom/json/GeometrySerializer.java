@@ -47,7 +47,7 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         if (geometry.getGeometryType() != GEOMETRYCOLLECTION) {
             writeCoords(gen, geometry.getGeometryType(), geometry);
         } else {
-            GeometryCollection<P, Geometry<P>> gc = (GeometryCollection<P, Geometry<P>>) geometry;
+            AbstractGeometryCollection<P, Geometry<P>> gc = (AbstractGeometryCollection<P, Geometry<P>>) geometry;
             writeGeometries(gen, gc.components());
         }
         gen.writeEndObject();

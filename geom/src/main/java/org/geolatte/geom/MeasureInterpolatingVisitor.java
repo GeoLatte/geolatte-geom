@@ -161,7 +161,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
     }
 
     @Override
-    public void visit(GeometryCollection collection) {
+    public void visit(AbstractGeometryCollection collection) {
 
     }
 
@@ -218,7 +218,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
                     geometries[i++] = new LineString<P>(ps, this.geometry.getCoordinateReferenceSystem());
                 }
             }
-            return new GeometryCollection<P, Geometry<P>>(geometries);
+            return new GeometryCollection<P>(geometries);
         }
 
 

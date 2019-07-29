@@ -145,7 +145,7 @@ public class TestJTSGeometryOperations {
         }
 
         Polygon<C2D> polygon4 = new Polygon(crs);
-        assertEquals("Intersection with empty is not a GeometryCollection", new GeometryCollection<C2D, Geometry<C2D>>(crs),
+        assertEquals("Intersection with empty is not a GeometryCollection", new GeometryCollection<>(crs),
                 ops.intersection(polygon1, polygon4));
     }
 
@@ -165,7 +165,7 @@ public class TestJTSGeometryOperations {
         Polygon<C2D> expected = polygon(ring(crs, c(5, 3), c(5, 0), c(0, 0), c(0, 3), c(5, 3)));
         assertEquals(expected, ops.difference(pg1, pg2));
         assertEquals(pg1, ops.difference(pg1, new Polygon<C2D>(crs)));
-        assertEquals(new GeometryCollection<C2D, Geometry<C2D>>(crs),
+        assertEquals(new GeometryCollection<C2D>(crs),
                 ops.difference(new Polygon<C2D>(crs), pg2));
     }
 
@@ -199,7 +199,7 @@ public class TestJTSGeometryOperations {
         Polygon<C2D> p = polygon(crs, ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)));
         assertEquals(polygon(crs, ring(c(0, 0), c(0, 1), c(1, 1), c(1, 0), c(0, 0))), ops.reverse(p));
 
-        GeometryCollection<C2D, Geometry<C2D>> coll = geometrycollection(l, p, ml);
+        GeometryCollection<C2D> coll = geometrycollection(l, p, ml);
         assertEquals(geometrycollection(ops.reverse(ml), ops.reverse(p), ops.reverse(l)), ops.reverse(coll));
 
     }

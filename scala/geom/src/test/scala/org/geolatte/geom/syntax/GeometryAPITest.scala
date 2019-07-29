@@ -2,6 +2,7 @@
 import org.geolatte.geom.crs.CoordinateReferenceSystems._
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, Unit}
 import org.scalatest.FlatSpec
+import org.scalatest.Matchers.a
 
 class GeometryAPITest extends FlatSpec {
 

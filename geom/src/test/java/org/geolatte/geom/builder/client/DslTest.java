@@ -255,7 +255,7 @@ public class DslTest {
 
     @Test
     public void testValidGeometryCollection() {
-        GeometryCollection gc = geometrycollection(
+        AbstractGeometryCollection gc = geometrycollection(
                 point(WGS84, g(1, 2)),
                 linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
@@ -266,12 +266,12 @@ public class DslTest {
 
     @Test
     public void testValidGeometryCollectionAlternativeSyntax() {
-        GeometryCollection gc = geometrycollection(
+        AbstractGeometryCollection gc = geometrycollection(
                 point(WGS84, g(1, 2)),
                 linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
         );
-        GeometryCollection gc2 = geometrycollection(WGS84,
+        AbstractGeometryCollection gc2 = geometrycollection(WGS84,
                 point(g(1, 2)),
                 linestring(g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
@@ -311,7 +311,7 @@ public class DslTest {
 
     @Test
     public void testMultiPointCanBeEmbeddedInGeometryCollection() {
-        GeometryCollection geometryCollection = geometrycollection(
+        AbstractGeometryCollection geometryCollection = geometrycollection(
                 multipoint(point(WGS84, g(1, 2))),
                 point(WGS84, g(3, 4))
         );
@@ -343,7 +343,7 @@ public class DslTest {
 
     @Test
     public void testMultiLineStringCanBeEmbeddedInGeometryCollection() {
-        GeometryCollection geometryCollection = geometrycollection(
+        AbstractGeometryCollection geometryCollection = geometrycollection(
                 multilinestring(
                         linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
                         linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0))
@@ -381,7 +381,7 @@ public class DslTest {
 
     @Test
     public void testMultiPolygonCanBeEmbeddedInGeometryCollection() {
-        GeometryCollection geometryCollection =
+        AbstractGeometryCollection geometryCollection =
                 geometrycollection(
                         multipolygon(
                                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
@@ -394,7 +394,7 @@ public class DslTest {
 
     @Test
         public void testMultiPolygonCanBeEmbeddedInGeometryCollectionAlternative() {
-            GeometryCollection g1=
+            AbstractGeometryCollection g1=
                     geometrycollection(
                             multipolygon(
                                     polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
@@ -403,7 +403,7 @@ public class DslTest {
                             polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                     );
 
-        GeometryCollection g2=
+        AbstractGeometryCollection g2=
                             geometrycollection(WGS84,
                                     multipolygon(
                                             polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),

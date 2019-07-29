@@ -69,7 +69,7 @@ public class SerializableTest {
     public void testSerializeGeometryCollection() throws Exception {
 
         ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
-        GeometryCollection<C2D, Geometry<C2D>> geom = geometrycollection(crs, point(c(4, 4)), linestring(c(3, 4), c(5, 5)));
+        AbstractGeometryCollection<C2D, Geometry<C2D>> geom = geometrycollection(crs, point(c(4, 4)), linestring(c(3, 4), c(5, 5)));
         ObjectOutputStream outputStream = new ObjectOutputStream(byteOutput);
         outputStream.writeObject(geom);
 

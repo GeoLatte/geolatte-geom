@@ -175,7 +175,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }
 
-    private <P extends Position> GeometryCollection<P, Geometry<P>> decodeGeometryCollection(CoordinateReferenceSystem<P> crs) {
+    private <P extends Position> GeometryCollection<P> decodeGeometryCollection(CoordinateReferenceSystem<P> crs) {
         if (matchesOpenList()) {
             List<Geometry<P>> geometries = new ArrayList<Geometry<P>>();
             while (!matchesCloseList()) {
@@ -185,7 +185,7 @@ class PostgisWktDecoder extends AbstractWktDecoder<Geometry<?>> implements WktDe
             return mkGeometryCollection(geometries);
         }
         if (matchesEmptyToken()) {
-            return new GeometryCollection<P, Geometry<P>>(crs);
+            return new GeometryCollection<>(crs);
         }
         throw new WktDecodeException(buildWrongSymbolAtPositionMsg());
     }

@@ -199,8 +199,8 @@ public class JTS {
             return to((org.geolatte.geom.MultiLineString<P>) geometry, gFact);
         } else if (geometry instanceof org.geolatte.geom.MultiPolygon) {
             return to((org.geolatte.geom.MultiPolygon<P>) geometry, gFact);
-        } else if (geometry instanceof org.geolatte.geom.GeometryCollection) {
-            return to((org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>) geometry, gFact);
+        } else if (geometry instanceof AbstractGeometryCollection) {
+            return to((AbstractGeometryCollection<P, org.geolatte.geom.Geometry<P>>) geometry, gFact);
         } else {
             throw new JTSConversionException();
         }
@@ -331,15 +331,15 @@ public class JTS {
      * Converts a jts geometrycollection into a geolatte geometrycollection
      */
     @SuppressWarnings("unchecked")
-    private static <P extends Position> org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>> from
+    private static <P extends Position> org.geolatte.geom.GeometryCollection<P> from
     (GeometryCollection jtsGeometry, CoordinateReferenceSystem<P> crs) {
         if (jtsGeometry.getNumGeometries() == 0)
-            return new org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>(crs);
+            return new org.geolatte.geom.GeometryCollection<>(crs);
         org.geolatte.geom.Geometry<P>[] geoms = new org.geolatte.geom.Geometry[jtsGeometry.getNumGeometries()];
         for (int i = 0; i < jtsGeometry.getNumGeometries(); i++) {
             geoms[i] = from(jtsGeometry.getGeometryN(i), crs);
         }
-        return new org.geolatte.geom.GeometryCollection<P, org.geolatte.geom.Geometry<P>>(geoms);
+        return new org.geolatte.geom.GeometryCollection<>(geoms);
     }
 
     /*
@@ -426,8 +426,8 @@ public class JTS {
         return gFact.createMultiPolygon(polygons);
     }
 
-    private static <P extends Position> GeometryCollection to(org.geolatte.geom.GeometryCollection<P, org.geolatte
-            .geom.Geometry<P>> collection, GeometryFactory gFact) {
+    private static <P extends Position> GeometryCollection to(AbstractGeometryCollection<P, org.geolatte
+                .geom.Geometry<P>> collection, GeometryFactory gFact) {
         Geometry[] geoms = new Geometry[collection.getNumGeometries()];
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             geoms[i] = to(collection.getGeometryN(i));

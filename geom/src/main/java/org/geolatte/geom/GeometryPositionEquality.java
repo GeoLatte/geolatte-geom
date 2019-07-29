@@ -73,9 +73,9 @@ public class GeometryPositionEquality implements GeometryEquality {
         if (first.isEmpty() || second.isEmpty()) return false;
         if (! first.getCoordinateReferenceSystem().equals(second.getCoordinateReferenceSystem())) return false;
         if (first.getGeometryType() != second.getGeometryType()) return false;
-        if (first instanceof GeometryCollection) {
-            assert(second instanceof GeometryCollection);
-            return equals((GeometryCollection<?,?>)first, (GeometryCollection<?,?>)second);
+        if (first instanceof AbstractGeometryCollection) {
+            assert(second instanceof AbstractGeometryCollection);
+            return equals((AbstractGeometryCollection<?,?>)first, (AbstractGeometryCollection<?,?>)second);
         }
         if (first instanceof Polygon) {
             assert(second instanceof Polygon);
@@ -93,7 +93,7 @@ public class GeometryPositionEquality implements GeometryEquality {
         return true;
     }
 
-    private boolean equals(GeometryCollection first, GeometryCollection second) {
+    private boolean equals(AbstractGeometryCollection first, AbstractGeometryCollection second) {
         if (first.getNumGeometries() != second.getNumGeometries()) return false;
         for (int i = 0; i < first.getNumGeometries(); i++) {
             if (! equals(first.getGeometryN(i), second.getGeometryN(i))) return false;

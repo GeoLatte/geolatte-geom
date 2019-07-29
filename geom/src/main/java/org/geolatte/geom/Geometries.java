@@ -56,7 +56,7 @@ public class Geometries {
      * @return an empty {@code LineString} with the specified coordinate reference system
      */
     public static <P extends Position> LineString<P> mkEmptyLineString(CoordinateReferenceSystem<P> crs) {
-        return new LineString<P>(crs);
+        return new LineString<>(crs);
     }
 
 
@@ -112,7 +112,7 @@ public class Geometries {
      * @param <P> the type of {@code Position}
      * @return an empty {@code GeometryCollection} with the specified coordinate reference system
      */
-    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkEmptyGeometryCollection(CoordinateReferenceSystem<P> crs) {
+    public static <P extends Position> GeometryCollection<P> mkEmptyGeometryCollection(CoordinateReferenceSystem<P> crs) {
         return new GeometryCollection<>(crs);
     }
 
@@ -162,13 +162,13 @@ public class Geometries {
         return new Polygon<P>(rings.toArray(ringArr));
     }
 
-    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkGeometryCollection(Geometry<P>... geometries) {
-        return new GeometryCollection<P, Geometry<P>>(geometries);
+    public static <P extends Position> GeometryCollection<P> mkGeometryCollection(Geometry<P>... geometries) {
+        return new GeometryCollection<>(geometries);
     }
 
-    public static <P extends Position> GeometryCollection<P, Geometry<P>> mkGeometryCollection(List<Geometry<P>> geometries) {
+    public static <P extends Position> GeometryCollection<P> mkGeometryCollection(List<Geometry<P>> geometries) {
         Geometry<P>[] geomArr = (Geometry<P>[]) new Geometry[geometries.size()];
-        return new GeometryCollection<P, Geometry<P>>(geometries.toArray(geomArr));
+        return new GeometryCollection<>(geometries.toArray(geomArr));
     }
 
 
@@ -235,16 +235,16 @@ public class Geometries {
             return new Polygon((LinearRing<P>[]) parts);
         }
         if (MultiLineString.class.isAssignableFrom(geometryClass)) {
-            return new MultiLineString<P>((LineString<P>[]) parts);
+            return new MultiLineString<>((LineString<P>[]) parts);
         }
         if (MultiPoint.class.isAssignableFrom(geometryClass)) {
-            return new MultiPoint<P>((Point<P>[]) parts);
+            return new MultiPoint<>((Point<P>[]) parts);
         }
         if (MultiPolygon.class.isAssignableFrom(geometryClass)) {
-            return new MultiPolygon<P>((Polygon<P>[]) parts);
+            return new MultiPolygon<>((Polygon<P>[]) parts);
         }
-        if (GeometryCollection.class.isAssignableFrom(geometryClass)) {
-            return new GeometryCollection<P, Geometry<P>>((Geometry<P>[]) parts);
+        if (AbstractGeometryCollection.class.isAssignableFrom(geometryClass)) {
+            return new GeometryCollection<>((Geometry<P>[]) parts);
         }
         throw new IllegalStateException("Unknown Geometry class");
 
@@ -264,7 +264,7 @@ public class Geometries {
             return new MultiPolygon<Q>(crs);
         }
         if (GeometryCollection.class.isAssignableFrom(geometryClass)) {
-            return new GeometryCollection<Q, Geometry<Q>>(crs);
+            return new GeometryCollection<Q>(crs);
         }
         throw new IllegalStateException("Unknown Geometry class");
     }

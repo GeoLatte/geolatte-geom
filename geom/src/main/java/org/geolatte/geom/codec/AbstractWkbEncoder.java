@@ -61,8 +61,8 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         }
         //empty geoms have same representation as an empty GeometryCollection
         if (geom.isEmpty()) return size + sizeEmptyGeometry(geom);
-        if (geom instanceof GeometryCollection) {
-            size += sizeOfGeometryCollection((GeometryCollection<P, ?>) geom);
+        if (geom instanceof AbstractGeometryCollection) {
+            size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
         } else if (geom instanceof Polygon) {
             size += getPolygonSize((Polygon<P>) geom);
         } else if (geom instanceof Point) {
@@ -90,7 +90,7 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         return size;
     }
 
-    private <P extends Position, G extends Geometry<P>> int sizeOfGeometryCollection(GeometryCollection<P,G> collection) {
+    private <P extends Position, G extends Geometry<P>> int sizeOfGeometryCollection(AbstractGeometryCollection<P,G> collection) {
         int size = ByteBuffer.UINT_SIZE;
         for (G g : collection) {
             size += calculateSize(g, false);

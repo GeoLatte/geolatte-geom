@@ -75,7 +75,7 @@ class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
     }
 
     @Override
-    public  <G extends Geometry<P>>  void visit(GeometryCollection<P,G> geom) {
+    public  <G extends Geometry<P>>  void visit(AbstractGeometryCollection<P,G> geom) {
         writeByteOrder(output);
         writeTypeCodeAndSrid(geom, output);
         output.putUInt(geom.getNumGeometries());

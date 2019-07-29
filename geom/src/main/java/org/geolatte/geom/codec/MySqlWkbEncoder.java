@@ -52,8 +52,8 @@ class MySqlWkbEncoder extends AbstractWkbEncoder {
         if (geometry.isEmpty()) {
             return true;
         }
-        if (geometry instanceof GeometryCollection) {
-            for (Geometry<P> part : (GeometryCollection<P, ?>) geometry) {
+        if (geometry instanceof AbstractGeometryCollection) {
+            for (Geometry<P> part : (AbstractGeometryCollection<P, ?>) geometry) {
                 if (hasEmpty(part)) return true;
             }
         }

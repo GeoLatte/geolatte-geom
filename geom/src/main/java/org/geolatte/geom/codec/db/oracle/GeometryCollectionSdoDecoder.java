@@ -1,6 +1,7 @@
 package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.GeometryCollection;
 import org.geolatte.geom.codec.db.Decoder;
 

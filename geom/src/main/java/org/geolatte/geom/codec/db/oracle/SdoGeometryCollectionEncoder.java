@@ -1,7 +1,7 @@
 package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
 
@@ -18,7 +18,7 @@ public class SdoGeometryCollectionEncoder extends AbstractSDOEncoder {
     @Override
     @SuppressWarnings("unchecked")
     public <P extends Position, G extends Geometry<P>> SDOGeometry encode(G geom) {
-        GeometryCollection<P, Geometry<P>> collection = (GeometryCollection<P, Geometry<P>>)geom;
+        AbstractGeometryCollection<P, Geometry<P>> collection = (AbstractGeometryCollection<P, Geometry<P>>)geom;
         final SDOGeometry[] sdoElements = new SDOGeometry[collection.getNumGeometries()];
         for (int i = 0; i < collection.getNumGeometries(); i++) {
             final Geometry component = collection.getGeometryN(i);

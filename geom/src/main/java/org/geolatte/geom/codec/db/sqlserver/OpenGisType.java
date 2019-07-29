@@ -37,7 +37,7 @@ public enum OpenGisType {
 	MULTIPOINT( (byte) 4, MultiPoint.class ),
 	MULTILINESTRING( (byte) 5, MultiLineString.class ),
 	MULTIPOLYGON( (byte) 6, MultiPolygon.class ),
-	GEOMETRYCOLLECTION( (byte) 7, GeometryCollection.class ),
+	GEOMETRYCOLLECTION( (byte) 7, AbstractGeometryCollection.class ),
 	INVALID_TYPE( (byte) 0, null );
 
 	final byte byteValue;

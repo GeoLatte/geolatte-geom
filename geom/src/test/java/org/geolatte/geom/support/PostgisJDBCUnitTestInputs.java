@@ -249,7 +249,7 @@ public class PostgisJDBCUnitTestInputs extends WktWkbCodecTestBase {
                 geometrycollection(polygon3D, polygon3D));
 
         MultiPoint<C3D> mp = multipoint(point(crsZ, c(10, 10, 10)), point(crsZ, c(20, 20, 20)));
-        GeometryCollection gcmp = geometrycollection(mp, mp);
+        AbstractGeometryCollection gcmp = geometrycollection(mp, mp);
         addCase(35,
                 "GEOMETRYCOLLECTION(MULTIPOINT(10 10 10, 20 20 20),MULTIPOINT(10 10 10, 20 20 20))",
                 "0107000080020000000104000080020000000101000080000000000000244000000000000024400000000000002440010100008000000000000034400000000000003440000000000000344001040000800200000001010000800000000000002440000000000000244000000000000024400101000080000000000000344000000000000034400000000000003440",

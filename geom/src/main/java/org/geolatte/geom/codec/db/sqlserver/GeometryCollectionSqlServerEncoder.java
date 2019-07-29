@@ -22,7 +22,7 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.Position;
 
 import java.util.List;
@@ -53,10 +53,10 @@ class GeometryCollectionSqlServerEncoder extends AbstractSqlServerEncoder {
 		int thisShapeIndex = shapes.size();
 		Shape thisShape = createShape( parentShapeIndex, figures );
 		shapes.add( thisShape );
-		if (! (geom instanceof GeometryCollection)) {
+		if (! (geom instanceof AbstractGeometryCollection)) {
 			throw new IllegalArgumentException( "Expect GeometryCollection argument." );
 		}
-		GeometryCollection gc =  (GeometryCollection) geom;
+		AbstractGeometryCollection gc =  (AbstractGeometryCollection) geom;
 		for ( int i = 0; i < gc.getNumGeometries(); i++ ) {
 			Geometry component = gc.getGeometryN( i );
 			encodeComponent( component, thisShapeIndex, coordinates, figures, shapes );

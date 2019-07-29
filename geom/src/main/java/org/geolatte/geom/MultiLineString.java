@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/8/11
  */
-public class MultiLineString<P extends Position> extends GeometryCollection<P, LineString<P>> implements Linear {
+public class MultiLineString<P extends Position> extends AbstractGeometryCollection<P, LineString<P>> implements Linear {
 
 
     /**

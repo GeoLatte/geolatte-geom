@@ -22,7 +22,7 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.AbstractGeometryCollection;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ class GeometryCollectionSqlServerDecoder extends AbstractGeometryCollectionSqlSe
 	}
 
     @Override
-    protected GeometryCollection<?, Geometry<?>> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
+    protected AbstractGeometryCollection<?, Geometry<?>> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
         return mkGeometryCollection(geometries);
     }
 
