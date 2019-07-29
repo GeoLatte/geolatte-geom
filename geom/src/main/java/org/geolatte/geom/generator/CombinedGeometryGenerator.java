@@ -13,9 +13,9 @@ import java.util.stream.IntStream;
 class CombinedGeometryGenerator<P extends Position> implements GeometryGenerator<P, Geometry<P>> {
 
     private final Random  chooser;
-    private final List<GeometryGenerator<P, Geometry<P>>> generators;
+    private final List<GeometryGenerator<P, ? extends Geometry<P>>> generators;
 
-    CombinedGeometryGenerator(Random rnd, List<GeometryGenerator<P, Geometry<P>>> generators) {
+    CombinedGeometryGenerator(Random rnd, List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
         this.chooser = rnd;
         this.generators = generators;
     }

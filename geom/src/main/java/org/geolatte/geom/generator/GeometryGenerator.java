@@ -14,7 +14,7 @@ public interface GeometryGenerator<P extends Position, G extends Geometry<P>> {
     G generate();
 
     @SuppressWarnings("unchecked")
-    default G[] generateArray(int size){
+    default G[] generateArray(int size) {
         List<G> geoms = new ArrayList<>(size);
         for(int i = 0; i < size; i++){
             geoms.add(generate());
@@ -22,8 +22,4 @@ public interface GeometryGenerator<P extends Position, G extends Geometry<P>> {
         return (G[])geoms.toArray();
     }
 
-    @SuppressWarnings("unchecked")
-    default GeometryGenerator<P, Geometry<P>> asGeometryGenerator() {
-        return (GeometryGenerator<P, Geometry<P>>)this;
-    }
 }

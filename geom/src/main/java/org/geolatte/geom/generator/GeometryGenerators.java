@@ -11,12 +11,12 @@ import java.util.Random;
 public class GeometryGenerators {
 
     public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final Random rnd, final List<GeometryGenerator<P, Geometry<P>>> generators){
+            (final Random rnd, final List<GeometryGenerator<P, ? extends Geometry<P>>> generators){
         return new CombinedGeometryGenerator<>(rnd, generators);
     }
 
     public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final List<GeometryGenerator<P, Geometry<P>>> generators){
+            (final List<GeometryGenerator<P, ? extends Geometry<P>>> generators){
         return new CombinedGeometryGenerator<>(new Random(), generators);
     }
 

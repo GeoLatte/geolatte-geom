@@ -25,9 +25,9 @@ class DefaultGeometryCollectionGenerator<P extends Position> extends AbstractGeo
 
 
         this.combined = GeometryGenerators.combine(asList(
-                GeometryGenerators.point(bbox, rnd).asGeometry(),
-                GeometryGenerators.lineString(numPos, bbox, rnd).asGeometry(),
-                GeometryGenerators.polygon(numPos, bbox, rnd).asGeometry()
+                GeometryGenerators.point(bbox, rnd),
+                GeometryGenerators.lineString(numPos, bbox, rnd),
+                GeometryGenerators.polygon(numPos, bbox, rnd)
         ));
     };
 
