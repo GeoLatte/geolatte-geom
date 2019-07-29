@@ -237,8 +237,8 @@ public class TestHANAWktTokenizer {
 		for ( int i = 0; i < 10000; i++ ) {
 			double m = Math.random() * 1000;
 			int e = (int) ( -20 + Math.random() * 20 );
-
-			String testValue = Double.valueOf( m ) + "E" + e;
+			String tvBase = Double.valueOf(m).toString();
+			String testValue = tvBase.contains("E") ? tvBase : tvBase + "E" + e;
 			String wkt = testValue + " ";
 			tokens = new HANAWktTokenizer( wkt, words, crs );
 
