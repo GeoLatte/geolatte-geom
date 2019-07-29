@@ -275,7 +275,7 @@ trait CoordinateSystemExtender {
 
 }
 
-object CoordinateReferenceSystemSyntax extends CoordinateSystemExtender {
+trait CoordinateReferenceSystemSyntax extends CoordinateSystemExtender {
 
   self =>
 
@@ -307,4 +307,5 @@ trait ImplicitConversionsToLowerDimension {
 object GeometryImplicits
     extends PositionBuilders
     with GeometryConstructors
+    with CoordinateReferenceSystemSyntax
     with ImplicitConversionsToLowerDimension

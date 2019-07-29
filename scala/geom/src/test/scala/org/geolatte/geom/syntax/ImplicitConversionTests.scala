@@ -10,7 +10,6 @@ import org.scalatest.Matchers._
   */
 class ImplicitConversionTests extends FlatSpec {
 
-  import org.geolatte.geom.syntax.CoordinateReferenceSystemSyntax._
   import org.geolatte.geom.syntax.GeometryImplicits._
 
   "A 3D Cartesian Point" should "be a assignable to a 2D Cartesian Point" in {
