@@ -8,8 +8,9 @@ import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
 
+
 import static org.geolatte.geom.builder.DSL.ring;
-import static org.geolatte.geom.generator.PositionGenerator.nPositionsWithin;
+import static org.geolatte.geom.generator.PositionGenerator.nPositionsWithinAndClosed;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
@@ -25,8 +26,8 @@ class DefaultPolygonGenerator<P extends Position> extends AbstractGeometryGenera
 
     @Override
     public Polygon<P> generate() {
-        P[] ps = nPositionsWithin(numPoints, bbox, rnd);
-        LinearRing<P> hull = DSL.ring(crs(), ps);
+        P[] ps = nPositionsWithinAndClosed(numPoints, bbox, rnd);
+        LinearRing<P> hull = ring(crs(), ps);
         return DSL.polygon(hull);
     }
 

@@ -1,8 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.MultiPolygon;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
@@ -24,6 +22,8 @@ class DefaultMultiPolygonGenerator<P extends Position> extends AbstractGeometryG
 
     @Override
     public MultiPolygon<P> generate() {
-        return DSL.multipolygon(polyGen.generate(), polyGen.generateArray(numPolys - 1));
+        Polygon<P>[] polys = (Polygon<P>[]) new Polygon[numPolys - 1];
+        polyGen.generateArray(polys);
+        return DSL.multipolygon(polyGen.generate(), polys);
     }
 }

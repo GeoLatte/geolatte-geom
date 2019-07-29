@@ -1,8 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
-import org.geolatte.geom.MultiLineString;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
@@ -23,6 +21,8 @@ class DefaultMultiLineStringGenerator<P extends Position> extends AbstractGeomet
 
     @Override
     public MultiLineString<P> generate() {
-        return DSL.multilinestring(lineStrGen.generate(), lineStrGen.generateArray(numLineString - 1));
+        LineString<P>[] linestrings = (LineString<P>[]) new LineString[numLineString - 1];
+        lineStrGen.generateArray(linestrings);
+        return DSL.multilinestring(lineStrGen.generate(), linestrings);
     }
 }

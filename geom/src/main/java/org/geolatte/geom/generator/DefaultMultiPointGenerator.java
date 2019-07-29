@@ -26,7 +26,8 @@ class DefaultMultiPointGenerator<P extends Position>  extends AbstractGeometryGe
 
     @Override
     public MultiPoint<P> generate() {
-        Point<P>[] points = pntGen.generateArray(numPnts-1);
+        Point<P>[] points = (Point<P>[]) new Point[numPnts - 1];
+        pntGen.generateArray(points);
         return DSL.multipoint(pntGen.generate(), points);
     }
 }

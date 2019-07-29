@@ -27,11 +27,11 @@ public class PositionGenerator {
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> P[] nPositionsWithin(int size, Envelope<P> bbox, Random rnd) {
-        List<P> ret = new ArrayList<>(size);
+        P[] ret = (P[])new Position[size];
         for(int i = 0; i < size; i++){
-            ret.add(positionWithin(bbox, rnd));
+            ret[i]= positionWithin(bbox, rnd);
         }
-        return (P[])ret.toArray();
+        return ret;
     }
 
     public static <P extends Position> P[] nPositionsWithinAndClosed(int size, Envelope<P> bbox, Random rnd) {

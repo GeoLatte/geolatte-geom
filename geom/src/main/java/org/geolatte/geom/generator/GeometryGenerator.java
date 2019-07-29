@@ -3,7 +3,9 @@ package org.geolatte.geom.generator;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,12 +16,10 @@ public interface GeometryGenerator<P extends Position, G extends Geometry<P>> {
     G generate();
 
     @SuppressWarnings("unchecked")
-    default G[] generateArray(int size) {
-        List<G> geoms = new ArrayList<>(size);
-        for(int i = 0; i < size; i++){
-            geoms.add(generate());
+    default void generateArray(G[] geoms) {
+        for(int i = 0; i < geoms.length; i++){
+            geoms[i]  = generate();
         }
-        return (G[])geoms.toArray();
     }
 
 }

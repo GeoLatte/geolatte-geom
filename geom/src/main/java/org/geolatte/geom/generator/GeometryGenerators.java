@@ -5,18 +5,20 @@ import org.geolatte.geom.*;
 import java.util.List;
 import java.util.Random;
 
+import static java.util.Arrays.asList;
+
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
  */
 public class GeometryGenerators {
 
     public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final Random rnd, final List<GeometryGenerator<P, ? extends Geometry<P>>> generators){
+            (final Random rnd, final List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
         return new CombinedGeometryGenerator<>(rnd, generators);
     }
 
     public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final List<GeometryGenerator<P, ? extends Geometry<P>>> generators){
+            (final List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
         return new CombinedGeometryGenerator<>(new Random(), generators);
     }
 
@@ -47,7 +49,7 @@ public class GeometryGenerators {
     }
 
     public static <P extends Position> GeometryGenerator<P, MultiPoint<P>> multiPoint(int numPnts, Envelope<P> bbox,
-                                                                                Random rnd) {
+                                                                                      Random rnd) {
         return new DefaultMultiPointGenerator<>(numPnts, bbox, rnd);
     }
 
@@ -56,12 +58,12 @@ public class GeometryGenerators {
     }
 
     public static <P extends Position> GeometryGenerator<P, MultiLineString<P>> multiLineString(int numLines,
-        int numPoints, Envelope<P> bbox, Random rnd) {
+                                                                                                int numPoints, Envelope<P> bbox, Random rnd) {
         return new DefaultMultiLineStringGenerator<>(numLines, numPoints, bbox, rnd);
     }
 
     public static <P extends Position> GeometryGenerator<P, MultiLineString<P>> multiLineString(int numLines,
-        int numPoints, Envelope<P> bbox) {
+                                                                                                int numPoints, Envelope<P> bbox) {
         return new DefaultMultiLineStringGenerator<>(numLines, numPoints, bbox, new Random());
     }
 
@@ -73,6 +75,20 @@ public class GeometryGenerators {
     public static <P extends Position> GeometryGenerator<P, MultiPolygon<P>> multiPolygon
             (int numLines, int numPoints, Envelope<P> bbox) {
         return new DefaultMultiPolygonGenerator<>(numLines, numPoints, bbox, new Random());
+    }
+
+    @SafeVarargs
+    public static <P extends Position> GeometryGenerator<P, GeometryCollection<P>> geometryCollection
+            (int numGeoms, Random rnd, GeometryGenerator<P, ? extends Geometry<P>>... generators) {
+
+        GeometryGenerator<P, Geometry<P>> combine = combine(asList(generators));
+        return new DefaultGeometryCollectionGenerator<>(numGeoms, combine, rnd);
+    }
+
+    @SafeVarargs
+    public static <P extends Position> GeometryGenerator<P, GeometryCollection<P>> geometryCollection
+            (int numGeoms, GeometryGenerator<P, ? extends Geometry<P>>... generators) {
+        return geometryCollection(numGeoms, new Random(), generators);
     }
 
 }
