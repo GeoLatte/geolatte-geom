@@ -13,3 +13,4 @@ javadoc/*
 **/project/project/
 **/project/target/
 **/target/
+**/.flattened-pom.xml
