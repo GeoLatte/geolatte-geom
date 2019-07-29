@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
  */
-public class Generators {
+public class GeometryGenerators {
 
     public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
             (final Random rnd, final List<GeometryGenerator<P, Geometry<P>>> generators){

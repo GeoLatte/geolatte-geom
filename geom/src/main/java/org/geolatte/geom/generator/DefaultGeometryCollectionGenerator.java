@@ -6,8 +6,6 @@ import org.geolatte.geom.GeometryCollection;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.builder.DSL;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import static java.util.Arrays.asList;
@@ -25,10 +23,10 @@ class DefaultGeometryCollectionGenerator<P extends Position> extends AbstractGeo
         super(bbox, rnd);
         this.numGeoms = numGeoms;
 
-        this.combined = Generators.combine(asList(
-                Generators.point(bbox, rnd).asGeometry(),
-                Generators.lineString(numPos, bbox, rnd).asGeometry(),
-                Generators.polygon(numPos, bbox, rnd).asGeometry()
+        this.combined = GeometryGenerators.combine(asList(
+                GeometryGenerators.point(bbox, rnd).asGeometry(),
+                GeometryGenerators.lineString(numPos, bbox, rnd).asGeometry(),
+                GeometryGenerators.polygon(numPos, bbox, rnd).asGeometry()
         ));
     };
 
