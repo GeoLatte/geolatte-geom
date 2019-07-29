@@ -55,7 +55,7 @@ class GeometryReaderCRS extends FlatSpec {
 
   "Given a CRs, a GeometryReader" should "deserialize a Json Geometry " in {
 
-    import org.geolatte.geom.syntax.CoordinateReferenceSystemSyntax._
+
 
     val json = Json.parse(JsonFragments.jsonPoint)
     val WGS84Z = WGS84.addVertical()

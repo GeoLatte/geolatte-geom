@@ -4,7 +4,7 @@ import org.geolatte.geom.syntax.GeometryImplicits._
 import org.geolatte.geom._
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.geolatte.geom.crs.CoordinateReferenceSystem
-import org.geolatte.geom.generator.Generators
+import org.geolatte.geom.generator.{GeometryGenerator, GeometryGenerators}
 import org.geolatte.geom.json.GeolatteGeomModule
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
 import org.geolatte.geom.syntax.PositionBuilder
@@ -14,8 +14,6 @@ import org.geolatte.geom.syntax.PositionBuilder
 object GeoJsonGen {
 
   import org.geolatte.geom.syntax.GeometryImplicits._
-  import org.geolatte.geom.types._
-
 
   private val mapper = {
     val om = new ObjectMapper()
@@ -34,12 +32,16 @@ object GeoJsonGen {
   case class GeneratorSet[T, P <: Position]
   (lowerLeft: T, upperRight: T)
   (implicit val crs: CoordinateReferenceSystem[P], val pb: PositionBuilder[T, P]) {
+
+
     private val box = envelope( crs )( lowerLeft, upperRight )
-    val pointGen = Generators.point( box )
-    val lineGen = Generators.lineString( 5, box )
-    val polyGen = Generators.polygon( 6, box )
-    val multiLineGen = Generators.multiLineString( 4, 5, box )
-    val multiPolyGen = Generators.multiPolygon( 4, 6, box )
+    val pointGen = GeometryGenerators.point( box )
+    val lineGen = GeometryGenerators.lineString( 5, box )
+    val polyGen = GeometryGenerators.polygon( 6, box )
+    val multiPointGen = GeometryGenerators.multiPoint( 4, box )
+    val multiLineGen = GeometryGenerators.multiLineString( 4, 5, box )
+    val multiPolyGen = GeometryGenerators.multiPolygon( 4, 6, box )
+    val geometryCollectionGen = GeometryGenerators.geometryCollection(4, pointGen, lineGen, polyGen, multiPointGen, multiLineGen)
   }
 
 }
