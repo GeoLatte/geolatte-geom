@@ -176,9 +176,9 @@ trait GeometryConstructors {
     }
 
   def geometrycollection[P <: Position](geometries: Geometry[P]*)(
-      implicit crs: CoordinateReferenceSystem[P]): GeometryCollection[P, Geometry[P]] =
+      implicit crs: CoordinateReferenceSystem[P]): GeometryCollection[P] =
     if (geometries.isEmpty) {
-      new jgeom.GeometryCollection[P, jgeom.Geometry[P]](crs)
+      new jgeom.GeometryCollection[P](crs)
     } else {
       val (h, t) = castback[Geometry[P], jgeom.Geometry[P]](geometries.head, geometries.tail)
       DSL.geometrycollection(h, t: _*)
@@ -192,31 +192,6 @@ trait GeometryConstructors {
 
 }
 
-trait GeometryOps {
-
-  def castTo[P <: Position](implicit ev: Class[P]): Geometry[P]
-
-  def castToCrs[P <: Position](implicit ev: CoordinateReferenceSystem[P]): Geometry[P]
-
-}
-
-trait GeometryOpsImplicit {
-
-  implicit def geometryOpsWrapper[P <: Position](inner: Geometry[P]): GeometryOps =
-    new GeometryOps {
-
-      override def castTo[Q <: Position](implicit ev: Class[Q]): Geometry[Q] = {
-        inner.as(ev)
-      }
-
-      override def castToCrs[Q <: Position](
-          implicit ev: CoordinateReferenceSystem[Q]): Geometry[Q] = {
-        inner.as(ev.getPositionClass)
-      }
-
-    }
-
-}
 
 trait ArrayToPosition {
 
@@ -316,45 +291,20 @@ object CoordinateReferenceSystemSyntax extends CoordinateSystemExtender {
 
 }
 
-trait ContraVariantOps extends GeometryOpsImplicit with PositionBuilders {
-  import ExtendDim._
-
-  case class ClassRepr[B <: Position, BZ <: B, BM <: B, G[_] <: Geometry[B]]
-  (gc : Class[G[B]])
-  (implicit ed: ExtendDim[B, BZ, BM], cr : Class[B]) {
-    type OUTPUT = G[B]
-    def cast(g: G[_]) : OUTPUT = g.castTo[B](cr).asInstanceOf[OUTPUT]
-  }
-
-  implicit def pClass[B <: Position, BZ <: B, BM <: B](implicit ed: ExtendDim[B, BZ, BM], cr: Class[B]) = ClassRepr(classOf[Point[B]])(ed, cr)
+trait ImplicitConversionsToLowerDimension {
 
 
-//  implicit def geomZToBase[B <: Position, BZ <: B, G <: Geometry[BZ]](point: G)(
-//    implicit
-//    ed: ExtendDim[B, BZ, _],
-//    b: Class[B],
-//    g: Class[G]) : g.type =
-//      point.as(ed.baseClass)
+  implicit def pnt2LowerDim[P <: Position, Q <: P](p: Point[Q])(implicit ev: Class[P]): Point[P] = p.as(ev)
+  implicit def ls2LowerDim[P <: Position, Q <: P](p: LineString[Q])(implicit ev: Class[P]): LineString[P] = p.as(ev)
+  implicit def poly2LowerDim[P <: Position, Q <: P](p: Polygon[Q])(implicit ev: Class[P]): Polygon[P] = p.as(ev)
+  implicit def multiPoint2LowerDim[P <: Position, Q <: P](p: MultiPoint[Q])(implicit ev: Class[P]): MultiPoint[P] = p.as(ev)
+  implicit def multiLineString2LowerDim[P <: Position, Q <: P](p: MultiLineString[Q])(implicit ev: Class[P]): MultiLineString[P] = p.as(ev)
+  implicit def multiPolygon2LowerDim[P <: Position, Q <: P](p: MultiPolygon[Q])(implicit ev: Class[P]): MultiPolygon[P] = p.as(ev)
+  implicit def multiGeometryCollection2LowerDim[P <: Position, Q <: P](p: GeometryCollection[Q])(implicit ev: Class[P]): GeometryCollection[P] = p.as(ev).asInstanceOf[GeometryCollection[P]]
 
-//  implicit def pointZToBase[B <: Position, BZ <: Position](point: Point[BZ])(implicit ed: ExtendDim[B, BZ, _], b: Class[B]) : Point[B] =
-//    point.as(ed.baseClass)
-//  implicit def pointMToBase[B <: Position, BM <: Position](point: Point[BM])(implicit ed: ExtendDim[B, _, BM], b: Class[B]) : Point[B] =
-//    point.as(ed.baseClass)
-
-//  implicit def lsZToBase[B <: Position, BZ <: Position](ls: LineString[BZ])(implicit ed: ExtendDim[B, BZ, _], b: Class[B]) : LineString[B] =
-//    ls.as(ed.baseClass)
-//  implicit def lsMToBase[B <: Position, BM <: Position](ls: LineString[BM])(implicit ed: ExtendDim[B, _, BM], b: Class[B]) : LineString[B] =
-//    ls.as(ed.baseClass)
-
-//  implicit def geomToBase[B <: Position, BZ <: Position](geom: Geometry[BZ])(implicit ed: ExtendDim[B, BZ, _], b: Class[B]) : Geometry[B] =
-//    geom.as(ed.baseClass)
-
-
-
-  }
+}
 
 object GeometryImplicits
     extends PositionBuilders
     with GeometryConstructors
-    with GeometryOpsImplicit
-    with ContraVariantOps
+    with ImplicitConversionsToLowerDimension

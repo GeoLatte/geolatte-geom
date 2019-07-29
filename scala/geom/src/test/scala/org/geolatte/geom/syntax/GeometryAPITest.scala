@@ -1,8 +1,10 @@
+package org.geolatte.geom.syntax
 
+
+import org.geolatte.geom.{Geometry, Position}
 import org.geolatte.geom.crs.CoordinateReferenceSystems._
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, Unit}
 import org.scalatest.FlatSpec
-import org.scalatest.Matchers.a
 
 class GeometryAPITest extends FlatSpec {
 
@@ -49,15 +51,6 @@ class GeometryAPITest extends FlatSpec {
     val p = point( 2.0, 3.0, 4.0 )
     assertResult( new geom.Point( new G3D( 2.0, 3.0, 4.0 ), crs ) )( p )
   }
-
-  //  "A 3D Geodetic Geometry" should "be easily constructed from an array of doubles" in {
-  //    implicit val crs: CoordinateReferenceSystem[G3D] = addVerticalSystem(
-  //      WGS84, classOf[G3D], Unit.METER
-  //    )
-  //    val p = point( Array(2.0, 3.0, 4.0) )
-  //    assertResult( new Point( new G3D( 2.0, 3.0, 4.0 ), crs ) )( p )
-  //  }
-
 
   "A 2DM linestring " should "be easily constructed form tuples " in {
     implicit val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem( WGS84, classOf[G2DM], Unit.METER )
@@ -115,7 +108,7 @@ class GeometryApiAsType extends FlatSpec {
     implicit val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem( WGS84, classOf[G2DM], Unit.METER )
     val l = lineString((1.0, 2.0, 3.0), (2.0, 3.0, 4.0))
 
-    val l2 = l.castTo[G2D]
+    val l2 = l
   }
 
   "We" should "be able to cast to the Position type of implicitly declared Crs" in {
@@ -123,15 +116,9 @@ class GeometryApiAsType extends FlatSpec {
     val l = lineString(crs)((1.0, 2.0, 3.0), (2.0, 3.0, 4.0))
 
     implicit val wgs = WGS84
-    val l3 = l.castToCrs
+    val l3 = l
   }
 
-  "Dynamic cast gives runtime error" should "actual geometry pType be inconsistent" in {
-    val crs: CoordinateReferenceSystem[C2D] = PROJECTED_2D_METER
-    val l = lineString(crs)((1.0, 2.0), (2.0, 3.0))
 
-    implicit val wgs = WGS84
-    assertThrows[ClassCastException] {l.castToCrs}
-  }
 
 }

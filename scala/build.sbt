@@ -10,7 +10,9 @@ val commonSettings = Seq(
   organization := "org.geolatte",
   version := geolatteGeomVersion,
   scalaVersion := "2.12.8",
+  updateOptions := updateOptions.value.withLatestSnapshots(false),
   resolvers ++= commonResolvers,
+  scalacOptions ++= Seq(  "-language:implicitConversions"),
   scalacOptions in Test ++= Seq("-Yrangepos")
 )
 
