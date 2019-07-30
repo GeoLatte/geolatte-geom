@@ -6,7 +6,6 @@ import org.geolatte.geom.crs.LinearUnit
 import org.geolatte.geom.generator.GeometryGenerator
 import org.specs2.matcher.MatchResult
 
-
 class GeometryEncodersSpec extends org.specs2.mutable.Specification {
 
   import io.circe._
@@ -15,23 +14,19 @@ class GeometryEncodersSpec extends org.specs2.mutable.Specification {
 
   import GeoJsonGen._
 
-
-
   "Encoding unit tests for 2D" >> {
 
     import org.geolatte.geom.syntax.GeometryImplicits._
     implicit val crs = WGS84
-    val generatorSet = GeneratorSet((10.0,10.0), (80.0, 80.0))
-
+    val generatorSet = GeneratorSet((10.0, 10.0), (80.0, 80.0))
 
     "Encoding a point returns the same Json string as Jackson" >> {
-      testGen( generatorSet.pointGen)
+      testGen(generatorSet.pointGen)
     }
 
     "Encoding a linestring returns the same Json string as Jackson" >> {
       testGen(generatorSet.lineGen)
     }
-
 
     "Encoding a polygon returns the same Json string as Jackson" >> {
       testGen(generatorSet.polyGen)
@@ -55,10 +50,11 @@ class GeometryEncodersSpec extends org.specs2.mutable.Specification {
 
   }
 
-  def testGen[P <: Position](generator: GeometryGenerator[P, _ <:  Geometry[P]]): MatchResult[Any] = {
-    val geom : Geometry[P] = generator.generate()
-    val expected = geom.asJsonString
-    val received = geom.asJson.pretty(Printer(true, true, "  "))
+  def testGen[P <: Position](
+      generator: GeometryGenerator[P, _ <: Geometry[P]]): MatchResult[Any] = {
+    val geom: Geometry[P] = generator.generate()
+    val expected          = geom.asJsonString
+    val received          = geom.asJson.pretty(Printer(true, true, "  "))
 
 //    println(s"expected = $expected")
 //    println(s"received = $received")
