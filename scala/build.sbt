@@ -19,6 +19,7 @@ val commonSettings = Seq(
 val Specs2Version      = "4.5.1"
 val CirceVersion       = "0.11.1"
 val jacksonVersion     = "2.9.9"
+val scalaCheckVersion  = "1.14.0"
 
 val commonDependencies = Seq(
   "org.geolatte" % "geolatte-geom" % geolatteGeomVersion,
@@ -51,6 +52,7 @@ lazy val circeGeoJson = (project in file ("circe-geojson")).settings(
     "io.circe"       %% "circe-generic"       % CirceVersion withJavadoc (),
     "org.specs2"     %% "specs2-core"         % Specs2Version % "test" withJavadoc (),
     "org.geolatte" % "geolatte-geojson" % geolatteGeomVersion % "test",
+    "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test",
     "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion % "test"
     )
 ).dependsOn(geom)
