@@ -59,5 +59,10 @@ public class GeoJsonStrings {
     static String featureIntId = "{\"type\" : \"Feature\", \"id\": 1, \"geometry\":  {\"type\":\"Point\",\"coordinates\":[1.0,2.0]}, " +
             "\"properties\": { \"a\" : 1 }}";
 
+    // crs
+    static String crswgs84 = "{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}}";
+    static String crswgs84TextWithUrnCrs = "{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::4326\"}}";
+    static String crslambert72 = "{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}}";
+    static String crslambert72TextWithUrnCrs = "{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::31370\"}}";
 
 }

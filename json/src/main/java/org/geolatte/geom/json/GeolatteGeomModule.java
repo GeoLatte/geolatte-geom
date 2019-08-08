@@ -25,6 +25,7 @@ public class GeolatteGeomModule extends SimpleModule {
     private final Map<Class, JsonDeserializer> dezers = new HashMap<>();
 
     private  GeometrySerializer geometrySerializer;
+    private CrsSerializer crsSerializer;
 
     public GeolatteGeomModule() {
         this(WGS84);
@@ -39,6 +40,8 @@ public class GeolatteGeomModule extends SimpleModule {
         geometrySerializer = new GeometrySerializer(defaultCrs, settings);
         GeometryDeserializer parser = new GeometryDeserializer(defaultCrs, settings);
         addSerializer(Geometry.class, geometrySerializer); //use raw to get this compiled
+        crsSerializer = new CrsSerializer<>(defaultCrs, settings);
+        addSerializer(CoordinateReferenceSystem.class, crsSerializer);
         dezers.put(Geometry.class, parser);
         dezers.put(Point.class, parser);
         dezers.put(LineString.class, parser);
@@ -48,6 +51,7 @@ public class GeolatteGeomModule extends SimpleModule {
         dezers.put(MultiPolygon.class, parser);
         dezers.put(GeometryCollection.class, parser);
         dezers.put(Feature.class, new FeatureDeserializer(defaultCrs, settings));
+        dezers.put(CoordinateReferenceSystem.class, new CrsDeserializer(defaultCrs, settings));
 
         dezers.forEach(this::addDeserializer);
     }
@@ -73,6 +77,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
     public void copyToModule(SimpleModule other) {
         other.addSerializer(getGeometrySerializer());
+        other.addSerializer(this.crsSerializer);
         getGeometryDeserializers().forEach(other::addDeserializer);
     }
 
