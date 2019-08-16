@@ -1,11 +1,17 @@
 package org.geolatte.geom.generators;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.generator.Generator;
-import org.geolatte.geom.generator.GeometryGenerators;
+import org.geolatte.geom.generator.*;
 import org.junit.Test;
 
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -60,5 +66,49 @@ public class GeneratorsTest {
         assertEquals(3, gc.getNumGeometries());
         assertTrue(gc.getEnvelope().within(env));
     }
-    
+
+    @Test
+    public void testStringGenerator(){
+        Generator<String> strng = new ValueGenerator().string(5, 20);
+        for(int i = 0; i < 100; i++){
+            String s = strng.generate();
+            assert (s.length() <= 20 && s.length() >= 5);
+        }
+    }
+
+    @Test
+    public void testIntGenerator(){
+        Generator<Integer> ints = new ValueGenerator().integer(5, 20);
+        for(int i = 0; i < 100; i++){
+            Integer g = ints.generate();
+            System.out.println(g);
+            assert (g <= 20 && g >= 5);
+        }
+    }
+
+    @Test
+    public void testInstantGenerator(){
+        LocalDateTime start = LocalDateTime.of(2015, 1, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.of(2016, 1, 1, 0, 0);
+        Generator<Instant> instants = new ValueGenerator().instant(start.toInstant(ZoneOffset.UTC), end.toInstant(ZoneOffset.UTC));
+        for(int i = 0; i < 100; i++){
+            LocalDateTime dt = LocalDateTime.ofInstant(instants.generate(), ZoneOffset.UTC);
+            System.out.println(dt);
+            assert ( dt.isAfter(start) && dt.isBefore(end) );
+        }
+    }
+
+    @Test
+    public void testPropertyMapGenerator(){
+        ValueGenerator generator = new ValueGenerator();
+        List<Generator<?>> generators = asList(generator.integer(0, 100), generator.string(1, 100));
+        PropertyMapGenerator props = new PropertyMapGenerator(5,
+                generator.string(3,5),
+                Choice.of(generators)
+        );
+        for(int i = 0; i < 100; i++){
+            Map<String, Object> map = props.generate();
+            assert ( map.keySet().size() == 5 );
+        }
+    }
 }
