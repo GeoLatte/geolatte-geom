@@ -20,191 +20,191 @@
     <packaging>pom</packaging>
     <version>${revision}</version>
 
-	<description>
-		This geoLatte-geom project contains modules for working with geometries.
-	</description>
-	<url>https://github.com/geolatte/geolatte-geom</url>
+    <description>
+        This geoLatte-geom project contains modules for working with geometries.
+    </description>
+    <url>https://github.com/geolatte/geolatte-geom</url>
 
-	<modules>
-		<module>geom</module>
-		<module>json</module>
-	</modules>
-
-
-	<organization>
-		<name>geolatte.org</name>
-		<url>http://www.geolatte.org/</url>
-	</organization>
-
-	<properties>
-		<revision>1.5.0-SNAPSHOT</revision>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-
-	<licenses>
-		<license>
-			<name>LGPL 3.0</name>
-			<url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<scm>
-		<connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
-		<url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
-		<developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
-	</scm>
-
-	<developers>
-		<developer>
-			<id>maesenka</id>
-			<name>Karel Maesen</name>
-			<email>karel@geovise.com</email>
-			<roles>
-				<role>Contributor</role>
-				<role>Committer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>bertvh</id>
-			<name>Bert Vanhooff</name>
-			<email>bert.vanhooff@qmino.com</email>
-			<roles>
-				<role>Contributor</role>
-				<role>Committer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>yvesv</id>
-			<name>Yves Vandewoude</name>
-			<email>yves.vandewoude@qmino.com</email>
-			<roles>
-				<role>Contributor</role>
-				<role>Committer</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>rigolepe</id>
-			<name>Peter Rigole</name>
-			<email>peter.rigole@qmino.com</email>
-			<roles>
-				<role>Contributor</role>
-				<role>Committer</role>
-			</roles>
-		</developer>
-	</developers>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<!--generate source artefacts -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- generate javadoc artefacts -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>3.1.1</version>
-						<!-- doclint config removed for building with jdk < 8 (as in Travis) -->
-						<!--<configuration>-->
-						<!--<additionalparam>-Xdoclint:none</additionalparam>-->
-						<!--</configuration> -->
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- GPG Signed components -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- Sonatype release plugin -->
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.8</version>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
+    <modules>
+        <module>geom</module>
+        <module>json</module>
+    </modules>
 
 
-				</plugins>
-			</build>
+    <organization>
+        <name>geolatte.org</name>
+        <url>http://www.geolatte.org/</url>
+    </organization>
 
-		</profile>
-	</profiles>
-	<build>
-		<plugins>
-			<!-- generate compiled (binary) artefacts -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
+    <properties>
+        <revision>1.5.0-SNAPSHOT</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
-			<!--generate source artefacts -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+    <licenses>
+        <license>
+            <name>LGPL 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-			<!-- generate javadoc artefacts -->
+    <scm>
+        <connection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</connection>
+        <url>scm:git:git@github.com:GeoLatte/geolatte-geom.git</url>
+        <developerConnection>scm:git:git@github.com:GeoLatte/geolatte-geom.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>maesenka</id>
+            <name>Karel Maesen</name>
+            <email>karel@geovise.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>bertvh</id>
+            <name>Bert Vanhooff</name>
+            <email>bert.vanhooff@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>yvesv</id>
+            <name>Yves Vandewoude</name>
+            <email>yves.vandewoude@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>rigolepe</id>
+            <name>Peter Rigole</name>
+            <email>peter.rigole@qmino.com</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Committer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!--generate source artefacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- generate javadoc artefacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <!-- doclint config removed for building with jdk < 8 (as in Travis) -->
+                        <configuration>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- GPG Signed components -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Sonatype release plugin -->
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.8</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+
+
+                </plugins>
+            </build>
+
+        </profile>
+    </profiles>
+    <build>
+        <plugins>
+            <!-- generate compiled (binary) artefacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!--generate source artefacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- generate javadoc artefacts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
                 </configuration>
                 <executions>
                     <execution>
@@ -228,60 +228,59 @@
                 </configuration>
             </plugin>
 
-			<!-- see  https://maven.apache.org/maven-ci-friendly.html -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>1.1.0</version>
-				<configuration>
-					<updatePomFile>true</updatePomFile>
-					<flattenMode>resolveCiFriendliesOnly</flattenMode>
-				</configuration>
-				<executions>
-					<execution>
-						<id>flatten</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>flatten.clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- see  https://maven.apache.org/maven-ci-friendly.html -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>OSGEO</id>
-			<url>http://download.osgeo.org/webdav/geotools</url>
-		</repository>
-		<repository>
-			<id>sonatype-snapshots</id>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>OSGEO</id>
+            <url>http://download.osgeo.org/webdav/geotools</url>
+        </repository>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 </project>
