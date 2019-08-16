@@ -5,15 +5,22 @@ import org.geolatte.geom.Position;
 import org.geolatte.geom.Positions;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Random;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/08/2018.
  */
-public class PositionGenerator {
+public class PositionGenerator<P extends Position> implements Generator<P> {
 
-    public static <P extends Position>  P positionWithin(Envelope<P> bbox, Random rnd) {
+    private final Envelope<P> bbox;
+    private final Random rnd;
+
+    PositionGenerator(Envelope<P> bbox, Random rnd) {
+        this.bbox = bbox;
+        this.rnd = rnd;
+    }
+
+    public static <P extends Position> P positionWithin(Envelope<P> bbox, Random rnd) {
         P ll = bbox.lowerLeft();
         P ur = bbox.upperRight();
 
@@ -27,9 +34,9 @@ public class PositionGenerator {
 
     @SuppressWarnings("unchecked")
     public static <P extends Position> P[] nPositionsWithin(int size, Envelope<P> bbox, Random rnd) {
-        P[] ret = (P[])new Position[size];
-        for(int i = 0; i < size; i++){
-            ret[i]= positionWithin(bbox, rnd);
+        P[] ret = (P[]) new Position[size];
+        for (int i = 0; i < size; i++) {
+            ret[i] = positionWithin(bbox, rnd);
         }
         return ret;
     }
@@ -39,4 +46,10 @@ public class PositionGenerator {
         ps[ps.length - 1] = ps[0];
         return ps;
     }
+
+    @Override
+    public P generate() {
+        return positionWithin(bbox, rnd);
+    }
+
 }

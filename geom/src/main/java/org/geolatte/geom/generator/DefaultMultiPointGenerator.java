@@ -16,7 +16,7 @@ import static org.geolatte.geom.generator.PositionGenerator.nPositionsWithin;
 class DefaultMultiPointGenerator<P extends Position>  extends AbstractGeometryGenerator<P, MultiPoint<P>> {
 
 
-    final private GeometryGenerator<P, Point<P>> pntGen;
+    final private Generator<Point<P>> pntGen;
     final private int numPnts;
     DefaultMultiPointGenerator(int numPnts, Envelope<P> bbox, Random rnd) {
         super(bbox, rnd);

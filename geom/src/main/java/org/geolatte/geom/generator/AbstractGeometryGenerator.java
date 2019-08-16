@@ -13,7 +13,7 @@ import static org.geolatte.geom.generator.PositionGenerator.positionWithin;
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */
-abstract class AbstractGeometryGenerator<P extends Position, G extends Geometry<P>> implements GeometryGenerator<P, G> {
+abstract class AbstractGeometryGenerator<P extends Position, G extends Geometry<P>> implements Generator<G> {
     protected final Envelope<P> bbox;
     protected final Random rnd;
 

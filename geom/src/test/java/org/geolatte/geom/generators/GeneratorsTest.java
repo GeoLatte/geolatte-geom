@@ -2,7 +2,7 @@ package org.geolatte.geom.generators;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.generator.GeometryGenerator;
+import org.geolatte.geom.generator.Generator;
 import org.geolatte.geom.generator.GeometryGenerators;
 import org.junit.Test;
 
@@ -19,14 +19,14 @@ public class GeneratorsTest {
 
     @Test
     public void testPointGenerator(){
-        GeometryGenerator<G2D, Point<G2D>> gen = GeometryGenerators.point(env);
+        Generator<Point<G2D>> gen = GeometryGenerators.point(env);
         Point<G2D> pnt = gen.generate();
         assertTrue(pnt.getEnvelope().within(env));
     }
 
     @Test
     public void testLineStringGenerator() {
-        GeometryGenerator<G2D, LineString<G2D>> generator = GeometryGenerators.lineString(3, env);
+        Generator<LineString<G2D>> generator = GeometryGenerators.lineString(3, env);
         LineString<G2D> ls = generator.generate();
         assertEquals(3, ls.getNumPositions());
         assertTrue(ls.getEnvelope().within(env));
@@ -35,7 +35,7 @@ public class GeneratorsTest {
 
     @Test
     public void testPolygonGenerator() {
-        GeometryGenerator<G2D, Polygon<G2D>> generator = GeometryGenerators.polygon(24, env);
+        Generator<Polygon<G2D>> generator = GeometryGenerators.polygon(24, env);
         Polygon<G2D> ls = generator.generate();
         assertEquals(24, ls.getNumPositions());
         assertTrue(ls.getEnvelope().within(env));
@@ -43,7 +43,7 @@ public class GeneratorsTest {
 
     @Test
     public void testMultiPointGenerator() {
-        GeometryGenerator<G2D, MultiPoint<G2D>> generator = GeometryGenerators.multiPoint(24, env);
+        Generator<MultiPoint<G2D>> generator = GeometryGenerators.multiPoint(24, env);
         MultiPoint<G2D> ls = generator.generate();
         assertEquals(24, ls.getNumPositions());
         assertTrue(ls.getEnvelope().within(env));
@@ -51,7 +51,7 @@ public class GeneratorsTest {
 
     @Test
     public void testGeometryCollectionGenerator() {
-        GeometryGenerator<G2D, GeometryCollection<G2D>> generator = GeometryGenerators.geometryCollection (
+        Generator<GeometryCollection<G2D>> generator = GeometryGenerators.geometryCollection (
                 3,
                 GeometryGenerators.lineString(3, env),
                 GeometryGenerators.point(env)
