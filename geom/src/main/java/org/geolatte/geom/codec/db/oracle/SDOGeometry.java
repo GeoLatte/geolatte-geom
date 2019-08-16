@@ -193,7 +193,7 @@ public class SDOGeometry {
 
 	/**
 	 * Gets the number of elements or compound elements.
-	 * <p/>
+	 *
 	 * Subelements of a compound element are not counted.
 	 *
 	 * @return the number of elements

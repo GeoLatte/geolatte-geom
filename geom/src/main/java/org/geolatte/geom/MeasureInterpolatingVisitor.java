@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * A <code>GeometryVisitor</code> that derives a <code>Geometry</code>
  * by interpolating on the measure values of the visited <code>Geometries</code>.
- * <p/>
+ *
  * <p>Interpolation is used to determine any points on the 1-dimensional geometry with an m coordinate value
  * between SM and EM inclusively. The implementation-defined interpolation algorithm is used to estimate
  * values between measured values, usually using a mathematical function. For example, given a measure

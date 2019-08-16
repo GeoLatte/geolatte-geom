@@ -32,7 +32,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
- * <p/>
+ *
  * <p>This class is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA

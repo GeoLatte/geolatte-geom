@@ -123,7 +123,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     /**
      * Returns the coordinate dimension of this <code>Geometry</code>
-     * <p/>
+     *
      * <p>The coordinate dimension is the number of components in the coordinates of the points in
      * this <code>Geometry</code>. </p>
      *
@@ -144,7 +144,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     /**
      * Returns the numeric identifier of the coordinate reference system of this <code>Geometry</code>.
-     * <p/>
+     *
      * <p>A SRID is usually interpreted as meaning the EPSG-code for the coordinate reference system. In this
      * implementation, this is not enforced.</p>
      *

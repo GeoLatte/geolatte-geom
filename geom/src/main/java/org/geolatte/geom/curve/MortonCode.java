@@ -48,7 +48,7 @@ import java.util.regex.Pattern;
  * <li>1 : upper-left quadrant</li>
  * <li>2 : lower-right quadrant</li>
  * <li>3 : upper-right quadrant</li>
- * <p/>
+ *
  * </ul>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -70,7 +70,7 @@ public class MortonCode<P extends C2D> {
 
     /**
      * Constructs an instance with the given {@code Mortoncontext}
-     * <p/>
+     *
      * <p>The specified {@code MortonCode} determines a QuadTree for which
      * this instance calculates labels.
      *
@@ -85,7 +85,7 @@ public class MortonCode<P extends C2D> {
 
     /**
      * Returns the Morton code for the specified {@code Geometry}.
-     * <p/>
+     *
      * <p>This method is equivalent to {@code ofEnvelope(geometry.getEnvelope())}.
      *
      * @param geometry a {code Geometry} value.
@@ -249,7 +249,7 @@ public class MortonCode<P extends C2D> {
 
     /**
      * Returns the common prefix of two morton codes.
-     * <p/>
+     *
      * <p>The common prefix is the morton code for the quadtree node that
      * is the common ancestor node for the nodes specified by the argument morton codes.</p>
      *
@@ -278,7 +278,7 @@ public class MortonCode<P extends C2D> {
 
     /**
      * Transforms the morton code long value into a string such that each character is a label for the quadrant.
-     * <p/>
+     *
      * (note: {@code Long.toString(interleaved, 4)} was not used since this turns morton code '001' into '1')
      *
      * @param interleaved the morton code as a long

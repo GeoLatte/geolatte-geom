@@ -25,7 +25,7 @@ import org.geolatte.geom.*;
 
 /**
  * A geographic <code>CoordinateReferenceSystem</code>.
- * <p/>
+ *
  * <p>A <code>GeographicCoordinateReferenceSystem</code> is defined as a coordinate system based on
  * latitude and longitude. Some geographic coordinate systems are Lat/Lon, and some are Lon/Lat.
  * You can find out which this is by examining the {@link CoordinateSystemAxis CoordinateSystemAxes}.

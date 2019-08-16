@@ -29,12 +29,12 @@ import java.util.List;
 
 /**
  * A decoder for <code>CoordinateReferenceSystem</code> definitions in WKT.
- * <p/>
+ * 
  * <p> The current implementation ensures that the postgis CRS WKT's are correctly interpreted. There are
  * some minor differences with the OGC specification: "Coordinate Transformation Services (rev. 1.00)". </p>
- * <p/>
+ * 
  * <p>The implementation uses a recursive-decent parsing approach.</p>
- * <p/>
+ * 
  * <p>This class is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA

@@ -61,7 +61,7 @@ public class NumericalMethods {
 
     /**
      * Determines if the triangle determined by p0, p1, p2 is counterclockwise in 2D.
-     * <p/>
+     * 
      * <p>This is equivalent to p2 is to the left of the line p0 - p1.</p>
      *
      * @param p0

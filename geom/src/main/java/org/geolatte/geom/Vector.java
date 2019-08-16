@@ -67,7 +67,6 @@ public class Vector {
 
     /**
      * Returns the dot-product of the specified <code>Position</code>s
-     * <p/>
      *
      * @param p0 first operand
      * @param p1 second operand
@@ -80,7 +79,7 @@ public class Vector {
 
     /**
      * Adds two <code>Position</code>s.
-     * <p/>
+     *
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
      * @param p0 first operand
@@ -98,7 +97,7 @@ public class Vector {
 
     /**
      * Subtracts two <code>Position</code>s.
-     * <p/>
+     *
      * <p>If any of the parameters are 2D, the operation is performed in 2D.</p>
      *
      * @param p0 first operand
@@ -135,10 +134,10 @@ public class Vector {
 
     /**
      * Applies the perp dot-operation on the specified <code>Position</code>s
-     * <p/>
+     *
      * <p>The perp dot operation on vectors <code>P</code>, <code>Q</code> is defined as
      * <code>dot(perp(P),Q)</code>.</p>
-     * <p/>
+     *
      * <p>This operation will be performed in 2D only.</p>
      *
      * @param p0 first operand

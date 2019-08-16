@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * A Factory for {@code Geometry}s
- * <p/>
+ *
  * <p>This Factory allows generically creating Geometries</p>
  *
  * @author Karel Maesen, Geovise BVBA

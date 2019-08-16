@@ -33,7 +33,7 @@ import java.sql.Connection;
  * <code>Connection</code> objects, executes these methods and checks the
  * result. If the result is of type <code>OracleConnection</code> the object
  * is returned, otherwise it recurses on it.
- * <p/>
+ *
  * </p>
  *
  * @author Karel Maesen

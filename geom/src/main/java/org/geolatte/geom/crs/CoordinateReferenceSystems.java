@@ -46,7 +46,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic projected coordinate reference system using the specified units of length for coordinates.
-     * <p/>
+     *
      * A generic system is one without a precisely defined Coordinate Reference System
      *
      * @param unit the unit to use for the planar coordinates.
@@ -58,7 +58,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic geographic coordinate reference system using the specified units of length for coordinates.
-     * <p/>
+     *
      * A generic system is one without a precisely defined datum or ellipsoid.
      *
      * @param

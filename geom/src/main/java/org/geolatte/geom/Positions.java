@@ -51,7 +51,7 @@ public class Positions {
 
 	/**
 	 * Factory method for {@code Position}s in the reference system.
-	 * <p/>
+	 * 
 	 * The coordinates array should be in normalized order. See
 	 * {@link Position}
 	 *
@@ -95,7 +95,7 @@ public class Positions {
 
 	/**
 	 * Copies the source positions to a new PositionSequence.
-	 * <p/>
+	 * 
 	 * <P>The coordinates are taken as-is. If the target coordinate reference systems has a larger coordinate
 	 * dimensions then the source, NaN coordinate values are created.</p>
 	 *

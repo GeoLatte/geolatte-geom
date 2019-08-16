@@ -29,11 +29,11 @@ import java.util.Iterator;
 /**
  * A planar surface defined by 1 exterior boundary and 0 or more interior boundaries. Each interior boundary defines a
  * hole in the <code>Polygon</code>.
- * <p/>
+ *
  * <p>The exterior boundary <code>LinearRing</code> defines the "top" of the surface which is the side of the surface
  * from which the exterior boundary appears to traverse the boundary in a counter clockwise direction. The interior
  * <code>LinearRing</code>s will have the opposite orientation and appear as clockwise when viewed from the "top".</p>
- * <p/>
+ *
  * <p>The rules that define valid <code>Polygon</code>s are as follows</p>
  * <ol>
  * <li><code>Polygon</code>s are topologically closed;</li>

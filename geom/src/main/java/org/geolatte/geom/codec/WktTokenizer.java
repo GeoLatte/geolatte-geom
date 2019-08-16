@@ -32,7 +32,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
  * A tokenizer for WKT representations.
- * <p/>
+ *
  * <p>The variant of WKT that this tokenizer recognizes is determined by the {@link WktVariant}
  * that is passed upon construction. </p>
  *
@@ -95,7 +95,7 @@ class WktTokenizer extends AbstractWktTokenizer {
 
     /**
      * Reads a number at the current position.
-     * <p>Note that this method loses precision, e.g. 51.16666723333333 becomes 51.16666723333332) <p/>
+     * <p>Note that this method loses precision, e.g. 51.16666723333333 becomes 51.16666723333332) </p>
      *
      * @return
      */

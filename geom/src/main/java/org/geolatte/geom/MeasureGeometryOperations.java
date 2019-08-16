@@ -38,7 +38,7 @@ public interface MeasureGeometryOperations {
     /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified range of M-coordinate value
      * inclusively.
-     * <p/>
+     * 
      * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
      * <p>The semantics implemented here are specified by SFA 1.2.1, section 6.1.2.6.</p>
      *
@@ -53,7 +53,7 @@ public interface MeasureGeometryOperations {
 
     /**
      * Creates an operation to calculate the <code>GeometryCollection</code> that matches the specified M-coordinate value.
-     * <p/>
+     * 
      * <p>This method is only valid if executed on 0- or 1-dimensional objects or collections thereof.</p>
      * <p>The semantics implemented here are specified by SFA 1.2.1, section 6.1.2.6.</p>
      *
@@ -80,7 +80,7 @@ public interface MeasureGeometryOperations {
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
      * that has the same 2D/3D-coordinates as the specified <code>Geometry</code>, and
      * with measure values that correspond with the length along it (or begin-measure + length).
-     * <p/>
+     * 
      * <p>The positionTypeMarker is needed because the compiler can't figure our the relationship between the input CRS
      * and its measured variant.</p>
      *
@@ -95,7 +95,7 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a {@code GeometryOperation} that returns the minimum measure value of the {@code Position}s
      * of the specified Geometry.
-     * <p/>
+     * 
      * If the geometry is empty, this method returns Double.NaN
      *
      * @param geometry the geometry for which the minimum measure is sought
@@ -107,7 +107,7 @@ public interface MeasureGeometryOperations {
     /**
      * Creates a {@code GeometryOperation} that returns the maximum measure value of the {@code Position}s
      * of the specified Geometry.
-     * <p/>
+     * 
      * If the geometry is empty, this method returns Double.NaN
      *
      * @param geometry the geometry for which the maximum measure is sought

@@ -137,7 +137,7 @@ abstract class AbstractWktTokenizer {
 
     /**
      * Matches the specifed subsequence of the WKT to a <code>WktToken</code>.
-     * <p/>
+     *
      * @param currentPos the start of the subsequence to match
      * @param endPos     the end of the subsequence to match
      * @return the token that matches the specified subsequence

@@ -32,7 +32,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 /**
  * This class provides operations for handling the usage of Circles and arcs in
  * Geometries.
- * <p/>
+ *
  *
  * @author Tom Acree
  */

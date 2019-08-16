@@ -32,7 +32,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * A <code>SqlServerGeometry</code> represents the native SQL Server database object.
- * <p/>
+ *
  * <p>Instances are created by deserializing the byte array returned in the JDBC result set.
  * They present the structure of the SQL Server Geometry object as specified in <a href="http://download.microsoft.com/download/7/9/3/79326E29-1E2E-45EE-AA73-74043587B17D/%5BMS-SSCLRT%5D.pdf">Microsoft SQL Server CLR Types Serialization Formats</a> .
  *

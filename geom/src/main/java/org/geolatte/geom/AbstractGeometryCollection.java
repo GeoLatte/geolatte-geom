@@ -29,7 +29,7 @@ import java.util.Iterator;
 
 /**
  * A <code>Geometry</code> that is an ordered collection of some number of <code>Geometry</code>s.
- * <p/>
+ *
  * <p>All elements in a <code>GeometryCollection</code> must be in the same <code>CoordinateReferenceSystem</code>,
  * which is also the <code>CoordinateReferenceSystem</code> for the <code>GeometryCollection</code>.</p>
  *
@@ -156,7 +156,7 @@ abstract public class AbstractGeometryCollection<P extends Position, G extends G
 
     /**
      * Verifies that the <code>Geometry</code> array can be used to construct a Geometry collection.
-     * <p/>
+     *
      * <p>Conditions:</p>
      * <il>
      * <li>Array contains no NULL values</li>

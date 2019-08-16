@@ -30,7 +30,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * Default implementation of {@link MeasureGeometryOperations}.
- * <p/>
+ *
  * <p>This implementation conforms to the SQL/MM and SFA 1.2.1 specifications. See
  * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access -
  * Part 1: common architecture</a>, sec. 6.1.2.6 </p>

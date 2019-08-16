@@ -23,10 +23,10 @@ package org.geolatte.geom;
 
 /**
 * Defines standard operations on {@code Geometry}s with projected coordinate systems.
-* <p/>
+*
 * <p>The semantics of the operations is as specified in
 * <a href="http://portal.opengeospatial.org/files/?artifact_id=25355">Simple Feature Access - Part 1: common architecture</a>
-* </p>
+*
 *
 * @author Karel Maesen, Geovise BVBA
 */
@@ -137,7 +137,7 @@ public interface ProjectedGeometryOperations {
     /**
      * Calculates a <code>Geometry</code> that represents all points whose distance from the specified
      * <code>Geometry</code> is less than or equal the specified distance.
-     * <p/>
+     *
      * <p>Calculations are in the <code>CoordinateReferenceSystem</code> of this
      * <code>Geometry</code>.</p>
      * <p>Z- or M-coordinates are ignored in the buffering operation; and the result will always be a 2D geometry.</p>

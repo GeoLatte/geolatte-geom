@@ -38,7 +38,7 @@ import java.util.function.Function;
 
 /**
  * A repository for <code>CoordinateReferenceSystem</code>s.
- * <p/>
+ *
  * <p>Currently, the registry is limited to EPSG-defined coordinate reference systems.</p>
  *
  * @author Karel Maesen, Geovise BVBA

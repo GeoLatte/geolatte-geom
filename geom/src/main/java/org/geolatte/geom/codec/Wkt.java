@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * Creates encoders/decoders for WKT geometry representations.
- * <p/>
+ *
  * <p>Note that the <coder>WktEncoder</coder>/<code>WktDecoder</code> instances returned by the factory
  * methods are not thread-safe.</p>
  *

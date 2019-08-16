@@ -31,7 +31,7 @@ import java.sql.Struct;
 
 /**
  * Factory for Oracle JDBC extension types (ARRAY, STRUCT, ...).
- * <p/>
+ *
  * This factory creates the Oracle extension types using reflection in order to
  * avoid creating compile-time dependencies on the proprietary Oracle driver.
  *

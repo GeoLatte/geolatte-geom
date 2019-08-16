@@ -35,7 +35,7 @@ import static org.geolatte.geom.Geometries.*;
 
 /**
  * A decoder for the Postgis WKT/EWKT representations as used in Postgis (at least 1.0 to 1.5+).
- * <p/>
+ *
  * <p>This class is not thread-safe</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011

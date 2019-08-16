@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * A Two-dimensional Cartesian Coordinate system extended with a {@code LinearCoordinateSystemAxis}
- * <p/>
+ *
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
 public class CartesianCoordinateSystem2DM extends CoordinateSystem<C2DM> {
