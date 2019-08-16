@@ -3,7 +3,7 @@ package org.geolatte.geom.circejson
 import org.geolatte.geom.{Geometry, Position}
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
 import org.geolatte.geom.crs.LinearUnit
-import org.geolatte.geom.generator.GeometryGenerator
+import org.geolatte.geom.generator.Generator
 import org.specs2.matcher.MatchResult
 
 class GeometryEncodersSpec extends org.specs2.mutable.Specification {
@@ -51,7 +51,7 @@ class GeometryEncodersSpec extends org.specs2.mutable.Specification {
   }
 
   def testGen[P <: Position](
-      generator: GeometryGenerator[P, _ <: Geometry[P]]): MatchResult[Any] = {
+      generator: Generator[_ <: Geometry[P]]): MatchResult[Any] = {
     val geom: Geometry[P] = generator.generate()
     val expected          = geom.asJsonString
     val received          = geom.asJson.pretty(Printer(true, true, "  "))

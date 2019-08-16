@@ -4,7 +4,7 @@ import org.geolatte.geom.syntax.GeometryImplicits._
 import org.geolatte.geom._
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.geolatte.geom.crs.CoordinateReferenceSystem
-import org.geolatte.geom.generator.{GeometryGenerator, GeometryGenerators}
+import org.geolatte.geom.generator.GeometryGenerators
 import org.geolatte.geom.json.GeolatteGeomModule
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
 import org.geolatte.geom.syntax.PositionBuilder
