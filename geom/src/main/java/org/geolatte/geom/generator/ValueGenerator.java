@@ -22,7 +22,7 @@ public class ValueGenerator {
         this(new Random());
     }
 
-    public Generator<String> string(int minLength, int maxLength) {
+    public Generator<String> stringGenerator(int minLength, int maxLength) {
         return new Generator<String>() {
             private final Choice<Character> ascii = new Choice<>(asciiRange());
 
@@ -35,18 +35,18 @@ public class ValueGenerator {
         };
     }
 
-    public Generator<Integer> integer(int min, int max) {
+    public Generator<Integer> integerGenerator(int min, int max) {
         return () -> min + rnd.nextInt(max - min + 1);
     }
 
-    public Generator<Double> integer(double min, double max) {
+    public Generator<Double> doubleGenerator(double min, double max) {
         return () -> min + rnd.nextDouble() * (max - min);
     }
 
-    public Generator<Instant> instant(Instant start, Instant end) {
+    public Generator<Instant> instantGenerator(Instant start, Instant end) {
         return () -> {
             long seconds = Duration.between(start, end).getSeconds();
-            return Instant.ofEpochSecond(start.getEpochSecond() + (long)(rnd.nextDouble() * seconds));
+            return Instant.ofEpochSecond(start.getEpochSecond() + (long) (rnd.nextDouble() * seconds));
         };
     }
 
