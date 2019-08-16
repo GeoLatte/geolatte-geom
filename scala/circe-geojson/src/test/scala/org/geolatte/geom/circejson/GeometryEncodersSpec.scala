@@ -1,16 +1,18 @@
 package org.geolatte.geom.circejson
 
-import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
-import org.geolatte.geom.generator.GeometryGenerator
 import org.geolatte.geom.{Geometry, Position}
+import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
+import org.geolatte.geom.crs.LinearUnit
+import org.geolatte.geom.generator.GeometryGenerator
 import org.specs2.matcher.MatchResult
 
 class GeometryEncodersSpec extends org.specs2.mutable.Specification {
 
-  import GeoJsonGen._
   import io.circe._
   import io.circe.syntax._
   import org.geolatte.geom.circe.GeoJsonCodec._
+
+  import GeoJsonGen._
 
   "Encoding unit tests for 2D" >> {
 
