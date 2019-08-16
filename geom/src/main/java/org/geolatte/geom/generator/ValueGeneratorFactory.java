@@ -8,17 +8,19 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
+ * A Factory for value {@code Generator}s
+ *
  * Created by Karel Maesen, Geovise BVBA on 2019-08-16.
  */
-public class ValueGenerator {
+public class ValueGeneratorFactory {
 
     private final Random rnd;
 
-    public ValueGenerator(Random rnd) {
+    public ValueGeneratorFactory(Random rnd) {
         this.rnd = rnd;
     }
 
-    public ValueGenerator() {
+    public ValueGeneratorFactory() {
         this(new Random());
     }
 

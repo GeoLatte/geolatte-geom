@@ -68,7 +68,7 @@ public class GeneratorsTest {
 
     @Test
     public void testStringGenerator(){
-        Generator<String> strng = new ValueGenerator().stringGenerator(5, 20);
+        Generator<String> strng = new ValueGeneratorFactory().stringGenerator(5, 20);
         for(int i = 0; i < 100; i++){
             String s = strng.generate();
             assert (s.length() <= 20 && s.length() >= 5);
@@ -77,7 +77,7 @@ public class GeneratorsTest {
 
     @Test
     public void testIntGenerator(){
-        Generator<Integer> ints = new ValueGenerator().integerGenerator(5, 20);
+        Generator<Integer> ints = new ValueGeneratorFactory().integerGenerator(5, 20);
         for(int i = 0; i < 100; i++){
             Integer g = ints.generate();
             System.out.println(g);
@@ -89,7 +89,7 @@ public class GeneratorsTest {
     public void testInstantGenerator(){
         LocalDateTime start = LocalDateTime.of(2015, 1, 1, 0, 0);
         LocalDateTime end = LocalDateTime.of(2016, 1, 1, 0, 0);
-        Generator<Instant> instants = new ValueGenerator().instantGenerator(start.toInstant(ZoneOffset.UTC), end.toInstant(ZoneOffset.UTC));
+        Generator<Instant> instants = new ValueGeneratorFactory().instantGenerator(start.toInstant(ZoneOffset.UTC), end.toInstant(ZoneOffset.UTC));
         for(int i = 0; i < 100; i++){
             LocalDateTime dt = LocalDateTime.ofInstant(instants.generate(), ZoneOffset.UTC);
             System.out.println(dt);
@@ -99,7 +99,7 @@ public class GeneratorsTest {
 
     @Test
     public void testPropertyMapGenerator(){
-        ValueGenerator generator = new ValueGenerator();
+        ValueGeneratorFactory generator = new ValueGeneratorFactory();
         List<Generator<?>> generators = asList(generator.integerGenerator(0, 100), generator.stringGenerator(1, 100));
         PropertyMapGenerator props = new PropertyMapGenerator(5,
                 generator.stringGenerator(3,5),
