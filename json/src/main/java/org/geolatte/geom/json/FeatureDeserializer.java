@@ -34,7 +34,7 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
 
 
         JsonNode geomNode = root.get("geometry");
-        Geometry<?> geom = geomParser.parseGeometry(geomNode);
+        Geometry<?> geom = null == geomNode ? null : geomParser.parseGeometry(geomNode);
 
         Object id = null;
         JsonNode idNode = root.get("id");
