@@ -38,12 +38,13 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
 
         Object id = null;
         JsonNode idNode = root.get("id");
-        if (idNode.canConvertToLong()) {
-            id = idNode.asLong();
-        } else {
-            id = idNode.asText();
+        if(idNode != null) {
+            if (idNode.canConvertToLong()) {
+                id = idNode.asLong();
+            } else {
+                id = idNode.asText();
+            }
         }
-
         HashMap<String, Object> properties =  (HashMap<String, Object>)oc.treeToValue(root.get("properties"), HashMap.class);
 
         return new GeoJsonFeature<>(geom, id, properties);
