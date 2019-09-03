@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.lang.reflect.InvocationTargetException;	
 import java.lang.reflect.Method;
-import oracle.jdbc.OracleConnection;
 
 /**
  * Default <code>ConnectionFinder</code> implementation.
@@ -61,7 +60,7 @@ public class DefaultConnectionFinder implements ConnectionFinder {
 
 		// try to find the OracleConnection
 		try{
-			return conn.unwrap(ORACLE_CONNECTION_CLASS);
+			return con.unwrap(ORACLE_CONNECTION_CLASS);
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(
