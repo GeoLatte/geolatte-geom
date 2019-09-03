@@ -48,7 +48,7 @@ public class DefaultConnectionFinder implements ConnectionFinder {
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(
-				"Couldn't get at the OracleSpatial Connection object from the PreparedStatement."
+				"Couldn't get at the OracleSpatial Connection object from the PreparedStatement.");
 		};
 	}
 
