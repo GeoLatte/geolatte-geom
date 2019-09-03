@@ -20,19 +20,15 @@
  */
 package org.geolatte.geom.codec.db.oracle;
 
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.sql.Connection;
+import oracle.jdbc.OracleConnection;
 
 /**
  * Default <code>ConnectionFinder</code> implementation.
  * <p>
  * This implementation attempts to retrieve the <code>OracleConnection</code>
- * by recursive reflection: it searches for methods that return
- * <code>Connection</code> objects, executes these methods and checks the
- * result. If the result is of type <code>OracleConnection</code> the object
- * is returned, otherwise it recurses on it.
+ * by calling the java.sql.Wrapper.unwrap(Class<T>) method.
  *
  * </p>
  *
@@ -40,70 +36,20 @@ import java.sql.Connection;
  */
 public class DefaultConnectionFinder implements ConnectionFinder {
 
-	private static final Class<?> ORACLE_CONNECTION_CLASS;
-
-	static {
-		try {
-			ORACLE_CONNECTION_CLASS = Class.forName( "oracle.jdbc.driver.OracleConnection" );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException( "Can't find Oracle JDBC Driver on classpath." );
-		}
-	}
-
 	@Override
 	public Connection find(Connection con) {
 		if ( con == null ) {
 			return null;
 		}
 
-		if ( ORACLE_CONNECTION_CLASS.isInstance( con ) ) {
-			return con;
+		// try to find the OracleConnection
+		try{
+			return conn.unwrap(OracleConnection.class);
 		}
-		// try to find the Oracleconnection recursively
-		for ( Method method : con.getClass().getMethods() ) {
-			if ( method.getReturnType().isAssignableFrom(
-					java.sql.Connection.class
-			)
-					&& method.getParameterTypes().length == 0 ) {
-
-				try {
-					method.setAccessible( true );
-					final Connection oc = find( (Connection) ( method.invoke( con, new Object[] { } ) ) );
-					if ( oc == null ) {
-						throw new RuntimeException(
-								String.format(
-										"Tried retrieving OracleConnection from %s using method %s, but received null.",
-										con.getClass().getCanonicalName(),
-										method.getName()
-								)
-						);
-					}
-					return oc;
-				}
-				catch ( IllegalAccessException e ) {
-					throw new RuntimeException(
-							String.format(
-									"Illegal access on executing method %s when finding OracleConnection",
-									method.getName()
-							)
-					);
-				}
-				catch ( InvocationTargetException e ) {
-					throw new RuntimeException(
-							String.format(
-									"Invocation exception on executing method %s when finding OracleConnection",
-									method.getName()
-							)
-					);
-				}
-
-
-			}
-		}
-		throw new RuntimeException(
+		catch (SQLException e) {
+			throw new RuntimeException(
 				"Couldn't get at the OracleSpatial Connection object from the PreparedStatement."
-		);
+		};
 	}
 
 }
