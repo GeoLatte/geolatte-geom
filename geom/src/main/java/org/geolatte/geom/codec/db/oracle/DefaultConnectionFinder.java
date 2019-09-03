@@ -22,6 +22,8 @@ package org.geolatte.geom.codec.db.oracle;
 
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.lang.reflect.InvocationTargetException;	
+import java.lang.reflect.Method;
 import oracle.jdbc.OracleConnection;
 
 /**
@@ -36,15 +38,30 @@ import oracle.jdbc.OracleConnection;
  */
 public class DefaultConnectionFinder implements ConnectionFinder {
 
+	private static final Class<?> ORACLE_CONNECTION_CLASS;	
+
+ 	static {	
+		try {	
+			ORACLE_CONNECTION_CLASS = Class.forName( "oracle.jdbc.driver.OracleConnection" );	
+		}	
+		catch ( ClassNotFoundException e ) {	
+			throw new RuntimeException( "Can't find Oracle JDBC Driver on classpath." );	
+		}	
+	}
+	
 	@Override
 	public Connection find(Connection con) {
 		if ( con == null ) {
 			return null;
 		}
+		
+		if ( ORACLE_CONNECTION_CLASS.isInstance( con ) ) {
+			return con;
+		}
 
 		// try to find the OracleConnection
 		try{
-			return conn.unwrap(OracleConnection.class);
+			return conn.unwrap(ORACLE_CONNECTION_CLASS);
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(
