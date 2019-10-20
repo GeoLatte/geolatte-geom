@@ -62,8 +62,8 @@ public class DefaultConnectionFinder implements ConnectionFinder {
 		}
 		// try to find the Oracleconnection recursively
 		for ( Method method : con.getClass().getMethods() ) {
-			if ( method.getReturnType().isAssignableFrom(
-					java.sql.Connection.class
+			if ( java.sql.Connection.class.isAssignableFrom(
+					method.getReturnType()
 			)
 					&& method.getParameterTypes().length == 0 ) {
 
