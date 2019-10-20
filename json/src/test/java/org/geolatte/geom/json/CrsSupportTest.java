@@ -13,12 +13,20 @@ import static org.junit.Assert.assertEquals;
 
 public class CrsSupportTest extends GeoJsonTest {
     @Test
-    public void testSrializeCrsInUrnFormat() throws IOException {
+    public void testSerializeCrsInUrnFormat() throws IOException {
 
         ObjectMapper mapper = createMapper(Setting.SERIALIZE_CRS_AS_URN, true);
         assertEquals(crswgs84TextWithUrnCrs, mapper.writeValueAsString(WGS84));
         assertEquals(crslambert72TextWithUrnCrs, mapper.writeValueAsString(lambert72));
     }
+
+    @Test
+    public void testSerializeCrsDefault() throws IOException {
+
+        assertEquals(crswgs84, mapper.writeValueAsString(WGS84));
+        assertEquals(crslambert72, mapper.writeValueAsString(lambert72));
+    }
+
 
     @Test
     public void testDeserializeCrs() throws IOException {
