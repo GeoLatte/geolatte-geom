@@ -273,14 +273,14 @@
     <repositories>
         <repository>
             <id>OSGEO</id>
-            <url>http://download.osgeo.org/webdav/geotools</url>
+            <url>https://download.osgeo.org/webdav/geotools</url>
         </repository>
         <repository>
             <id>sonatype-snapshots</id>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
     </repositories>
 </project>
