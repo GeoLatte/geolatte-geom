@@ -64,7 +64,7 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
      * @inheritDoc
      */
     @Override
-    public <P extends C2D & Measured> double measureAt(final Geometry<P> geometry, final P pos, double tolerance) {
+    public <P extends C2D & Measured> double measureAt(final Geometry<P> geometry, final C2D pos, double tolerance) {
         if (geometry == null || pos == null) throw new IllegalArgumentException("Parameters must not be NULL");
         if (geometry.isEmpty()) return Double.NaN;
         InterpolatingVisitor<P> visitor = new InterpolatingVisitor<P>(pos, tolerance);
@@ -141,12 +141,12 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         public static final String INVALID_TYPE_MSG = "Operation only valid on LineString, MultiPoint and MultiLineString Geometries.";
         public static final String OUTSIDE_TOL_MSG = "Search point not within tolerance: distance to geometry is %f > %f";
 
-        final P searchPosition;
+        final C2D searchPosition;
         final double tolerance;
         double mValue = Double.NaN;
         double distToSearchPoint = Double.MAX_VALUE;
 
-        InterpolatingVisitor(P pnt, double tolerance) {
+        InterpolatingVisitor(C2D pnt, double tolerance) {
             if (pnt == null) throw new IllegalArgumentException("Null point is not allowed.");
             searchPosition = pnt;
             this.tolerance = Math.abs(tolerance);

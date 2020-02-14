@@ -74,7 +74,7 @@ public interface MeasureGeometryOperations {
      * @param tolerance the maximum value allowed for distance between pos and geometry.
      * @return a <code>GeometryOperation</code> that returns the measure value at the specified point on the specified geometry
      */
-    public <P extends C2D & Measured> double measureAt(Geometry<P> geometry, P pos, double tolerance);
+    public <P extends C2D & Measured> double measureAt(final Geometry<P> geometry, final C2D pos, double tolerance);
 
     /**
      * Creates a <code>GeometryOperation</code> that creates a new Geometry
