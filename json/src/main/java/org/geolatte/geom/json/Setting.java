@@ -14,6 +14,10 @@ public enum Setting {
     FORCE_DEFAULT_CRS_DIMENSION(false),
 
     /**
+     * Ignore the CRS component during deserialization, if present
+     */
+    IGNORE_CRS(false),
+    /**
      * Suppresses the serialization of CRS property
      */
     SUPPRESS_CRS_SERIALIZATION(false),

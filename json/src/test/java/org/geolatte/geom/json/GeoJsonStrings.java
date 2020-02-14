@@ -64,5 +64,6 @@ public class GeoJsonStrings {
     static String crswgs84TextWithUrnCrs = "{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::4326\"}}";
     static String crslambert72 = "{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:31370\"}}";
     static String crslambert72TextWithUrnCrs = "{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::31370\"}}";
+    static String crswgs84WithLink = "{\"type\":\"link\",\"properties\":{\"href\":\"http://wwww.opengis.net/def/crs/EPSG/4326\"}}";
 
 }

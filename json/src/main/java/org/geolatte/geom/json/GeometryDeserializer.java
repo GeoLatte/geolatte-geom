@@ -87,7 +87,9 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
     private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
-        return id.equals(CrsId.UNDEFINED) || settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ?
+        return id.equals(CrsId.UNDEFINED) ||
+                settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ||
+                settings.isSet(Setting.IGNORE_CRS) ?
                 this.defaultCRS :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
     }
