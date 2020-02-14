@@ -24,12 +24,10 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.Unit;
+import org.geolatte.geom.crs.*;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
+import static org.geolatte.geom.crs.CoordinateSystemAxisDirection.OTHER;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
@@ -41,6 +39,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
  */
 class PostgisWkbDecoder extends AbstractWkbDecoder {
 
+    private CoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
 
     @Override
     protected void prepare(ByteBuffer byteBuffer) {
@@ -60,7 +59,7 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
             return crs;
         }
 
-        CoordinateReferenceSystem crsDeclared;
+        CoordinateReferenceSystem<?> crsDeclared;
         if (hasSrid(typeCode)) {
             int srid = byteBuffer.getInt();
             crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
@@ -69,14 +68,20 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
             crsDeclared = CoordinateReferenceSystems.PROJECTED_2D_METER;
         }
 
+        if(hasM) {
+            crsDeclared = expander.expandM(crsDeclared);
+        }
+
         if (hasZ) {
-            crsDeclared = addVerticalSystem(crsDeclared, Unit.METER);
+            crsDeclared = expander.expandZ(crsDeclared);
         }
-        if (hasM) {
-            crsDeclared = addLinearSystem(crsDeclared, Unit.METER);
-        }
+
+
+
         return (CoordinateReferenceSystem<P>)crsDeclared;
     }
+
+
 
     private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
         if ( (hasM && ! hasMeasureAxis(crs)) ||

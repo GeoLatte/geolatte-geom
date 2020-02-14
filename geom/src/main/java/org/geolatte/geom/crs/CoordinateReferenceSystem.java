@@ -126,4 +126,12 @@ public abstract class CoordinateReferenceSystem<P extends Position> extends CrsI
         result = 31 * result + coordinateSystem.hashCode();
         return result;
     }
+
+    public boolean hasZ() {
+        return getCoordinateSystem().hasZ();
+    }
+
+    public boolean hasM() {
+        return getCoordinateSystem().hasM();
+    }
 }

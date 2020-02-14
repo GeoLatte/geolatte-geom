@@ -50,4 +50,14 @@ public class EllipsoidalCoordinateSystem2DM extends CoordinateSystem<G2DM> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return true;
+    }
+
 }

@@ -46,4 +46,14 @@ public class EllipsoidalCoordinateSystem3D extends CoordinateSystem<G3D> {
         }
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean hasZ() {
+        return true;
+    }
+
+    @Override
+    public boolean hasM() {
+        return false;
+    }
 }

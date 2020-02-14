@@ -269,12 +269,20 @@ public class CoordinateReferenceSystems {
         return false;
     }
 
+    /**
+     * @deprecated User crs.hasZ()
+     */
+    @Deprecated
     public static <P extends Position> boolean hasVerticalAxis(CoordinateReferenceSystem<P> crs) {
-        return hasAxisOrder(crs, 2);
+        return crs.hasZ();
     }
 
+    /**
+     * @deprecated User crs.hasM()
+     */
+    @Deprecated
     public static <P extends Position> boolean hasMeasureAxis(CoordinateReferenceSystem<P> crs) {
-        return hasAxisOrder(crs, 3);
+        return crs.hasM();
     }
 
 }

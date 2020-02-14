@@ -43,9 +43,19 @@ public class CartesianCoordinateSystem2DM extends CoordinateSystem<C2DM> {
     public CoordinateSystem<C3DM> extend(CoordinateSystemAxis axis) {
         if (axis instanceof VerticalStraightLineAxis) {
             return new CartesianCoordinateSystem3DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1),
-                    (VerticalStraightLineAxis) axis, (MeasureStraightLineAxis) getAxis(1));
+                    (VerticalStraightLineAxis) axis, (MeasureStraightLineAxis) getAxis(2));
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return true;
     }
 
 }

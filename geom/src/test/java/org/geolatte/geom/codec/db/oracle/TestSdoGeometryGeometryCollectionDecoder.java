@@ -9,12 +9,14 @@ import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class testSdoGeometryGeometryCollectionDecoder {
+@Ignore("Requires better test case ")
+public class TestSdoGeometryGeometryCollectionDecoder {
 
     GeographicCoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 

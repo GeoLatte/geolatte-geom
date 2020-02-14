@@ -88,9 +88,9 @@ public class CrsRegistry {
             LOGGER.debug(String.format("Non-EPSG CRS ignored: %s", tokens[2]));
             return;
         }
-        Integer srid = Integer.valueOf(tokens[1]);
+        int srid = Integer.parseInt(tokens[1]);
         try {
-            CoordinateReferenceSystem crs = decoder.decode(tokens[2], srid);
+            CoordinateReferenceSystem<?> crs = decoder.decode(tokens[2], srid);
             crsMap.put(CrsId.valueOf(srid), crs);
         } catch (WktDecodeException e) {
             LOGGER.warn(String.format("Can't parse srid %d (%s). \n%s", srid, tokens[2], e.getMessage()));
@@ -150,14 +150,6 @@ public class CrsRegistry {
     public static CoordinateReferenceSystem<?> ifAbsentReturnGeographic2D(int epsgCode) {
         return computeIfAbsent(CrsId.valueOf(epsgCode),  key -> CoordinateReferenceSystems.mkGeographic(key, AngularUnit.RADIAN));
     }
-
-    /**
-     * Returns the registered coordinate reference system, or when unavailable in the registry, create a new Geographic 2D system and register
-     * this on-the-fly.
-     *
-     * @param epsgCode the code to look up
-     * @return a CoordinateReferenceSystem with the specified epsg code
-     */
 
     /**
      * Returns the registered coordinate reference system, or when unavailable in the registry, create a new reference system and register

@@ -40,4 +40,14 @@ public class CartesianCoordinateSystem3DM extends CoordinateSystem<C3DM> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean hasZ() {
+        return true;
+    }
+
+    @Override
+    public boolean hasM() {
+        return true;
+    }
+
 }

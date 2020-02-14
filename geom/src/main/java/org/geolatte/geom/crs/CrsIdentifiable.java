@@ -76,8 +76,6 @@ abstract public class CrsIdentifiable {
         CrsIdentifiable that = (CrsIdentifiable) o;
 
         if (crsId != null ? !crsId.equals(that.crsId) : that.crsId != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
         return true;
     }
 
