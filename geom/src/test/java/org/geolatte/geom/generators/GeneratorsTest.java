@@ -103,9 +103,7 @@ public class GeneratorsTest {
                 generator.stringGenerator(3,5),
                 Choice.of(generators)
         );
-        for(int i = 0; i < 100; i++){
-            Map<String, Object> map = props.generate();
-            assert ( map.keySet().size() == 5 );
-        }
+        Map<String, Object> map = props.generate();
+        assert (map.keySet().size() == 5);
     }
 }
