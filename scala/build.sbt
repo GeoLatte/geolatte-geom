@@ -2,8 +2,8 @@
 val geolatteGeomVersion = "1.5.0-SNAPSHOT"
 
 val commonResolvers = Seq(
-  "Local Maven Repository" at Path.userHome.asFile.toURI.toURL + "/.m2/repository",
-  "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/",
+  Resolver.mavenLocal,
+  "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/",
 )
 
 val commonSettings = Seq(
@@ -13,11 +13,11 @@ val commonSettings = Seq(
   updateOptions := updateOptions.value.withLatestSnapshots(false),
   resolvers ++= commonResolvers,
   scalacOptions ++= Seq(  "-language:implicitConversions"),
-  scalacOptions in Test ++= Seq("-Yrangepos")
+  scalacOptions in Test ++= Seq("-Yrangepos", "--explain-types")
 )
 
 val Specs2Version      = "4.5.1"
-val CirceVersion       = "0.12.3"
+val CirceVersion       = "0.12.1"
 val jacksonVersion     = "2.9.9"
 val scalaCheckVersion  = "1.14.1"
 val scalaTestVersion   = "3.1.0"
