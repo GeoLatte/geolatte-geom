@@ -59,10 +59,30 @@ class ElemInfo {
 		return this.triplets;
 	}
 
+	public InterpretedElemInfo[] interpret() {
+		InterpretedElemInfo[] result = new InterpretedElemInfo[getSize()];
+		for(int idx = 0; idx < getSize(); idx++){
+			BigDecimal[] triplet = new BigDecimal[3];
+			System.arraycopy(this.triplets, 3 * idx, triplet, 0, 3);
+			result[idx] = InterpretedElemInfo.parse(triplet);
+		}
+		return result;
+	}
+
+	/**
+	 * Returns the number of elements
+	 * @return
+	 */
 	public int getSize() {
 		return this.triplets.length / 3;
 	}
 
+	/**
+	 * Returns first ordinate of the specified element in ordinates array (1-based)
+	 *
+	 * @param i the idx of the element (0-based)
+	 * @return
+	 */
 	public int getOrdinatesOffset(int i) {
 		return this.triplets[i * 3].intValue();
 	}
@@ -98,10 +118,9 @@ class ElemInfo {
 		}
 		this.triplets[i * 3] = new BigDecimal( ordinatesOffset );
 		this.triplets[i * 3 + 1] = new BigDecimal( et.getEType() );
-		this.triplets[i * 3 + 2] = et.isCompound() ? new BigDecimal( numCompounds ) : new BigDecimal(
-				et
-						.getInterpretation()
-		);
+		this.triplets[i * 3 + 2] = et.isCompound() ?
+				new BigDecimal( numCompounds ) :
+				new BigDecimal(et.getInterpretation());
 	}
 
 	public String toString() {
@@ -155,3 +174,4 @@ class ElemInfo {
         return triplets != null ? Arrays.hashCode(triplets) : 0;
     }
 }
+

@@ -33,6 +33,41 @@ class SDOGType {
 
 	private TypeGeometry typeGeometry = TypeGeometry.UNKNOWN_GEOMETRY;
 
+	static SDOGType derive(ElementType elementType, SDOGeometry origGeom) {
+		switch (elementType) {
+			case POINT:
+			case ORIENTATION:
+				return new SDOGType(
+						origGeom.getDimension(), origGeom
+						.getLRSDimension(), TypeGeometry.POINT
+				);
+			case POINT_CLUSTER:
+				return new SDOGType(
+						origGeom.getDimension(), origGeom
+						.getLRSDimension(), TypeGeometry.MULTIPOINT
+				);
+			case LINE_ARC_SEGMENTS:
+			case LINE_STRAITH_SEGMENTS:
+			case COMPOUND_LINE:
+				return new SDOGType(
+						origGeom.getDimension(), origGeom
+						.getLRSDimension(), TypeGeometry.LINE
+				);
+			case COMPOUND_EXTERIOR_RING:
+			case EXTERIOR_RING_ARC_SEGMENTS:
+			case EXTERIOR_RING_CIRCLE:
+			case EXTERIOR_RING_RECT:
+			case EXTERIOR_RING_STRAIGHT_SEGMENTS:
+				return new SDOGType(
+						origGeom.getDimension(), origGeom
+						.getLRSDimension(), TypeGeometry.POLYGON
+				);
+			default:
+				return null;
+		}
+	}
+
+
 	public SDOGType(int dimension, int lrsDimension,
 					TypeGeometry typeGeometry) {
 		setDimension( dimension );

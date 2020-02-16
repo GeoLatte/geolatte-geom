@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.codec.db.oracle;
 
+import org.locationtech.jts.util.CoordinateArrayFilter;
+
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -80,39 +82,6 @@ public class SDOGeometry {
         }
     }
 
-    private static SDOGType deriveGTYPE(ElementType elementType, SDOGeometry origGeom) {
-        switch (elementType) {
-            case POINT:
-            case ORIENTATION:
-				return new SDOGType(
-						origGeom.getDimension(), origGeom
-						.getLRSDimension(), TypeGeometry.POINT
-				);
-            case POINT_CLUSTER:
-				return new SDOGType(
-						origGeom.getDimension(), origGeom
-						.getLRSDimension(), TypeGeometry.MULTIPOINT
-				);
-            case LINE_ARC_SEGMENTS:
-            case LINE_STRAITH_SEGMENTS:
-            case COMPOUND_LINE:
-				return new SDOGType(
-						origGeom.getDimension(), origGeom
-						.getLRSDimension(), TypeGeometry.LINE
-				);
-            case COMPOUND_EXTERIOR_RING:
-            case EXTERIOR_RING_ARC_SEGMENTS:
-            case EXTERIOR_RING_CIRCLE:
-            case EXTERIOR_RING_RECT:
-            case EXTERIOR_RING_STRAIGHT_SEGMENTS:
-				return new SDOGType(
-						origGeom.getDimension(), origGeom
-						.getLRSDimension(), TypeGeometry.POLYGON
-				);
-            default:
-                return null;
-        }
-    }
 
     public static SDOGeometry load(Struct struct) {
 
@@ -217,59 +186,20 @@ public class SDOGeometry {
         if (getGType().getTypeGeometry() == TypeGeometry.COLLECTION) {
             final List<SDOGeometry> elements = new ArrayList<SDOGeometry>();
             int i = 0;
-            BigDecimal[] triplets = null;
+            InterpretedElemInfo[] elemInfos = this.info.interpret();
             while (i < this.getNumElements()) {
-                final ElementType et = this.getInfo().getElementType(i);
-                int next = i + 1;
-                // if the element is an exterior ring, or a compound
-                // element, then this geometry spans multiple elements.
-                if (et.isExteriorRing()) {
-                    // then next element is the
-                    // first non-interior ring
-                    while (next < this.getNumElements()) {
-                        if (!this.getInfo().getElementType(next).isInteriorRing()) {
-                            break;
-                        }
-                        next++;
-                    }
+                InterpretedElemInfo elemInfo = elemInfos[i];
+                ElementType et = elemInfo.getElementType();
+                int next = findNextGeometryElemInfo(i, elemInfos, elemInfo, et);
 
-                    triplets = new BigDecimal[3 * next];
-                    for (int j = i; j < next; j++) {
-                        BigDecimal[] temp = this.getInfo().getElement(j);
-                        System.arraycopy(temp, 0, triplets, 3 * j, temp.length);
-                    }
-                } else if (et.isCompound()) {
-                    next = i + this.getInfo().getNumCompounds(i) + 1;
-                }
-
-                if (triplets == null) {
-                    triplets = this.getInfo().getElement(i);
-                }
-
-                final SDOGType elemGtype = deriveGTYPE(this.getInfo().getElementType(i), this);
-                final ElemInfo elemInfo = new ElemInfo(triplets);
-                shiftOrdinateOffset(elemInfo, -elemInfo.getOrdinatesOffset(0) + 1);
-                final int startPosition = this.getInfo().getOrdinatesOffset(i);
-                Ordinates elemOrdinates = null;
-                if (next < this.getNumElements()) {
-                    final int endPosition = this.getInfo().getOrdinatesOffset(next);
-					elemOrdinates = new Ordinates(
-							this.getOrdinates()
-									.getOrdinatesArray( startPosition, endPosition )
-					);
-				}
-				else {
-					elemOrdinates = new Ordinates(
-							this.getOrdinates()
-									.getOrdinatesArray( startPosition )
-					);
-                }
-
+                final SDOGType elemGtype = SDOGType.derive(et, this);
+                final ElemInfo outElemInfo = buildElemInfo(elemInfos, i, next);
+                Ordinates elemOrdinates = buildOrdinates(elemInfos, i, next);
                 SDOGeometry elemGeom = new SDOGeometry(
                         elemGtype,
                         this.getSRID(),
                         null,
-                        elemInfo,
+                        outElemInfo,
                         elemOrdinates
                 );
                 elements.add(elemGeom);
@@ -279,6 +209,51 @@ public class SDOGeometry {
         } else {
             return new SDOGeometry[]{this};
         }
+    }
+
+    private Ordinates buildOrdinates(InterpretedElemInfo[] elemInfos, int start, int next) {
+        Double[] ordinateArray = this.ordinates.getOrdinateArray();
+        int length;
+        int srcPos = elemInfos[start].getStartingOffset();
+        if(next < elemInfos.length){
+            length = elemInfos[next].getStartingOffset() - srcPos;
+        } else {
+            length = (ordinateArray.length + 1) - srcPos;
+        }
+        Double[] out = new Double[length];
+        System.arraycopy(ordinateArray, srcPos-1, out, 0, length);
+        return new Ordinates(out);
+    }
+
+
+    //start is the next Geometry in the collection
+    private ElemInfo buildElemInfo(InterpretedElemInfo[] elemInfos, int start, int next) {
+        List<BigDecimal> out = new ArrayList<>(3*(next - start));
+        int startingOffset = elemInfos[start].getStartingOffset();
+        for (int idx = start; idx < next; idx++) {
+            InterpretedElemInfo adjusted = elemInfos[idx].shiftStartingOffset(-startingOffset + 1);
+            adjusted.addTo(out);
+        }
+        return new ElemInfo(out.toArray(new BigDecimal[0]));
+    }
+
+    private int findNextGeometryElemInfo(int i, InterpretedElemInfo[] elemInfos, InterpretedElemInfo elemInfo, ElementType et) {
+        int next = i + 1;
+        // if the element is an exterior ring, or a compound
+        // element, then this geometry spans multiple elements.
+        if (et.isExteriorRing()) {
+            // then next element is the
+            // first non-interior ring
+            while (next < elemInfos.length) {
+                if (!elemInfos[next].getElementType().isInteriorRing()) {
+                    break;
+                }
+                next++;
+            }
+        } else if (elemInfo.isCompound()) {
+            next = i + ((CompoundIElemInfo)elemInfo).numParts() + 1;
+        }
+        return next;
     }
 
     @Override
