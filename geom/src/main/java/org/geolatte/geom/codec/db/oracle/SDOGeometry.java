@@ -21,8 +21,6 @@
 
 package org.geolatte.geom.codec.db.oracle;
 
-import org.locationtech.jts.util.CoordinateArrayFilter;
-
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.SQLException;
@@ -186,9 +184,9 @@ public class SDOGeometry {
         if (getGType().getTypeGeometry() == TypeGeometry.COLLECTION) {
             final List<SDOGeometry> elements = new ArrayList<SDOGeometry>();
             int i = 0;
-            InterpretedElemInfo[] elemInfos = this.info.interpret();
+            ElemInfoTriplet[] elemInfos = this.info.interpret();
             while (i < this.getNumElements()) {
-                InterpretedElemInfo elemInfo = elemInfos[i];
+                ElemInfoTriplet elemInfo = elemInfos[i];
                 ElementType et = elemInfo.getElementType();
                 int next = findNextGeometryElemInfo(i, elemInfos, elemInfo, et);
 
@@ -211,7 +209,7 @@ public class SDOGeometry {
         }
     }
 
-    private Ordinates buildOrdinates(InterpretedElemInfo[] elemInfos, int start, int next) {
+    private Ordinates buildOrdinates(ElemInfoTriplet[] elemInfos, int start, int next) {
         Double[] ordinateArray = this.ordinates.getOrdinateArray();
         int length;
         int srcPos = elemInfos[start].getStartingOffset();
@@ -227,17 +225,17 @@ public class SDOGeometry {
 
 
     //start is the next Geometry in the collection
-    private ElemInfo buildElemInfo(InterpretedElemInfo[] elemInfos, int start, int next) {
+    private ElemInfo buildElemInfo(ElemInfoTriplet[] elemInfos, int start, int next) {
         List<BigDecimal> out = new ArrayList<>(3*(next - start));
         int startingOffset = elemInfos[start].getStartingOffset();
         for (int idx = start; idx < next; idx++) {
-            InterpretedElemInfo adjusted = elemInfos[idx].shiftStartingOffset(-startingOffset + 1);
+            ElemInfoTriplet adjusted = elemInfos[idx].shiftStartingOffset(-startingOffset + 1);
             adjusted.addTo(out);
         }
         return new ElemInfo(out.toArray(new BigDecimal[0]));
     }
 
-    private int findNextGeometryElemInfo(int i, InterpretedElemInfo[] elemInfos, InterpretedElemInfo elemInfo, ElementType et) {
+    private int findNextGeometryElemInfo(int i, ElemInfoTriplet[] elemInfos, ElemInfoTriplet elemInfo, ElementType et) {
         int next = i + 1;
         // if the element is an exterior ring, or a compound
         // element, then this geometry spans multiple elements.
@@ -251,7 +249,7 @@ public class SDOGeometry {
                 next++;
             }
         } else if (elemInfo.isCompound()) {
-            next = i + ((CompoundIElemInfo)elemInfo).numParts() + 1;
+            next = i + ((CompoundIElemInfoTriplet)elemInfo).numParts() + 1;
         }
         return next;
     }

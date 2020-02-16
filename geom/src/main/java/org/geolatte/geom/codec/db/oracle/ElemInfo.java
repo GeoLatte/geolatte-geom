@@ -59,12 +59,12 @@ class ElemInfo {
 		return this.triplets;
 	}
 
-	public InterpretedElemInfo[] interpret() {
-		InterpretedElemInfo[] result = new InterpretedElemInfo[getSize()];
+	public ElemInfoTriplet[] interpret() {
+		ElemInfoTriplet[] result = new ElemInfoTriplet[getSize()];
 		for(int idx = 0; idx < getSize(); idx++){
 			BigDecimal[] triplet = new BigDecimal[3];
 			System.arraycopy(this.triplets, 3 * idx, triplet, 0, 3);
-			result[idx] = InterpretedElemInfo.parse(triplet);
+			result[idx] = ElemInfoTriplet.parse(triplet);
 		}
 		return result;
 	}

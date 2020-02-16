@@ -17,7 +17,7 @@ public class SDOElemInfoTest {
     public void testSimpleElements(){
         BigDecimal[] raw = bd(1, 1, 1);
         ElemInfo info = new ElemInfo(raw);
-        InterpretedElemInfo[] iinfo = info.interpret();
+        ElemInfoTriplet[] iinfo = info.interpret();
         assertEquals(1, iinfo.length);
         assertEquals(1, iinfo[0].getStartingOffset());
         assertTrue(iinfo[0].isSimple());
@@ -26,7 +26,7 @@ public class SDOElemInfoTest {
     @Test
     public void testGeometryCollectionInfo(){
         ElemInfo info = new ElemInfo(bd(1, 1, 1, 3, 2, 1, 7, 1003, 1));
-        InterpretedElemInfo[] iinfo = info.interpret();
+        ElemInfoTriplet[] iinfo = info.interpret();
         assertEquals(3, iinfo.length);
         assertEquals(1, iinfo[0].getStartingOffset());
         assertTrue(iinfo[0].isSimple());
@@ -47,7 +47,7 @@ public class SDOElemInfoTest {
     public void testPolygonInfo(){
 
         ElemInfo info = new ElemInfo(bd(1,1003,1,11,2003,1));
-        InterpretedElemInfo[] iinfo = info.interpret();
+        ElemInfoTriplet[] iinfo = info.interpret();
         assertEquals(2, iinfo.length);
         assertEquals(1, iinfo[0].getStartingOffset());
         assertTrue(iinfo[0].isSimple());

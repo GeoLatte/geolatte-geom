@@ -8,26 +8,26 @@ import java.util.List;
  *
  * Created by Karel Maesen, Geovise BVBA on 15/02/2020.
  */
-abstract class InterpretedElemInfo {
+abstract class ElemInfoTriplet {
 
     private final int startingOffset;
     private final ElementType elementType;
 
-    static InterpretedElemInfo parse(BigDecimal[] triplet) {
+    static ElemInfoTriplet parse(BigDecimal[] triplet) {
         int sOffset = triplet[0].intValue();
         int etype = triplet[1].intValue();
         int interp = triplet[2].intValue();
         ElementType et = ElementType.parseType(etype, interp);
         if(et.isCompound()) {
-            return new CompoundIElemInfo(sOffset, et);
+            return new CompoundIElemInfoTriplet(sOffset, et);
         } else {
-            return new SimpleIElemInfo(sOffset, et);
+            return new SimpleIElemInfoTriplet(sOffset, et);
         }
     }
 
 
 
-    InterpretedElemInfo(int sOffset, ElementType et) {
+    ElemInfoTriplet(int sOffset, ElementType et) {
         startingOffset = sOffset;
         elementType = et;
     }
@@ -48,7 +48,7 @@ abstract class InterpretedElemInfo {
         return elementType;
     }
 
-    abstract InterpretedElemInfo shiftStartingOffset(int offset);
+    abstract ElemInfoTriplet shiftStartingOffset(int offset);
 
     void addTo(List<BigDecimal> list) {
         list.add(BigDecimal.valueOf(startingOffset));
@@ -58,9 +58,9 @@ abstract class InterpretedElemInfo {
 
 }
 
-class SimpleIElemInfo extends InterpretedElemInfo {
+class SimpleIElemInfoTriplet extends ElemInfoTriplet {
 
-    SimpleIElemInfo(int sOffset, ElementType et) {
+    SimpleIElemInfoTriplet(int sOffset, ElementType et) {
         super(sOffset, et);
     }
 
@@ -74,15 +74,15 @@ class SimpleIElemInfo extends InterpretedElemInfo {
         return false;
     }
 
-    InterpretedElemInfo shiftStartingOffset(int offset) {
-        return new SimpleIElemInfo(this.getStartingOffset() + offset, this.getElementType());
+    ElemInfoTriplet shiftStartingOffset(int offset) {
+        return new SimpleIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
     }
 }
 
 
-class CompoundIElemInfo extends InterpretedElemInfo {
+class CompoundIElemInfoTriplet extends ElemInfoTriplet {
 
-    CompoundIElemInfo(int sOffset, ElementType et) {
+    CompoundIElemInfoTriplet(int sOffset, ElementType et) {
         super(sOffset, et);
     }
 
@@ -100,7 +100,7 @@ class CompoundIElemInfo extends InterpretedElemInfo {
         return getElementType().getInterpretation();
     }
 
-    InterpretedElemInfo shiftStartingOffset(int offset) {
-        return new CompoundIElemInfo(this.getStartingOffset() + offset, this.getElementType());
+    ElemInfoTriplet shiftStartingOffset(int offset) {
+        return new CompoundIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
     }
 }
