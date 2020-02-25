@@ -31,10 +31,12 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
     private final CoordinateReferenceSystem<?> defaultCRS;
     private final Settings settings;
+    private final CrsDeserializer crsDeser;
 
     public GeometryDeserializer(CoordinateReferenceSystem<?> defaultCRS, Settings settings) {
         this.defaultCRS = defaultCRS;
         this.settings = settings;
+        this.crsDeser = new CrsDeserializer(this.defaultCRS, settings);
     }
 
 
@@ -96,15 +98,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
     protected CrsId getCrsId(JsonNode root) throws GeoJsonProcessingException {
         JsonNode crs = root.get("crs");
-        if (crs == null) return CrsId.UNDEFINED;
-
-        String type = crs.get("type").asText();
-        if (!type.equalsIgnoreCase("name")) {
-            throw new GeoJsonProcessingException("Can parse only named crs elements");
-        }
-
-        String text = crs.get("properties").get("name").asText();
-        return CrsId.parse(text);
+        return crsDeser.getCrsId(crs);
     }
 }
 
