@@ -193,4 +193,16 @@ abstract public class CoordinateSystem<P extends Position> {
      */
     public abstract CoordinateSystem<?> extend(CoordinateSystemAxis axis);
 
+    /**
+     * Does the coordinate system have a Vertical or Z axis?
+     * @return
+     */
+    public abstract boolean hasZ();
+
+    /**
+     * does the system have a Measure axis?
+     * @return
+     */
+    public abstract boolean hasM();
+
 }

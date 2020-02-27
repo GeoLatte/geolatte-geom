@@ -49,11 +49,19 @@ public class CrsDeserializer extends JsonDeserializer<CoordinateReferenceSystem>
         if (crs == null) return CrsId.UNDEFINED;
 
         String type = crs.get("type").asText();
-        if (!type.equalsIgnoreCase("name")) {
-            throw new GeoJsonProcessingException("Can parse only named crs elements");
+
+        if (type.equalsIgnoreCase("name")) {
+            String text = crs.get("properties").get("name").asText();
+            return CrsId.parse(text);
         }
 
-        String text = crs.get("properties").get("name").asText();
-        return CrsId.parse(text);
+        if (type.equalsIgnoreCase("link")) {
+            String text = crs.get("properties").get("href").asText();
+            String[] components = text.split("/");
+            int last = components.length - 1;
+            return CrsId.valueOf(components[last-1], Integer.decode(components[last]));
+        }
+
+        throw new GeoJsonProcessingException("Can parse only named crs elements");
     }
 }

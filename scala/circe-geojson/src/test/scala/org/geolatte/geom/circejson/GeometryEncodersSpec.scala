@@ -54,11 +54,7 @@ class GeometryEncodersSpec extends org.specs2.mutable.Specification {
       generator: Generator[_ <: Geometry[P]]): MatchResult[Any] = {
     val geom: Geometry[P] = generator.generate()
     val expected          = geom.asJsonString
-    val received          = geom.asJson.pretty(Printer(true, true, "  "))
-
-//    println(s"expected = $expected")
-//    println(s"received = $received")
-
+    val received          = geom.asJson.pretty(Printer(true, "  "))
     expected must_== received
   }
 }

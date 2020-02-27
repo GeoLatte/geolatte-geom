@@ -31,10 +31,12 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
     private final CoordinateReferenceSystem<?> defaultCRS;
     private final Settings settings;
+    private final CrsDeserializer crsDeser;
 
     public GeometryDeserializer(CoordinateReferenceSystem<?> defaultCRS, Settings settings) {
         this.defaultCRS = defaultCRS;
         this.settings = settings;
+        this.crsDeser = new CrsDeserializer(this.defaultCRS, settings);
     }
 
 
@@ -87,22 +89,16 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
     private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
-        return id.equals(CrsId.UNDEFINED) || settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ?
+        return id.equals(CrsId.UNDEFINED) ||
+                settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ||
+                settings.isSet(Setting.IGNORE_CRS) ?
                 this.defaultCRS :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
     }
 
     protected CrsId getCrsId(JsonNode root) throws GeoJsonProcessingException {
         JsonNode crs = root.get("crs");
-        if (crs == null) return CrsId.UNDEFINED;
-
-        String type = crs.get("type").asText();
-        if (!type.equalsIgnoreCase("name")) {
-            throw new GeoJsonProcessingException("Can parse only named crs elements");
-        }
-
-        String text = crs.get("properties").get("name").asText();
-        return CrsId.parse(text);
+        return crsDeser.getCrsId(crs);
     }
 }
 

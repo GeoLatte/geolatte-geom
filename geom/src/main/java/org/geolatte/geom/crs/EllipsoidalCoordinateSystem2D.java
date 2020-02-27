@@ -53,4 +53,14 @@ public class EllipsoidalCoordinateSystem2D extends CoordinateSystem<G2D> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return false;
+    }
+
 }

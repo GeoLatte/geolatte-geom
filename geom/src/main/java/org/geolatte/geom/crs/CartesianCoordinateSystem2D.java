@@ -65,4 +65,14 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
         }
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return false;
+    }
 }

@@ -80,7 +80,6 @@ public class GeneratorsTest {
         Generator<Integer> ints = new ValueGeneratorFactory().integerGenerator(5, 20);
         for(int i = 0; i < 100; i++){
             Integer g = ints.generate();
-            System.out.println(g);
             assert (g <= 20 && g >= 5);
         }
     }
@@ -92,7 +91,6 @@ public class GeneratorsTest {
         Generator<Instant> instants = new ValueGeneratorFactory().instantGenerator(start.toInstant(ZoneOffset.UTC), end.toInstant(ZoneOffset.UTC));
         for(int i = 0; i < 100; i++){
             LocalDateTime dt = LocalDateTime.ofInstant(instants.generate(), ZoneOffset.UTC);
-            System.out.println(dt);
             assert ( dt.isAfter(start) && dt.isBefore(end) );
         }
     }
@@ -105,9 +103,7 @@ public class GeneratorsTest {
                 generator.stringGenerator(3,5),
                 Choice.of(generators)
         );
-        for(int i = 0; i < 100; i++){
-            Map<String, Object> map = props.generate();
-            assert ( map.keySet().size() == 5 );
-        }
+        Map<String, Object> map = props.generate();
+        assert (map.keySet().size() == 5);
     }
 }

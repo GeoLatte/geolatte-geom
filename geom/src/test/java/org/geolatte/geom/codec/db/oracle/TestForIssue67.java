@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/08/2018.
  */
-@Ignore
 public class TestForIssue67 {
 
     private Connection conn;
@@ -30,32 +29,18 @@ public class TestForIssue67 {
     @Before
     public void before() throws SQLException {
         System.setProperty("GEOLATTE_USE_SDO_POINT_TYPE", "true");
-        String url = "jdbc:oracle:thin:@localhost:1521/orcl12c";
-        Properties props = new Properties();
-        props.put("user", "C##hibernate");
-        props.put("password", "hibernate");
-        conn = DriverManager.getConnection (url, props);
     }
 
     @After
     public void after() throws SQLException {
-        conn.close();
         System.setProperty("GEOLATTE_USE_SDO_POINT_TYPE", "false");
     }
 
     @Test
     public void testArrayStoreExceptionOn() throws SQLException {
-
-        final ConnectionFinder finder = new DefaultConnectionFinder();
-
-
         Geometry<G2D> geom = point(WGS84, g(4.96 , 53.56));
         SDOGeometry sdoGeometry = Encoders.encode(geom);
-
-        Struct struct = new OracleJDBCTypeFactory(finder).createStruct(sdoGeometry, conn);
-        Geometry decoded = Decoders.decode(struct);
-
-        assertEquals(geom, decoded);
+        SDOGeometry expected = new SDOGeometry(SDOGType.parse(2001), 4326, new SDOPoint(4.96, 53.56), null ,null);
 
     }
 }

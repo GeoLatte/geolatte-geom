@@ -40,4 +40,11 @@ public class CrsSupportTest extends GeoJsonTest {
         CoordinateReferenceSystem<?> lambert72expected = lambert72;
         assertEquals(lambert72expected, lambert72rec);
     }
+
+    @Test
+    public void testDeserializeCrsLinkType() throws IOException {
+        CoordinateReferenceSystem<?> received = mapper.readValue(crswgs84WithLink, CoordinateReferenceSystem.class);
+        assertEquals(WGS84, received);
+    }
+
 }
