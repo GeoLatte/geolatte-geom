@@ -115,7 +115,7 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
         if(coordinates.length < dim) {
             throw new IllegalArgumentException("Position argument must be an array of size at least " + dim);
         }
-        for(int i = 0; i < getCoordinateDimension(); i++) {
+        for(int i = 0; i < dim; i++) {
             coordinates[i] = this.coordinates[position * dim + i];
         }
     }
