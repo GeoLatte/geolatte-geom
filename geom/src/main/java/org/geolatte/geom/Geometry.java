@@ -188,9 +188,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
         if (index >= getPositions().size()) {
             throw new IndexOutOfBoundsException();
         }
-        double[] coords = new double[getCoordinateDimension()];
-        getPositions().getCoordinates(index, coords);
-        return Positions.mkPosition(getCoordinateReferenceSystem(), coords);
+        return getPositions().getPositionN(index);
     }
 
     /**
