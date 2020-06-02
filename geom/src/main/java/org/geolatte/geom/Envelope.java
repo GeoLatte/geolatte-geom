@@ -5,12 +5,10 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import static java.lang.String.format;
 
 /**
- * An envelope or bounding box implementation.
+ * An 2D envelope or bounding box implementation.
  *
- * <p>An <code>Envelope</code> is characterised by a lower-left and an upper-right coordinate.</p>
- * <p>An <code>Envelope</code> is empty if the set of enclosed points is empty. </p>
- *
- * <p>An empty Envelope has Double.NaN for its lowerleft/upperright coordinates.</p>
+ * <p>An <code>Envelope</code> determines a 2D area characterised by a lower-left and an upper-right coordinate.</p>
+ * <p>An <code>Envelope</code> is empty if the set of enclosed points are empty, and has Double.NaN for its lowerleft/upperright coordinates.</p>
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */

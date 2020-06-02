@@ -37,7 +37,7 @@ abstract public class Position{
     protected Position(double... coords) {
         if (coords.length == 0) {
             this.coords = new double[0];
-            //Arrays.fill(this.coords, Double.NaN);
+            Arrays.fill(this.coords, Double.NaN);
         } else {
             if(coords.length == getCoordinateDimension()) {
                 this.coords = coords;
