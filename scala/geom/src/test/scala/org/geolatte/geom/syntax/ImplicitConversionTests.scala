@@ -1,12 +1,11 @@
 package org.geolatte.geom.syntax
 
-import org.geolatte.geom.{Geometry, Position}
 import org.geolatte.geom.crs.CoordinateReferenceSystems._
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, Unit}
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class ImplicitConversionTests extends FlatSpec {
+class ImplicitConversionTests extends AnyFlatSpec with Matchers {
 
   import org.geolatte.geom
   import org.geolatte.geom._
@@ -127,15 +126,15 @@ class ImplicitConversionTests extends FlatSpec {
 
     l shouldBe a[Geometry[_]]
 
-    assert(l.getPositions.getPositionN(0).getLon == 2.0 && l.getPositionN(0).getLat() == 3.0)
+    assert(l.getPositions.getPositionN(0).getLon == 2.0 && l.getPositionN(0).getLat == 3.0)
 
   }
 
   "A 3D geodetic geometry collection" should "be assigned to a 2D geome" in {
-    implicit val crs = WGS84.addVertical()
-    val pz           = point((1.2, 2.0, 3.0))
-    val ls           = lineString((2.0, 3.0, 100.0), (3.0, 5.0, 102.0))
-    val gc           = geometrycollection(pz, ls)
+    implicit val crs: CoordinateReferenceSystem[G3D] = WGS84.addVertical()
+    val pz                                           = point((1.2, 2.0, 3.0))
+    val ls                                           = lineString((2.0, 3.0, 100.0), (3.0, 5.0, 102.0))
+    val gc                                           = geometrycollection(pz, ls)
 
     val g: GeometryCollection[G2D] = gc
 

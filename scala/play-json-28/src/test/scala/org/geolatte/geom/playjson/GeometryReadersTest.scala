@@ -1,18 +1,16 @@
 package org.geolatte.geom.playjson
 
-import org.scalatest.FlatSpec
 import org.geolatte.geom._
-import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, CrsId, LinearUnit}
-import play.api.libs.json.{JsError, JsSuccess, Json}
-import CoordinateReferenceSystems.WGS84
+import org.geolatte.geom.crs.CoordinateReferenceSystems
+import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
+import org.scalatest.flatspec.AnyFlatSpec
+import play.api.libs.json.{JsError, Json}
 
-class GeometryReaderCRS extends FlatSpec {
+class GeometryReaderCRS extends AnyFlatSpec {
 
-  import org.geolatte.geom.syntax.GeometryImplicits._
   import GeometryJsonFormats._
   import org.geolatte.geom.crs._
-
-
+  import org.geolatte.geom.syntax.GeometryImplicits._
 
   "Crs objects" should "be parsed to CrsId" in {
     val json = Json.parse(JsonFragments.crsObject)
@@ -37,42 +35,34 @@ class GeometryReaderCRS extends FlatSpec {
     assertResult(crs)(WGS84)
   }
 
-
-
   "Invalid Crs objects" should " fail when parsed " in {
     val json = Json.parse(JsonFragments.invalidCrsObject)
 
     val crs = json.validate[CrsId]
-    assert( crs.isInstanceOf[JsError])
+    assert(crs.isInstanceOf[JsError])
   }
 
   "Crs objects of non-existent CRS" should " fail when read as CoordinateReferenceSystem" in {
     val json = Json.parse(JsonFragments.nonExistentCrsObject)
 
     val crs = json.validate[CoordinateReferenceSystem[_]]
-    assert( crs.isInstanceOf[JsError])
+    assert(crs.isInstanceOf[JsError])
   }
 
   "Given a CRs, a GeometryReader" should "deserialize a Json Geometry " in {
 
-
-
-    val json = Json.parse(JsonFragments.jsonPoint)
-    val WGS84Z = WGS84.addVertical()
+    val json               = Json.parse(JsonFragments.jsonPoint)
+    val WGS84Z             = WGS84.addVertical()
     implicit val geomReads = mkGeometryReads[Position](WGS84)
-    val pnt = json.as[Geometry[Position]]
+    val pnt                = json.as[Geometry[Position]]
 
     val expected = point(WGS84Z)(1.0, 2.0, 3.0)
 
-    assertResult( expected )(pnt)
+    assertResult(expected)(pnt)
 
   }
 
-
-
 }
-
-
 
 object JsonFragments {
 
@@ -114,7 +104,5 @@ object JsonFragments {
        |    }
        |
      """.stripMargin
-
-
 
 }
