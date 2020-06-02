@@ -37,7 +37,7 @@
     </organization>
 
     <properties>
-        <revision>1.5.1</revision>
+        <revision>1.6.0-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -61,33 +61,6 @@
             <id>maesenka</id>
             <name>Karel Maesen</name>
             <email>karel@geovise.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>bertvh</id>
-            <name>Bert Vanhooff</name>
-            <email>bert.vanhooff@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>yvesv</id>
-            <name>Yves Vandewoude</name>
-            <email>yves.vandewoude@qmino.com</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Committer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>rigolepe</id>
-            <name>Peter Rigole</name>
-            <email>peter.rigole@qmino.com</email>
             <roles>
                 <role>Contributor</role>
                 <role>Committer</role>
