@@ -38,7 +38,20 @@ public class BoxTest {
         assertEquals(expected, box2.union(box1));
         Box<C2DM> unioned = box1.union(box2);
         assert (unioned.contains(box1) && unioned.contains(box2));
-
     }
+
+    @Test
+    public void checkIntersection(){
+        Box<C2DM> box1 = new Box(new C2DM(1.0, 1.0, 1.0), new C2DM(10.0, 10.0, 10.0), PRM);
+        Box<C2DM> box2 = new Box(new C2DM(0.0, 5.0, 0.0), new C2DM(5.0, 20, 9.0), PRM);
+        Box<C2DM> expected = new Box(new C2DM(1.0, 5.0, 1.0), new C2DM(5.0, 10, 9.0), PRM);
+
+        assertEquals(expected, box1.intersect(box2));
+        assertEquals(expected, box2.intersect(box1));
+        Box<C2DM> intersection = box1.intersect(box2);
+        assert (box1.contains(intersection) && box2.contains(intersection));
+    }
+
+
 
 }
