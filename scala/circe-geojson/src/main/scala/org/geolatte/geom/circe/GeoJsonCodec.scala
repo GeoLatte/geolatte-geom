@@ -1,18 +1,13 @@
 package org.geolatte.geom.circe
 
-import org.geolatte.geom._
-import org.geolatte.geom.syntax._
-import GeometryImplicits._
 import io.circe._
 import io.circe.syntax._
+import org.geolatte.geom.{PositionSequence, _}
 import org.geolatte.geom.crs.CrsId
-import org.geolatte.geom.{GeometryType, PositionSequence}
-
-import scala.util.{Failure, Success, Try}
 
 object GeoJsonCodec {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   implicit def encodePosition[P <: Position]: Encoder[P] = new Encoder[P] {
     override def apply(a: P): Json = {
@@ -32,8 +27,10 @@ object GeoJsonCodec {
 
   implicit val encodeCrs: Encoder[CrsId] = new Encoder[CrsId] {
     override def apply(crs: CrsId): Json =
-      Json.obj("type"       -> Json.fromString("name"),
-               "properties" -> Json.obj("name" -> Json.fromString(crs.toString)))
+      Json.obj(
+        "type"       -> Json.fromString("name"),
+        "properties" -> Json.obj("name" -> Json.fromString(crs.toString))
+      )
   }
 
   //TODO -- is there a better way to do this?
@@ -102,7 +99,8 @@ object GeoJsonCodec {
           "coordinates" -> Json.arr(
             geom
               .components()
-              .map(encodePolygonCoordinates): _*)
+              .map(encodePolygonCoordinates): _*
+          )
         )
     }
 
