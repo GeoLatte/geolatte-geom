@@ -1,6 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Box;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.Positions;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -12,15 +12,15 @@ import java.util.Random;
  */
 public class PositionGenerator<P extends Position> implements Generator<P> {
 
-    private final Envelope<P> bbox;
+    private final Box<P> bbox;
     private final Random rnd;
 
-    PositionGenerator(Envelope<P> bbox, Random rnd) {
+    PositionGenerator(Box<P> bbox, Random rnd) {
         this.bbox = bbox;
         this.rnd = rnd;
     }
 
-    public static <P extends Position> P positionWithin(Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> P positionWithin(Box<P> bbox, Random rnd) {
         P ll = bbox.lowerLeft();
         P ur = bbox.upperRight();
 
@@ -33,7 +33,7 @@ public class PositionGenerator<P extends Position> implements Generator<P> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <P extends Position> P[] nPositionsWithin(int size, Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> P[] nPositionsWithin(int size, Box<P> bbox, Random rnd) {
         P[] ret = (P[]) new Position[size];
         for (int i = 0; i < size; i++) {
             ret[i] = positionWithin(bbox, rnd);
@@ -41,7 +41,7 @@ public class PositionGenerator<P extends Position> implements Generator<P> {
         return ret;
     }
 
-    public static <P extends Position> P[] nPositionsWithinAndClosed(int size, Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> P[] nPositionsWithinAndClosed(int size, Box<P> bbox, Random rnd) {
         P[] ps = nPositionsWithin(size, bbox, rnd);
         ps[ps.length - 1] = ps[0];
         return ps;

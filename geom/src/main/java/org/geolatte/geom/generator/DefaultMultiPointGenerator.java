@@ -1,6 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Box;
 import org.geolatte.geom.MultiPoint;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Position;
@@ -18,7 +18,7 @@ class DefaultMultiPointGenerator<P extends Position>  extends AbstractGeometryGe
 
     final private Generator<Point<P>> pntGen;
     final private int numPnts;
-    DefaultMultiPointGenerator(int numPnts, Envelope<P> bbox, Random rnd) {
+    DefaultMultiPointGenerator(int numPnts, Box<P> bbox, Random rnd) {
         super(bbox, rnd);
         this.numPnts = numPnts;
         pntGen = new DefaultPointGenerator<>(bbox, rnd);

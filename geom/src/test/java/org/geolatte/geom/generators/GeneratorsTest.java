@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
+import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,50 +21,50 @@ import static org.junit.Assert.assertTrue;
  */
 public class GeneratorsTest {
 
-    private Envelope<G2D> env = new Envelope<>(10, 10, 80, 80, WGS84);
+    private Box<G2D> box = new Box<>(g(10, 10), g(80, 80), WGS84);
 
     @Test
     public void testPointGenerator(){
-        Generator<Point<G2D>> gen = GeometryGenerators.point(env);
+        Generator<Point<G2D>> gen = GeometryGenerators.point(box);
         Point<G2D> pnt = gen.generate();
-        assertTrue(pnt.getEnvelope().within(env));
+        assertTrue(box.contains(pnt.getPosition()));
     }
 
     @Test
     public void testLineStringGenerator() {
-        Generator<LineString<G2D>> generator = GeometryGenerators.lineString(3, env);
+        Generator<LineString<G2D>> generator = GeometryGenerators.lineString(3, box);
         LineString<G2D> ls = generator.generate();
         assertEquals(3, ls.getNumPositions());
-        assertTrue(ls.getEnvelope().within(env));
+        assertTrue(ls.getBoundingBox().within(box));
 
     }
 
     @Test
     public void testPolygonGenerator() {
-        Generator<Polygon<G2D>> generator = GeometryGenerators.polygon(24, env);
-        Polygon<G2D> ls = generator.generate();
-        assertEquals(24, ls.getNumPositions());
-        assertTrue(ls.getEnvelope().within(env));
+        Generator<Polygon<G2D>> generator = GeometryGenerators.polygon(24, box);
+        Polygon<G2D> polygon = generator.generate();
+        assertEquals(24, polygon.getNumPositions());
+        assertTrue(polygon.getBoundingBox().within(box));
     }
 
     @Test
     public void testMultiPointGenerator() {
-        Generator<MultiPoint<G2D>> generator = GeometryGenerators.multiPoint(24, env);
-        MultiPoint<G2D> ls = generator.generate();
-        assertEquals(24, ls.getNumPositions());
-        assertTrue(ls.getEnvelope().within(env));
+        Generator<MultiPoint<G2D>> generator = GeometryGenerators.multiPoint(24, box);
+        MultiPoint<G2D> mp = generator.generate();
+        assertEquals(24, mp.getNumPositions());
+        assertTrue(mp.getBoundingBox().within(box));
     }
 
     @Test
     public void testGeometryCollectionGenerator() {
         Generator<GeometryCollection<G2D>> generator = GeometryGenerators.geometryCollection (
                 3,
-                GeometryGenerators.lineString(3, env),
-                GeometryGenerators.point(env)
+                GeometryGenerators.lineString(3, box),
+                GeometryGenerators.point(box)
         );
         GeometryCollection<G2D> gc = generator.generate();
         assertEquals(3, gc.getNumGeometries());
-        assertTrue(gc.getEnvelope().within(env));
+        assertTrue(gc.getBoundingBox().within(box));
     }
 
     @Test

@@ -13,10 +13,10 @@ class DefaultMultiLineStringGenerator<P extends Position> extends AbstractGeomet
     private final int numLineString;
     private final DefaultLineStringGenerator<P> lineStrGen;
 
-    DefaultMultiLineStringGenerator(int numLineString, int numPoints, Envelope<P> bbox, Random rnd) {
+    DefaultMultiLineStringGenerator(int numLineString, int numPoints, Box<P> bbox, Random rnd) {
         super(bbox, rnd);
         this.numLineString = numLineString;
-        this.lineStrGen = new DefaultLineStringGenerator<>(numPoints, false, bbox, rnd);
+        this.lineStrGen = new DefaultLineStringGenerator<>(numPoints, bbox, rnd);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Box;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.builder.DSL;
@@ -15,7 +15,7 @@ import static org.geolatte.geom.generator.PositionGenerator.positionWithin;
  */
 class DefaultPointGenerator<P extends Position> extends AbstractGeometryGenerator<P, Point<P>>  {
 
-    DefaultPointGenerator(Envelope<P> bbox, Random rnd) {
+    DefaultPointGenerator(Box<P> bbox, Random rnd) {
         super(bbox, rnd);
     }
 
