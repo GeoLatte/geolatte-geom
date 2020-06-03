@@ -3,7 +3,7 @@ package org.geolatte.geom.circejson
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.geolatte.geom._
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
-import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems}
+import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, LinearUnit}
 import org.geolatte.geom.generator.GeometryGenerators
 import org.geolatte.geom.json.GeolatteGeomModule
 import org.geolatte.geom.syntax.{GeometryImplicits, PositionBuilder}
@@ -20,7 +20,7 @@ object GeoJsonGen {
   }
 
   implicit class JsonStringable[P <: Position](geom: Geometry[P]) {
-    def asJsonString: String = mapper.writeValueAsString(geom)
+    def asFasterXMLJsonString: String = mapper.writeValueAsString(geom)
   }
 
   /**
@@ -31,13 +31,13 @@ object GeoJsonGen {
       val pb: PositionBuilder[T, P]
   ) {
 
-    private val box   = envelope(crs)(lowerLeft, upperRight)
-    val pointGen      = GeometryGenerators.point(box)
-    val lineGen       = GeometryGenerators.lineString(5, box)
-    val polyGen       = GeometryGenerators.polygon(6, box)
-    val multiPointGen = GeometryGenerators.multiPoint(4, box)
-    val multiLineGen  = GeometryGenerators.multiLineString(4, 5, box)
-    val multiPolyGen  = GeometryGenerators.multiPolygon(4, 6, box)
+    private val bbox   = box(crs)(lowerLeft, upperRight)
+    val pointGen      = GeometryGenerators.point(bbox)
+    val lineGen       = GeometryGenerators.lineString(5, bbox)
+    val polyGen       = GeometryGenerators.polygon(6, bbox)
+    val multiPointGen = GeometryGenerators.multiPoint(4, bbox)
+    val multiLineGen  = GeometryGenerators.multiLineString(4, 5, bbox)
+    val multiPolyGen  = GeometryGenerators.multiPolygon(4, 6, bbox)
     val geometryCollectionGen = GeometryGenerators.geometryCollection(
       4,
       pointGen,
@@ -49,111 +49,109 @@ object GeoJsonGen {
     )
   }
 
-  implicit val crs2DGen: Gen[CoordinateReferenceSystem[C2DM]] =
-    Gen.const(CoordinateReferenceSystems.PROJECTED_2DM_METER)
+  implicit val crs2DGen: Gen[CoordinateReferenceSystem[G2D]] =
+    Gen.const(CoordinateReferenceSystems.WGS84)
 
-  implicit val crs3DGen: Gen[CoordinateReferenceSystem[C3DM]] =
-    Gen.const(CoordinateReferenceSystems.PROJECTED_3DM_METER)
+  implicit val crs3DGen: Gen[CoordinateReferenceSystem[G3D]] =
+    Gen.const(CoordinateReferenceSystems.WGS84.addVertical() )
 
   implicit def generator2DSetGen[P <: Position](
       implicit crs: CoordinateReferenceSystem[P],
-      pb: PositionBuilder[(Double, Double, Double), P]
-  ): Gen[GeneratorSet[(Double, Double, Double), P]] = {
+      pb: PositionBuilder[(Double, Double), P]
+  ): Gen[GeneratorSet[(Double, Double), P]] = {
     for {
-      lowerLeft  <- Gen.choose(0d, 20d)
-      upperRight <- Gen.choose(190d, 210d)
-      metered    <- Gen.choose(0d, 1d)
-    } yield GeneratorSet((lowerLeft, lowerLeft, metered), (upperRight, upperRight, metered))
+      lowerLeft  <- Gen.choose(0d, 40d)
+      upperRight <- Gen.choose(50d, 80d)
+    } yield GeneratorSet((lowerLeft, lowerLeft), (upperRight, upperRight))
   }
 
   implicit def generator3DSetGen[P <: Position](
       implicit crs: CoordinateReferenceSystem[P],
-      pb: PositionBuilder[(Double, Double, Double, Double), P]
-  ): Gen[GeneratorSet[(Double, Double, Double, Double), P]] = {
+      pb: PositionBuilder[(Double, Double, Double), P]
+  ): Gen[GeneratorSet[(Double, Double, Double), P]] = {
     for {
-      lowerLeft  <- Gen.choose(0d, 20d)
-      upperRight <- Gen.choose(190d, 210d)
-      metered    <- Gen.choose(0d, 1d)
+      lowerLeft  <- Gen.choose(0d, 40d)
+      upperRight <- Gen.choose(50d, 80d)
     } yield
       GeneratorSet(
-        (lowerLeft, lowerLeft, lowerLeft, metered),
-        (upperRight, upperRight, upperRight, metered)
+        (lowerLeft, lowerLeft, lowerLeft),
+        (upperRight, upperRight, upperRight)
       )
   }
 
-  implicit val point2DGen: Gen[Point[C2DM]] = for {
+  implicit val point2DGen: Gen[Point[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     point        <- Gen.lzy(generatorSet.pointGen.generate())
   } yield point
 
-  implicit val point3DGen: Gen[Point[C3DM]] = for {
+  implicit val point3DGen: Gen[Point[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     point        <- Gen.lzy(generatorSet.pointGen.generate())
   } yield point
 
-  implicit val line2DGen: Gen[LineString[C2DM]] = for {
+  implicit val line2DGen: Gen[LineString[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     line         <- Gen.lzy(generatorSet.lineGen.generate())
   } yield line
 
-  implicit val line3DGen: Gen[LineString[C3DM]] = for {
+  implicit val line3DGen: Gen[LineString[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     line         <- Gen.lzy(generatorSet.lineGen.generate())
   } yield line
 
-  implicit val polygon2DGen: Gen[Polygon[C2DM]] = for {
+  implicit val polygon2DGen: Gen[Polygon[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     polygon      <- Gen.lzy(generatorSet.polyGen.generate())
   } yield polygon
 
-  implicit val polygon3DGen: Gen[Polygon[C3DM]] = for {
+  implicit val polygon3DGen: Gen[Polygon[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     polygon      <- Gen.lzy(generatorSet.polyGen.generate())
   } yield polygon
 
-  implicit val multiPoint2DGen: Gen[MultiPoint[C2DM]] = for {
+  implicit val multiPoint2DGen: Gen[MultiPoint[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     multiPoint   <- Gen.lzy(generatorSet.multiPointGen.generate())
   } yield multiPoint
 
-  implicit val multiPoint3DGen: Gen[MultiPoint[C3DM]] = for {
+  implicit val multiPoint3DGen: Gen[MultiPoint[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     multiPoint   <- Gen.lzy(generatorSet.multiPointGen.generate())
   } yield multiPoint
 
-  implicit val multiLine2DGen: Gen[MultiLineString[C2DM]] = for {
+  implicit val multiLine2DGen: Gen[MultiLineString[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     multiLine    <- Gen.lzy(generatorSet.multiLineGen.generate())
   } yield multiLine
 
-  implicit val multiLine3DGen: Gen[MultiLineString[C3DM]] = for {
+  implicit val multiLine3DGen: Gen[MultiLineString[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     multiLine    <- Gen.lzy(generatorSet.multiLineGen.generate())
   } yield multiLine
 
-  implicit val multiPolygon2DGen: Gen[MultiPolygon[C2DM]] = for {
+  implicit val multiPolygon2DGen: Gen[MultiPolygon[G2D]] = for {
     crs          <- crs2DGen
-    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToC2DM)
+    generatorSet <- generator2DSetGen(crs, GeometryImplicits.tupleToG2D)
     multiPolygon <- Gen.lzy(generatorSet.multiPolyGen.generate())
   } yield multiPolygon
 
-  implicit val multiPolygon3DGen: Gen[MultiPolygon[C3DM]] = for {
+  implicit val multiPolygon3DGen: Gen[MultiPolygon[G3D]] = for {
     crs          <- crs3DGen
-    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToC3DM)
+    generatorSet <- generator3DSetGen(crs, GeometryImplicits.tupleToG3D)
     multiPolygon <- Gen.lzy(generatorSet.multiPolyGen.generate())
   } yield multiPolygon
 
-  implicit val geometry2DGen: Gen[Geometry[C2DM]] = Gen.oneOf(
+  implicit val geometry2DGen: Gen[Geometry[G2D]] = Gen.oneOf(
     point2DGen,
     line2DGen,
     polygon2DGen,
@@ -162,7 +160,7 @@ object GeoJsonGen {
     multiPolygon2DGen
   )
 
-  implicit val geometry3DGen: Gen[Geometry[C3DM]] = Gen.oneOf(
+  implicit val geometry3DGen: Gen[Geometry[G3D]] = Gen.oneOf(
     point3DGen,
     line3DGen,
     polygon3DGen,
@@ -171,14 +169,14 @@ object GeoJsonGen {
     multiPolygon3DGen
   )
 
-  implicit val geometryCollection2DGen: Gen[GeometryCollection[C2DM]] = for {
+  implicit val geometryCollection2DGen: Gen[GeometryCollection[G2D]] = for {
     aantal     <- Gen.choose(1, 10)
     geometries <- Gen.listOfN(aantal, geometry2DGen)
-  } yield new GeometryCollection[C2DM](geometries: _*)
+  } yield new GeometryCollection[G2D](geometries: _*)
 
-  implicit val geometryCollection3DGen: Gen[GeometryCollection[C3DM]] = for {
+  implicit val geometryCollection3DGen: Gen[GeometryCollection[G3D]] = for {
     aantal     <- Gen.choose(1, 10)
     geometries <- Gen.listOfN(aantal, geometry3DGen)
-  } yield new GeometryCollection[C3DM](geometries: _*)
+  } yield new GeometryCollection[G3D](geometries: _*)
 
 }

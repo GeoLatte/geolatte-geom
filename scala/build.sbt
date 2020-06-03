@@ -1,4 +1,4 @@
-val geolatteGeomVersion = "1.5.0-SNAPSHOT"
+val geolatteGeomVersion = "1.6.0-SNAPSHOT"
 
 val commonResolvers = Seq(
   Resolver.mavenLocal,
@@ -53,6 +53,7 @@ lazy val circeGeoJson = (project in file("circe-geojson"))
       "io.circe"                   %% "circe-generic"   % CirceVersion withJavadoc (),
       "org.specs2"                 %% "specs2-core"     % Specs2Version % "test" withJavadoc (),
       "org.geolatte"               % "geolatte-geojson" % geolatteGeomVersion % "test",
+      "io.circe"                   %% "circe-parser"    % CirceVersion % "test" withJavadoc (),
       "org.scalacheck"             %% "scalacheck"      % scalaCheckVersion % "test",
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion % "test"
     )

@@ -115,6 +115,16 @@ trait GeometryConstructors {
       pb: PositionBuilder[T, P]): Envelope[P] =
     envelope(crs)(lowerLeft, upperRight)(pb)
 
+  def box[P <: Position, T](crs: CoordinateReferenceSystem[P])(lowerLeft: T, upperRight: T)(
+    implicit pb: PositionBuilder[T, P]): Box[P] =
+    new org.geolatte.geom.Box[P](pb.apply(lowerLeft), pb.apply(upperRight), crs)
+
+  def box[P <: Position, T](lowerLeft: T, upperRight: T)(
+    implicit crs: CoordinateReferenceSystem[P],
+    pb: PositionBuilder[T, P]): Box[P] =
+    box(crs)(lowerLeft, upperRight)(pb)
+
+
   def point[P <: Position, T](crs: CoordinateReferenceSystem[P])(tuple: T)(
       implicit pb: PositionBuilder[T, P]): Point[P] =
     point(tuple)(crs, pb)
