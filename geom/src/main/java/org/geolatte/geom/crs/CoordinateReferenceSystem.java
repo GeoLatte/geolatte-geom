@@ -134,4 +134,8 @@ public abstract class CoordinateReferenceSystem<P extends Position> extends CrsI
     public boolean hasM() {
         return getCoordinateSystem().hasM();
     }
+
+    public String toString() {
+        return getName() + " (" + getCrsId().toString() + ")";
+    }
 }
