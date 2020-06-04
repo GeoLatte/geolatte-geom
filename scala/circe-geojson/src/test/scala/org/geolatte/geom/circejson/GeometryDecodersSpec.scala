@@ -25,7 +25,7 @@ class GeometryDecodersSpec extends Specification {
     Right(CrsId.UNDEFINED)  must_== decoded
   }
 
-  "Decoding Unit tests 2D for " >> {
+  "Decoding Unit tests " >> {
 
     "Decoding a point GeoJson returns a point" >> {
       testScalaCheckGen(point2DGen)
@@ -37,16 +37,30 @@ class GeometryDecodersSpec extends Specification {
       testScalaCheckGen(line3DGen)
     }
 
-    "Decoding a multilinestring GeoJson returns a linestring" >> {
+    "Decoding a polygon GeoJson returns a polygon" >> {
+      testScalaCheckGen(polygon2DGen)
+      testScalaCheckGen(polygon3DGen)
+    }
+
+    "Decoding a multipoint GeoJson returns a multipoint" >> {
+      testScalaCheckGen(multiPoint2DGen)
+      testScalaCheckGen(multiPoint3DGen)
+    }
+
+    "Decoding a multilinestring GeoJson returns a multilinestring" >> {
       testScalaCheckGen(multiLine2DGen)
       testScalaCheckGen(multiLine3DGen)
     }
 
-    "Decoding a multipolygon GeoJson returns a linestring" >> {
+    "Decoding a multipolygon GeoJson returns a multipolygon" >> {
       testScalaCheckGen(multiPolygon2DGen)
       testScalaCheckGen(multiPolygon3DGen)
     }
 
+    "Decoding a GeometryCollection GeoJson returns a GeometryCollection" >> {
+      testScalaCheckGen(geometryCollection2DGen)
+      testScalaCheckGen(geometryCollection3DGen)
+    }
 
   }
 
