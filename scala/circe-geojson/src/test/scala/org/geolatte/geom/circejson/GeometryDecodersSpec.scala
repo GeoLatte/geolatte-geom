@@ -7,11 +7,11 @@ import CoordinateReferenceSystems._
 import org.scalacheck.Gen
 import org.specs2.matcher.MatchResult
 import org.specs2.mutable.Specification
+
 /**
   * Created by Karel Maesen, Geovise BVBA on 02/06/2020.
   */
 class GeometryDecodersSpec extends Specification {
-
 
   import org.geolatte.geom.GeometryType._
   import org.geolatte.geom.circe.GeoJsonCodec._
@@ -23,8 +23,8 @@ class GeometryDecodersSpec extends Specification {
       """
         |{"type":"name","properties":{"name":"EPSG:-1"}}
         |""".stripMargin
-    val decoded = decode[CrsId](json)(crsidDecoder)
-    Right(CrsId.UNDEFINED)  must_== decoded
+    val decoded = decode[CrsId](json)
+    decoded must beRight(CrsId.UNDEFINED)
   }
 
   "Decoding Unit tests " >> {
@@ -74,25 +74,25 @@ class GeometryDecodersSpec extends Specification {
   }
 
   "Decoding with a user-specified default CRS" >> {
-    implicit val gDecoder = geometryDecoder(WEB_MERCATOR)
-    val expected : Geometry[G2D] = point2DGen.sample.get
-    val jsonString = expected.asFasterXMLJsonString(false)
-    val received = decode[Geometry[_]](jsonString)
+    implicit val gDecoder       = geometryDecoder(WEB_MERCATOR)
+    val expected: Geometry[G2D] = point2DGen.sample.get
+    val jsonString              = expected.asFasterXMLJsonString(false)
+    val received                = decode[Geometry[_]](jsonString)
     received.map(_.getCoordinateReferenceSystem) must beRight(WEB_MERCATOR)
   }
 
   def testScalaCheckGen[P <: Position](generator: Gen[_ <: Geometry[P]]): MatchResult[Any] = {
 
     val expected: Geometry[P] = generator.sample.get
-    val jsonString          = expected.asFasterXMLJsonString(true)
-    val received            = decode[Geometry[_]](jsonString)
+    val jsonString            = expected.asFasterXMLJsonString(true)
+    val received              = decode[Geometry[_]](jsonString)
     received must beRight(expected)
   }
 
   def testEmpty(gtype: GeometryType): MatchResult[Any] = {
-    val expected = Geometries.mkEmptyGeometry(gtype, WGS84)
+    val expected   = Geometries.mkEmptyGeometry(gtype, WGS84)
     val jsonString = expected.asFasterXMLJsonString(true)
-    val received = decode[Geometry[_]](jsonString)
+    val received   = decode[Geometry[_]](jsonString)
     received must beRight(expected)
   }
 
