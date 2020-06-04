@@ -57,11 +57,12 @@ class GeometryEncodersSpec extends org.specs2.mutable.Specification {
 
   }
 
+
   //TODO test decoding empty geometries
 
   def testScalaCheckGen[P <: Position](generator: Gen[_ <: Geometry[P]]): MatchResult[Any] = {
     val geom: Geometry[P] = generator.sample.get
-    val expected          = geom.asFasterXMLJsonString
+    val expected          = geom.asFasterXMLJsonString(true)
     val received          = geom.asJson.printWith(Printer(dropNullValues = true, "  "))
     expected must_== received
   }

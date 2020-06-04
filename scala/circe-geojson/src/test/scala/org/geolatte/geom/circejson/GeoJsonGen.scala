@@ -5,7 +5,7 @@ import org.geolatte.geom._
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, LinearUnit}
 import org.geolatte.geom.generator.GeometryGenerators
-import org.geolatte.geom.json.GeolatteGeomModule
+import org.geolatte.geom.json.{GeolatteGeomModule, Setting}
 import org.geolatte.geom.syntax.{GeometryImplicits, PositionBuilder}
 import org.scalacheck.Gen
 
@@ -13,14 +13,21 @@ object GeoJsonGen {
 
   import org.geolatte.geom.syntax.GeometryImplicits._
 
-  private val mapper = {
+  def buildMapper(crs: CoordinateReferenceSystem[_], settings: (Setting, Boolean)*) : ObjectMapper = {
     val om = new ObjectMapper()
-    om.registerModule(new GeolatteGeomModule(WGS84))
+    val module =new GeolatteGeomModule(crs)
+    settings.foreach{ case (s, v) => module.set(s,v)}
+    om.registerModule(module)
     om
   }
 
+  private val mapper = buildMapper(WGS84)
+
+  private val noCrsMapper = buildMapper(WGS84, Setting.SUPPRESS_CRS_SERIALIZATION->true)
+
   implicit class JsonStringable[P <: Position](geom: Geometry[P]) {
-    def asFasterXMLJsonString: String = mapper.writeValueAsString(geom)
+    def asFasterXMLJsonString(withCrs: Boolean = true): String = if (withCrs) mapper.writeValueAsString(geom) else
+      noCrsMapper.writeValueAsString(geom)
   }
 
   /**

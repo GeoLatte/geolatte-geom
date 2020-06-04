@@ -163,34 +163,38 @@ object GeoJsonCodec {
   implicit val PolygonListDecoder: Decoder[PolygonListHolder] =
     Decoder.decodeArray[PointListListHolder].map(PolygonListHolder)
 
-  def geometryDecoder(defaultCrs: CoordinateReferenceSystem[_]): Decoder[Geometry[_]] = new Decoder[Geometry[_]] {
-    override def apply(c: HCursor): Decoder.Result[Geometry[_ <: Position]] = {
-      for {
-        crsId  <- c.downField("crs").as[Option[CrsId]]
-        typeId <- c.downField("type").as[GeometryType]
-        crs = crsId.map(CrsRegistry.getCoordinateReferenceSystem(_, defaultCrs)).getOrElse(defaultCrs)
-        geom <- if(isSimple(typeId)) SimpleGeometryDecoder(crs, typeId)(c) else GeometryCollectionDecoder(crs, typeId)(c)
-      } yield geom
+  def geometryDecoder(defaultCrs: CoordinateReferenceSystem[_]): Decoder[Geometry[_]] =
+    new Decoder[Geometry[_]] {
+      override def apply(c: HCursor): Decoder.Result[Geometry[_ <: Position]] = {
+        for {
+          crsId  <- c.downField("crs").as[Option[CrsId]]
+          typeId <- c.downField("type").as[GeometryType]
+          crs = crsId
+            .map(CrsRegistry.getCoordinateReferenceSystem(_, defaultCrs))
+            .getOrElse(defaultCrs)
+          geom <- if (isSimple(typeId)) SimpleGeometryDecoder(crs, typeId)(c)
+          else GeometryCollectionDecoder(crs, typeId)(c)
+        } yield geom
 
+      }
     }
-  }
 
   implicit val gDecoder: Decoder[Geometry[_]] = geometryDecoder(WGS84)
-
 
   def isSimple(gtype: GeometryType): Boolean =
     gtype != GEOMETRYCOLLECTION
 
   def GeometryCollectionDecoder(crs: CoordinateReferenceSystem[_],
-                                 gtype: GeometryType): Decoder[Geometry[_]] = new Decoder[Geometry[_]] {
-    override def apply(c: HCursor): Decoder.Result[Geometry[_]] = {
-      val gf = c.downField("geometries")
-      for {
-        parts <- gf.as[List[Geometry[_]]](Decoder.decodeList(geometryDecoder(crs)))
-        geom = Geometries.mkGeometryCollection(parts:_*)
-      } yield geom
+                                gtype: GeometryType): Decoder[Geometry[_]] =
+    new Decoder[Geometry[_]] {
+      override def apply(c: HCursor): Decoder.Result[Geometry[_]] = {
+        val gf = c.downField("geometries")
+        for {
+          parts <- gf.as[List[Geometry[_]]](Decoder.decodeList(geometryDecoder(crs)))
+          geom = if (parts.isEmpty) Geometries.mkEmptyGeometryCollection(crs) else Geometries.mkGeometryCollection(parts: _*)
+        } yield geom
+      }
     }
-  }
 
   def SimpleGeometryDecoder(crs: CoordinateReferenceSystem[_],
                             gtype: GeometryType): Decoder[Geometry[_]] =
@@ -205,6 +209,7 @@ object GeoJsonCodec {
             case MULTIPOINT      => cf.as[PointListHolder]
             case MULTILINESTRING => cf.as[PointListListHolder]
             case MULTIPOLYGON    => cf.as[PolygonListHolder]
+            case _               => throw new IllegalArgumentException(s"Can't deserialize type $gtype")
           }
           adjusted = adjustTo(crs, coordinates.getCoordinateDimension)
           builder  = GeometryBuilder(coordinates, gtype)
@@ -248,8 +253,8 @@ object GeoJsonCodec {
         case LINESTRING => Geometries.mkLineString(ps, crs)
         case LINEARRING => Geometries.mkLinearRing(ps, crs)
         case MULTIPOINT => Geometries.mkMultiPoint(ps, crs)
+        case _          => throw new IllegalArgumentException(s"Can't deserialize type $gtype")
       }
-
     }
   }
 
@@ -266,6 +271,7 @@ object GeoJsonCodec {
         case POLYGON =>
           Geometries.mkPolygon(
             ptLists.map(ptl => ptl.toGeometry(crs, LINEARRING).asInstanceOf[LinearRing[P]]): _*)
+        case _ => throw new IllegalArgumentException(s"Can't deserialize type $gtype")
       }
     }
   }
