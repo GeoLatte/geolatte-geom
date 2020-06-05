@@ -12,7 +12,8 @@ val commonSettings = Seq(
   updateOptions := updateOptions.value.withLatestSnapshots(false),
   resolvers ++= commonResolvers,
   scalacOptions ++= Seq("-language:implicitConversions"),
-  scalacOptions in Test ++= Seq("-Yrangepos", "--explain-types")
+  scalacOptions in Test ++= Seq("-Yrangepos", "--explain-types"),
+  Test / publishArtifact := true
 )
 
 val Specs2Version     = "4.9.4"
@@ -60,8 +61,20 @@ lazy val circeGeoJson = (project in file("circe-geojson"))
   )
   .dependsOn(geom)
 
+lazy val slick = (project in file("slick"))
+  .settings(
+    commonSettings,
+    name := "geolatte-geom-slick",
+    libraryDependencies ++= commonDependencies ++ Seq(
+      "com.github.tminglei" %% "slick-pg" % "0.19.0",
+      "com.typesafe.slick"  %% "slick"    % "3.3.2"
+    )
+  )
+  .dependsOn(geom)
+
 lazy val root = (project in file(".")).aggregate(
   geom,
   playJson28,
-  circeGeoJson
+  circeGeoJson,
+  slick
 )
