@@ -50,6 +50,7 @@ lazy val circeGeoJson = (project in file("circe-geojson"))
   .settings(
     commonSettings,
     name := "geolatte-geom-circe",
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
     libraryDependencies ++= commonDependencies ++ Seq(
       "io.circe"                   %% "circe-generic"   % CirceVersion withJavadoc (),
       "org.specs2"                 %% "specs2-core"     % Specs2Version % "test" withJavadoc (),
