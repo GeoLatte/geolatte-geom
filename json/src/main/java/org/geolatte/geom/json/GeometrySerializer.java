@@ -1,12 +1,16 @@
 package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.type.WritableTypeId;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import static org.geolatte.geom.GeometryType.*;
 
@@ -37,6 +41,14 @@ public class GeometrySerializer<P extends Position> extends JsonSerializer<Geome
         writeGeometry(gen, geometry, !settings.isSet(Setting.SUPPRESS_CRS_SERIALIZATION));
     }
 
+    @Override
+    public void serializeWithType(Geometry<P> value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+        // Better ensure we don't use specific sub-classes:
+        WritableTypeId typeIdDef = typeSer.writeTypePrefix(gen,
+                typeSer.typeId(value, value.getClass(), JsonToken.VALUE_STRING));
+        serialize(value, gen, serializers);
+        typeSer.writeTypeSuffix(gen, typeIdDef);
+    }
 
     private void writeGeometry(JsonGenerator gen, Geometry<P> geometry, boolean includeCrs) throws IOException {
         gen.writeStartObject();

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * A Two-dimensional Cartesian Coordinate system extended with a {@code LinearCoordinateSystemAxis}
- * <p/>
+ *
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
 public class CartesianCoordinateSystem2DM extends CoordinateSystem<C2DM> {
@@ -43,9 +43,19 @@ public class CartesianCoordinateSystem2DM extends CoordinateSystem<C2DM> {
     public CoordinateSystem<C3DM> extend(CoordinateSystemAxis axis) {
         if (axis instanceof VerticalStraightLineAxis) {
             return new CartesianCoordinateSystem3DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1),
-                    (VerticalStraightLineAxis) axis, (MeasureStraightLineAxis) getAxis(1));
+                    (VerticalStraightLineAxis) axis, (MeasureStraightLineAxis) getAxis(2));
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return true;
     }
 
 }

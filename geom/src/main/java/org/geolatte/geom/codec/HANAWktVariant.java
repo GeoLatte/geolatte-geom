@@ -107,7 +107,7 @@ class HANAWktVariant extends PostgisWktVariant {
 
 	/**
 	 * Determines whether the candidate has the same measured 'M' suffix and Z axis as the geometry in WKT.
-	 * <p/>
+	 *
 	 * POINT(x y): 2D point, 
 	 * POINT Z(x y z): 3D point, 
 	 * POINT M(x y m): 2D measured point, 

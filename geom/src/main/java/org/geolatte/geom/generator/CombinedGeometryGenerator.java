@@ -10,12 +10,12 @@ import java.util.stream.IntStream;
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */
-class CombinedGeometryGenerator<P extends Position> implements GeometryGenerator<P, Geometry<P>> {
+class CombinedGeometryGenerator<P extends Position> implements Generator<Geometry<P>> {
 
     private final Random  chooser;
-    private final List<GeometryGenerator<P, ? extends Geometry<P>>> generators;
+    private final List<Generator<? extends Geometry<P>>> generators;
 
-    CombinedGeometryGenerator(Random rnd, List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
+    CombinedGeometryGenerator(Random rnd, List<Generator<? extends Geometry<P>>> generators) {
         this.chooser = rnd;
         this.generators = generators;
     }

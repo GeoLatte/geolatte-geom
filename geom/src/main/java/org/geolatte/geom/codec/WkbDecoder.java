@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A decoder for WKB (Well-Known Binary) encoded <code>Geometries</code>.
- * <p/>
+ *
  * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA

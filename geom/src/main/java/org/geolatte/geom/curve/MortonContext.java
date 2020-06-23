@@ -28,7 +28,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A context for the calculation of Morton codes.
- * <p/>
+ *
  * <p>This class holds the the maximum spatial extent and tree-depth of the implied
  * QuadTree-index for a {@code MortonCode}.</p>
  *

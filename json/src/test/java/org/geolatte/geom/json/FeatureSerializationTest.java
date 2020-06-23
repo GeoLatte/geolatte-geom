@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 public class FeatureSerializationTest extends GeoJsonTest {
 
     @Test
-    public void testDeSerialize() throws IOException {
+    public void testSerialize() throws IOException {
 
         Map<String, Object> map = new HashMap<>();
         map.put("a", 1);

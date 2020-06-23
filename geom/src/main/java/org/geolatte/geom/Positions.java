@@ -24,7 +24,9 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Factories for creating Positions.
@@ -34,24 +36,23 @@ import java.util.List;
  */
 public class Positions {
 
-	public static List<PositionFactory<?>> registeredFactories;
+	public static Map<Class<?>, PositionFactory<?>> registeredFactoriesMap;
 
 	static {
-		registeredFactories = Arrays.asList(
-				new CanMakeG2D(),
-				new CanMakeG2DM(),
-				new CanMakeG3D(),
-				new CanMakeG3DM(),
-				new CanMakeP2D(),
-				new CanMakeP2DM(),
-				new CanMakeP3D(),
-				new CanMakeP3DM()
-		);
+		registeredFactoriesMap = new HashMap<>();
+		registeredFactoriesMap.put(G2D.class, new CanMakeG2D());
+		registeredFactoriesMap.put(G2DM.class, new CanMakeG2DM());
+		registeredFactoriesMap.put(G3D.class, new CanMakeG3D());
+		registeredFactoriesMap.put(G3DM.class, new CanMakeG3DM());
+		registeredFactoriesMap.put(C2D.class, new CanMakeP2D());
+		registeredFactoriesMap.put(C2DM.class, new CanMakeP2DM());
+		registeredFactoriesMap.put(C3D.class, new CanMakeP3D());
+		registeredFactoriesMap.put(C3DM.class, new CanMakeP3DM());
 	}
 
 	/**
 	 * Factory method for {@code Position}s in the reference system.
-	 * <p/>
+	 * 
 	 * The coordinates array should be in normalized order. See
 	 * {@link Position}
 	 *
@@ -80,11 +81,11 @@ public class Positions {
 
 	@SuppressWarnings("unchecked")
 	public static <P extends Position> PositionFactory<P> getFactoryFor(Class<P> pClass) {
-		for ( PositionFactory<?> pFact : registeredFactories ) {
-			if ( pFact.forClass().equals( pClass ) ) {
-				return (PositionFactory<P>) pFact;
-			}
+		PositionFactory<P> pf = (PositionFactory<P>)registeredFactoriesMap.get(pClass);
+		if(pf != null) {
+			return pf;
 		}
+
 		throw new UnsupportedOperationException(
 				String.format(
 						"Position type %s unsupported",
@@ -95,7 +96,7 @@ public class Positions {
 
 	/**
 	 * Copies the source positions to a new PositionSequence.
-	 * <p/>
+	 * 
 	 * <P>The coordinates are taken as-is. If the target coordinate reference systems has a larger coordinate
 	 * dimensions then the source, NaN coordinate values are created.</p>
 	 *

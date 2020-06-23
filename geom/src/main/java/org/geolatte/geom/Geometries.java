@@ -28,7 +28,7 @@ import java.util.List;
 
 /**
  * A Factory for {@code Geometry}s
- * <p/>
+ *
  * <p>This Factory allows generically creating Geometries</p>
  *
  * @author Karel Maesen, Geovise BVBA
@@ -116,6 +116,33 @@ public class Geometries {
         return new GeometryCollection<>(crs);
     }
 
+    /**
+     * Creates an Empty geometry for the specified {@code GeometryType}
+     * @param gtype the type to create
+     * @param crs the coordinate reference system
+     * @param <P> the type of {@code Position}
+     * @return an empty {@Geometry} of the specified type and coordinate reference system
+     */
+    public static <P extends Position> Geometry<P> mkEmptyGeometry(GeometryType gtype, CoordinateReferenceSystem<P> crs) {
+        switch(gtype) {
+            case POINT:
+                return mkEmptyPoint(crs);
+            case LINESTRING:
+                return mkEmptyLineString(crs);
+            case POLYGON:
+                return mkEmptyPolygon(crs);
+            case MULTIPOINT:
+                return mkEmptyMultiPoint(crs);
+            case MULTILINESTRING:
+                return mkEmptyMultiLineString(crs);
+            case MULTIPOLYGON:
+                return mkEmptyMultiPolygon(crs);
+            case GEOMETRYCOLLECTION:
+                return mkEmptyGeometryCollection(crs);
+            default:
+                throw new IllegalArgumentException("Can't create empty geometry for type: " + gtype);
+        }
+    }
 
     /**
      * Creates a {@code Point} from a Position and coordinate reference system

@@ -23,7 +23,7 @@ public class M extends Position {
 
     /**
      * Constructs an instance from the specified coordinates.
-     * <p/>
+     *
      * It expects first the longitude, then the latitude coordinate
      *
      * @param coords

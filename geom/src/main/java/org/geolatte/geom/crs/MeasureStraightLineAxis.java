@@ -2,7 +2,7 @@ package org.geolatte.geom.crs;
 
 /**
  * An axis for a {@code LinearCoordinateReferenceSystem}
- * <p/>
+ *
  * Created by Karel Maesen, Geovise BVBA on 29/11/14.
  */
 public class MeasureStraightLineAxis extends StraightLineAxis {

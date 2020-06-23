@@ -51,10 +51,8 @@ class PositionSequenceIterator<P extends Position> implements Iterator<P> {
 
     @Override
     public P next() {
-        double[] coordinates = new double[sequence.getCoordinateDimension()];
         if (hasNext()){
-            sequence.getCoordinates(index++, coordinates);
-            return Positions.mkPosition(sequence.getPositionClass(), coordinates);
+            return sequence.getPositionN(index++);
         }
         throw new NoSuchElementException();
     }

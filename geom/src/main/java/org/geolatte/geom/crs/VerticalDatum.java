@@ -2,8 +2,10 @@ package org.geolatte.geom.crs;
 
 /**
  * Vertical Datum
- *
- * TODO - document the datum type and extension, and provide reference for this model
+ *<p>
+ * Determines how elevation is to be interpreted. See <a href="https://en.wikipedia.org/wiki/Geodetic_datum#Vertical_datum">this Wikipedia page</a>).
+ * It is modeled here as in the OGC specification "OpenGIS Implementation Specification: Coordinate Transformation Services" (rev. 1.00)"
+ * </p>
  * Created by Karel Maesen, Geovise BVBA on 29/11/14.
  */
 public class VerticalDatum extends CrsIdentifiable {

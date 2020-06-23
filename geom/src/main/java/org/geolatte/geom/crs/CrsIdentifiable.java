@@ -23,7 +23,7 @@ package org.geolatte.geom.crs;
 
 /**
  * Abstract base class for classes the are identified by a <code>CrsId</code> (e.g. by EPSG-code).
- * <p/>
+ *
  * <h3>Warning: identity of <code>CrsIdentifiable</code>s:</h3>
  * <p>In theory the <code>CrsId</code> should identify uniquely the CoordinateReferenceSystem-related objects
  * (whether CRS, datum, projection, etc.). In practice this is not always the case. Users, for example, can add their own
@@ -76,8 +76,6 @@ abstract public class CrsIdentifiable {
         CrsIdentifiable that = (CrsIdentifiable) o;
 
         if (crsId != null ? !crsId.equals(that.crsId) : that.crsId != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
         return true;
     }
 

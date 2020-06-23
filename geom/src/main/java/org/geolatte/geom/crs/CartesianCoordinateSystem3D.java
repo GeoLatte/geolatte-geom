@@ -47,5 +47,15 @@ public class CartesianCoordinateSystem3D extends CoordinateSystem<C3D> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean hasZ() {
+        return true;
+    }
+
+    @Override
+    public boolean hasM() {
+        return false;
+    }
+
 
 }

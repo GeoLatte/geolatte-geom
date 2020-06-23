@@ -25,7 +25,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A tokenizer for the HANA WKT representation.
- * <p/>
+ * 
  * <p>
  * The variant of WKT that this tokenizer recognizes is determined by the {@link WktVariant} that is passed upon
  * construction.

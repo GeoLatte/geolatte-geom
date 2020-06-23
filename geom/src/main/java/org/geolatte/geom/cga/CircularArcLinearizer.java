@@ -11,9 +11,9 @@ import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
 
 /**
  * Linearizes arc segments defined by three consecutive {@code Positions}
- * <p/>
+ * 
  * <p>The implementation guarantees that the specified Positions are among the returned, linearized Positions</p>
- * <p/>
+ * 
  * Created by Karel Maesen, Geovise BVBA on 02/03/15.
  */
 public class CircularArcLinearizer<P extends Position> {

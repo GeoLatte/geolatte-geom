@@ -10,13 +10,13 @@ import static java.util.Arrays.asList;
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */
-class DefaultGeometryCollectionGenerator<P extends Position> implements GeometryGenerator<P, GeometryCollection<P>> {
+class DefaultGeometryCollectionGenerator<P extends Position> implements Generator<GeometryCollection<P>> {
 
 
     private final int numGeoms;
-    private final GeometryGenerator<P, Geometry<P>> baseGenerator;
+    private final Generator<Geometry<P>> baseGenerator;
 
-    DefaultGeometryCollectionGenerator(int numGeoms, GeometryGenerator<P, Geometry<P>> baseGenerator, Random rnd) {
+    DefaultGeometryCollectionGenerator(int numGeoms, Generator<Geometry<P>> baseGenerator, Random rnd) {
         this.numGeoms = numGeoms;
         this.baseGenerator = baseGenerator;
     };

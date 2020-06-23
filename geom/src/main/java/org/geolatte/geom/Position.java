@@ -37,11 +37,17 @@ abstract public class Position{
     protected Position(double... coords) {
         if (coords.length == 0) {
             this.coords = new double[0];
-            //Arrays.fill(this.coords, Double.NaN);
+            Arrays.fill(this.coords, Double.NaN);
         } else {
-            double[] c = new double[getCoordinateDimension()];
-            System.arraycopy(coords, 0, c, 0, coords.length);
-            this.coords = c;
+            if(coords.length == getCoordinateDimension()) {
+                this.coords = coords;
+            } else {
+                // only do this if we don't have the correct number of coords
+                // but this shouldn't ever be the case
+                double[] c = new double[getCoordinateDimension()];
+                System.arraycopy(coords, 0, c, 0, coords.length);
+                this.coords = c;
+            }
         }
     }
 

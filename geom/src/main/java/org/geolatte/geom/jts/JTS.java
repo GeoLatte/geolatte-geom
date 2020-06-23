@@ -118,6 +118,7 @@ public class JTS {
      * @throws IllegalArgumentException when a null object is passed
      */
     public static org.geolatte.geom.Geometry<?> from(org.locationtech.jts.geom.Geometry jtsGeometry) {
+        DefaultCoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
@@ -125,7 +126,7 @@ public class JTS {
         boolean is3D = !(testCo == null || Double.isNaN(testCo.z));
         CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(jtsGeometry.getSRID());
         if (is3D) {
-            crs = CoordinateReferenceSystems.addVerticalSystem(crs, LinearUnit.METER);
+            crs = expander.expandZ(crs);
         }
 
         // to translate measure, add Measure as LinearSystem

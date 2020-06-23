@@ -37,7 +37,7 @@ class PointSqlServerEncoder extends AbstractSqlServerEncoder {
 
     /**
      * Encodes a point as an <code>SQLGeometryV1</code> object.
-     * <p/>
+     *
      * This is a specific implementation because points don't explicitly serialize figure and shape components.
      *
      * @param geom Geometry to serialize

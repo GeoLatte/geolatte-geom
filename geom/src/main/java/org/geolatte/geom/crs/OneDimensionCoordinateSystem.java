@@ -38,4 +38,14 @@ public class OneDimensionCoordinateSystem<P extends Position> extends Coordinate
     public CoordinateSystem<?> extend(CoordinateSystemAxis axis) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean hasZ() {
+        return getAxis().getNormalOrder() == 2;
+    }
+
+    @Override
+    public boolean hasM() {
+        return getAxis().getNormalOrder() == 3;
+    }
 }

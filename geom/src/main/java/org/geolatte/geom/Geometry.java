@@ -29,6 +29,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.util.Arrays;
 
 import static java.lang.String.format;
 
@@ -123,7 +124,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     /**
      * Returns the coordinate dimension of this <code>Geometry</code>
-     * <p/>
+     *
      * <p>The coordinate dimension is the number of components in the coordinates of the points in
      * this <code>Geometry</code>. </p>
      *
@@ -144,7 +145,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     /**
      * Returns the numeric identifier of the coordinate reference system of this <code>Geometry</code>.
-     * <p/>
+     *
      * <p>A SRID is usually interpreted as meaning the EPSG-code for the coordinate reference system. In this
      * implementation, this is not enforced.</p>
      *
@@ -188,9 +189,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
         if (index >= getPositions().size()) {
             throw new IndexOutOfBoundsException();
         }
-        double[] coords = new double[getCoordinateDimension()];
-        getPositions().getCoordinates(index, coords);
-        return Positions.mkPosition(getCoordinateReferenceSystem(), coords);
+        return getPositions().getPositionN(index);
     }
 
     /**
@@ -231,7 +230,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
     }
 
     /**
-     * Returns the {@code Envelope} of this instance.
+     * Returns the 2D {@code Envelope} of this instance.
      * @return the {@code Envelope} of this instance.
      */
     public Envelope<P> getEnvelope() {
@@ -240,6 +239,17 @@ public abstract class Geometry<P extends Position> implements Serializable {
         EnvelopeVisitor<P> visitor = new EnvelopeVisitor<P>(getCoordinateReferenceSystem());
         positions.accept(visitor);
         return visitor.result();
+    }
+
+    /**
+     * Returns the bounding {@code Box} of this instance
+     * @return Returns a {@code Box} that encloses this geometry
+     */
+    public Box<P> getBoundingBox(){
+        if (isEmpty()) return Box.mkEmpty(crs);
+        BoxVisitor bv = new BoxVisitor<P>(crs);
+        getPositions().accept(bv);
+        return bv.build();
     }
 
     @Override
@@ -334,5 +344,30 @@ public abstract class Geometry<P extends Position> implements Serializable {
             }
         }
 
+    private static class BoxVisitor<P extends Position> implements LLAPositionVisitor {
+        private double[] lowerLeft;
+        private double[] upperRight;
+        final private CoordinateReferenceSystem<P> crs;
+
+        BoxVisitor(CoordinateReferenceSystem<P> crs) {
+            this.crs = crs;
+            lowerLeft = new double[crs.getCoordinateDimension()];
+            Arrays.fill(lowerLeft, Double.MAX_VALUE);
+            upperRight = new double[crs.getCoordinateDimension()];
+            Arrays.fill(upperRight, Double.MIN_VALUE);
+        }
+
+        @Override
+        public void visit(double[] coordinate) {
+            for (int i = 0; i < coordinate.length; i++) {
+                lowerLeft[i] = Math.min(lowerLeft[i], coordinate[i]);
+                upperRight[i] = Math.max(upperRight[i], coordinate[i]);
+            }
+        }
+
+        Box<P> build() {
+            return new Box<>(Positions.mkPosition(crs, lowerLeft), Positions.mkPosition(crs, upperRight), crs);
+        }
+    }
 }
 

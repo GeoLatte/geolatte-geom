@@ -14,7 +14,7 @@ class DefaultMultiPolygonGenerator<P extends Position> extends AbstractGeometryG
     private final int numPolys;
     private final DefaultPolygonGenerator<P> polyGen;
 
-    DefaultMultiPolygonGenerator(int numPolys, int numPoints, Envelope<P> bbox, Random rnd) {
+    DefaultMultiPolygonGenerator(int numPolys, int numPoints, Box<P> bbox, Random rnd) {
         super(bbox, rnd);
         this.numPolys = numPolys;
         this.polyGen = new DefaultPolygonGenerator<>(numPoints, bbox, rnd);

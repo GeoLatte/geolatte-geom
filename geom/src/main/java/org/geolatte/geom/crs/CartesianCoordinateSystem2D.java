@@ -12,7 +12,7 @@ import java.util.List;
  * <p>A Cartesian coordinate system is a
  * coordinate system which gives the position of points relative to orthogonal straight axes. All axes shall have the same unit of measure.
  * </p>
- * <p/>
+ *
  * Created by Karel Maesen, Geovise BVBA on 28/11/14.
  */
 public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
@@ -64,5 +64,15 @@ public class CartesianCoordinateSystem2D extends CoordinateSystem<C2D> {
             return new CartesianCoordinateSystem2DM((StraightLineAxis) getAxis(0), (StraightLineAxis) getAxis(1), (MeasureStraightLineAxis) axis);
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasZ() {
+        return false;
+    }
+
+    @Override
+    public boolean hasM() {
+        return false;
     }
 }

@@ -49,12 +49,12 @@ public class MultiLineString<P extends Position> extends AbstractGeometryCollect
 
 
     @Override
-    public Position getStartPosition() {
+    public P getStartPosition() {
         return getPositionN(0);
     }
 
     @Override
-    public Position getEndPosition() {
+    public P getEndPosition() {
         return getPositionN(getNumPositions() - 1);
     }
 

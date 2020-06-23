@@ -109,7 +109,7 @@ class PostgisWktVariant extends WktVariant {
     /**
      * Determines whether the candidate has the same measured 'M' suffix as the geometry in WKT.
      * The suffix is only added when the geometry is measured and not 3D.
-     * <p/>
+     *
      * POINT(x y): 2D point,
      * POINT(x y z): 3D point,
      * POINTM(x y m): 2D measured point (with 'M' suffix),

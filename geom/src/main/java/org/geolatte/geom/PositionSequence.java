@@ -23,7 +23,7 @@ package org.geolatte.geom;
 
 /**
  * A <code>PositionSequence</code> is an ordered sequence of <code>Position</code>s.
- * <p/>
+ * 
  * <p>A <code>PositionSequence</code> is typically used to store the <code>Position</code>s (vertices) that define a
  * curve (a 1-dimensional geometric primitive), with the subtype of the curve specifying the form of interpolation between
  * consecutive <code>Position</code>s. (E.g.a <code>LineString</code> uses linear interpolation between <code>Position</code>s.)</p>
@@ -47,7 +47,7 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     /**
      * Returns the coordinate dimension of this <code>PositionSequence</code>.
-     * <p/>
+     * 
      * <p>The coordinate dimension is number of measurements or axes needed to describe <code>Position</code>
      * in the coordinate system associated with this <code>PositionSequence</code>.</p>
      *
@@ -82,7 +82,7 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     /**
      * Accepts a <code>PositionVisitor</code>.
-     * <p/>
+     * 
      * <p>This instance will pass the visitor to all of its <code>Position</code>s.</p>
      *
      * @param visitor the visitor for this instance's <code>Position</code>s

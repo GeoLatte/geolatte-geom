@@ -12,82 +12,82 @@ import static java.util.Arrays.asList;
  */
 public class GeometryGenerators {
 
-    public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final Random rnd, final List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
+    public static <P extends Position> Generator<Geometry<P>> combine
+            (final Random rnd, final List<Generator<? extends Geometry<P>>> generators) {
         return new CombinedGeometryGenerator<>(rnd, generators);
     }
 
-    public static <P extends Position> GeometryGenerator<P, Geometry<P>> combine
-            (final List<GeometryGenerator<P, ? extends Geometry<P>>> generators) {
+    public static <P extends Position> Generator<Geometry<P>> combine
+            (final List<Generator<? extends Geometry<P>>> generators) {
         return new CombinedGeometryGenerator<>(new Random(), generators);
     }
 
-    public static <P extends Position> GeometryGenerator<P, Point<P>> point(Envelope<P> bbox) {
+    public static <P extends Position> Generator<Point<P>> point(Box<P> bbox) {
         return new DefaultPointGenerator<>(bbox, new Random());
     }
 
-    public static <P extends Position> GeometryGenerator<P, Point<P>> point(Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> Generator<Point<P>> point(Box<P> bbox, Random rnd) {
         return new DefaultPointGenerator<>(bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, LineString<P>> lineString(int numPnts, Envelope<P> bbox,
+    public static <P extends Position> Generator<LineString<P>> lineString(int numPnts, Box<P> bbox,
                                                                                       Random rnd) {
-        return new DefaultLineStringGenerator<>(numPnts, false, bbox, rnd);
+        return new DefaultLineStringGenerator<>(numPnts, bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, LineString<P>> lineString(int numPnts, Envelope<P> bbox) {
-        return new DefaultLineStringGenerator<>(numPnts, false, bbox, new Random());
+    public static <P extends Position> Generator<LineString<P>> lineString(int numPnts, Box<P> bbox) {
+        return new DefaultLineStringGenerator<>(numPnts, bbox, new Random());
     }
 
-    public static <P extends Position> GeometryGenerator<P, Polygon<P>> polygon(int numPnts, Envelope<P> bbox,
+    public static <P extends Position> Generator<Polygon<P>> polygon(int numPnts, Box<P> bbox,
                                                                                 Random rnd) {
         return new DefaultPolygonGenerator<>(numPnts, bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, Polygon<P>> polygon(int numPnts, Envelope<P> bbox) {
+    public static <P extends Position> Generator<Polygon<P>> polygon(int numPnts, Box<P> bbox) {
         return new DefaultPolygonGenerator<>(numPnts, bbox, new Random());
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiPoint<P>> multiPoint(int numPnts, Envelope<P> bbox,
+    public static <P extends Position> Generator<MultiPoint<P>> multiPoint(int numPnts, Box<P> bbox,
                                                                                       Random rnd) {
         return new DefaultMultiPointGenerator<>(numPnts, bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiPoint<P>> multiPoint(int numPnts, Envelope<P> bbox) {
+    public static <P extends Position> Generator<MultiPoint<P>> multiPoint(int numPnts, Box<P> bbox) {
         return new DefaultMultiPointGenerator<>(numPnts, bbox, new Random());
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiLineString<P>> multiLineString(int numLines,
-                                                                                                int numPoints, Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> Generator<MultiLineString<P>> multiLineString(int numLines,
+                                                                                                int numPoints, Box<P> bbox, Random rnd) {
         return new DefaultMultiLineStringGenerator<>(numLines, numPoints, bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiLineString<P>> multiLineString(int numLines,
-                                                                                                int numPoints, Envelope<P> bbox) {
+    public static <P extends Position> Generator<MultiLineString<P>> multiLineString(int numLines,
+                                                                                                int numPoints, Box<P> bbox) {
         return new DefaultMultiLineStringGenerator<>(numLines, numPoints, bbox, new Random());
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiPolygon<P>> multiPolygon
-            (int numLines, int numPoints, Envelope<P> bbox, Random rnd) {
+    public static <P extends Position> Generator<MultiPolygon<P>> multiPolygon
+            (int numLines, int numPoints, Box<P> bbox, Random rnd) {
         return new DefaultMultiPolygonGenerator<>(numLines, numPoints, bbox, rnd);
     }
 
-    public static <P extends Position> GeometryGenerator<P, MultiPolygon<P>> multiPolygon
-            (int numLines, int numPoints, Envelope<P> bbox) {
+    public static <P extends Position> Generator<MultiPolygon<P>> multiPolygon
+            (int numLines, int numPoints, Box<P> bbox) {
         return new DefaultMultiPolygonGenerator<>(numLines, numPoints, bbox, new Random());
     }
 
     @SafeVarargs
-    public static <P extends Position> GeometryGenerator<P, GeometryCollection<P>> geometryCollection
-            (int numGeoms, Random rnd, GeometryGenerator<P, ? extends Geometry<P>>... generators) {
+    public static <P extends Position> Generator<GeometryCollection<P>> geometryCollection
+            (int numGeoms, Random rnd, Generator<? extends Geometry<P>>... generators) {
 
-        GeometryGenerator<P, Geometry<P>> combine = combine(asList(generators));
+        Generator<Geometry<P>> combine = combine(asList(generators));
         return new DefaultGeometryCollectionGenerator<>(numGeoms, combine, rnd);
     }
 
     @SafeVarargs
-    public static <P extends Position> GeometryGenerator<P, GeometryCollection<P>> geometryCollection
-            (int numGeoms, GeometryGenerator<P, ? extends Geometry<P>>... generators) {
+    public static <P extends Position> Generator<GeometryCollection<P>> geometryCollection
+            (int numGeoms, Generator<? extends Geometry<P>>... generators) {
         return geometryCollection(numGeoms, new Random(), generators);
     }
 

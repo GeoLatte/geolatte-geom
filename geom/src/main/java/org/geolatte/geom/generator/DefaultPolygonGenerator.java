@@ -1,6 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Box;
 import org.geolatte.geom.LinearRing;
 import org.geolatte.geom.Polygon;
 import org.geolatte.geom.Position;
@@ -19,7 +19,7 @@ class DefaultPolygonGenerator<P extends Position> extends AbstractGeometryGenera
 
     final private int numPoints;
 
-    DefaultPolygonGenerator(int numPoints, Envelope<P> bbox, Random rnd) {
+    DefaultPolygonGenerator(int numPoints, Box<P> bbox, Random rnd) {
         super(bbox, rnd);
         this.numPoints = numPoints;
     }

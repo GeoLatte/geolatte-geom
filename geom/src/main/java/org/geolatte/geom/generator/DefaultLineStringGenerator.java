@@ -1,6 +1,6 @@
 package org.geolatte.geom.generator;
 
-import org.geolatte.geom.Envelope;
+import org.geolatte.geom.Box;
 import org.geolatte.geom.LineString;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.builder.DSL;
@@ -17,7 +17,7 @@ class DefaultLineStringGenerator<P extends Position> extends AbstractGeometryGen
     final private int size;
     final private boolean closed;
 
-    DefaultLineStringGenerator(int size, boolean closed, Envelope<P> bbox, Random rnd) {
+    DefaultLineStringGenerator(int size, Box<P> bbox, Random rnd) {
         super(bbox, rnd);
         this.size = size;
         this.closed = false;

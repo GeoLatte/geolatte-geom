@@ -21,10 +21,11 @@
 
 package org.geolatte.geom.crs;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotSame;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -57,5 +58,17 @@ public class TestCoordinateReferenceSystem {
 
     }
 
+    @Test
+    public void testHasZ(){
+        assertFalse(PROJECTED_2D_METER.hasZ());
+        assertTrue(PROJECTED_3D_METER.hasZ());
+    }
+
+    @Test
+    public void testHasM(){
+        assertFalse(PROJECTED_2D_METER.hasM());
+        assertFalse(PROJECTED_3D_METER.hasM());
+        assertTrue(PROJECTED_3DM_METER.hasM());
+    }
 
 }

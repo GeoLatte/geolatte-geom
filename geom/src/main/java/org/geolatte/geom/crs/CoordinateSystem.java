@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * A coordinate system.
- * <p/>
+ *
  * <p>A coordinate system is characterized by its {@link CoordinateSystemAxis CoordinateSystemAxes} (in order).</p>
  *
  * @param <P> the Position type for the system
@@ -43,7 +43,7 @@ abstract public class CoordinateSystem<P extends Position> {
 
     /**
      * Constructs a <code>CoordinateSystem</code>.
-     * <p/>
+     *
      * <p><code>CoordinateSystem</code>s are characterized by their {@link CoordinateSystemAxis CoordinateSystemAxes}. </p>
      *
      * @param axes the sequence (at least two) of its <code>CoordinateSystem</code>s.
@@ -192,5 +192,17 @@ abstract public class CoordinateSystem<P extends Position> {
      * @throws java.lang.UnsupportedOperationException if no supported coordinate system can contain the axes.
      */
     public abstract CoordinateSystem<?> extend(CoordinateSystemAxis axis);
+
+    /**
+     * Does the coordinate system have a Vertical or Z axis?
+     * @return
+     */
+    public abstract boolean hasZ();
+
+    /**
+     * does the system have a Measure axis?
+     * @return
+     */
+    public abstract boolean hasM();
 
 }

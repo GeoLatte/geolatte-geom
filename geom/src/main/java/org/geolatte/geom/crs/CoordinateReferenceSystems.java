@@ -46,7 +46,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic projected coordinate reference system using the specified units of length for coordinates.
-     * <p/>
+     *
      * A generic system is one without a precisely defined Coordinate Reference System
      *
      * @param unit the unit to use for the planar coordinates.
@@ -58,7 +58,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic geographic coordinate reference system using the specified units of length for coordinates.
-     * <p/>
+     *
      * A generic system is one without a precisely defined datum or ellipsoid.
      *
      * @param
@@ -211,6 +211,25 @@ public class CoordinateReferenceSystems {
     }
 
 
+    public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension) {
+        if (coordinateDimension <= 2) {
+            return crs;
+        }
+
+        if (coordinateDimension == 3) {
+            CrsId extId = crs.getCrsId().extend(METER, null);
+            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, null));
+        }
+
+        if (coordinateDimension == 4) {
+            CrsId extId = crs.getCrsId().extend(METER, METER);
+            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, METER));
+        }
+
+        throw new IllegalStateException("CoordinateDimension " + coordinateDimension + " less than 2 or larger than 4");
+    }
+
+
     /**
      * A generic projected 2D {@code CoordinateReferenceSystem} with meter coordinates
      */
@@ -269,12 +288,20 @@ public class CoordinateReferenceSystems {
         return false;
     }
 
+    /**
+     * @deprecated User crs.hasZ()
+     */
+    @Deprecated
     public static <P extends Position> boolean hasVerticalAxis(CoordinateReferenceSystem<P> crs) {
-        return hasAxisOrder(crs, 2);
+        return crs.hasZ();
     }
 
+    /**
+     * @deprecated User crs.hasM()
+     */
+    @Deprecated
     public static <P extends Position> boolean hasMeasureAxis(CoordinateReferenceSystem<P> crs) {
-        return hasAxisOrder(crs, 3);
+        return crs.hasM();
     }
 
 }

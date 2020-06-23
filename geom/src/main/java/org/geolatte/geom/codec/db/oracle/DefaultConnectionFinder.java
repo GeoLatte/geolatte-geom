@@ -33,7 +33,7 @@ import java.sql.Connection;
  * <code>Connection</code> objects, executes these methods and checks the
  * result. If the result is of type <code>OracleConnection</code> the object
  * is returned, otherwise it recurses on it.
- * <p/>
+ *
  * </p>
  *
  * @author Karel Maesen
@@ -62,8 +62,8 @@ public class DefaultConnectionFinder implements ConnectionFinder {
 		}
 		// try to find the Oracleconnection recursively
 		for ( Method method : con.getClass().getMethods() ) {
-			if ( method.getReturnType().isAssignableFrom(
-					java.sql.Connection.class
+			if ( java.sql.Connection.class.isAssignableFrom(
+					method.getReturnType()
 			)
 					&& method.getParameterTypes().length == 0 ) {
 

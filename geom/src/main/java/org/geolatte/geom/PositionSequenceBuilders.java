@@ -31,7 +31,7 @@ public class PositionSequenceBuilders {
 
     /**
      * Creates a <code>PositionSequenceBuilder</code> of fixed size.
-     * <p/>
+     * 
      * <p>The returned <code>PositionSequenceBuilder</code> expects that exactly <code>num</code> will be
      * added to it.</p>
      *

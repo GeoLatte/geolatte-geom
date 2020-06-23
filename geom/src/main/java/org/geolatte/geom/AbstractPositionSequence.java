@@ -78,7 +78,7 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
 
     /**
      * Clones a  PointCollection
-     * <p/>
+     *
      * <p>This method is defined in the JTS CoordinateSequence interface.
      *
      * @return
