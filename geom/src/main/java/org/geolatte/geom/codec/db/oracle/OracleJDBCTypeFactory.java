@@ -24,10 +24,12 @@ package org.geolatte.geom.codec.db.oracle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Struct;
+import java.util.Arrays;
 
 /**
  * Factory for Oracle JDBC extension types (ARRAY, STRUCT, ...).
@@ -44,7 +46,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 	private final Method structDescriptorCreator;
 	private final Method arrayDescriptorCreator;
 	private final Constructor<?> numberConstructor;
-	private final Constructor<?> doubleConstructor;
+	private final Constructor<?> bigDecimalConstructor;
 	private final Constructor<?> arrayConstructor;
 	private final Constructor<?> structConstructor;
 	private final ConnectionFinder connectionFinder;
@@ -69,7 +71,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 		Class<?> structClass = findClass( "oracle.sql.STRUCT" );
 
 		numberConstructor = findConstructor( numberClass, java.lang.Integer.TYPE );
-		doubleConstructor = findConstructor(numberClass, java.lang.Double.TYPE);
+		bigDecimalConstructor = findConstructor(numberClass, BigDecimal.class);
 		arrayConstructor = findConstructor( arrayClass, arrayDescriptorClass, Connection.class, Object.class );
 		structConstructor = findConstructor( structClass, structDescriptorClass, Connection.class, Object[].class );
 	}
@@ -155,7 +157,15 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 	}
 
 	private Array createArray(Object descriptor, Connection conn, Object[] data) {
+		boolean shouldConvertToBigDecimal = Arrays.stream(data).allMatch(e -> e instanceof Double || e == null);
 		try {
+			if (shouldConvertToBigDecimal) {
+				BigDecimal[] dataAsBigDecimal = new BigDecimal[data.length];
+				for (int i = 0; i < data.length; i++) {
+					dataAsBigDecimal[i] = data[i] == null ? null : BigDecimal.valueOf((Double) data[i]);
+				}
+				return (Array) arrayConstructor.newInstance( descriptor, conn, dataAsBigDecimal );
+			}
 			return (Array) arrayConstructor.newInstance( descriptor, conn, data );
 		}
 		catch ( InstantiationException e ) {
@@ -230,7 +240,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
 
 	private Object createDouble(Double obj) {
 		try {
-			return obj == null ? null : doubleConstructor.newInstance( obj );
+			return obj == null ? null : bigDecimalConstructor.newInstance( BigDecimal.valueOf( obj ) );
 		}
 		catch ( InvocationTargetException e ) {
 			throw new RuntimeException( "Error creating oracle NUMBER", e );
