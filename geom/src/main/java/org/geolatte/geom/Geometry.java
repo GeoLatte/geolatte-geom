@@ -354,7 +354,7 @@ public abstract class Geometry<P extends Position> implements Serializable {
             lowerLeft = new double[crs.getCoordinateDimension()];
             Arrays.fill(lowerLeft, Double.MAX_VALUE);
             upperRight = new double[crs.getCoordinateDimension()];
-            Arrays.fill(upperRight, Double.MIN_VALUE);
+            Arrays.fill(upperRight, -Double.MAX_VALUE);
         }
 
         @Override
