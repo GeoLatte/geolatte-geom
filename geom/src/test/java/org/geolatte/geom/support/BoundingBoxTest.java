@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class BoundingBoxTest {
 
     @Test
-    public void checkBBContainsAllPositions(){
+    public void checkBoundingBoxIsConstructedCorrectly(){
         C2D p1 = c(-2, -2);
         C2D p2 = c(-1, -1);
         MultiPoint mp = multipoint(point(WEB_MERCATOR, p1), point(WEB_MERCATOR, p2));
