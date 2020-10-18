@@ -30,7 +30,7 @@ public class Envelope<P extends Position> {
     /**
      * Creates an instance from specified lower-left and upper-right <code>Point</code>s.
      *
-     * If the positions have coordinate dimension > 2, the Z/M coordinate values will be
+     * If the positions have coordinate dimension higher than 2, the Z/M coordinate values will be
      * set to 0 in the constructed Envelope
      *
      * @param lowerLeft  the <code>Point</code> designating the lower-left coordinates
@@ -45,7 +45,7 @@ public class Envelope<P extends Position> {
     /**
      * Create an instance using the specified coordinates and <code>CoordinateReferenceSystem</code>.
      *
-     * If the {@code CoordinateReferenceSystem} has coordinate dimension > 2, the Z/M coordinate values will be set to 0
+     * If the {@code CoordinateReferenceSystem} has coordinate dimension higher than 2, the Z/M coordinate values will be set to 0
      * in the envelope
      *
      * @param minC1 minimum first coordinate
@@ -63,11 +63,11 @@ public class Envelope<P extends Position> {
         double[] lowerLeft = new double[crs.getCoordinateDimension()];
         double[] upperRight = new double[crs.getCoordinateDimension()];
 
-        lowerLeft[0] = minC1 <= maxC1 ? minC1 : maxC1;
-        lowerLeft[1] = minC2 <= maxC2 ? minC2 : maxC2;
+        lowerLeft[0] = Math.min(minC1, maxC1);
+        lowerLeft[1] = Math.min(minC2, maxC2);
 
-        upperRight[0] = minC1 > maxC1 ? minC1 : maxC1;
-        upperRight[1] = minC2 > maxC2 ? minC2 : maxC2;
+        upperRight[0] = Math.max(minC1, maxC1);
+        upperRight[1] = Math.max(minC2, maxC2);
 
         this.crs =  crs;
         this.lowerLeft = Positions.mkPosition(crs, lowerLeft);

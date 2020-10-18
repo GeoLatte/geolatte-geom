@@ -128,7 +128,7 @@ abstract public class CoordinateSystem<P extends Position> {
      *
      * @param i the 0-base index for a coordinate
      * @return the axis
-     * @throws java.lang.IndexOutOfBoundsException if i > getCoordinateDimension() - 1
+     * @throws java.lang.IndexOutOfBoundsException if i &gt; getCoordinateDimension() - 1
      */
     public CoordinateSystemAxis getAxisForComponentIndex(int i) {
         List<Integer> order = getAxisNormalOrder();

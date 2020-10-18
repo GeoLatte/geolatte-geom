@@ -94,7 +94,6 @@ public class CrsId {
      *
      * @param authority the authority that assigned the code
      * @param code the code for the <code>CoordinateReferenceSystem</code>
-     * @return a <code>CrsId</code> for the specified authority and code.
      */
     public CrsId(String authority, int code) {
         if (authority == null || authority.isEmpty()) {

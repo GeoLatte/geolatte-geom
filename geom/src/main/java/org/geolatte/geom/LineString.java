@@ -49,7 +49,7 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
      * and <code>ProjectedGeometryOperations</code> implementation.
      *
      * @param positions the {@code PositionSequence} that determines this geometry
-     * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size < 2
+     * @throws IllegalArgumentException if the passed <code>PointSequence</code> is non-empty and of size less than 2
      */
     public LineString(PositionSequence<P> positions, CoordinateReferenceSystem<P> crs) {
         super(positions, crs);
