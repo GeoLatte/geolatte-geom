@@ -14,3 +14,5 @@ javadoc/*
 **/project/target/
 **/target/
 **/.flattened-pom.xml
+deploy-release.sh
+.sdkmanrc
