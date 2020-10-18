@@ -139,8 +139,8 @@ public class Wkt {
             throw new IllegalArgumentException("Null WKT codec class is not allowed.");
         }
         try {
-            return codecClass.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            return codecClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
