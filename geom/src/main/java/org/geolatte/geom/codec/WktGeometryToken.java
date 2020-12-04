@@ -23,26 +23,46 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.GeometryType;
 
+import java.util.Locale;
+
 /**
  * The <code>WktKeywordToken</code> for the type of geometry.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/19/11
  */
 class WktGeometryToken extends WktKeywordToken {
+
+    static WktGeometryToken forType(GeometryType type) {
+        return new WktGeometryToken(type.name().toUpperCase(Locale.US), type);
+    }
+
+    static WktGeometryToken forType(GeometryType type, String wktTag) {
+        return new WktGeometryToken(wktTag, type);
+    }
+
     private final GeometryType geometryType;
+    @Deprecated
     private final boolean isMeasured;
 
-    public WktGeometryToken(String word, GeometryType tag, boolean measured) {
+
+    @Deprecated
+    WktGeometryToken(String word, GeometryType tag, boolean measured) {
         super(word);
         this.geometryType = tag;
         this.isMeasured = measured;
+    }
+
+    WktGeometryToken(String word, GeometryType tag) {
+        super(word);
+        this.geometryType = tag;
+        this.isMeasured = false;
     }
 
     GeometryType getType() {
         return geometryType;
     }
 
+    @Deprecated
     boolean isMeasured() {
         return isMeasured;
     }

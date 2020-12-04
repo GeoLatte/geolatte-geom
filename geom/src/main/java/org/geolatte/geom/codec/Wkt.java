@@ -25,7 +25,6 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +39,10 @@ import java.util.Map;
 public class Wkt {
 
     public enum Dialect {
-        SFA_1_1_0, //SFA vs 1.1.0, OGC document 05_126 (http://portal.opengeospatial.org/files/?artifact_id=13227)
+        /**
+         * Implements SFA vs 1.1.0, OGC document <a href="<a href="http://portal.opengeospatial.org/files/?artifact_id=13227">05_126</a>
+         */
+        SFA_1_1_0,
         //the PostGIS EWKT dialect (versions 1.0 to 1.5).
         POSTGIS_EWKT_1,
         MYSQL_WKT,

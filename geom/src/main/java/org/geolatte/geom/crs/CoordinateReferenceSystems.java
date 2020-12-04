@@ -155,17 +155,17 @@ public class CoordinateReferenceSystems {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <P extends Position, R extends P> CompoundCoordinateReferenceSystem<R> combine
+    public static <P extends Position, R extends Position> CompoundCoordinateReferenceSystem<R> combine
     (CoordinateReferenceSystem<P> base, SingleCoordinateReferenceSystem ods, Class<R> resultCSPtype) {
         return (CompoundCoordinateReferenceSystem<R>) combine(base, ods);
     }
 
-    public static <P extends Position, R extends P> CompoundCoordinateReferenceSystem<R> addLinearSystem
+    public static <P extends Position, R extends Position> CompoundCoordinateReferenceSystem<R> addLinearSystem
             (CoordinateReferenceSystem<P> base, Class<R> resultCSPtype, LinearUnit unit) {
         return combine(base, mkLinear(unit), resultCSPtype);
     }
 
-    public static <P extends Position, R extends P> CompoundCoordinateReferenceSystem<R> addVerticalSystem
+    public static <P extends Position, R extends Position> CompoundCoordinateReferenceSystem<R> addVerticalSystem
             (CoordinateReferenceSystem<P> base, Class<R> resultCSPtype, LinearUnit unit) {
         return combine(base, mkVertical(unit), resultCSPtype);
     }
@@ -274,7 +274,7 @@ public class CoordinateReferenceSystems {
      *
      * This system can be used for all of Europe.
      */
-    public static GeographicCoordinateReferenceSystem ETRS89 = CrsRegistry
+    public static GeographicCoordinateReferenceSystem<G2D> ETRS89 = CrsRegistry
             .getGeographicCoordinateReferenceSystemForEPSG(4258);
 
 
@@ -297,7 +297,7 @@ public class CoordinateReferenceSystems {
     }
 
     /**
-     * @deprecated User crs.hasM()
+     * @deprecated Use crs.hasM()
      */
     @Deprecated
     public static <P extends Position> boolean hasMeasureAxis(CoordinateReferenceSystem<P> crs) {
