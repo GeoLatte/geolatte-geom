@@ -40,6 +40,7 @@ import java.util.Map;
 public class Wkt {
 
     public enum Dialect {
+        SFA_1_1_0, //SFA vs 1.1.0, OGC document 05_126 (http://portal.opengeospatial.org/files/?artifact_id=13227)
         //the PostGIS EWKT dialect (versions 1.0 to 1.5).
         POSTGIS_EWKT_1,
         MYSQL_WKT,
@@ -53,6 +54,7 @@ public class Wkt {
     private static final Map<Dialect, Class<? extends WktEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WktEncoder>>();
 
     static {
+        ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WktEncoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktDecoder.class);
         DECODERS.put(Dialect.MYSQL_WKT, PostgisWktDecoder.class); // use also the PostgisWktDecoder since it can handle everything from Mysql
         DECODERS.put(Dialect.HANA_EWKT, HANAWktDecoder.class);

@@ -22,6 +22,9 @@
 package org.geolatte.geom.codec;
 
 
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+
 import java.util.Set;
 
 /**
