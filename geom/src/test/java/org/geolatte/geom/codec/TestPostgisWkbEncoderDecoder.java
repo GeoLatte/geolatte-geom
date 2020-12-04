@@ -43,7 +43,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_point_2d() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_2D);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?> geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_2D), geom);
         testEncoding(byteBuffer, geom);
@@ -52,7 +52,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_point_XYZ() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_3D);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?> geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_3D), geom);
         testEncoding(byteBuffer, geom);
@@ -61,7 +61,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_point_XYZM() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_3DM);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_3DM), geom);
         testEncoding(byteBuffer, geom);
@@ -70,7 +70,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_point_XYM() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_2DM);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_2DM), geom);
         testEncoding(byteBuffer, geom);
@@ -79,7 +79,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_point_XYZM_WITH_SRID() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POINT_WITH_SRID);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertEquals(GeometryType.POINT, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POINT_WITH_SRID), geom);
         testEncoding(byteBuffer, geom);
@@ -88,7 +88,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_linestring_2d() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.LINESTRING_2D);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.LINESTRING, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.LINESTRING_2D), geom);
@@ -98,7 +98,7 @@ public class TestPostgisWkbEncoderDecoder {
     @Test
     public void test_Polygon_2d_no_interior_rings() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertNotNull(geom);
         assertEquals(GeometryType.POLYGON, geom.getGeometryType());
         assertEquals(testcases.getExpected(PostgisTestCases.POLYGON_2D_NO_INNER_RINGS), geom);
@@ -198,25 +198,25 @@ public class TestPostgisWkbEncoderDecoder {
         PostgisWkbDecoder decoder = new PostgisWkbDecoder();
 
         ByteBuffer pointWithNoSridBuffer = testcases.getWKB(PostgisTestCases.POINT_2D);
-        Geometry decodedBefore = decoder.decode(pointWithNoSridBuffer);
+        Geometry<?>decodedBefore = decoder.decode(pointWithNoSridBuffer);
 
         //Use decoder to decode point with srid
         decoder.decode(testcases.getWKB(PostgisTestCases.POINT_WITH_SRID));
 
-        Geometry decodedAfter = decoder.decode(pointWithNoSridBuffer);
+        Geometry<?>decodedAfter = decoder.decode(pointWithNoSridBuffer);
         assertEquals(decodedBefore, decodedAfter);
     }
 
     @Test(expected = WkbDecodeException.class)
     public void test_invalid_point() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.INVALID_POINT);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
     }
 
     @Test(expected = WkbDecodeException.class)
     public void test_invalid_polygon() {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.INVALID_POLYGON);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
     }
 
     @Test
@@ -224,13 +224,13 @@ public class TestPostgisWkbEncoderDecoder {
         Geometry<G2D> g = new Point<G2D>(CoordinateReferenceSystems.mkGeographic(Unit.DEGREE));
         ByteBuffer buf = Wkb.toWkb(g);
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT);
-        Geometry geom = decode(byteBuffer);
+        Geometry<?>geom = decode(byteBuffer);
         assertTrue(geom.isEmpty());
         testEncoding(byteBuffer, geom);
     }
 
 
-    private void testEncoding(ByteBuffer byteBuffer, Geometry geom) {
+    private void testEncoding(ByteBuffer byteBuffer, Geometry<?>geom) {
         ByteBuffer out = Wkb.toWkb(geom);
         assertTrue(String.format("Expected: %s, Received: %s", byteBuffer.toString(), out.toString()),
                 byteBuffer.hasSameContent(out));
