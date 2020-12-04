@@ -21,6 +21,11 @@
 
 package org.geolatte.geom;
 
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 /**
  * A <code>PositionSequence</code> is an ordered sequence of <code>Position</code>s.
  * 
@@ -103,5 +108,11 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
      */
     PositionSequence<P> reverse();
 
+    default Stream<P>  stream() {
+        return StreamSupport.stream(this.spliterator(), false);
+    }
 
+    default Spliterator<P> splitIterator(){
+        return Spliterators.spliteratorUnknownSize(this.iterator(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
+    }
 }
