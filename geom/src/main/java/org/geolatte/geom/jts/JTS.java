@@ -355,6 +355,16 @@ public class JTS {
     }
 
     /*
+     * Converts a jts linearRing into a geolatte linearRing
+     */
+    private static <P extends Position> org.geolatte.geom.LinearRing<P> from(LinearRing jtsLinearRing,
+                                                                             CoordinateReferenceSystem<P> crs) {
+        CoordinateSequence cs = jtsLinearRing.getCoordinateSequence();
+        return new org.geolatte.geom.LinearRing<P>(pscsFactory.toPositionSequence(cs, crs.getPositionClass(), crs),
+                crs);
+    }
+
+    /*
      * Converts a jts multipoint into a geolatte multipoint
      */
     @SuppressWarnings("unchecked")
