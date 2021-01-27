@@ -157,5 +157,34 @@ public class TestSimpleTokenizer {
     }
 
 
+    @Test
+    public void testFastReadNumber(){
+        SimpleTokenizer t = new SimpleTokenizer("   12.34  ");
+        assertEquals(12.34, t.fastReadNumber(), 0.00001);
+        assertFalse(t.hasMoreInput());
+
+        t = new SimpleTokenizer("   -12.34  ");
+        assertEquals(-12.34, t.fastReadNumber(), 0.00001);
+        assertFalse(t.hasMoreInput());
+
+        t = new SimpleTokenizer("-1234");
+        assertEquals(-1234, t.fastReadNumber(), 0.00001);
+        assertFalse(t.hasMoreInput());
+
+        t = new SimpleTokenizer("1234ab");
+        assertEquals(1234, t.fastReadNumber(), 0.00001);
+        assertTrue(t.hasMoreInput());
+        assertEquals(4, t.currentPos());
+        assertEquals("ab", t.readText());
+
+        t = new SimpleTokenizer("1234.");
+        assertEquals(1234, t.fastReadNumber(), 0.00001);
+        assertFalse(t.hasMoreInput());
+
+        t = new SimpleTokenizer("1234.0E003");
+        assertEquals(1234000, t.fastReadNumber(), 0.00001);
+        assertFalse(t.hasMoreInput());
+    }
+
 
 }
