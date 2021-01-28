@@ -43,7 +43,6 @@ abstract class AbstractWktTokenizer {
     // this is just temporarily for testing
     WktToken nextToken() {
         WktToken token = inner();
-//        System.out.println("NEXT TOKEN: " + token);
         return token;
     }
 

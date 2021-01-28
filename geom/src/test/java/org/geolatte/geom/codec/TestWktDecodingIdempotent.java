@@ -18,7 +18,7 @@ public class TestWktDecodingIdempotent {
 
     @Test
     public void testFastNumberReader() {
-        WktTokenizer tokenizer = new WktTokenizer("169038.177124  ", new PostgisWktVariant(), crs);
+        SimpleTokenizer tokenizer = new SimpleTokenizer("169038.177124  ");
         double v = tokenizer.fastReadNumber();
         assertEquals("169038.177124", String.valueOf(v));
 

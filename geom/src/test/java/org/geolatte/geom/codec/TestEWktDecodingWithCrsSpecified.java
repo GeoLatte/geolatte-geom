@@ -17,7 +17,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Karel Maesen, Geovise BVBA on 17/02/15.
+ * Created by Karel Maesen, Geovise BVBA on 17/02/15.w
  */
 public class TestEWktDecodingWithCrsSpecified {
 

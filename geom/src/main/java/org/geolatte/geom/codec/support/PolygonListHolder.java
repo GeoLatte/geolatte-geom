@@ -1,4 +1,4 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.codec.support;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -10,27 +10,26 @@ import java.util.stream.Collectors;
 /**
  * Created by Karel Maesen, Geovise BVBA on 11/09/17.
  */
-class PolygonListHolder extends Holder {
+public class PolygonListHolder extends Holder {
 
     final private List<LinearPositionsListHolder> spcs = new ArrayList<>();
 
-    void push( LinearPositionsListHolder lph) {
+    public void push(LinearPositionsListHolder lph) {
         spcs.add(lph);
     }
 
     @Override
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return spcs.isEmpty();
     }
 
     @Override
-    int getCoordinateDimension() {
+    public int getCoordinateDimension() {
         return spcs.stream().mapToInt(Holder::getCoordinateDimension).max().orElse(0);
     }
 
     @Override
-    <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws GeoJsonProcessingException {
-
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
         return isEmpty() ? Geometries.mkEmptyMultiPolygon(crs) : Geometries.mkMultiPolygon(toPolygons(crs));
     }
 

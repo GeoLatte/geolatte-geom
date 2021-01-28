@@ -6,6 +6,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem
 /**
  * Created by Karel Maesen, Geovise BVBA on 14/02/2020.
  */
+@Deprecated
 public class DefaultCoordinateSystemExpander implements CoordinateSystemExpander {
 
     @Override

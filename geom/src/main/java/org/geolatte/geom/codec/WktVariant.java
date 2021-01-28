@@ -28,7 +28,6 @@ import org.geolatte.geom.Position;
 import java.util.Set;
 
 /**
- * The punctuation characters and keywords for a particular dialect of WKT.
  *
  * <p>There exist several dailects for WKT (e.g. postgis EWKT, SFS version 1.2.1 WKT). Instances of <code>WktVariant</code>
  * capture these differences. This allows easy customization of the <code>WktTokenizer</code> for particular WKT variants

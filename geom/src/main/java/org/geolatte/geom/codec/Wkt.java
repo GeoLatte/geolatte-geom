@@ -56,11 +56,12 @@ public class Wkt {
     private static final Map<Dialect, Class<? extends WktEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WktEncoder>>();
 
     static {
-        ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WktEncoder.class);
+        DECODERS.put(Dialect.SFA_1_1_0, Sfa110WktDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktDecoder.class);
         DECODERS.put(Dialect.MYSQL_WKT, PostgisWktDecoder.class); // use also the PostgisWktDecoder since it can handle everything from Mysql
         DECODERS.put(Dialect.HANA_EWKT, HANAWktDecoder.class);
         DECODERS.put(Dialect.DB2_WKT, Db2Decoder.class);
+        ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WktEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktEncoder.class);
         ENCODERS.put(Dialect.MYSQL_WKT, PostgisWktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
         ENCODERS.put(Dialect.HANA_EWKT, HANAWktEncoder.class);

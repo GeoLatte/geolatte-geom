@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 
 public class SimpleTokenizer {
 
-    final static char openListChar ='(';
-    final static char closeListChar =')';
-    final static char elementSeparator = ',';
+    final public static char openListChar ='(';
+    final public static char closeListChar =')';
+    final public static char elementSeparator = ',';
 
     final private CharSequence input;
 
@@ -26,8 +26,19 @@ public class SimpleTokenizer {
         currentPos = newPos;
     }
 
+    public void back(int numPos) {
+        if (currentPos < numPos) {
+            throw new IllegalStateException("Trying to return beyond start of input");
+        }
+        currentPos -= numPos;
+    }
+
     public int currentPos(){
         return currentPos;
+    }
+
+    public String input() {
+        return this.input.toString();
     }
 
     public void skipWhitespace() {
@@ -63,7 +74,7 @@ public class SimpleTokenizer {
         try {
             return Double.parseDouble(stb.toString());
         } catch(NumberFormatException ex) {
-            throw new WktParseException("Expected double", ex);
+            throw new WktDecodeException("Expected double", ex);
         }
     }
 
@@ -80,14 +91,14 @@ public class SimpleTokenizer {
 
     public String readLiteralText() {
         skipWhitespace();
-        if( currentChar() != '"') throw new WktParseException("Expected quote character");
+        if( currentChar() != '"') throw new WktDecodeException("Expected quote character");
         StringBuilder builder = new StringBuilder();
         nextChar();
         while (currentChar() != '"') {
             builder.append(currentChar());
             nextChar();
             if (endOfInput()) {
-                throw new WktParseException("Literal text is not terminated");
+                throw new WktDecodeException("Literal text is not terminated");
             }
         }
         nextChar();
@@ -95,7 +106,7 @@ public class SimpleTokenizer {
     }
 
     public String readText(){
-        if( hasMoreInput() && !Character.isLetterOrDigit(currentChar())) throw new WktParseException("Expected a letter or digit");
+        if( hasMoreInput() && !Character.isLetterOrDigit(currentChar())) throw new WktDecodeException("Expected a letter or digit");
         StringBuilder builder = new StringBuilder();
         while (!endOfInput() && Character.isLetterOrDigit(currentChar())) {
             builder.append(currentChar());
@@ -106,7 +117,22 @@ public class SimpleTokenizer {
     }
 
     public char currentChar() {
-        return input.charAt(currentPos);
+        try {
+            return input.charAt(currentPos);
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new WktDecodeException("Unexpected end of input at position " + currentPos);
+        }
+    }
+
+    public boolean matchesChar(char c, boolean skipWhitespace){
+        if (skipWhitespace) {
+            skipWhitespace();
+        }
+        if (currentChar() == c) {
+            nextChar();
+            return true;
+        }
+        return false;
     }
 
     public boolean matchPattern(Pattern pattern){
@@ -129,32 +155,36 @@ public class SimpleTokenizer {
                 currentPos = m.end();
                 return Optional.of(m.group(group));
             } catch(IndexOutOfBoundsException t) {
-                throw new WktParseException("Attempted to extract non-existent capture group");
+                throw new WktDecodeException("Attempted to extract non-existent capture group");
             }
         } else {
             return Optional.empty();
         }
     }
 
-    private boolean matchesChar(char expected){
+
+    public Optional<Character> matchesOneOf(char... choices){
         skipWhitespace();
-        if(currentChar() != expected) {
-            return false;
+        for(char c: choices) {
+            if(currentChar() == c) {
+                nextChar();
+                return Optional.of(c);
+            }
         }
-        nextChar();
-        return true;
+        return Optional.empty();
     }
 
+
     public boolean matchesOpenList(){
-        return matchesChar(openListChar);
+        return matchesChar(openListChar, true);
     }
 
     public boolean matchesCloseList(){
-        return matchesChar(closeListChar);
+        return matchesChar(closeListChar, true);
     }
 
     public boolean matchElementSeparator(){
-        return matchesChar(elementSeparator);
+        return matchesChar(elementSeparator, true);
     }
 
     /**
@@ -176,15 +206,17 @@ public class SimpleTokenizer {
 
         //read the number and put it in form <long>E<long>
         long s = 0L;
+        boolean digitsSeen = false;
         boolean decPntSeen = false;
         long decPos = -1;
         while (true) {
 
             if (Character.isDigit(c)) {
                 s = 10 * s + (c - '0');
+                digitsSeen = true;
             } else if (c == '.' ) {
                 if (decPntSeen) {
-                    throw new WktParseException("Invalid number format at position " + currentPos);
+                    throw new WktDecodeException("Invalid number format at position " + currentPos);
                 }
                 decPntSeen = true;
             } else {
@@ -198,8 +230,6 @@ public class SimpleTokenizer {
             if (endOfInput()) break;
             c = currentChar();
         }
-
-
 
         //read the exponent (scientific notation)
         long exp = 0L;
@@ -216,6 +246,9 @@ public class SimpleTokenizer {
                 if (endOfInput()) break;
                 c = currentChar();
             }
+        }
+        if (!digitsSeen){
+            throw new WktDecodeException("Invalid number format at position " + currentPos);
         }
         long p =  decPos >= 0 ? expSign * exp - decPos : expSign * exp;
         int endPos = currentPos;

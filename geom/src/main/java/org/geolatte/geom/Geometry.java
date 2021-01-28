@@ -252,6 +252,22 @@ public abstract class Geometry<P extends Position> implements Serializable {
         return bv.build();
     }
 
+    /**
+     * Does this {@code Geometry} has Measure (M) coordinates
+     * @return true if this {@code Geometry} has Measure coordinate values
+     */
+    public boolean hasM(){
+        return getCoordinateReferenceSystem().hasM();
+    }
+
+    /**
+     * Does this {@code Geometry} has vertical or Z coordinates
+     * @return true if this {@code Geometry} has vertical coordinate values
+     */
+    public boolean hasZ(){
+        return getCoordinateReferenceSystem().hasZ();
+    }
+
     @Override
     public int hashCode() {
         int result = getGeometryType().hashCode();

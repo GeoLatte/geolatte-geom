@@ -35,13 +35,13 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWktVariant extends PostgisWktVariant {
+class HANAWktDialect extends PostgisWktDialect {
 	
 	private final static List<HANAWktGeometryToken> GEOMETRIES = new ArrayList<HANAWktGeometryToken>();
 
 	private final static Set<WktKeywordToken> KEYWORDS;
 
-	protected HANAWktVariant() {
+	protected HANAWktDialect() {
 	}
 
 	static {
@@ -79,7 +79,7 @@ class HANAWktVariant extends PostgisWktVariant {
 		// create an unmodifiable set of all pattern tokens
 		Set<WktKeywordToken> allTokens = new HashSet<WktKeywordToken>();
 		allTokens.addAll( GEOMETRIES );
-		allTokens.add( EMPTY );
+		allTokens.add( new WktEmptyGeometryToken() );
 		KEYWORDS = Collections.unmodifiableSet( allTokens );
 	}
 
@@ -87,7 +87,6 @@ class HANAWktVariant extends PostgisWktVariant {
 		GEOMETRIES.add( new HANAWktGeometryToken( word, type, isMeasured, is3D ) );
 	}
 
-	@Override
 	public String wordFor(@SuppressWarnings("rawtypes") Geometry geometry, boolean ignoreMeasureMarker) {
 		for ( HANAWktGeometryToken candidate : GEOMETRIES ) {
 			if ( sameGeometryType( candidate, geometry ) && hasSameMeasuredAndZAxisSuffixInWkt( candidate, geometry, ignoreMeasureMarker ) ) {
@@ -100,7 +99,10 @@ class HANAWktVariant extends PostgisWktVariant {
 						geometry.getClass().getName() ) );
 	}
 
-	@Override
+	private boolean sameGeometryType(HANAWktGeometryToken candidate, Geometry geometry) {
+		return false;
+	}
+
 	protected Set<WktKeywordToken> getWktKeywords() {
 		return KEYWORDS;
 	}

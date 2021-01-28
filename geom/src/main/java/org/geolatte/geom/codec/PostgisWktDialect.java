@@ -21,37 +21,35 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.FieldPosition;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.*;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
- * Encodes geometries to Postgis WKT/EWKT representations.
- *
- * <p>This class is not thread-safe.</p>
+ * Punctuation and keywords for Postgis EWKT/WKT representations.
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktEncoder extends BaseWktEncoder {
+class PostgisWktDialect extends BaseWktDialect {
 
-    /**
-     * Constructs an instance.
-     */
-    public PostgisWktEncoder() {
-        super(new BaseWktDialect());
+    @Override
+    void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+        if(geometry.hasM()) {
+            buffer.append('M');
+        }
     }
 
-    protected <P extends Position> double[] createCoordinateBuffer(PositionSequence<P> positions) {
-        return new double[positions.getCoordinateDimension()];
-    }
-
-    protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> positions, int pos, double[] coords) {
-        for(int i = 0; i < positions.getCoordinateDimension(); i++) {
-            coords[i] = positions.getPositionN(pos).getCoordinate(i);
+    @Override
+    public void addSrid(StringBuffer builder, int srid) {
+        if (srid > 0) {
+            builder.append("SRID=")
+                    .append(srid)
+                    .append(";");
         }
     }
 }

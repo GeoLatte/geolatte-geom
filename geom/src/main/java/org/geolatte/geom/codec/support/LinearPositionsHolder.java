@@ -1,6 +1,7 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.codec.support;
 
 import org.geolatte.geom.*;
+import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
@@ -12,38 +13,39 @@ import static org.geolatte.geom.GeometryType.MULTIPOINT;
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
-class LinearPositionsHolder extends Holder {
+public class LinearPositionsHolder extends Holder {
 
-    final private List<PointHolder> spcs = new ArrayList<>();
+    final private List<PointHolder> pointHolderList = new ArrayList<>();
 
-    void push(PointHolder holder) {
-        spcs.add(holder);
+    public void push(PointHolder holder) {
+        pointHolderList.add(holder);
     }
 
     @Override
-    boolean isEmpty() {
-        return spcs.isEmpty();
+    public boolean isEmpty() {
+        return pointHolderList.isEmpty();
     }
 
     @Override
-    int getCoordinateDimension() {
-        return spcs.stream().mapToInt(Holder::getCoordinateDimension).max().orElse(0);
+    public int getCoordinateDimension() {
+        return pointHolderList.stream().mapToInt(Holder::getCoordinateDimension).max().orElse(0);
     }
 
     @Override
-    <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws GeoJsonProcessingException {
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
         if(geomType == LINESTRING) {
             return isEmpty()? Geometries.mkEmptyLineString(crs): Geometries.mkLineString(toPositionSequence(crs), crs);
         }
         if (geomType == MULTIPOINT) {
             return isEmpty()? Geometries.mkEmptyMultiPoint(crs) : Geometries.mkMultiPoint(toPositionSequence(crs), crs);
         }
-        throw new GeoJsonProcessingException("Can't convert this coordinates array to requested Geomtype: " + geomType);
+
+        throw new WktDecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
     }
 
-    <P extends Position> PositionSequence<P> toPositionSequence(CoordinateReferenceSystem<P> crs) {
-        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(spcs.size(), crs.getPositionClass());
-        spcs.forEach(h -> builder.add(h.toPosition(crs)));
+    public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateReferenceSystem<P> crs) {
+        PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized(pointHolderList.size(), crs.getPositionClass());
+        pointHolderList.forEach(h -> builder.add(h.toPosition(crs)));
         return builder.toPositionSequence();
     }
 

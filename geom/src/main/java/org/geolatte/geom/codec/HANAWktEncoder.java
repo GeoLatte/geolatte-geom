@@ -32,7 +32,7 @@ import org.geolatte.geom.crs.CrsId;
  */
 class HANAWktEncoder extends PostgisWktEncoder {
 
-	private final static HANAWktVariant WKT_WORDS = new HANAWktVariant();
+	private final static HANAWktDialect WKT_WORDS = new HANAWktDialect();
 
 	@Override
 	public <P extends Position> String encode(Geometry<P> geometry) {
@@ -58,8 +58,8 @@ class HANAWktEncoder extends PostgisWktEncoder {
 		return wkt;
 	}
 
-	@Override
-	protected PostgisWktVariant getWktWords() {
+
+	protected PostgisWktDialect getWktWords() {
 		return WKT_WORDS;
 	}
 

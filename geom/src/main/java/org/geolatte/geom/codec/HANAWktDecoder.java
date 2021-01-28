@@ -20,29 +20,27 @@
  */
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
 /**
  * The HANA EWKT decoder is a variant of the Postgis EWKT decoder. The differences are that it uses a different
  * tokenizer and a different set of keywords.
  * 
  * @author Jonathan Bregler, SAP
  */
-class HANAWktDecoder extends PostgisWktDecoder {
-
-	private final static HANAWktVariant WKT_GEOM_TOKENS = new HANAWktVariant();
-
-	public HANAWktDecoder() {
-		super( WKT_GEOM_TOKENS );
-	}
+class HANAWktDecoder implements WktDecoder {
 
 	@Override
-	protected void setTokenizer(AbstractWktTokenizer tokenizer) {
-		if ( tokenizer instanceof WktTokenizer ) {
-			WktTokenizer wktTokenizer = (WktTokenizer) tokenizer;
-			super.setTokenizer( new HANAWktTokenizer( wktTokenizer.wkt, WKT_GEOM_TOKENS, wktTokenizer.baseCRS, wktTokenizer.forceToCRS ) );
-		}
-		else {
-			throw new IllegalArgumentException( "The tokenizer must be an instance of " + WktTokenizer.class.getName() );
-		}
+	public <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {
+		return new HANAWktParser<>(wkt, crs).parse();
+	}
+}
 
+class HANAWktParser<P extends Position> extends PostgisWktParser<P> {
+	private final static HANAWktDialect dialect = new HANAWktDialect();
+	public HANAWktParser(String wkt, CoordinateReferenceSystem<P> crs) {
+		super(dialect, wkt, crs);
 	}
 }

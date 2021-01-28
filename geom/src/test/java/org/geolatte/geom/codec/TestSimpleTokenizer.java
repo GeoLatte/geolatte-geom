@@ -64,7 +64,7 @@ public class TestSimpleTokenizer {
     }
 
 
-    @Test(expected = WktParseException.class)
+    @Test(expected = WktDecodeException.class)
     public void testReadTextFailsWhenNotAtLetterOrDigit(){
         SimpleTokenizer t = new SimpleTokenizer("$abc");
         t.readText();
@@ -95,7 +95,7 @@ public class TestSimpleTokenizer {
         assertFalse(t.hasMoreInput());
     }
 
-    @Test(expected = WktParseException.class)
+    @Test(expected = WktDecodeException.class)
     public void testReadNumberFailsOnAlpha(){
         SimpleTokenizer t = new SimpleTokenizer("  abc124e ");
         t.readNumber();
@@ -109,13 +109,13 @@ public class TestSimpleTokenizer {
     }
 
 
-    @Test(expected= WktParseException.class)
+    @Test(expected= WktDecodeException.class)
     public void testLiteralTextFailsWhenNotTerminated(){
         SimpleTokenizer t = new SimpleTokenizer(" \"this is text ");
         t.readLiteralText();
     }
 
-    @Test(expected= WktParseException.class)
+    @Test(expected= WktDecodeException.class)
     public void testLiteralTextFailsOnNotQuoteAtStart(){
         SimpleTokenizer t = new SimpleTokenizer(" This is text ");
         t.readLiteralText();
@@ -186,5 +186,30 @@ public class TestSimpleTokenizer {
         assertFalse(t.hasMoreInput());
     }
 
+    @Test(expected= WktDecodeException.class)
+    public void testFailfastreader(){
+        SimpleTokenizer t = new SimpleTokenizer(" (1.2");
+        t.fastReadNumber();
+    }
+
+    @Test
+    public void testFastReadNumbersNoDecimals(){
+        SimpleTokenizer t = new SimpleTokenizer(" 1.245 33");
+        assertEquals(1.245, t.fastReadNumber(), 0.0001);
+        assertEquals(33, t.fastReadNumber(), 0.0001);
+    }
+
+    @Test
+    public void testMatchOneOf(){
+        SimpleTokenizer t = new SimpleTokenizer("(12.3,45) )");
+        assertEquals(Optional.of('('), t.matchesOneOf('(', ',', ')'));
+        assertEquals(12.3, t.fastReadNumber(), 0.00001);
+        assertEquals(Optional.of(','), t.matchesOneOf('(', ',', ')'));
+        assertEquals(Optional.empty(), t.matchesOneOf('(', ',', ')'));
+        assertEquals(45, t.fastReadNumber(), 0.00001);
+        assertEquals(Optional.of(')'), t.matchesOneOf('(', ',', ')'));
+        assertEquals(Optional.of(')'), t.matchesOneOf('(', ',', ')'));
+        assertFalse(t.hasMoreInput());
+    }
 
 }

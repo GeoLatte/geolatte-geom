@@ -340,12 +340,14 @@ public class TestPostgisWktEncoderDecoder {
     }
 
     private Geometry decode(String wkt) {
-        return Wkt.fromWkt(wkt);
+        WktDecoder dec = Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
+        return dec.decode(wkt);
     }
 
 
     private void testEncoding(String wkt, Geometry geom) {
-        assertEquals(wkt, Wkt.toWkt(geom));
+        WktEncoder enc = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
+        assertEquals(wkt, enc.encode(geom));
     }
 
 

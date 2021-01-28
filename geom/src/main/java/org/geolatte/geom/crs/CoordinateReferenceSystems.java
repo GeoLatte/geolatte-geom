@@ -46,7 +46,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic projected coordinate reference system using the specified units of length for coordinates.
-     *
+     * <p>
      * A generic system is one without a precisely defined Coordinate Reference System
      *
      * @param unit the unit to use for the planar coordinates.
@@ -58,7 +58,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * Creates a generic geographic coordinate reference system using the specified units of length for coordinates.
-     *
+     * <p>
      * A generic system is one without a precisely defined datum or ellipsoid.
      *
      * @param
@@ -118,7 +118,7 @@ public class CoordinateReferenceSystems {
         CoordinateReferenceSystem<?> crs = mkCoordinateReferenceSystem(baseCrs, verticalUnit, measureUnit);
 
         if (crs.getPositionClass().equals(positionType)) {
-            return (CoordinateReferenceSystem<P>)crs;
+            return (CoordinateReferenceSystem<P>) crs;
         }
 
         throw new IllegalArgumentException(format("Invalid positionClass: %s not equals %s",
@@ -176,7 +176,7 @@ public class CoordinateReferenceSystems {
      * @param original
      * @return
      */
-    public static <P extends Position> ProjectedCoordinateReferenceSystem  asProjected(CoordinateReferenceSystem<P> original) {
+    public static <P extends Position> ProjectedCoordinateReferenceSystem asProjected(CoordinateReferenceSystem<P> original) {
         //we use WGS84 as the source geocrs, because it really doesn't matter with a no-op projection
         return new ProjectedCoordinateReferenceSystem(original.getCrsId(), original.getName(), WGS84,
                 Projection.NOOP, new ArrayList<>(), CartesianCoordinateSystem2D.DEFAULT);
@@ -210,13 +210,21 @@ public class CoordinateReferenceSystems {
         return combine(base, mkVertical(unit));
     }
 
-
     public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension) {
+        return adjustTo(crs, coordinateDimension, false);
+    }
+
+    public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension, boolean hasM) {
         if (coordinateDimension <= 2) {
             return crs;
         }
 
-        if (coordinateDimension == 3) {
+        if (coordinateDimension == 3 && hasM) {
+            CrsId extId = crs.getCrsId().extend(null, METER);
+            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, null, METER));
+        }
+
+        if (coordinateDimension == 3 && !hasM) {
             CrsId extId = crs.getCrsId().extend(METER, null);
             return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, null));
         }
@@ -262,7 +270,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * The WGS 84/Pseudo-Mercator {@code ProjectedCoordinateReferenceSystem}
-     *
+     * <p>
      * This is de de facto standard for Web mapping applications. See <a href="https://en.wikipedia.org/wiki/Web_Mercator#Identifiers">this Wikipedia article</a>
      * for more information, and some warnings of its use.
      */
@@ -271,7 +279,7 @@ public class CoordinateReferenceSystems {
 
     /**
      * The European ETRS89 geographic reference system.
-     *
+     * <p>
      * This system can be used for all of Europe.
      */
     public static GeographicCoordinateReferenceSystem<G2D> ETRS89 = CrsRegistry

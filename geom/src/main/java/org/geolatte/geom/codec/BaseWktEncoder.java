@@ -12,14 +12,14 @@ class BaseWktEncoder implements WktEncoder {
 
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
     private StringBuffer builder;
-    private final WktGeomVariant wktGeomVariant;
+    private final BaseWktDialect dialect;
     private final WktPositionEncoder positionEncoder = new PositionEncoder();
 
     /**
      * Constructs an instance.
      */
-    public BaseWktEncoder(WktGeomVariant variant) {
-        this.wktGeomVariant = variant;
+    public BaseWktEncoder(BaseWktDialect variant) {
+        this.dialect = variant;
     }
 
     /**
@@ -37,7 +37,7 @@ class BaseWktEncoder implements WktEncoder {
     }
 
     protected void addSrid(int srid) {
-        wktGeomVariant.addSrid(builder, srid);
+        dialect.addSrid(builder, srid);
     }
 
     protected <P extends Position> void addGeometry(Geometry<P> geometry) {
@@ -47,11 +47,11 @@ class BaseWktEncoder implements WktEncoder {
     }
 
     protected void addGeometryTag(Geometry<?> geometry) {
-        wktGeomVariant.addGeometryTag(builder, geometry);
+        dialect.addGeometryTag(builder, geometry);
     }
 
     protected void addGeometryZMMarker(Geometry<?> geometry) {
-        wktGeomVariant.addGeometryZMMarker(builder, geometry);
+        dialect.addGeometryZMMarker(builder, geometry);
     }
 
     protected<P extends Position> void addGeometryText(Geometry<P> geometry) {
@@ -129,18 +129,22 @@ class BaseWktEncoder implements WktEncoder {
 
     }
 
-    protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> points, int pos, double[] coords) {
-        coords[0] = points.getPositionN(pos).getCoordinate(0);
-        coords[1] = points.getPositionN(pos).getCoordinate(1);
+    protected <P extends Position> double[] createCoordinateBuffer(PositionSequence<P> positions) {
+        return new double[2];
     }
 
-    private <P extends Position> void addPositions(PositionSequence<P> points) {
-        double[] coords = new double[2];
-        for (int i = 0; i < points.size(); i++) {
+    protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> positions, int pos, double[] coords) {
+        coords[0] = positions.getPositionN(pos).getCoordinate(0);
+        coords[1] = positions.getPositionN(pos).getCoordinate(1);
+    }
+
+    private <P extends Position> void addPositions(PositionSequence<P> positions) {
+        double[] coords = createCoordinateBuffer(positions);
+        for (int i = 0; i < positions.size(); i++) {
             if (i > 0) {
                 addDelimiter();
             }
-            setCoordinatesToWrite(points, i, coords);
+            setCoordinatesToWrite(positions, i, coords);
             positionEncoder.addPoint(builder, coords);
         }
     }

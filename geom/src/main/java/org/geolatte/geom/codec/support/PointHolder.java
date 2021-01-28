@@ -1,37 +1,39 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.codec.support;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
  */
-class PointHolder extends Holder {
+public class PointHolder extends Holder {
 
-    final private double[] coordinates;
+    final private List<Double> coordinates;
 
     public PointHolder() {
-        this.coordinates = new double[0];
+        this.coordinates = new ArrayList<>(4);
     }
 
-    public PointHolder(double[] coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public double[] getCoordinates() {
-        return coordinates;
+    public void push(double co){
+        this.coordinates.add(co);
     }
 
     @Override
-    boolean isEmpty() {
-        return this.coordinates.length == 0;
+    public boolean isEmpty() {
+        return this.coordinates.size() == 0;
+    }
+
+    public double[] getCoordinates(){
+        return coordinates.stream().mapToDouble(x -> x).toArray();
     }
 
     @Override
-    int getCoordinateDimension() {
-        return this.coordinates.length;
+    public int getCoordinateDimension() {
+        return this.coordinates.size();
     }
 
     public <P extends Position> P toPosition(CoordinateReferenceSystem<P> crs) {
@@ -42,7 +44,7 @@ class PointHolder extends Holder {
 
     }
 
-    <P extends Position> Point<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
+    public <P extends Position> Point<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
         if (isEmpty()) return Geometries.mkEmptyPoint(crs);
         return Geometries.mkPoint(toPosition(crs), crs);
     }
