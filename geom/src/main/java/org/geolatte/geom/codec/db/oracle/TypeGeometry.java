@@ -21,15 +21,74 @@
 
 package org.geolatte.geom.codec.db.oracle;
 
+import org.geolatte.geom.codec.db.Decoder;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Jul 1, 2010
  */
 enum TypeGeometry {
 
-	UNKNOWN_GEOMETRY( 0 ), POINT( 1 ), LINE( 2 ), POLYGON( 3 ), COLLECTION( 4 ), MULTIPOINT(
-			5
-	), MULTILINE( 6 ), MULTIPOLYGON( 7 ), SOLID( 8 ), MULTISOLID( 9 );
+	UNKNOWN_GEOMETRY(0) {
+		@Override
+		Decoder createDecoder() {
+			throw new UnsupportedOperationException();
+		}
+	},
+	POINT(1) {
+		@Override
+		Decoder createDecoder() {
+			return new PointSdoDecoder();
+		}
+	},
+	LINE(2) {
+		@Override
+		Decoder createDecoder() {
+			return new LineStringSdoDecoder();
+		}
+	},
+	POLYGON(3) {
+		@Override
+		Decoder createDecoder() {
+			return new PolygonSdoDecoder();
+		}
+	},
+	COLLECTION(4) {
+		@Override
+		Decoder createDecoder() {
+			return new GeometryCollectionSdoDecoder();
+		}
+	},
+	MULTIPOINT(5) {
+		@Override
+		Decoder createDecoder() {
+			return new MultiPointSdoDecoder();
+		}
+	},
+	MULTILINE(6) {
+		@Override
+		Decoder createDecoder() {
+			return new MultiLineSdoDecoder();
+		}
+	},
+	MULTIPOLYGON(7) {
+		@Override
+		Decoder createDecoder() {
+			return new MultiPolygonSdoDecoder();
+		}
+	},
+	SOLID(8) {
+		@Override
+		Decoder createDecoder() {
+			throw new UnsupportedOperationException();
+		}
+	},
+	MULTISOLID(9) {
+		@Override
+		Decoder createDecoder() {
+			throw new UnsupportedOperationException();
+		}
+	};
 
 	private int gtype;
 
@@ -53,4 +112,5 @@ enum TypeGeometry {
 		);
 	}
 
+	abstract Decoder createDecoder();
 }
