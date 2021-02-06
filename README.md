@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/GeoLatte/geolatte-geom.svg?branch=master)](https://travis-ci.org/GeoLatte/geolatte-geom)
+[![Build Status](ttps://github.com/actions/GeoLatte/geolatte-geom/workflows/Java%20CI/badge.svg))
 
 # Geolatte-geom
 
