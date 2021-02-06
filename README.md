@@ -1,4 +1,4 @@
-[![Build Status](ttps://github.com/actions/GeoLatte/geolatte-geom/workflows/Java%20CI/badge.svg))
+![Build Status](https://github.com/GeoLatte/geolatte-geom/workflows/Java%20CI/badge.svg)
 
 # Geolatte-geom
 
