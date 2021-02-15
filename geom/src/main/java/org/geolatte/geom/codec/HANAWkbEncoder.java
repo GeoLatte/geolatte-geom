@@ -58,7 +58,7 @@ class HANAWkbEncoder extends PostgisWkbEncoder {
 
 		@Override
 		protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-			int typeCode = getGeometryType(geometry);
+			int typeCode = geometryTypeCode(geometry);
 			CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
 			if (!this.hasWrittenSrid) {
 				typeCode |= PostgisWkbTypeMasks.SRID_FLAG;

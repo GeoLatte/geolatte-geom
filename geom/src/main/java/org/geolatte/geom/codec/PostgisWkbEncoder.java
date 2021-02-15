@@ -40,7 +40,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
  */
 class PostgisWkbEncoder extends AbstractWkbEncoder {
 
-    //size of an empty geometry is the size of an emp
+    //size of an empty geometry is the size of an empty
     @Override
     protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
         return ByteBuffer.UINT_SIZE;
@@ -51,7 +51,7 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
         return new PostgisWkbVisitor<P>(output);
     }
 
-    static private class PostgisWkbVisitor<P extends Position> extends WkbVisitor<P> {
+    static class PostgisWkbVisitor<P extends Position> extends WkbVisitor<P> {
 
         private boolean hasWrittenSrid = false;
 
@@ -60,7 +60,7 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
         }
 
         protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-            int typeCode = getGeometryType(geometry);
+            int typeCode = geometryTypeCode(geometry);
             boolean hasSrid = (geometry.getSRID() > 0);
             CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
             if (hasSrid && !hasWrittenSrid) {

@@ -167,7 +167,6 @@ public class DSL {
         return new G3DM(lon, lat, height, m);
     }
 
-
     /**
      * Creates a {@code Point}
      *
@@ -178,6 +177,17 @@ public class DSL {
      */
     public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs, P p) {
         return new Point<>(p, crs);
+    }
+
+    /**
+     * Creates an empty {@code Point}
+     *
+     * @param crs the {@code CoordinateReferenceSystem} for the {@code Point}
+     * @param <P> the {@code Position} type
+     * @return a {@code Point} having the specified {@code Position} and {@code CoordinateReferenceSystem}
+     */
+    public static <P extends Position> Point<P> point(CoordinateReferenceSystem<P> crs) {
+        return new Point<>(crs);
     }
 
     /**

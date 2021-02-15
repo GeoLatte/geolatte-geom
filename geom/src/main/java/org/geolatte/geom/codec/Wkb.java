@@ -40,22 +40,27 @@ import java.util.Map;
 public class Wkb {
 
     public enum Dialect {
-        //the PostGIS EWKB dialect (versions 1.0 to 1.6).
+        //the PostGIS EWKB dialect (version < 2.2.1).
         POSTGIS_EWKB_1,
+        //Postgis version >= 2.2.2
+        POSTGIS_EWKB_2,
         MYSQL_WKB,
-        HANA_EWKB
+        HANA_EWKB,
     }
 
-    private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_1;
+    private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_2;
 
     private static final Map<Dialect, Class<? extends WkbDecoder>> DECODERS = new HashMap<Dialect, Class<? extends WkbDecoder>>();
     private static final Map<Dialect, Class<? extends WkbEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WkbEncoder>>();
 
+
     static {
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbDecoder.class);
+        DECODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Decoder.class);
         DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
         DECODERS.put(Dialect.HANA_EWKB, HANAWkbDecoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
+        ENCODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Encoder.class);
         ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);
         ENCODERS.put(Dialect.HANA_EWKB, HANAWkbEncoder.class);
     }

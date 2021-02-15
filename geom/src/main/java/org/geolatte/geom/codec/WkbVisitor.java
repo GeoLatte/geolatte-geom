@@ -30,8 +30,7 @@ import org.geolatte.geom.*;
 class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
 
-    private final ByteBuffer output;
-
+    protected final ByteBuffer output;
 
     WkbVisitor(ByteBuffer byteBuffer) {
         this.output = byteBuffer;
@@ -109,13 +108,13 @@ class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
     }
 
     protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-        int typeCode = getGeometryType(geometry);
+        int typeCode = geometryTypeCode(geometry);
         output.putUInt(typeCode);
     }
 
-    protected int getGeometryType(Geometry<P> geometry) {
+    protected int geometryTypeCode(Geometry<P> geometry) {
         //empty geometries have the same representation as an empty geometry collection
-        if (geometry.isEmpty()) {
+        if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
             return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
         }
         WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());

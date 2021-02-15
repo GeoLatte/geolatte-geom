@@ -55,6 +55,10 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
     public static final Integer LINESTRING_3DM = 19;
     public static final Integer LINESTRING_2DM = 21;
     public static final Integer EMPTY_POINT = 20;
+    public static final Integer EMPTY_POINT_USING_NAN = 21;
+    public static final Integer EMPTY_LINESTRING = 22;
+    public static final Integer EMPTY_POLYGON = 23;
+
 
     public PostgisTestCases() {
         addCase(POINT_2D,
@@ -77,38 +81,34 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 "01010000E0E6100000000000000000F03F000000000000004000000000000008400000000000001040",
                 point(WGS84_ZM, g(1, 2, 3, 4)));
 
-
-
-        Geometry expected = linestring(crs, c(-29.261, 66.000), c(-71.1074, -20.255));
         addCase(LINESTRING_2D,
                 "LINESTRING(-29.261 66,-71.1074 -20.255)",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
-                expected);
+                linestring(crs, c(-29.261, 66.000), c(-71.1074, -20.255)));
 
-        expected = polygon(ring(crs , c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)));
+
         addCase(POLYGON_2D_NO_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0))",
                 "0103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F00000000000000000000000000000000",
-                expected);
+                polygon(ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))));
 
-        expected = polygon(
-            ring(crs , c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)),
-            ring(crs , c(0.25, 0.25), c(0.25, 0.5), c(0.5, 0.5), c(0.5, 0.25), c(0.25, 0.25))
 
-        );
         addCase(POLYGON_2D_INNER_RINGS,
                 "POLYGON((0 0,1 0,1 1,0 1,0 0),(0.25 0.25,0.25 0.5,0.5 0.5,0.5 0.25,0.25 0.25))",
                 "0103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
-                expected);
+                polygon(
+                        ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)),
+                        ring(crs, c(0.25, 0.25), c(0.25, 0.5), c(0.5, 0.5), c(0.5, 0.25), c(0.25, 0.25))
+
+                ));
 
 
         Point<C2D> pnt1 = point(crs, c(1, 1));
         Point<C2D> pnt2 = point(crs, c(2, 2));
-        expected = geometrycollection(pnt1, pnt2 );
         addCase(GEOM_COLL_2D_POINTS,
                 "GEOMETRYCOLLECTION(POINT(1 1),POINT(2 2))",
                 "0107000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
-                expected);
+                geometrycollection(pnt1, pnt2));
 
         addCase(EMPTY_GEOM_COLL,
                 "GEOMETRYCOLLECTION EMPTY",
@@ -118,7 +118,7 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
         addCase(MULTIPOINT_2D,
                 "MULTIPOINT((1 1),(2 2))",
                 "0104000000020000000101000000000000000000F03F000000000000F03F010100000000000000000000400000000000000040",
-                multipoint( pnt1, pnt2));
+                multipoint(pnt1, pnt2));
 
         Point<G2D> gpnt1 = point(WGS84, g(1, 2));
         Point<G2D> gpnt2 = point(WGS84, g(3, 4));
@@ -131,32 +131,29 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 "MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "010500000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
                 ,
-                multilinestring( linestring (crs , c(1, 2), c(2, 3), c(4, 5) ), linestring(crs , c(6, 7), c(8, 9) ))
-                );
+                multilinestring(linestring(crs, c(1, 2), c(2, 3), c(4, 5)), linestring(crs, c(6, 7), c(8, 9)))
+        );
 
 
         addCase(MULTILINESTRING_2D_WITH_SRID,
                 "SRID=4326;MULTILINESTRING((1 2,2 3,4 5),(6 7,8 9))",
                 "0105000020E610000002000000010200000003000000000000000000F03F0000000000000040000000000000004000000000000008400000000000001040000000000000144001020000000200000000000000000018400000000000001C4000000000000020400000000000002240"
-                , multilinestring( linestring (WGS84 ,g(1, 2),g(2, 3),g(4, 5) ), linestring(WGS84 ,g(6, 7),g(8, 9) )));
-
-
+                , multilinestring(linestring(WGS84, g(1, 2), g(2, 3), g(4, 5)), linestring(WGS84, g(6, 7), g(8, 9))));
 
 
         addCase(MULTIPOLYGON_2D,
                 "MULTIPOLYGON(((0 0,1 0,1 1,0 1,0 0)),((0 0,1 0,1 1,0 1,0 0),(0.25 0.25,0.25 0.5,0.5 0.5,0.5 0.25,0.25 0.25)))",
                 "0106000000020000000103000000010000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F000000000000000000000000000000000103000000020000000500000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0000000000000000000000000000000005000000000000000000D03F000000000000D03F000000000000D03F000000000000E03F000000000000E03F000000000000E03F000000000000E03F000000000000D03F000000000000D03F000000000000D03F",
                 multipolygon(
-                        polygon(ring(crs , c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0) )),
-                        polygon(ring(crs , c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)),
-                                ring(crs , c(0.25, 0.25), c(0.25, 0.5), c(0.5, 0.5), c(0.5, 0.25), c(0.25, 0.25))))
-                );
+                        polygon(ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
+                        polygon(ring(crs, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0)),
+                                ring(crs, c(0.25, 0.25), c(0.25, 0.5), c(0.5, 0.5), c(0.5, 0.25), c(0.25, 0.25))))
+        );
 
-        expected = linestring(crs, c(-29.261, 66.000), c(-71.1074, -20.255));
         addCase(LINESTRING_IRREGULAR_WHITE_SPACE_1,
                 "LINESTRING ( -29.261 66 ,  -71.1074    -20.255     )",
                 "010200000002000000894160E5D0423DC00000000000805040C9E53FA4DFC651C0E17A14AE474134C0",
-                expected);
+                linestring(crs, c(-29.261, 66.000), c(-71.1074, -20.255)));
 
         addCase(POINT_SCIENTIFIC_NOTATION,
                 "POINT(1e100 1.2345e-100 -2e-5)",
@@ -173,26 +170,39 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
                 "0103000000010000000400000000000000000000000000000000000000000000000000F03F0000000000000000000000000000F03F000000000000F03F0000000000000000000000000000F03F0",
                 polygon(crs));
 
-        expected = linestring(crsZM , c(-29.261, 66.000, 1, 2), c(-71.1074, -20.255, 3, 5));
+
         addCase(LINESTRING_3DM,
                 "LINESTRING(-29.261 66 1 2, -71.1074 -20.255 3 5)",
                 "01020000C002000000894160E5D0423DC00000000000805040000000000000F03F0000000000000040C9E53FA4DFC651C0E17A14AE474134C000000000000008400000000000001440",
-                expected);
+                linestring(crsZM, c(-29.261, 66.000, 1, 2), c(-71.1074, -20.255, 3, 5)));
 
-        expected = linestring(crsM , cM(-29.261, 66.000, 2), cM(-71.1074, -20.255, 5));
+
         addCase(LINESTRING_2DM,
                 "LINESTRING(-29.261 66 2, -71.1074 -20.255 5)",
                 "010200004002000000894160e5d0423dc000000000008050400000000000000040c9e53fa4dfc651c0e17a14ae474134c00000000000001440",
-                expected);
-
+                linestring(crsM, cM(-29.261, 66.000, 2), cM(-71.1074, -20.255, 5)));
 
         addCase(EMPTY_POINT,
                 "POINT EMPTY",
                 "010700000000000000",
-                expected);
+                point(crs));
 
 
+        //see also:https://trac.osgeo.org/postgis/ticket/3181
+        addCase(EMPTY_POINT_USING_NAN,
+                "POINT EMPTY",
+                "0101000020E6100000000000000000F87F000000000000F87F",
+                point(crs));
+
+        addCase(EMPTY_LINESTRING,
+                "LINESTRING EMPTY",
+                "010200000000000000",
+                linestring(crs));
+
+        addCase(EMPTY_POLYGON,
+                "POLYGON EMPTY",
+                "010300000000000000",
+                polygon(crs));
     }
-
 
 }

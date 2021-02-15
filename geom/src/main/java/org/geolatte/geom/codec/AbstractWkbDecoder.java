@@ -55,7 +55,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return decode(byteBuffer, (CoordinateReferenceSystem<?>) null);
     }
 
-    private <P extends Position> Geometry<P> decodeGeometry(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected <P extends Position> Geometry<P> decodeGeometry(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         alignByteOrder(byteBuffer);
         int typeCode = readTypeCode(byteBuffer);
         WkbGeometryType wkbType = WkbGeometryType.parse((byte) typeCode);
@@ -79,7 +79,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         throw new WkbDecodeException(String.format("WKBType %s is not supported.", wkbType));
     }
 
-    private <P extends Position> MultiLineString<P> decodeMultiLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected  <P extends Position> MultiLineString<P> decodeMultiLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiLineString<P>(crs);
@@ -91,7 +91,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkMultiLineString(geometries);
     }
 
-    private <P extends Position> MultiPoint<P> decodeMultiPoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected  <P extends Position> MultiPoint<P> decodeMultiPoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiPoint<P>(crs);
@@ -103,7 +103,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkMultiPoint(geometries);
     }
 
-    private <P extends Position> MultiPolygon<P> decodeMultiPolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected  <P extends Position> MultiPolygon<P> decodeMultiPolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
             return new MultiPolygon<P>(crs);
@@ -115,7 +115,7 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkMultiPolygon(geometries);
     }
 
-    private <P extends Position> AbstractGeometryCollection<P, Geometry<P>>
+    protected  <P extends Position> AbstractGeometryCollection<P, Geometry<P>>
     decodeGeometryCollection(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numGeometries = byteBuffer.getInt();
         if (numGeometries == 0) {
@@ -128,24 +128,24 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
         return mkGeometryCollection(geometries);
     }
 
-    private <P extends Position> Polygon<P> decodePolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected <P extends Position> Polygon<P> decodePolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numRings = byteBuffer.getInt();
         List<LinearRing<P>> rings = readPolygonRings(numRings, byteBuffer, crs);
         return mkPolygon(rings);
     }
 
-    private <P extends Position> LineString<P> decodeLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected <P extends Position> LineString<P> decodeLineString(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numPoints = byteBuffer.getInt();
         PositionSequence<P> points = readPositions(numPoints, byteBuffer, crs);
         return new LineString<P>(points, crs);
     }
 
-    private <P extends Position>  Point<P> decodePoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected <P extends Position>  Point<P> decodePoint(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         PositionSequence<P> points = readPositions(1, byteBuffer, crs);
         return new Point<P>(points, crs);
     }
 
-    private <P extends Position> PositionSequence<P> readPositions(int numPos, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+    protected <P extends Position> PositionSequence<P> readPositions(int numPos, ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         PositionSequenceBuilder<P> psBuilder = PositionSequenceBuilders.fixedSized(numPos, crs.getPositionClass());
         double[] coordinates = new double[crs.getCoordinateDimension()];
         for (int i = 0; i < numPos; i++) {
