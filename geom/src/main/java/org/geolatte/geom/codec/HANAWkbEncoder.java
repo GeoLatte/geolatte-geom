@@ -25,6 +25,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -34,7 +35,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * 
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbEncoder extends PostgisWkbEncoder {
+class HANAWkbEncoder extends PostgisWkb2Encoder {
 
 	@Override
 	protected <P extends Position> int calculateSize(Geometry<P> geom, boolean includeSrid) {
@@ -78,6 +79,23 @@ class HANAWkbEncoder extends PostgisWkbEncoder {
 			}
 		}
 
+		protected int geometryTypeCode(Geometry<P> geometry) {
+			//empty geometries have the same representation as an empty geometry collection
+			if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
+				return WkbGeometryType.MULTI_POINT.getTypeCode();
+			}
+			WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
+			if (type == null) {
+				throw new UnsupportedConversionException(
+						String.format(
+								"Can't convert geometries of type %s",
+								geometry.getClass().getCanonicalName()
+						)
+				);
+			}
+			return type.getTypeCode();
+		}
 	}
+
 
 }

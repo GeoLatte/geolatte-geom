@@ -34,8 +34,8 @@ public class TestPostgisJDBCUnitTests extends CodecUnitTestBase {
 
     WktDecoder wktDecoder = Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
     WktEncoder wktEncoder = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1);
-    WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.POSTGIS_EWKB_1);
-    WkbEncoder wkbEncoder = Wkb.newEncoder(Wkb.Dialect.POSTGIS_EWKB_1);
+    WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.POSTGIS_EWKB_2);
+    WkbEncoder wkbEncoder = Wkb.newEncoder(Wkb.Dialect.POSTGIS_EWKB_2);
 
 
     @Override

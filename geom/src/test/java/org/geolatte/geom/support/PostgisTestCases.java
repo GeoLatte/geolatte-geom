@@ -53,11 +53,11 @@ public class PostgisTestCases extends WktWkbCodecTestBase {
     public static final Integer INVALID_POINT = 17;
     public static final Integer INVALID_POLYGON = 18;
     public static final Integer LINESTRING_3DM = 19;
-    public static final Integer LINESTRING_2DM = 21;
-    public static final Integer EMPTY_POINT = 20;
-    public static final Integer EMPTY_POINT_USING_NAN = 21;
-    public static final Integer EMPTY_LINESTRING = 22;
-    public static final Integer EMPTY_POLYGON = 23;
+    public static final Integer LINESTRING_2DM = 20;
+    public static final Integer EMPTY_POINT = 21;
+    public static final Integer EMPTY_POINT_USING_NAN = 22;
+    public static final Integer EMPTY_LINESTRING = 23;
+    public static final Integer EMPTY_POLYGON = 24;
 
 
     public PostgisTestCases() {

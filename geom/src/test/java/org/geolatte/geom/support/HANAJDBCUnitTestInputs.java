@@ -29,7 +29,7 @@ import static org.geolatte.geom.CrsMock.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 10/13/12
+ * creation-date: 10/13/12
  */
 
 public class HANAJDBCUnitTestInputs extends WktWkbCodecTestBase {
@@ -225,13 +225,13 @@ public class HANAJDBCUnitTestInputs extends WktWkbCodecTestBase {
                 "GEOMETRYCOLLECTION Z(POINT(10 10 20),POINT(20 20 20))",
                 "01070000800200000001010000800000000000002440000000000000244000000000000034400101000080000000000000344000000000000034400000000000003440",
                 geometrycollection(point(crsZ, c(10, 10, 20)), point(crsZ, c(20, 20, 20)))
-                );
+        );
 
         addCase(31,
                 "GEOMETRYCOLLECTION M(POINT(10 10 20),POINT(20 20 20))",
                 "01070000400200000001010000400000000000002440000000000000244000000000000034400101000040000000000000344000000000000034400000000000003440",
                 geometrycollection(point(crsM, cM(10, 10, 20)), point(crsM, cM(20, 20, 20)))
-                );
+        );
 
         addCase(32,
                 "GEOMETRYCOLLECTION ZM(POINT(10 10 20 7),POINT(20 20 20 7))",
@@ -265,7 +265,7 @@ public class HANAJDBCUnitTestInputs extends WktWkbCodecTestBase {
                 "010700008001000000010500008002000000010200008005000000000000000000244000000000000024400000000000000000000000000000344000000000000024400000000000000000000000000000344000000000000034400000000000000000000000000000344000000000000024400000000000000000000000000000244000000000000024400000000000000000010200008005000000000000000000144000000000000014400000000000000000000000000000144000000000000018400000000000000000000000000000184000000000000018400000000000000000000000000000184000000000000014400000000000000000000000000000144000000000000014400000000000000000",
                 geometrycollection(multilinestring(
                         linestring(crsZ, c(10, 10, 0), c(20, 10, 0), c(20, 20, 0), c(20, 10, 0), c(10, 10, 0)),
-                        linestring(crsZ , c(5, 5, 0), c(5, 6, 0), c(6, 6, 0), c(6, 5, 0), c(5, 5, 0))
+                        linestring(crsZ, c(5, 5, 0), c(5, 6, 0), c(6, 6, 0), c(6, 5, 0), c(5, 5, 0))
                 )));
 
         addCase(38,
@@ -298,14 +298,15 @@ public class HANAJDBCUnitTestInputs extends WktWkbCodecTestBase {
 
         addCase(42, "GEOMETRYCOLLECTION EMPTY", "010700000000000000", geometrycollection(crs));
 
-        addCase(43, "POINT EMPTY", "010700000000000000", new Point(crs));
-        addCase(44, "LINESTRING EMPTY", "010700000000000000", linestring(crs));
-        addCase(45, "POLYGON EMPTY", "010700000000000000", polygon(crs));
-        addCase(46, "MULTIPOINT EMPTY", "010700000000000000", linestring(crs));
+        //HANA encodes empty points as empty multipoints
+        addCase(43, "POINT EMPTY", "010400000000000000", multipoint(crs));
+        addCase(44, "LINESTRING EMPTY", "010200000000000000", linestring(crs));
+        addCase(45, "POLYGON EMPTY", "010300000000000000", polygon(crs));
+        addCase(46, "MULTIPOINT EMPTY", "010400000000000000", multipoint(crs));
 
         addCase(47, "GEOMETRYCOLLECTION(POINT(4 0),POINT EMPTY,LINESTRING(4 2,5 3))",
                 "0107000000030000000101000000000000000000104000000000000000000107000000000000000102000000020000000000000000001040000000000000004000000000000014400000000000000840",
-                geometrycollection(point(crs, c(4, 0)), new Point(crs), linestring(crs, c(4, 2), c(5, 3)))
+                geometrycollection(point(crs, c(4, 0)), geometrycollection(crs), linestring(crs, c(4, 2), c(5, 3)))
         );
 
     }

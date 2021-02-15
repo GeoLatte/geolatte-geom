@@ -131,6 +131,9 @@ abstract class AbstractWkbDecoder implements WkbDecoder {
     protected <P extends Position> Polygon<P> decodePolygon(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         int numRings = byteBuffer.getInt();
         List<LinearRing<P>> rings = readPolygonRings(numRings, byteBuffer, crs);
+        if (rings.isEmpty()) {
+            return mkEmptyPolygon(crs);
+        }
         return mkPolygon(rings);
     }
 

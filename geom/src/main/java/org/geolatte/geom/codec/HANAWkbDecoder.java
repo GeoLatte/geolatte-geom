@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * 
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbDecoder extends PostgisWkbDecoder {
+class HANAWkbDecoder extends PostgisWkb2Decoder {
 
 	private int currentTypeCode;
 
