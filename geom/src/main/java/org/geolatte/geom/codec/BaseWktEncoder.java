@@ -32,7 +32,7 @@ class BaseWktEncoder implements WktEncoder {
     public <P extends Position> String encode(Geometry<P> geometry) {
         builder = new StringBuffer();
         addSrid(geometry.getSRID());
-        addGeometry(geometry);
+        addGeometry(geometry, true);
         return result();
     }
 
@@ -40,9 +40,9 @@ class BaseWktEncoder implements WktEncoder {
         dialect.addSrid(builder, srid);
     }
 
-    protected <P extends Position> void addGeometry(Geometry<P> geometry) {
+    protected <P extends Position> void addGeometry(Geometry<P> geometry, boolean topLevel) {
         addGeometryTag(geometry);
-        addGeometryZMMarker(geometry);
+        if (topLevel) addGeometryZMMarker(geometry);
         addGeometryText(geometry);
     }
 
@@ -54,7 +54,7 @@ class BaseWktEncoder implements WktEncoder {
         dialect.addGeometryZMMarker(builder, geometry);
     }
 
-    protected<P extends Position> void addGeometryText(Geometry<P> geometry) {
+    protected <P extends Position> void addGeometryText(Geometry<P> geometry) {
         if (geometry.isEmpty()) {
             addEmptyKeyword();
             return;
@@ -103,7 +103,7 @@ class BaseWktEncoder implements WktEncoder {
             }
             Geometry<?> geom = collection.getGeometryN(i);
             if (withTag) {
-                addGeometry(geom);
+                addGeometry(geom, false);
             } else {
                 addGeometryText(geom);
             }
@@ -166,7 +166,6 @@ class BaseWktEncoder implements WktEncoder {
     }
 
 
-
     private String result() {
         return builder.toString();
     }
@@ -177,6 +176,7 @@ class BaseWktEncoder implements WktEncoder {
 
         private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
         private final NumberFormat formatter;
+
         PositionEncoder() {
             formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
             formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
