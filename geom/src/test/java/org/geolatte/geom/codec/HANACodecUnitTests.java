@@ -21,8 +21,6 @@
 
 package org.geolatte.geom.codec;
 
-import static junit.framework.Assert.assertEquals;
-
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
@@ -33,7 +31,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import junit.framework.Assert;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Jonathan Bregler
@@ -56,7 +54,7 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
             Geometry geom = getWktDecoder().decode(wkt);
             assertEquals(String.format("Wkt decoder gives incorrect result for case: %d : ", testCase) + wkt, testCases.getExpected(testCase), geom);
             if (testCases.getTestEncoding(testCase)) {
-                Assert.assertEquals("Wkt encoder gives incorrect result for case:" + wkt, wkt, getWktEncoder().encode(geom));
+                assertEquals("Wkt encoder gives incorrect result for case:" + wkt, wkt, getWktEncoder().encode(geom));
             }
         }
     }
@@ -67,9 +65,9 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
         for (Integer testCase : testCases.getCases()) {
             ByteBuffer wkb = addSRID(testCases.getWKB(testCase));
             Geometry geom = getWkbDecoder().decode(wkb);
-            Assert.assertEquals("WKB decoder gives incorrect result for case: " + testCase, testCases.getExpected(testCase), geom);
-            Assert.assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(geom, ByteOrder.NDR));
-            Assert.assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
+            assertEquals("WKB decoder gives incorrect result for case: " + testCase, testCases.getExpected(testCase), geom);
+            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(geom, ByteOrder.NDR));
+            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
         }
     }
     

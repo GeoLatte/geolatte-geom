@@ -42,7 +42,11 @@ class PostgisWktEncoder extends BaseWktEncoder {
      * Constructs an instance.
      */
     public PostgisWktEncoder() {
-        super(new BaseWktDialect());
+        super(new PostgisWktDialect());
+    }
+
+    public PostgisWktEncoder(PostgisWktDialect dialect){
+        super(dialect);
     }
 
     protected <P extends Position> double[] createCoordinateBuffer(PositionSequence<P> positions) {

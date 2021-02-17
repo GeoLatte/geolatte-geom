@@ -39,7 +39,7 @@ class PostgisWktDialect extends BaseWktDialect {
 
     @Override
     void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
-        if(geometry.hasM()) {
+        if(geometry.hasM() && geometry.getCoordinateDimension() < 4) {
             buffer.append('M');
         }
     }

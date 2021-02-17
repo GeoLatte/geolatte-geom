@@ -74,10 +74,7 @@ public class BaseWktDialect {
 
 
     public void addSrid(StringBuffer builder, int srid) {
-        if(srid <= 0) return;
-        builder.append("SRID=")
-                .append(srid)
-                .append(';');
+
     }
 
     public void matchMultiPoint(BaseWktGeometryParser.GeometryBuilder builder) {

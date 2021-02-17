@@ -32,35 +32,9 @@ import org.geolatte.geom.crs.CrsId;
  */
 class HANAWktEncoder extends PostgisWktEncoder {
 
-	private final static HANAWktDialect WKT_WORDS = new HANAWktDialect();
-
-	@Override
-	public <P extends Position> String encode(Geometry<P> geometry) {
-		String wkt = super.encode( geometry );
-		if ( wkt == null ) {
-			return null;
-		}
-
-		if ( !wkt.startsWith( "SRID=" ) ) {
-			StringBuilder sb = new StringBuilder( wkt.length() + 16 );
-			sb.append( "SRID=" );
-			// Write the SRID, the HANA default SRID is 0
-			if ( geometry.getSRID() == CrsId.UNDEFINED.getCode() ) {
-				sb.append( 0 );
-			}
-			else {
-				sb.append( geometry.getSRID() );
-			}
-			sb.append( ";" );
-			sb.append( wkt );
-			wkt = sb.toString();
-		}
-		return wkt;
+	public HANAWktEncoder(){
+		super(new HANAWktDialect());
 	}
 
-
-	protected PostgisWktDialect getWktWords() {
-		return WKT_WORDS;
-	}
 
 }

@@ -36,110 +36,24 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
  * @author Jonathan Bregler, SAP
  */
 class HANAWktDialect extends PostgisWktDialect {
-	
-	private final static List<HANAWktGeometryToken> GEOMETRIES = new ArrayList<HANAWktGeometryToken>();
 
-	private final static Set<WktKeywordToken> KEYWORDS;
-
-	protected HANAWktDialect() {
-	}
-
-	static {
-
-		// TODO -- this doesn't work well with LinearRings (geometry type doesn't match 1-1 to WKT types)
-		// register the geometry tokens
-		add( GeometryType.POINT, false, false, "POINT" );
-		add( GeometryType.POINT, true, false, "POINT M" );
-		add( GeometryType.POINT, false, true, "POINT Z" );
-		add( GeometryType.POINT, true, true, "POINT ZM" );
-		add( GeometryType.LINESTRING, true, false, "LINESTRING M" );
-		add( GeometryType.LINESTRING, false, false, "LINESTRING" );
-		add( GeometryType.LINESTRING, true, true, "LINESTRING ZM" );
-		add( GeometryType.LINESTRING, false, true, "LINESTRING Z" );
-		add( GeometryType.POLYGON, false, false, "POLYGON" );
-		add( GeometryType.POLYGON, true, false, "POLYGON M" );
-		add( GeometryType.POLYGON, false, true, "POLYGON Z" );
-		add( GeometryType.POLYGON, true, true, "POLYGON ZM" );
-		add( GeometryType.MULTIPOINT, true, false, "MULTIPOINT M" );
-		add( GeometryType.MULTIPOINT, false, false, "MULTIPOINT" );
-		add( GeometryType.MULTIPOINT, true, true, "MULTIPOINT ZM" );
-		add( GeometryType.MULTIPOINT, false, true, "MULTIPOINT Z" );
-		add( GeometryType.MULTILINESTRING, false, false, "MULTILINESTRING" );
-		add( GeometryType.MULTILINESTRING, true, false, "MULTILINESTRING M" );
-		add( GeometryType.MULTILINESTRING, false, true, "MULTILINESTRING Z" );
-		add( GeometryType.MULTILINESTRING, true, true, "MULTILINESTRING ZM" );
-		add( GeometryType.MULTIPOLYGON, false, false, "MULTIPOLYGON" );
-		add( GeometryType.MULTIPOLYGON, true, false, "MULTIPOLYGON M" );
-		add( GeometryType.MULTIPOLYGON, false, true, "MULTIPOLYGON Z" );
-		add( GeometryType.MULTIPOLYGON, true, true, "MULTIPOLYGON ZM" );
-		add( GeometryType.GEOMETRYCOLLECTION, false, false, "GEOMETRYCOLLECTION" );
-		add( GeometryType.GEOMETRYCOLLECTION, true, false, "GEOMETRYCOLLECTION M" );
-		add( GeometryType.GEOMETRYCOLLECTION, false, true, "GEOMETRYCOLLECTION Z" );
-		add( GeometryType.GEOMETRYCOLLECTION, true, true, "GEOMETRYCOLLECTION ZM" );
-		// create an unmodifiable set of all pattern tokens
-		Set<WktKeywordToken> allTokens = new HashSet<WktKeywordToken>();
-		allTokens.addAll( GEOMETRIES );
-		allTokens.add( new WktEmptyGeometryToken() );
-		KEYWORDS = Collections.unmodifiableSet( allTokens );
-	}
-
-	private static void add(GeometryType type, boolean isMeasured, boolean is3D, String word) {
-		GEOMETRIES.add( new HANAWktGeometryToken( word, type, isMeasured, is3D ) );
-	}
-
-	public String wordFor(@SuppressWarnings("rawtypes") Geometry geometry, boolean ignoreMeasureMarker) {
-		for ( HANAWktGeometryToken candidate : GEOMETRIES ) {
-			if ( sameGeometryType( candidate, geometry ) && hasSameMeasuredAndZAxisSuffixInWkt( candidate, geometry, ignoreMeasureMarker ) ) {
-				return candidate.getPattern().toString();
+	@Override
+	void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+		if(geometry.hasZ()) {
+			buffer.append(" Z");
+			if (geometry.hasM()) {
+				buffer.append('M');
 			}
+		} else if(geometry.hasM()) {
+			buffer.append(" M");
 		}
-		throw new IllegalStateException(
-				String.format(
-						"Geometry type %s not recognized.",
-						geometry.getClass().getName() ) );
 	}
 
-	private boolean sameGeometryType(HANAWktGeometryToken candidate, Geometry geometry) {
-		return false;
-	}
-
-	protected Set<WktKeywordToken> getWktKeywords() {
-		return KEYWORDS;
-	}
-
-	/**
-	 * Determines whether the candidate has the same measured 'M' suffix and Z axis as the geometry in WKT.
-	 *
-	 * POINT(x y): 2D point, 
-	 * POINT Z(x y z): 3D point, 
-	 * POINT M(x y m): 2D measured point, 
-	 * POINT ZM(x y z m): 3D measured point
-	 *
-	 * @param candidate The candidate wkt geometry token
-	 * @param geometry The geometry to check the candidate wkt geometry token for
-	 * @param ignoreMeasureMarker when set to true, this method returns true iff the candidate token is not measured
-	 * @return The candidate is measured if and only if the geometry is measured and not 3D
-	 */
-	private boolean hasSameMeasuredAndZAxisSuffixInWkt(HANAWktGeometryToken candidate, Geometry<?> geometry, boolean ignoreMeasureMarker) {
-		if ( ignoreMeasureMarker ) {
-			return !candidate.isMeasured();
-		}
-		CoordinateReferenceSystem<?> crs = geometry.getCoordinateReferenceSystem();
-		if ( hasMeasureAxis( crs ) ) {
-			if ( hasVerticalAxis( crs ) ) {
-				return candidate.isMeasured() && candidate.is3D();
-			}
-			else {
-				return candidate.isMeasured() && !candidate.is3D();
-			}
-		}
-		else {
-			if ( hasVerticalAxis( crs ) ) {
-				return !candidate.isMeasured() && candidate.is3D();
-			}
-			else {
-				return !candidate.isMeasured() && !candidate.is3D();
-			}
-		}
+	@Override
+	public void addSrid(StringBuffer builder, int srid) {
+		if (srid < 0) srid = 0;
+		builder.append("SRID=")
+				.append(srid)
+				.append(";");
 	}
 }
