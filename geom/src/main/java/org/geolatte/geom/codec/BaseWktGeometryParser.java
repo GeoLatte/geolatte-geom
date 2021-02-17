@@ -3,6 +3,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.support.*;
 import org.geolatte.geom.crs.*;
+import org.locationtech.jts.geom.Coordinate;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -29,9 +30,14 @@ class BaseWktGeometryParser<P extends Position> {
     enum Delimiter {CLOSE, OPEN, SEP, NO_DELIM}
 
     /**
-     * The constructor of this AbstractWktDecoder. It sets the variant.
+     * The constructor of this AbstractWktDecoder.
+     * <p>
+     * The specified CRS (if not null) will be used for the resulting Geometry, even
+     * is the WKT contains a SRID code.
      *
      * @param wktDialect The <code>WktVariant</code> to be used by this decoder.
+     * @param wkt        The WKT string to parser
+     * @param crs        the CoordinateReferenceSystem for the parse result
      */
     BaseWktGeometryParser(BaseWktDialect wktDialect, String wkt, CoordinateReferenceSystem<P> crs) {
         dialect = wktDialect;
@@ -42,8 +48,8 @@ class BaseWktGeometryParser<P extends Position> {
     Geometry<P> parse() {
         matchesOptionalSrid();
         builder = matchesGeometryTaggedText();
-        CoordinateReferenceSystem<P> adapted = adaptCrs();
-        return builder.createGeometry(adapted);
+        CoordinateReferenceSystem<P> geomCrs = selectCoordinateReferenceSystem();
+        return builder.createGeometry(geomCrs);
     }
 
     protected GeometryBuilder matchesGeometryTaggedText() {
@@ -55,27 +61,24 @@ class BaseWktGeometryParser<P extends Position> {
     }
 
     @SuppressWarnings("unchecked")
-    protected CoordinateReferenceSystem<P> adaptCrs() {
+    protected CoordinateReferenceSystem<P> selectCoordinateReferenceSystem() {
         if (overrideCrs != null) {
-            if (overrideCrs.getCoordinateDimension() < this.builder.getCoordinateDimension()) {
-                throw new WktDecodeException("Target CoordinateReferenceSystem not compatible with coordinate dimension");
-            }
             return overrideCrs;
         } else {
-            CoordinateReferenceSystem<?> crs = this.matchedSrid != null ? matchedSrid : DEFAULT_CRS;
-            return (CoordinateReferenceSystem<P>)widenCrsToCoordinateDimension(crs);
+            CoordinateReferenceSystem<?> baseCrs = this.matchedSrid != null ? matchedSrid : DEFAULT_CRS;
+            return (CoordinateReferenceSystem<P>) widenCrsToCoordinateDimension(baseCrs);
         }
     }
 
     protected CoordinateReferenceSystem<?> widenCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
-        return  CoordinateReferenceSystems.adjustTo(crs, builder.getCoordinateDimension(), hasMMark);
+        return CoordinateReferenceSystems.adjustTo(crs, builder.getCoordinateDimension(), hasMMark);
     }
 
     protected void matchesOptionalSrid() {
         //do nothing
     }
 
-    protected void setMatchedSrid(CoordinateReferenceSystem<?> crs){
+    protected void setMatchedSrid(CoordinateReferenceSystem<?> crs) {
         this.matchedSrid = crs;
     }
 
@@ -151,7 +154,7 @@ class BaseWktGeometryParser<P extends Position> {
         do {
             pnt.push(tokenizer.fastReadNumber());
             d = matchesDelimiter();
-        } while ( !( d == Delimiter.CLOSE || d == Delimiter.SEP) );
+        } while (!(d == Delimiter.CLOSE || d == Delimiter.SEP));
         tokenizer.back(1);
         return pnt;
     }
@@ -261,7 +264,7 @@ class BaseWktGeometryParser<P extends Position> {
             if (positions == null || positions.isEmpty()) return Geometries.mkEmptyGeometry(type, crs);
             try {
                 return positions.toGeometry(crs, type);
-            } catch(Throwable t){
+            } catch (Throwable t) {
                 throw new WktDecodeException("Failed to create geometry for WKT", t);
             }
         }

@@ -22,16 +22,12 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
-import org.geolatte.geom.crs.Unit;
+import org.geolatte.geom.crs.*;
 import org.geolatte.geom.support.PostgisTestCases;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -104,8 +100,7 @@ public class TestPostgisWktEncoderDecoder {
         assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
     }
 
-
-    @Test(expected = WktDecodeException.class)
+    @Test
     public void testForceCRSWithMeasuredAxisButTargetBaseCRS() {
         String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
         WktDecoder decoder = new PostgisWktDecoder();
@@ -145,14 +140,25 @@ public class TestPostgisWktEncoderDecoder {
         assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
     }
 
-
-    @Test(expected = WktDecodeException.class)
+    @Test
     public void testFromWktCRSWithMeasuredAxisButTargetBaseCRS() {
         String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
         Geometry<C2D> geometry = Wkt.fromWkt(wkt, crs);
         assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
         assertEquals(crs, geometry.getCoordinateReferenceSystem());
+    }
+
+    //TODO -- this unit tests shows what is currently unsatisfactory on the design: we (silently) reinterpret a 2DM
+    // geometry to a 3D geometry.
+    @Test
+    public void testFromWktCRSWithMeasuredAxisButTargetBaseCRSWithNoMeasure() {
+        String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
+        ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        CoordinateReferenceSystem<C3D> crsZ = addVerticalSystem(crs, C3D.class, LinearUnit.METER);
+        Geometry<C3D> geometry = Wkt.fromWkt(wkt, crsZ);
+        assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
+        assertEquals(crsZ, geometry.getCoordinateReferenceSystem());
     }
 
     @Test

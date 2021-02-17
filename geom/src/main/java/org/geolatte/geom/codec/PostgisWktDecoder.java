@@ -63,7 +63,8 @@ class PostgisWktParser<P extends Position> extends BaseWktGeometryParser<P> {
 
     @Override
     protected void matchesOptionalZMMarkers() {
-        if (tokenizer.matchesChar('M', true)) {
+        tokenizer.skipWhitespace();
+        if (tokenizer.matchesOneOf('M', 'm').isPresent()) {
             this.hasMMark = true;
         }
     }

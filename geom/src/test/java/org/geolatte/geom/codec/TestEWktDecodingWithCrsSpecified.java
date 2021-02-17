@@ -1,13 +1,7 @@
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.C3D;
-import org.geolatte.geom.C3DM;
-import org.geolatte.geom.G3DM;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.crs.CompoundCoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsRegistry;
-import org.geolatte.geom.crs.LinearUnit;
-import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.*;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.c;
@@ -15,6 +9,7 @@ import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.addLinearSystem;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 17/02/15.w
@@ -31,28 +26,24 @@ public class TestEWktDecodingWithCrsSpecified {
     );
 
     Geometry<C3DM> original = point(crs3dm, c(688789, 169038, 24, 10));
-
     String originalWkt = "SRID=31370;POINT(688789 169038 24 10)";
-
-
 
     @Test
     public void testWktDecodingDeterminesCRSCorrectly() {
-
-        Geometry<?> geometry = Wkt.fromWkt(originalWkt);
-
+        Geometry<?> geometry = decode(originalWkt, null);
         assertEquals(geometry.getCoordinateReferenceSystem(), crs3dm);
         assertEquals(original, geometry);
     }
 
-    @Test(expected = WktDecodeException.class)
     public void testWktDecodingFailsWhenIncorrectCRSSpecified() {
-           Wkt.fromWkt(originalWkt, crs);
+           Geometry<?> geom = decode(originalWkt, crs);
+        assertTrue(geom.getCoordinateReferenceSystem().hasM());
+        assertTrue(geom.getCoordinateReferenceSystem().hasZ());
     }
 
     @Test
     public void testWktDecodingWithCorrectCRSSpecified() {
-        Geometry<C3DM> geometry = Wkt.fromWkt(originalWkt, crs3dm);
+        Geometry<C3DM> geometry = decode(originalWkt, crs3dm);
         assertEquals(original, geometry);
     }
 
@@ -60,11 +51,14 @@ public class TestEWktDecodingWithCrsSpecified {
     public void testWktTestWithUntypedCRS(){
         String wkt = "POINT(688789 169038 24 10)";
 
-        Geometry<?> geom = Wkt.fromWkt(wkt, crsUnknown);
+        Geometry<?> geom = decode(wkt, crsUnknown);
         assertEquals(4,geom.getCoordinateDimension());
         assertEquals(G3DM.class, geom.getCoordinateReferenceSystem().getPositionClass());
 
     }
 
+    private <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {
+        return Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1).decode(wkt, crs);
+    }
 
 }
