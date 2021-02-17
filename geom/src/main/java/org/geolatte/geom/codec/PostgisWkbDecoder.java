@@ -35,13 +35,11 @@ import static org.geolatte.geom.crs.CoordinateSystemAxisDirection.OTHER;
  * <p>This implementation is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 11, 2010
+ * creation-date: Nov 11, 2010
  */
 class PostgisWkbDecoder extends AbstractWkbDecoder {
 
-    private CoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
-
-    @Override
+     @Override
     protected void prepare(ByteBuffer byteBuffer) {
         //do nothing
     }
@@ -63,29 +61,16 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
         if (hasSrid(typeCode)) {
             int srid = byteBuffer.getInt();
             crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-
         } else {
             crsDeclared = CoordinateReferenceSystems.PROJECTED_2D_METER;
         }
-
-        if(hasM) {
-            crsDeclared = expander.expandM(crsDeclared);
-        }
-
-        if (hasZ) {
-            crsDeclared = expander.expandZ(crsDeclared);
-        }
-
-
-
-        return (CoordinateReferenceSystem<P>)crsDeclared;
+        return (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.adjustTo(crsDeclared, hasZ, hasM);
     }
 
 
-
     private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
-        if ( (hasM && ! hasMeasureAxis(crs)) ||
-                (hasZ && ! hasVerticalAxis(crs))) {
+        if ((hasM && !(crs.hasM())) ||
+                (hasZ && !crs.hasZ())) {
             throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
         }
     }

@@ -16,7 +16,6 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
     //TODO -- this should be parameterized.
     private static double LINEARIZER_EPSILON = 0.0001;
     private CoordinateReferenceSystem<?> crs;
-    private CoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
 
     @Override
     public Geometry<?> decode(SDOGeometry nativeGeom) {
@@ -43,14 +42,9 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
 
         CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(srid);
 
-        if (getVerticalDimension(nativeGeom) > 0) {
-            crs = expander.expandZ(crs);
-        }
-
-        if (getLinearReferenceDimension(nativeGeom) > 0) {
-            crs = expander.expandM(crs);
-        }
-        return crs;
+        return CoordinateReferenceSystems.adjustTo(crs,
+                getVerticalDimension(nativeGeom) > 0,
+                getLinearReferenceDimension(nativeGeom) > 0);
     }
 
     int getCoordinateDimension(SDOGeometry nativeGeom) {
@@ -280,7 +274,6 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
             return sdoGeom.getOrdinates().getOrdinatesArray(start);
         }
     }
-
 
 
 }

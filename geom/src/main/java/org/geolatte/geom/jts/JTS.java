@@ -123,24 +123,16 @@ public class JTS {
      * @throws IllegalArgumentException when a null object is passed
      */
     public static org.geolatte.geom.Geometry<?> from(org.locationtech.jts.geom.Geometry jtsGeometry) {
-        DefaultCoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
         if (jtsGeometry == null) {
             throw new IllegalArgumentException("Null object passed.");
         }
         Coordinate testCo = jtsGeometry.getCoordinate();
-        boolean is3D = !(testCo == null || Double.isNaN(testCo.z));
+        boolean hasZ = !(testCo == null || Double.isNaN(testCo.z));
         CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(jtsGeometry.getSRID());
-        if (is3D) {
-            crs = expander.expandZ(crs);
-        }
-
-        // to translate measure, add Measure as LinearSystem
         boolean hasM = isMeasuredCoordinate(testCo)
                 && !Double.isNaN(testCo.getM());
-        if (hasM) {
-            crs = CoordinateReferenceSystems.addLinearSystem(crs, LinearUnit.METER);
-        }
-
+        
+        crs = CoordinateReferenceSystems.adjustTo(crs, hasZ, hasM);
         return from(jtsGeometry, crs);
     }
 

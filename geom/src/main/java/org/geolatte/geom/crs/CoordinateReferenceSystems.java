@@ -210,6 +210,12 @@ public class CoordinateReferenceSystems {
         return combine(base, mkVertical(unit));
     }
 
+    public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, boolean hasZ, boolean hasM) {
+        if (!hasZ && !hasM) return crs;
+        CrsId extId = crs.getCrsId().extend(hasZ ? METER : null, hasM ? METER : null);
+        return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, hasZ ? METER : null, hasM ? METER : null));
+    }
+
     public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension) {
         return adjustTo(crs, coordinateDimension, false);
     }
@@ -224,7 +230,7 @@ public class CoordinateReferenceSystems {
             return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, null, METER));
         }
 
-        if (coordinateDimension == 3 && !hasM) {
+        if (coordinateDimension == 3) {
             CrsId extId = crs.getCrsId().extend(METER, null);
             return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, null));
         }

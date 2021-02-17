@@ -64,9 +64,6 @@ public class SqlServerGeometry {
 	private int numberOfShapes;
 	private Shape[] shapes = null;
 
-	private final CoordinateSystemExpander expander = new DefaultCoordinateSystemExpander();
-
-
 	private SqlServerGeometry(byte[] bytes) {
 		buffer = ByteBuffer.wrap( bytes );
 		buffer.order( ByteOrder.LITTLE_ENDIAN );
@@ -197,13 +194,7 @@ public class SqlServerGeometry {
 
     CoordinateReferenceSystem<?> getCRS(int srid, boolean hasZValues, boolean hasMValues ) {
 		CoordinateReferenceSystem<?> crs = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, DEFAULT_CRS);
-		if (hasZValues) {
-			crs = expander.expandZ(crs);
-		}
-		if (hasMValues) {
-			crs = expander.expandM(crs);
-		}
-		return (CoordinateReferenceSystem<?>) crs;
+		return (CoordinateReferenceSystem<?>) CoordinateReferenceSystems.adjustTo(crs, hasZValues, hasMValues);
 	}
 
 	PositionSequence<?> coordinateRange(IndexRange range) {
