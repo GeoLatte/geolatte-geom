@@ -1,4 +1,4 @@
-val geolatteGeomVersion = "1.6.0"
+val geolatteGeomVersion = "1.7.0"
 
 val commonResolvers = Seq(
   Resolver.mavenLocal,
