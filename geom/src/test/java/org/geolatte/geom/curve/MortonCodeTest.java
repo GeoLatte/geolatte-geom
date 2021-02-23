@@ -180,9 +180,8 @@ public class MortonCodeTest {
     //test code for bug
     @Test
     public void testMortonCodeShouldNotReturnEmptyString() {
-        String wkt = "SRID=31370;POINT(-87.064293 33.087386)";
-        Point<C2D> geom = (Point<C2D>) Wkt.fromWkt(wkt);
-        MortonCode<C2D> mortonCode = new MortonCode<C2D>(new MortonContext<C2D>(new Envelope<C2D>(-140.0, 15, -40.0, 50.0, crs), 8));
+        Point<C2D> geom = point(CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370), c(-87.064293,33.087386));
+        MortonCode<C2D> mortonCode = new MortonCode<>(new MortonContext<C2D>(new Envelope<C2D>(-140.0, 15, -40.0, 50.0, crs), 8));
         assertEquals(mortonCode.ofGeometry(geom), mortonCode.ofPosition(geom.getPosition()));
     }
 

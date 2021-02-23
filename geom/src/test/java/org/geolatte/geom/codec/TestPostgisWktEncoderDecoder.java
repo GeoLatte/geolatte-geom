@@ -114,7 +114,7 @@ public class TestPostgisWktEncoderDecoder {
     public void testFromWktCRS() {
         String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-        Geometry<C2D> geometry = Wkt.fromWkt(wkt, crs);
+        Geometry<C2D> geometry = decode(wkt, crs);
         assertEquals(geometry.getGeometryType(), GeometryType.LINESTRING);
         assertEquals(geometry.getCoordinateReferenceSystem(), crs);
     }
@@ -124,7 +124,7 @@ public class TestPostgisWktEncoderDecoder {
         String wkt = "SRID=31300;LINESTRING(10 10, 20 20, 30 30)";
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
         CoordinateReferenceSystem<C2DM> crsWithM =  addLinearSystem(crs, C2DM.class, Unit.METER);
-        Geometry<C2DM> geometry = Wkt.fromWkt(wkt, crsWithM);
+        Geometry<C2DM> geometry = decode(wkt, crsWithM);
         assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
         assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
     }
@@ -135,7 +135,7 @@ public class TestPostgisWktEncoderDecoder {
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
         CoordinateReferenceSystem<C2DM> crsWithM =  addLinearSystem(crs, C2DM.class, Unit.METER);
 
-        Geometry<C2DM> geometry = Wkt.fromWkt(wkt, crsWithM);
+        Geometry<C2DM> geometry = decode(wkt, crsWithM);
         assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
         assertEquals(crsWithM, geometry.getCoordinateReferenceSystem());
     }
@@ -144,7 +144,7 @@ public class TestPostgisWktEncoderDecoder {
     public void testFromWktCRSWithMeasuredAxisButTargetBaseCRS() {
         String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-        Geometry<C2D> geometry = Wkt.fromWkt(wkt, crs);
+        Geometry<C2D> geometry = decode(wkt, crs);
         assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
         assertEquals(crs, geometry.getCoordinateReferenceSystem());
     }
@@ -156,7 +156,7 @@ public class TestPostgisWktEncoderDecoder {
         String wkt = "SRID=31300;LINESTRINGM(10 10 1, 20 20 2, 30 30 3)";
         ProjectedCoordinateReferenceSystem crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
         CoordinateReferenceSystem<C3D> crsZ = addVerticalSystem(crs, C3D.class, LinearUnit.METER);
-        Geometry<C3D> geometry = Wkt.fromWkt(wkt, crsZ);
+        Geometry<C3D> geometry = decode(wkt, crsZ);
         assertEquals(GeometryType.LINESTRING, geometry.getGeometryType());
         assertEquals(crsZ, geometry.getCoordinateReferenceSystem());
     }
@@ -356,5 +356,9 @@ public class TestPostgisWktEncoderDecoder {
         assertEquals(wkt, enc.encode(geom));
     }
 
+    private <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {
+        WktDecoder decoder = Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1);
+        return decoder.decode(wkt, crs);
+    }
 
 }

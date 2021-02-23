@@ -117,7 +117,7 @@ public class XmlDatabaseCodecTestCases {
         String ewkt = element.selectSingleNode("ewkt").getText();
         int srid = Integer.valueOf(element.selectSingleNode("srid").getText().trim());
         String hexString = element.selectSingleNode("db_representation").getText().trim();
-        Geometry geom = Wkt.fromWkt(String.format("SRID=%d;%s", srid, ewkt));
+        Geometry geom = Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1).decode(String.format("SRID=%d;%s", srid, ewkt));
         ByteBuffer bytes = ByteBuffer.from(hexString);
         testCases.addCase(id, ewkt, srid, geom, bytes);
     }
