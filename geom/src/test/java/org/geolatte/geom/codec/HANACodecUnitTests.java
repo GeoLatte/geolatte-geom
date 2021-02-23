@@ -21,9 +21,8 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.ByteOrder;
-import org.geolatte.geom.Geometry;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.support.HANAJDBCUnitTestInputs;
 import org.geolatte.geom.support.HANAJDBCWithSRIDTestInputs;
 import org.geolatte.geom.support.WktWkbCodecTestBase;
@@ -70,6 +69,14 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
             assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
         }
     }
+
+    //we require an explicit test for this because
+    @Test
+	public void test_wkb_encoding_empty_point() {
+    	//testCase for empty point is 43
+		Geometry<G2D> pnt =Geometries.mkEmptyPoint(CoordinateReferenceSystems.WGS84);
+		assertEquals(testCases.getWKB(43), getWkbEncoder().encode(pnt, ByteOrder.NDR));
+	}
     
     private ByteBuffer addSRID(ByteBuffer wkb) {
     	byte[] bytes = wkb.toByteArray();

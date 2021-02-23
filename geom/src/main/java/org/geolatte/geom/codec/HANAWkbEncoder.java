@@ -23,10 +23,7 @@ package org.geolatte.geom.codec;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -39,9 +36,23 @@ class HANAWkbEncoder extends PostgisWkb2Encoder {
 
 	@Override
 	protected <P extends Position> int calculateSize(Geometry<P> geom, boolean includeSrid) {
-		int size = super.calculateSize(geom, includeSrid);
-		// HANA always expects the SRID, the Postgis encoder doesn't write it unless it's > 0 
-		return (includeSrid && geom.getSRID() <= 0) ? size + 4 : size;
+		int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
+		if (includeSrid) {
+			size += 4;
+		}
+
+		if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
+		if (geom instanceof AbstractGeometryCollection) {
+			size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
+		} else if (geom instanceof Polygon) {
+			size += getPolygonSize((Polygon<P>) geom);
+		} else if (geom instanceof Point) {
+			size += getPointByteSize(geom);
+		} else {
+			size += ByteBuffer.UINT_SIZE; //to hold number of points
+			size += getPointByteSize(geom) * geom.getNumPositions();
+		}
+		return size;
 	}
 
 	@Override
@@ -64,10 +75,10 @@ class HANAWkbEncoder extends PostgisWkb2Encoder {
 			if (!this.hasWrittenSrid) {
 				typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
 			}
-			if (hasMeasureAxis(crs)) {
+			if (geometry.hasM()) {
 				typeCode |= PostgisWkbTypeMasks.M_FLAG;
 			}
-			if (hasVerticalAxis(crs)) {
+			if (geometry.hasZ()) {
 				typeCode |= PostgisWkbTypeMasks.Z_FLAG;
 			}
 			output.putUInt(typeCode);
