@@ -24,6 +24,7 @@ public class TestWkbDecodingBugs {
         String WkbText = "0101000080000000000000244000000000000034400000000000003E40";
         CoordinateReferenceSystem<C3D> crs = (CoordinateReferenceSystem<C3D>)CrsRegistry.getCoordinateReferenceSystemForEPSG(555, PROJECTED_3D_METER);
         Point<C3D> pnt = DSL.point(crs, c(10, 20, 30));
-        assertEquals(pnt, Wkb.fromWkb(ByteBuffer.from(WkbText)));
+        WkbDecoder decoder = Wkb.newDecoder(Wkb.Dialect.POSTGIS_EWKB_1);
+        assertEquals(pnt, decoder.decode(ByteBuffer.from(WkbText)));
     }
 }

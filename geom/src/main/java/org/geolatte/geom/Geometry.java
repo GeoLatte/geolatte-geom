@@ -22,6 +22,7 @@
 package org.geolatte.geom;
 
 import org.geolatte.geom.codec.Wkb;
+import org.geolatte.geom.codec.WkbEncoder;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
@@ -41,10 +42,8 @@ import static java.lang.String.format;
 
 public abstract class Geometry<P extends Position> implements Serializable {
 
-
-    private static final long serialVersionUID = 6884205871950410215L;
-
-    private static GeometryEquality geomEq = new GeometryPositionEquality();
+    private static final long serialVersionUID = 6884205871950410216L;
+    private static final GeometryEquality geomEq = new GeometryPositionEquality();
 
     private final PositionSequence<P> positions;
     private final CoordinateReferenceSystem<P> crs;
@@ -103,14 +102,14 @@ public abstract class Geometry<P extends Position> implements Serializable {
     @SuppressWarnings("unchecked")
     protected static <T extends Position> PositionSequence<T> nestPositionSequences(Geometry<T>[] geometries) {
         if (geometries == null || geometries.length == 0) {
-            return new NestedPositionSequence<T>((PositionSequence<T>[])new PositionSequence[0]);
+            return new NestedPositionSequence<>((PositionSequence<T>[])new PositionSequence[0]);
         }
         PositionSequence<T>[] sequences = (PositionSequence<T>[]) (new PositionSequence[geometries.length]);
         int i = 0;
         for (Geometry<T> g : geometries) {
             sequences[i++] = g.getPositions();
         }
-        return new NestedPositionSequence<T>(sequences);
+        return new NestedPositionSequence<>(sequences);
     }
 
     @SuppressWarnings("unchecked")
@@ -314,7 +313,8 @@ public abstract class Geometry<P extends Position> implements Serializable {
     }
 
     protected Object writeReplace() throws ObjectStreamException {
-        ByteBuffer buffer = Wkb.toWkb(this);
+        WkbEncoder encoder = Wkb.newEncoder(Wkb.Dialect.POSTGIS_EWKB_2);
+        ByteBuffer buffer = encoder.encode(this);
         return new SerializationProxy(buffer);
     }
 

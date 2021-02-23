@@ -42,4 +42,14 @@ public interface WkbEncoder {
      * @return a ByteBuffer containing the binary WKB representation of the specified geometry using the specified byte-order
      */
     <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder);
+
+    /**
+     * Encodes a <code>Geometry</code> to its WKB representation using NDR (little-endian) ByteOrder
+     * @param geometry the geometry to encode
+     * @return a ByteBuffer containing the binary WKB representation of the specified geometry with NDR byte-order
+     */
+    default <P extends Position> ByteBuffer encode(Geometry<P> geometry){
+       return encode(geometry, ByteOrder.NDR);
+    }
+
 }

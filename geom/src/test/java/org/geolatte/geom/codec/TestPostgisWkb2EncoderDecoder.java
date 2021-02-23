@@ -16,7 +16,7 @@ public class TestPostgisWkb2EncoderDecoder extends TestPostgisWkbEncoderDecoder{
     @Test
     public void test_empty_point() {
         Geometry<G2D> g = new Point<G2D>(CoordinateReferenceSystems.mkGeographic(Unit.DEGREE));
-        ByteBuffer buf = Wkb.toWkb(g);
+        ByteBuffer buf = Wkb.newEncoder(Wkb.Dialect.POSTGIS_EWKB_2).encode(g);
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT_USING_NAN);
         Geometry<?> geom = decode(byteBuffer);
         assertTrue(geom.isEmpty());
