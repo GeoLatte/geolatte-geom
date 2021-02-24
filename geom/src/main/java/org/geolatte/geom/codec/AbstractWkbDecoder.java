@@ -35,6 +35,7 @@ import static org.geolatte.geom.Geometries.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
+@Deprecated
 abstract class AbstractWkbDecoder implements WkbDecoder {
 
     @Override

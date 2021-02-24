@@ -27,6 +27,7 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
+@Deprecated
 abstract class AbstractWkbEncoder implements WkbEncoder {
 
     /**
