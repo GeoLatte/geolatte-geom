@@ -40,7 +40,7 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem> {
+public class CrsWktDecoder extends AbstractWktDecoder<CoordinateReferenceSystem<? extends Position>> {
 
     private final static CrsWktVariant CRS_TOKENS = new CrsWktVariant();
 

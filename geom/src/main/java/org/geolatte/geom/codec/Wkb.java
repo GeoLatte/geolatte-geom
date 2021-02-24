@@ -40,10 +40,24 @@ import java.util.Map;
 public class Wkb {
 
     public enum Dialect {
-        //the PostGIS EWKB dialect (version < 2.2.1).
+
+        /**
+         * Implements SFA vs 1.1.0, OGC document <a href="http://portal.opengeospatial.org/files/?artifact_id=13227">05_126</a>
+         */
+        SFA_1_1_0,
+
+        /**
+         * the PostGIS EWKB dialect (version < 2.2.1).
+         * This encodes an empty {@code Point} as an empty {@code GeometryCollection}
+         */
         POSTGIS_EWKB_1,
-        //Postgis version >= 2.2.2
+
+        /**
+         * the PostGIS EWKB dialect (version >= 2.2.2).
+         * This encodes an empty {@code Point} as an {@Point} with coordinates (NaN, NaN).
+         */
         POSTGIS_EWKB_2,
+
         MYSQL_WKB,
         HANA_EWKB,
     }
@@ -55,10 +69,12 @@ public class Wkb {
 
 
     static {
+//        DECODERS.put(Dialect.SFA_1_1_0, SFA110WkbDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Decoder.class);
         DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
         DECODERS.put(Dialect.HANA_EWKB, HANAWkbDecoder.class);
+//        ENCODERS.put(Dialect.SFA_1_1_0, SFA110WkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Encoder.class);
         ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);

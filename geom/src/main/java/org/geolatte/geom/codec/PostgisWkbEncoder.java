@@ -66,10 +66,10 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
             if (hasSrid && !hasWrittenSrid) {
                 typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
             }
-            if (hasMeasureAxis(crs)) {
+            if (geometry.hasM()) {
                 typeCode |= PostgisWkbTypeMasks.M_FLAG;
             }
-            if (hasVerticalAxis(crs)) {
+            if (geometry.hasZ()) {
                 typeCode |= PostgisWkbTypeMasks.Z_FLAG;
             }
             output.putUInt(typeCode);

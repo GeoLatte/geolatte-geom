@@ -33,12 +33,13 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/19/11
  */
+@Deprecated
 abstract class AbstractWktDecoder<T> {
 
     private final WktVariant wktVariant;
 
     protected WktToken currentToken;
-    private AbstractWktTokenizer tokenizer;
+    private CrsWktTokenizer tokenizer;
 
     /**
      * The constructor of this AbstractWktDecoder. It sets the variant.
@@ -50,7 +51,7 @@ abstract class AbstractWktDecoder<T> {
     }
 
 
-    protected void setTokenizer(AbstractWktTokenizer tokenizer) {
+    protected void setTokenizer(CrsWktTokenizer tokenizer) {
         this.tokenizer = tokenizer;
         this.currentToken = null;
     }

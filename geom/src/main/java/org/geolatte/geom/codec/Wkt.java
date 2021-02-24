@@ -40,10 +40,12 @@ public class Wkt {
 
     public enum Dialect {
         /**
-         * Implements SFA vs 1.1.0, OGC document <a href="<a href="http://portal.opengeospatial.org/files/?artifact_id=13227">05_126</a>
+         * Implements SFA vs 1.1.0, OGC document <a href="http://portal.opengeospatial.org/files/?artifact_id=13227">05_126</a>
          */
         SFA_1_1_0,
-        //the PostGIS EWKT dialect (versions 1.0 to 1.5).
+        /**
+         *the PostGIS EWKT dialect (versions 1.0 and later).
+         */
         POSTGIS_EWKT_1,
         MYSQL_WKT,
         HANA_EWKT,

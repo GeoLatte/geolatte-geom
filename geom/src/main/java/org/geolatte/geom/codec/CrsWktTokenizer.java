@@ -25,14 +25,129 @@ package org.geolatte.geom.codec;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/9/12
  */
-class CrsWktTokenizer extends AbstractWktTokenizer {
+class CrsWktTokenizer {
+    protected final CharSequence wkt;
+    protected final WktVariant variant;
+    protected int currentPos = 0;
 
     CrsWktTokenizer(CharSequence wkt, WktVariant variant) {
-        super(wkt, variant);
+        this.wkt = wkt;
+        this.variant = variant;
     }
 
-    @Override
-    WktToken numericToken() {
+    boolean moreTokens() {
+        skipWhitespace();
+        return this.currentPos < wkt.length();
+    }
+
+    // this is just temporarily for testing
+    WktToken nextToken() {
+        return inner();
+    }
+
+    private WktToken inner() {
+        if (!moreTokens()) {
+            return variant.end();
+        }
+        if (wkt.charAt(currentPos) == variant.getOpenListChar()) {
+            currentPos++;
+            return variant.getOpenList();
+        } else if (wkt.charAt(currentPos) == variant.getCloseListChar()) {
+            currentPos++;
+            return variant.getCloseList();
+        } else if (wkt.charAt(currentPos) == '"') {
+            return readText();
+        } else if (Character.isLetter(wkt.charAt(currentPos))) {
+            return readToken();
+        } else if (Character.isDigit(wkt.charAt(currentPos)) || wkt.charAt(currentPos) == '.' || wkt.charAt(currentPos) == '-') {
+            return numericToken();
+        } else if (wkt.charAt(currentPos) == variant.getElemSepChar()) {
+            currentPos++;
+            return variant.getElementSeparator();
+        } else {
+            throw new WktDecodeException(String.format("Illegal Character at pos %d in Wkt text: %s", currentPos, wkt));
+        }
+
+    }
+
+    protected WktToken numericToken() {
         return readNumberToken();
+    }
+
+    protected double readNumber() {
+        skipWhitespace();
+        StringBuilder stb = new StringBuilder();
+        char c = wkt.charAt(currentPos);
+        if (c == '-') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        c = readDigits(stb, c);
+        if (c == '.') {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+            readDigits(stb, c);
+        }
+        return Double.parseDouble(stb.toString());
+    }
+
+    private char readDigits(StringBuilder stb, char c) {
+        while (Character.isDigit(c)) {
+            stb.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        return c;
+    }
+
+    protected WktToken readNumberToken() {
+        double d = readNumber();
+        return new WktNumberToken(d);
+    }
+
+    protected WktToken readText() {
+        StringBuilder builder = new StringBuilder();
+        char c = wkt.charAt(++currentPos);
+        while (c != '"') {
+            builder.append(c);
+            c = wkt.charAt(++currentPos);
+        }
+        currentPos++;
+        return new WktTextToken(builder.toString());
+    }
+
+    protected void skipWhitespace() {
+        while (currentPos < wkt.length() && Character.isWhitespace(wkt.charAt(currentPos))) {
+            currentPos++;
+        }
+    }
+
+    protected WktToken readToken() {
+        int endPos = this.currentPos;
+        while (endPos < wkt.length() && isWordChar(wkt.charAt(endPos))) {
+            endPos++;
+        }
+        WktToken nextToken = matchKeyword(currentPos, endPos);
+        currentPos = endPos;
+        return nextToken;
+    }
+
+    protected boolean isWordChar(char c) {
+        return (Character.isLetter(c) || Character.isDigit(c) || c == '_');
+    }
+
+    /**
+     * Matches the specifed subsequence of the WKT to a <code>WktToken</code>.
+     *
+     * @param currentPos the start of the subsequence to match
+     * @param endPos     the end of the subsequence to match
+     * @return the token that matches the specified subsequence
+     * @throws org.geolatte.geom.codec.WktDecodeException if the specified subsequence does not match a token.
+     */
+    protected WktToken matchKeyword(int currentPos, int endPos) {
+        return variant.matchKeyword(wkt, currentPos, endPos);
+    }
+
+    public int position() {
+        return this.currentPos;
     }
 }

@@ -28,6 +28,7 @@ import org.geolatte.geom.*;
  *         creation-date: 11/1/12
  */
 abstract class AbstractWkbEncoder implements WkbEncoder {
+
     /**
      * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
      *
