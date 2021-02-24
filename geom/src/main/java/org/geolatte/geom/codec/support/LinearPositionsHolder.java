@@ -1,7 +1,6 @@
 package org.geolatte.geom.codec.support;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class LinearPositionsHolder extends Holder {
     }
 
     @Override
-    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws DecodeException {
         if(geomType == LINESTRING) {
             return isEmpty()? Geometries.mkEmptyLineString(crs): Geometries.mkLineString(toPositionSequence(crs), crs);
         }
@@ -40,7 +39,7 @@ public class LinearPositionsHolder extends Holder {
             return isEmpty()? Geometries.mkEmptyMultiPoint(crs) : Geometries.mkMultiPoint(toPositionSequence(crs), crs);
         }
 
-        throw new WktDecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
+        throw new DecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
     }
 
     public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateReferenceSystem<P> crs) {

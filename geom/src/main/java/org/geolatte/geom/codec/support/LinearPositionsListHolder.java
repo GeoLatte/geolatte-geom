@@ -31,7 +31,7 @@ public class LinearPositionsListHolder extends Holder {
     }
 
     @Override
-    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws DecodeException {
         if (geomType == POLYGON) {
             if (isEmpty()) {
                 return Geometries.mkEmptyPolygon(crs);
@@ -46,7 +46,7 @@ public class LinearPositionsListHolder extends Holder {
             return Geometries.mkMultiLineString(toLineStrings(crs));
         }
 
-        throw new RuntimeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
+        throw new DecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
     }
 
     <P extends Position> List<LinearRing<P>> toLinearRings(CoordinateReferenceSystem<P> crs) {

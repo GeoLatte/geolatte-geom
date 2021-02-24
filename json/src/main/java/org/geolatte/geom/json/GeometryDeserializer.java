@@ -1,7 +1,6 @@
 package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.codec.support.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsId;
@@ -21,14 +21,12 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static org.geolatte.geom.Geometries.mkEmptyGeometryCollection;
 import static org.geolatte.geom.Geometries.mkGeometryCollection;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.mkCoordinateReferenceSystem;
-import static org.geolatte.geom.crs.Unit.METER;
 
 /**
  * A Parser for Geometry types
  * Created by Karel Maesen, Geovise BVBA on 13/09/17.
  */
-public class GeometryDeserializer extends JsonDeserializer<Geometry> {
+public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
 
     private final CoordinateReferenceSystem<?> defaultCRS;
     private final Settings settings;
@@ -41,14 +39,14 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
     }
 
 
-    private JsonNode getRoot(JsonParser p) throws IOException, GeoJsonProcessingException {
+    private JsonNode getRoot(JsonParser p) throws IOException{
         ObjectCodec oc = p.getCodec();
         return oc.readTree(p);
     }
 
 
     @Override
-    public Geometry<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public Geometry<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode root = getRoot(p);
         return parseGeometry(root);
     }
@@ -85,9 +83,6 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry> {
 
 abstract class GeometryBuilder {
 
-    GeometryBuilder(JsonNode root) {
-    }
-
     static GeometryBuilder create(JsonNode root) throws GeoJsonProcessingException {
         GeometryType type = getType(root);
         if (type == GeometryType.GEOMETRYCOLLECTION) {
@@ -117,7 +112,7 @@ class GeometryCollectionBuilder extends GeometryBuilder {
     final private List<GeometryBuilder> components = new ArrayList<>();
 
     GeometryCollectionBuilder(JsonNode root) throws GeoJsonProcessingException {
-        super(root);
+
         JsonNode geometriesNode = root.get("geometries");
         for (int i = 0; i < geometriesNode.size(); i++) {
             components.add(GeometryBuilder.create(geometriesNode.get(i)));
@@ -158,7 +153,6 @@ class SimpleGeometryBuilder extends GeometryBuilder {
     final private Holder coordinates;
 
     SimpleGeometryBuilder(JsonNode root) throws GeoJsonProcessingException {
-        super(root);
         this.type = getType(root);
         this.coordinates = toHolder(type, getCoordinates(root));
     }
@@ -172,7 +166,11 @@ class SimpleGeometryBuilder extends GeometryBuilder {
     }
 
     <P extends Position> Geometry<P> parse(CoordinateReferenceSystem<P> crs) throws GeoJsonProcessingException {
-        return coordinates.toGeometry(crs, type);
+        try {
+            return coordinates.toGeometry(crs, type);
+        } catch (DecodeException e) {
+            throw new GeoJsonProcessingException(e);
+        }
     }
 
     protected Holder toHolder(GeometryType geomType, JsonNode root) throws GeoJsonProcessingException {
@@ -180,11 +178,9 @@ class SimpleGeometryBuilder extends GeometryBuilder {
             case POINT:
                 return toPointHolder(root);
             case LINESTRING:
-                return toLinearPositionsHolder(root);
-            case POLYGON:
-                return toLinearPositionsListHolder(root);
             case MULTIPOINT:
                 return toLinearPositionsHolder(root);
+            case POLYGON:
             case MULTILINESTRING:
                 return toLinearPositionsListHolder(root);
             case MULTIPOLYGON:

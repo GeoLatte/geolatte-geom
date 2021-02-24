@@ -10,4 +10,8 @@ public class GeoJsonProcessingException extends JsonProcessingException {
     GeoJsonProcessingException(String msg) {
         super(msg);
     }
+
+    GeoJsonProcessingException(Throwable cause) {
+        super(cause);
+    }
 }

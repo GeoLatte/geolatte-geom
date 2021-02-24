@@ -6,6 +6,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 09/09/17.
@@ -16,6 +18,12 @@ public class PointHolder extends Holder {
 
     public PointHolder() {
         this.coordinates = new ArrayList<>(4);
+    }
+
+    public PointHolder(double[] co) {
+        coordinates = DoubleStream.of(co)
+                .boxed()
+                .collect(Collectors.toList());
     }
 
     public void push(double co){
