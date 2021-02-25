@@ -5,8 +5,6 @@ import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
 
-import static java.util.Arrays.asList;
-
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */

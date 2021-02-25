@@ -6,7 +6,7 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.Unit;
-import org.geolatte.geom.support.PostgisTestCases;
+import org.geolatte.geom.codec.testcases.PostgisTestCases;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

@@ -1,4 +1,4 @@
-package org.geolatte.geom.support;
+package org.geolatte.geom.codec.testcases;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;

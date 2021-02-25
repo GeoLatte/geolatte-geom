@@ -34,10 +34,10 @@ import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.support.PostgisJDBCUnitTestInputs;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
-import org.geolatte.geom.support.PostgisTestCases;
-import org.geolatte.geom.support.WktWkbCodecTestBase;
+import org.geolatte.geom.codec.testcases.PostgisJDBCUnitTestInputs;
+import org.geolatte.geom.codec.testcases.PostgisJDBCWithSRIDTestInputs;
+import org.geolatte.geom.codec.testcases.PostgisTestCases;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 

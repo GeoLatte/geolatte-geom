@@ -19,7 +19,7 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.support;
+package org.geolatte.geom.codec.testcases;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -32,11 +32,11 @@ import static org.geolatte.geom.CrsMock.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 10/13/12
  */
-public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
+public class HANAJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
 
-    public PostgisJDBCWithSRIDTestInputs() {
-        PostgisJDBCUnitTestInputs base = new PostgisJDBCUnitTestInputs();
+    public HANAJDBCWithSRIDTestInputs() {
+    	HANAJDBCUnitTestInputs base = new HANAJDBCUnitTestInputs();
         for (Integer testCase : base.getCases()) {
             addCase(testCase,
                     "SRID=4326;" + base.getWKT(testCase),
@@ -47,7 +47,7 @@ public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
         }
     }
 
-    private Geometry addCrsId(PostgisJDBCUnitTestInputs base, Integer testCase) {
+    private Geometry addCrsId(HANAJDBCUnitTestInputs base, Integer testCase) {
         Geometry geom = base.getExpected(testCase);
         CoordinateReferenceSystem<?> crs = null;
         CoordinateReferenceSystem<?> srcCrs = geom.getCoordinateReferenceSystem();
@@ -65,7 +65,7 @@ public class PostgisJDBCWithSRIDTestInputs extends WktWkbCodecTestBase {
 
     }
 
-    private String toSRIDPrefixedWKB(PostgisJDBCUnitTestInputs base, Integer testCase) {
+    private String toSRIDPrefixedWKB(HANAJDBCUnitTestInputs base, Integer testCase) {
         String hexBase = base.getWKBHexString(testCase);
         ByteBuffer inBuffer = ByteBuffer.from(hexBase);
         //get the relevant parts

@@ -1,8 +1,6 @@
 package org.geolatte.geom.codec.support;
 
-//TODO -- this is now a checked exception because in the GeoJson module
-// it will need to be adapted to JsonProcessingException
-public class DecodeException extends Exception{
+public class DecodeException extends RuntimeException{
 
     public DecodeException(String msg){
         super(msg);

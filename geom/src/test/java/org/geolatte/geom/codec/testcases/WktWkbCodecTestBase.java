@@ -1,4 +1,4 @@
-package org.geolatte.geom.support;
+package org.geolatte.geom.codec.testcases;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;

@@ -19,13 +19,17 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.codec;
+package org.geolatte.geom.codec.testcases;
 
 import junit.framework.Assert;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.support.WktWkbCodecTestBase;
+import org.geolatte.geom.codec.WkbDecoder;
+import org.geolatte.geom.codec.WkbEncoder;
+import org.geolatte.geom.codec.WktDecoder;
+import org.geolatte.geom.codec.WktEncoder;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

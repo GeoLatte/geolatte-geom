@@ -2,7 +2,6 @@ package org.geolatte.geom.generator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.IntStream;
 
 /**

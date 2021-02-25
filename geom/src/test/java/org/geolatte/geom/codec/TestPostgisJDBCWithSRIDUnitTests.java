@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.support.WktWkbCodecTestBase;
-import org.geolatte.geom.support.PostgisJDBCWithSRIDTestInputs;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
+import org.geolatte.geom.codec.testcases.PostgisJDBCWithSRIDTestInputs;
 
 /**
  * @author Karel Maesen, Geovise BVBA

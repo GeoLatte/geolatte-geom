@@ -7,8 +7,6 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.Random;
 
-import static org.geolatte.geom.generator.PositionGenerator.positionWithin;
-
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */

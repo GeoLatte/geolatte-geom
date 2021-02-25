@@ -4,7 +4,7 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryEquality;
 import org.geolatte.geom.GeometryPositionEquality;
-import org.geolatte.geom.support.XmlDatabaseCodecTestCases;
+import org.geolatte.geom.codec.testcases.XmlDatabaseCodecTestCases;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

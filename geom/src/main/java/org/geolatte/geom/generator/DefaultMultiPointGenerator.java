@@ -8,8 +8,6 @@ import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
 
-import static org.geolatte.geom.generator.PositionGenerator.nPositionsWithin;
-
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */

@@ -31,7 +31,7 @@ public class LinearPositionsListHolder extends Holder {
     }
 
     @Override
-    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws DecodeException {
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
         if (geomType == POLYGON) {
             if (isEmpty()) {
                 return Geometries.mkEmptyPolygon(crs);
@@ -50,7 +50,11 @@ public class LinearPositionsListHolder extends Holder {
     }
 
     <P extends Position> List<LinearRing<P>> toLinearRings(CoordinateReferenceSystem<P> crs) {
-            return linearPositionsHolderList.stream().map(lph -> new LinearRing<>(lph.toPositionSequence(crs), crs)).collect(Collectors.toList());
+            try {
+                return linearPositionsHolderList.stream().map(lph -> new LinearRing<>(lph.toPositionSequence(crs), crs)).collect(Collectors.toList());
+            } catch(IllegalArgumentException ex){
+                throw new DecodeException("Failure to create LinearRings", ex);
+            }
     }
 
     <P extends Position> List<LineString<P>> toLineStrings(CoordinateReferenceSystem<P> crs) {

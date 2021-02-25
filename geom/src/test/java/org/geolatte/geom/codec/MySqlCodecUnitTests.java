@@ -23,9 +23,10 @@ package org.geolatte.geom.codec;
 
 import junit.framework.Assert;
 import org.geolatte.geom.*;
+import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.support.WktWkbCodecTestBase;
-import org.geolatte.geom.support.MySqlUnitTestInputs;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
+import org.geolatte.geom.codec.testcases.MySqlUnitTestInputs;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

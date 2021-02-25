@@ -17,11 +17,7 @@ public class SimpleGeometryBuilder extends GeometryBuilder {
 
     public <P extends Position> Geometry<P> createGeometry(CoordinateReferenceSystem<P> crs) {
         if (positions == null || positions.isEmpty()) return Geometries.mkEmptyGeometry(type, crs);
-        try {
-            return positions.toGeometry(crs, type);
-        } catch (Throwable t) {
-            throw new WktDecodeException("Failed to create geometry for WKT", t);
-        }
+        return positions.toGeometry(crs, type);
     }
 
     @Override

@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
-
 import static java.util.Arrays.asList;
 import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;

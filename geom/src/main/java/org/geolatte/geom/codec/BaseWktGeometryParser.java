@@ -49,7 +49,11 @@ class BaseWktGeometryParser<P extends Position> {
         matchesOptionalSrid();
         builder = matchesGeometryTaggedText();
         CoordinateReferenceSystem<P> geomCrs = selectCoordinateReferenceSystem();
-        return builder.createGeometry(geomCrs);
+        try {
+            return builder.createGeometry(geomCrs);
+        } catch (DecodeException e) {
+            throw new WktDecodeException("Failure in decoding Wkt", e);
+        }
     }
 
     protected GeometryBuilder matchesGeometryTaggedText() {

@@ -5,7 +5,7 @@ import org.geolatte.geom.cga.Circle;
 /**
  * Created by Karel Maesen, Geovise BVBA on 03/03/15.
  */
-public class CircleGenerator implements Generator<Circle>{
+public class CircleGenerator implements Generator<Circle> {
 
     final Generator<Double> cGen;
     final Generator<Double> rGen;
@@ -15,7 +15,6 @@ public class CircleGenerator implements Generator<Circle>{
         rGen = StdGenerators.between(0.0000000001, maxRadius);
     }
 
-    @Override
     public Circle sample() {
         double x = cGen.sample();
         double y = cGen.sample();

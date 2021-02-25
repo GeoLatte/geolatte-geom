@@ -31,14 +31,13 @@ public class LinearPositionsHolder extends Holder {
     }
 
     @Override
-    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws DecodeException {
+    public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
         if(geomType == LINESTRING) {
             return isEmpty()? Geometries.mkEmptyLineString(crs): Geometries.mkLineString(toPositionSequence(crs), crs);
         }
         if (geomType == MULTIPOINT) {
             return isEmpty()? Geometries.mkEmptyMultiPoint(crs) : Geometries.mkMultiPoint(toPositionSequence(crs), crs);
         }
-
         throw new DecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
     }
 

@@ -19,7 +19,7 @@
  * Geovise bvba - Generaal Eisenhowerlei 9 - 2140 Antwerpen (http://www.geovise.com)
  */
 
-package org.geolatte.geom.support;
+package org.geolatte.geom.codec.testcases;
 
 import org.geolatte.geom.*;
 

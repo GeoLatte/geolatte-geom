@@ -22,9 +22,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.Unit;
-import org.geolatte.geom.support.PostgisTestCases;
+import org.geolatte.geom.codec.testcases.PostgisTestCases;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;

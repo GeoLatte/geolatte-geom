@@ -14,6 +14,6 @@ abstract public class Holder {
 
     abstract public int getCoordinateDimension();
 
-    abstract public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) throws DecodeException;
+    abstract public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType);
 
 }

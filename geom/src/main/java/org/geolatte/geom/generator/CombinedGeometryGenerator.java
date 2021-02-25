@@ -5,7 +5,6 @@ import org.geolatte.geom.Position;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.

@@ -7,8 +7,6 @@ import org.geolatte.geom.builder.DSL;
 
 import java.util.Random;
 
-import static org.geolatte.geom.generator.PositionGenerator.nPositionsWithin;
-
 /**
  * Created by Karel Maesen, Geovise BVBA on 28/09/2018.
  */
@@ -25,7 +23,7 @@ class DefaultLineStringGenerator<P extends Position> extends AbstractGeometryGen
 
     @Override
     public LineString<P> generate() {
-        P[] ps = nPositionsWithin(size, bbox, rnd);
+        P[] ps = PositionGenerator.nPositionsWithin(size, bbox, rnd);
         if (closed) {
             ps[ps.length - 1] = ps[0];
         }
