@@ -30,7 +30,7 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * A <code>WktToken</code> that represents a keyword
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/19/11
+ * creation-date: 11/19/11
  */
 class WktKeywordToken implements WktToken {
 

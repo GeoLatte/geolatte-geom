@@ -10,25 +10,24 @@ import java.sql.Struct;
  */
 public class Decoders {
 
-	public static Decoder decoderFor(SDOGeometry object) {
-		return object.getGType().getTypeGeometry().createDecoder();
-	}
+    public static Decoder decoderFor(SDOGeometry object) {
+        return object.getGType().getTypeGeometry().createDecoder();
+    }
 
     /**
      * Decodes the SQL Server Geometry object to its JTS Geometry instance
      *
      * @param raw
-     *
      * @return
      */
     public static Geometry decode(Struct raw) {
-        SDOGeometry sdo = SDOGeometry.load( raw );
+        SDOGeometry sdo = SDOGeometry.load(raw);
         return decode(sdo);
     }
 
     public static Geometry decode(SDOGeometry sdo) {
         Decoder decoder = decoderFor(sdo);
-        return decoder.decode( sdo );
+        return decoder.decode(sdo);
     }
 
 }

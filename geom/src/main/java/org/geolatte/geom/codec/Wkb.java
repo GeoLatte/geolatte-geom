@@ -35,7 +35,7 @@ import java.util.Map;
  * methods are not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Oct 29, 2010
+ * creation-date: Oct 29, 2010
  */
 public class Wkb {
 

@@ -25,7 +25,7 @@ package org.geolatte.geom.codec;
  * Bit masks for PostGIS Wkb Encoder/Decoder.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/19/11
+ * creation-date: 4/19/11
  */
 class PostgisWkbTypeMasks {
 

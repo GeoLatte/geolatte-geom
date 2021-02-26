@@ -32,12 +32,13 @@ import org.geolatte.geom.Position;
  * <p>In general <code>WkbEncoder</code> implementations are not be thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/29/12
+ * creation-date: 9/29/12
  */
 public interface WkbEncoder {
     /**
      * Encodes a <code>Geometry</code> to its WKB representation
-     * @param geometry the geometry to encode
+     *
+     * @param geometry  the geometry to encode
      * @param byteOrder the bye-order for the WKB representation
      * @return a ByteBuffer containing the binary WKB representation of the specified geometry using the specified byte-order
      */
@@ -45,11 +46,12 @@ public interface WkbEncoder {
 
     /**
      * Encodes a <code>Geometry</code> to its WKB representation using NDR (little-endian) ByteOrder
+     *
      * @param geometry the geometry to encode
      * @return a ByteBuffer containing the binary WKB representation of the specified geometry with NDR byte-order
      */
-    default <P extends Position> ByteBuffer encode(Geometry<P> geometry){
-       return encode(geometry, ByteOrder.NDR);
+    default <P extends Position> ByteBuffer encode(Geometry<P> geometry) {
+        return encode(geometry, ByteOrder.NDR);
     }
 
 }

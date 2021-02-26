@@ -20,48 +20,11 @@
  */
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Position;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
 /**
  * The HANA EWKB decoder is equivalent to the Postgis EWKB decoder and is there mostly for symmetry reasons.
- * 
+ *
  * @author Jonathan Bregler, SAP
  */
 class HANAWkbDecoder extends PostgisWkb2Decoder {
 
-	private int currentTypeCode;
-
-//	@Override
-//	protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
-//		boolean hasM = ( this.currentTypeCode & PostgisWkbTypeMasks.M_FLAG ) == PostgisWkbTypeMasks.M_FLAG;
-//		boolean hasZ = ( this.currentTypeCode & PostgisWkbTypeMasks.Z_FLAG ) == PostgisWkbTypeMasks.Z_FLAG;
-//
-//		if ( ( this.currentTypeCode & 0xFFFF ) > 3000 ) {
-//			hasM = true;
-//			hasZ = true;
-//		}
-//		else if ( ( this.currentTypeCode & 0xFFFF ) > 2000 ) {
-//			hasM = true;
-//		}
-//		else if ( ( this.currentTypeCode & 0xFFFF ) > 1000 ) {
-//			hasZ = true;
-//		}
-//
-//		int modifiedTypeCode = this.currentTypeCode;
-//		if ( hasM ) {
-//			modifiedTypeCode = modifiedTypeCode | PostgisWkbTypeMasks.M_FLAG;
-//		}
-//		if ( hasZ ) {
-//			modifiedTypeCode = modifiedTypeCode | PostgisWkbTypeMasks.Z_FLAG;
-//		}
-//		return super.readCrs( byteBuffer, modifiedTypeCode, crs );
-//	}
-
-//	@Override
-//	protected int readTypeCode(ByteBuffer byteBuffer) {
-//		this.currentTypeCode = super.readTypeCode( byteBuffer );
-//		return (this.currentTypeCode & 0xFFFF) % 100;
-//	}
 }

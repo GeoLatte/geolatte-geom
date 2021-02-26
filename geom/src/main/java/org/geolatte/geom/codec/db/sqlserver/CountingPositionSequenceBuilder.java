@@ -21,12 +21,15 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.PositionSequenceBuilder;
+import org.geolatte.geom.PositionSequenceBuilders;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 10/19/12
+ * creation-date: 10/19/12
  */
 public class CountingPositionSequenceBuilder<P extends Position> implements PositionSequenceBuilder<P> {
 
@@ -57,7 +60,7 @@ public class CountingPositionSequenceBuilder<P extends Position> implements Posi
 
 
     @Override
-    public int getNumAdded(){
+    public int getNumAdded() {
         return num;
     }
 

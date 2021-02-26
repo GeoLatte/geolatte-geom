@@ -24,23 +24,23 @@ package org.geolatte.geom.codec.db.sqlserver;
 import java.nio.ByteBuffer;
 
 class Shape {
-	final int parentOffset;
-	final int figureOffset;
-	final OpenGisType openGisType;
+    final int parentOffset;
+    final int figureOffset;
+    final OpenGisType openGisType;
 
-	Shape(int parentOffset, int figureOffset, OpenGisType openGisType) {
-		this.figureOffset = figureOffset;
-		this.parentOffset = parentOffset;
-		this.openGisType = openGisType;
-	}
+    Shape(int parentOffset, int figureOffset, OpenGisType openGisType) {
+        this.figureOffset = figureOffset;
+        this.parentOffset = parentOffset;
+        this.openGisType = openGisType;
+    }
 
-	static int getByteSize() {
-		return 9;
-	}
+    static int getByteSize() {
+        return 9;
+    }
 
-	void store(ByteBuffer buffer) {
-		buffer.putInt( parentOffset );
-		buffer.putInt( figureOffset );
-		buffer.put( openGisType.byteValue );
-	}
+    void store(ByteBuffer buffer) {
+        buffer.putInt(parentOffset);
+        buffer.putInt(figureOffset);
+        buffer.put(openGisType.byteValue);
+    }
 }

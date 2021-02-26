@@ -40,15 +40,13 @@ import java.sql.Connection;
  */
 public interface ConnectionFinder extends Serializable {
 
-        /**
-         * Find an instance of Connection that can be cast to an {@code OracleConnection} instance.
-         *
-         * @param conn the object that is being searched for an OracleConnection
-         *
-         * @return the object sought
-         *
-         * @throws RuntimeException thrown when the feature can be found;
-         */
-        public Connection find(Connection conn) ;
+    /**
+     * Find an instance of Connection that can be cast to an {@code OracleConnection} instance.
+     *
+     * @param conn the object that is being searched for an OracleConnection
+     * @return the object sought
+     * @throws RuntimeException thrown when the feature can be found;
+     */
+    Connection find(Connection conn);
 
 }

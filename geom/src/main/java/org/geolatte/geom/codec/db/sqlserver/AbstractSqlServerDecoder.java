@@ -23,37 +23,36 @@ package org.geolatte.geom.codec.db.sqlserver;
 
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.db.Decoder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 abstract class AbstractSqlServerDecoder implements Decoder<SqlServerGeometry> {
 
-	public Geometry<?> decode(SqlServerGeometry nativeGeom) {
-		if ( !accepts( nativeGeom ) ) {
-			throw new IllegalArgumentException( getClass().getSimpleName() + " received object of type " + nativeGeom.openGisType() );
-		}
-		if ( nativeGeom.isEmpty() ) {
-			Geometry<?> nullGeom = createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
-			return nullGeom;
-		}
-		return createGeometry( nativeGeom );
-	}
+    public Geometry<?> decode(SqlServerGeometry nativeGeom) {
+        if (!accepts(nativeGeom)) {
+            throw new IllegalArgumentException(getClass().getSimpleName() + " received object of type " + nativeGeom.openGisType());
+        }
+        if (nativeGeom.isEmpty()) {
+            Geometry<?> nullGeom = createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
+            return nullGeom;
+        }
+        return createGeometry(nativeGeom);
+    }
 
-	public boolean accepts(OpenGisType type) {
-		return type == getOpenGisType();
-	}
+    public boolean accepts(OpenGisType type) {
+        return type == getOpenGisType();
+    }
 
-	public boolean accepts(SqlServerGeometry nativeGeom) {
-		return accepts( nativeGeom.openGisType() );
-	}
+    public boolean accepts(SqlServerGeometry nativeGeom) {
+        return accepts(nativeGeom.openGisType());
+    }
 
-	protected abstract OpenGisType getOpenGisType();
+    protected abstract OpenGisType getOpenGisType();
 
-	protected abstract Geometry<?> createNullGeometry(CoordinateReferenceSystem<?> crs);
+    protected abstract Geometry<?> createNullGeometry(CoordinateReferenceSystem<?> crs);
 
-	protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom);
+    protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom);
 
-	protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex);
+    protected abstract Geometry<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex);
 
 }

@@ -26,17 +26,17 @@ package org.geolatte.geom.codec;
  * to delimit values.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/18/11
+ * creation-date: 11/18/11
  */
 class WktPunctuationToken implements WktToken {
 
     private final char punctuationChar;
 
-    public WktPunctuationToken(char c){
+    public WktPunctuationToken(char c) {
         this.punctuationChar = c;
     }
 
-    public char getChar(){
+    public char getChar() {
         return punctuationChar;
     }
 

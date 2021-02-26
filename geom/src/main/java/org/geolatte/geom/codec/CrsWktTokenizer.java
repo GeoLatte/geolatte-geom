@@ -23,7 +23,7 @@ package org.geolatte.geom.codec;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/9/12
+ * creation-date: 11/9/12
  */
 class CrsWktTokenizer {
     protected final CharSequence wkt;

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/03/15.
  */
-public class MultiPolygonSdoDecoder extends AbstractSDODecoder{
+public class MultiPolygonSdoDecoder extends AbstractSDODecoder {
 
     @Override
     public boolean accepts(SDOGeometry nativeGeom) {

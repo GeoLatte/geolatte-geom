@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.Geometry;
 import org.geolatte.geom.AbstractGeometryCollection;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
 import java.util.List;
@@ -34,42 +34,42 @@ import java.util.List;
  */
 class GeometryCollectionSqlServerEncoder extends AbstractSqlServerEncoder {
 
-	private final OpenGisType openGisType;
+    private final OpenGisType openGisType;
 
-	GeometryCollectionSqlServerEncoder(OpenGisType openGisType) {
-		this.openGisType = openGisType;
-	}
+    GeometryCollectionSqlServerEncoder(OpenGisType openGisType) {
+        this.openGisType = openGisType;
+    }
 
-	public <P extends Position> boolean accepts(Geometry<P> geom) {
-		return this.openGisType.typeOf( geom );
-	}
+    public <P extends Position> boolean accepts(Geometry<P> geom) {
+        return this.openGisType.typeOf(geom);
+    }
 
-	@Override
-	protected  void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
-		if ( geom.isEmpty() ) {
-			shapes.add( new Shape( parentShapeIndex, -1, this.openGisType ) );
-			return;
-		}
-		int thisShapeIndex = shapes.size();
-		Shape thisShape = createShape( parentShapeIndex, figures );
-		shapes.add( thisShape );
-		if (! (geom instanceof AbstractGeometryCollection)) {
-			throw new IllegalArgumentException( "Expect GeometryCollection argument." );
-		}
-		AbstractGeometryCollection gc =  (AbstractGeometryCollection) geom;
-		for ( int i = 0; i < gc.getNumGeometries(); i++ ) {
-			Geometry component = gc.getGeometryN( i );
-			encodeComponent( component, thisShapeIndex, coordinates, figures, shapes );
-		}
-	}
+    @Override
+    protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
+        if (geom.isEmpty()) {
+            shapes.add(new Shape(parentShapeIndex, -1, this.openGisType));
+            return;
+        }
+        int thisShapeIndex = shapes.size();
+        Shape thisShape = createShape(parentShapeIndex, figures);
+        shapes.add(thisShape);
+        if (!(geom instanceof AbstractGeometryCollection)) {
+            throw new IllegalArgumentException("Expect GeometryCollection argument.");
+        }
+        AbstractGeometryCollection gc = (AbstractGeometryCollection) geom;
+        for (int i = 0; i < gc.getNumGeometries(); i++) {
+            Geometry component = gc.getGeometryN(i);
+            encodeComponent(component, thisShapeIndex, coordinates, figures, shapes);
+        }
+    }
 
-	protected Shape createShape(int parentShapeIndex, List<Figure> figures) {
-		Shape thisShape = new Shape( parentShapeIndex, figures.size(), this.openGisType );
-		return thisShape;
-	}
+    protected Shape createShape(int parentShapeIndex, List<Figure> figures) {
+        Shape thisShape = new Shape(parentShapeIndex, figures.size(), this.openGisType);
+        return thisShape;
+    }
 
-	protected void encodeComponent(Geometry geom, int thisShapeIndex, CountingPositionSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
-		AbstractSqlServerEncoder encoder = (AbstractSqlServerEncoder) Encoders.encoderFor( geom );
-		encoder.encode( geom, thisShapeIndex, coordinates, figures, shapes );
-	}
+    protected void encodeComponent(Geometry geom, int thisShapeIndex, CountingPositionSequenceBuilder coordinates, List<Figure> figures, List<Shape> shapes) {
+        AbstractSqlServerEncoder encoder = (AbstractSqlServerEncoder) Encoders.encoderFor(geom);
+        encoder.encode(geom, thisShapeIndex, coordinates, figures, shapes);
+    }
 }

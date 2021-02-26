@@ -17,7 +17,7 @@ public class CollectionGeometryBuilder extends GeometryBuilder {
         components.add(builder);
     }
 
-    public <P extends Position> Geometry<P> createGeometry(CoordinateReferenceSystem<P> crs){
+    public <P extends Position> Geometry<P> createGeometry(CoordinateReferenceSystem<P> crs) {
         if (components.isEmpty()) return Geometries.mkEmptyGeometry(GeometryType.GEOMETRYCOLLECTION, crs);
         List<Geometry<P>> geoms = components.stream()
                 .map(c -> c.createGeometry(crs))

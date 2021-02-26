@@ -5,7 +5,7 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-public class SFA110WkbDecoder implements WkbDecoder{
+public class SFA110WkbDecoder implements WkbDecoder {
 
 
     @Override

@@ -26,7 +26,6 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
@@ -34,15 +33,16 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * <p>This class is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Nov 11, 2010
+ * creation-date: Nov 11, 2010
  */
 class PostgisWkbEncoder implements WkbEncoder {
     final private WkbDialect dialect;
-    protected PostgisWkbEncoder(WkbDialect dialect){
+
+    protected PostgisWkbEncoder(WkbDialect dialect) {
         this.dialect = dialect;
     }
 
-    protected PostgisWkbEncoder(){
+    protected PostgisWkbEncoder() {
         this(PostgisWkbV1Dialect.INSTANCE);
     }
 

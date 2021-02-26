@@ -27,31 +27,32 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 /**
  * The HANA EWKT decoder is a variant of the Postgis EWKT decoder. The differences are that it uses a different
  * tokenizer and a different set of keywords.
- * 
+ *
  * @author Jonathan Bregler, SAP
  */
 class HANAWktDecoder implements WktDecoder {
 
-	@Override
-	public <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {
-		return new HANAWktParser<>(wkt, crs).parse();
-	}
+    @Override
+    public <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {
+        return new HANAWktParser<>(wkt, crs).parse();
+    }
 }
 
 class HANAWktParser<P extends Position> extends PostgisWktParser<P> {
-	private final static HANAWktDialect dialect = new HANAWktDialect();
-	public HANAWktParser(String wkt, CoordinateReferenceSystem<P> crs) {
-		super(dialect, wkt, crs);
-	}
+    private final static HANAWktDialect dialect = new HANAWktDialect();
 
-	@Override
-	protected void matchesOptionalZMMarkers() {
-		tokenizer.skipWhitespace();
-		if (tokenizer.matchesOneOf('Z', 'z').isPresent()) {
-			//no need to remember, just consume the token
-		}
-		if (tokenizer.matchesOneOf('M', 'm').isPresent()) {
-			this.hasMMark = true;
-		}
-	}
+    public HANAWktParser(String wkt, CoordinateReferenceSystem<P> crs) {
+        super(dialect, wkt, crs);
+    }
+
+    @Override
+    protected void matchesOptionalZMMarkers() {
+        tokenizer.skipWhitespace();
+        if (tokenizer.matchesOneOf('Z', 'z').isPresent()) {
+            //no need to remember, just consume the token
+        }
+        if (tokenizer.matchesOneOf('M', 'm').isPresent()) {
+            this.hasMMark = true;
+        }
+    }
 }

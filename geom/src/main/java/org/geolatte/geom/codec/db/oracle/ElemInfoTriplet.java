@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Interpreted triplet for a single element
- *
+ * <p>
  * Created by Karel Maesen, Geovise BVBA on 15/02/2020.
  */
 abstract class ElemInfoTriplet {
@@ -18,13 +18,12 @@ abstract class ElemInfoTriplet {
         int etype = triplet[1].intValue();
         int interp = triplet[2].intValue();
         ElementType et = ElementType.parseType(etype, interp);
-        if(et.isCompound()) {
+        if (et.isCompound()) {
             return new CompoundIElemInfoTriplet(sOffset, et);
         } else {
             return new SimpleIElemInfoTriplet(sOffset, et);
         }
     }
-
 
 
     ElemInfoTriplet(int sOffset, ElementType et) {
@@ -34,9 +33,10 @@ abstract class ElemInfoTriplet {
 
     /**
      * Starting offset in ordinates array for this element (1-based!)
+     *
      * @return
      */
-    int getStartingOffset(){
+    int getStartingOffset() {
         return startingOffset;
     }
 
@@ -96,7 +96,7 @@ class CompoundIElemInfoTriplet extends ElemInfoTriplet {
         return true;
     }
 
-    int numParts(){
+    int numParts() {
         return getElementType().getInterpretation();
     }
 

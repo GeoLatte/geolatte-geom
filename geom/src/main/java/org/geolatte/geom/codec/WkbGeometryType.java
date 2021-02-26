@@ -27,7 +27,7 @@ import org.geolatte.geom.*;
  * <code>WkbGeometryType</code> values indicate the Geometry type of a WKB representation.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 4/19/11
+ * creation-date: 4/19/11
  */
 enum WkbGeometryType {
 
@@ -51,7 +51,7 @@ enum WkbGeometryType {
     private final int wkbType;
     private final Class<? extends Geometry> geometryClass;
 
-    private WkbGeometryType(int type, Class<? extends Geometry> geometryClass) {
+    WkbGeometryType(int type, Class<? extends Geometry> geometryClass) {
         this.wkbType = type;
         this.geometryClass = geometryClass;
     }

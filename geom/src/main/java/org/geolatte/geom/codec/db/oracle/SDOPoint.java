@@ -26,7 +26,7 @@ import java.sql.Struct;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jul 1, 2010
+ * creation-date: Jul 1, 2010
  */
 class SDOPoint {
     public Double x;
@@ -45,7 +45,7 @@ class SDOPoint {
         this.z = z;
     }
 
-    public SDOPoint(Double[] ordinates){
+    public SDOPoint(Double[] ordinates) {
         this(ordinates[0], ordinates[1], ordinates.length > 2 ? ordinates[2] : null);
     }
 

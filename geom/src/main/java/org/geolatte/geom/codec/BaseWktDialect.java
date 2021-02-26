@@ -2,7 +2,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.codec.support.GeometryBuilder;
 
 import java.util.Collections;
 import java.util.HashMap;

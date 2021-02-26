@@ -22,13 +22,6 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
-import java.util.*;
-
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * Punctuation and keywords for Postgis EWKT/WKT representations.
@@ -39,7 +32,7 @@ class PostgisWktDialect extends BaseWktDialect {
 
     @Override
     void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
-        if(geometry.hasM() && geometry.getCoordinateDimension() < 4) {
+        if (geometry.hasM() && geometry.getCoordinateDimension() < 4) {
             buffer.append('M');
         }
     }

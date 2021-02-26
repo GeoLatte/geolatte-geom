@@ -44,7 +44,7 @@ public class Wkt {
          */
         SFA_1_1_0,
         /**
-         *the PostGIS EWKT dialect (versions 1.0 and later).
+         * the PostGIS EWKT dialect (versions 1.0 and later).
          */
         POSTGIS_EWKT_1,
         MYSQL_WKT,
@@ -80,7 +80,7 @@ public class Wkt {
      */
     public static <P extends Position> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs) {
         WktDecoder decoder = newDecoder();
-        return decoder.decode(wkt,crs);
+        return decoder.decode(wkt, crs);
     }
 
     public static Geometry<?> fromWkt(String wkt) {
@@ -113,8 +113,8 @@ public class Wkt {
     }
 
     /**
-    * Creates a <code>WktDecoder</code> for the default dialect (Postgis 1.x EWKT).
-     * @return an <code>WktDecoder</code> that supports the default dialect
+     * Creates a <code>WktDecoder</code> for the default dialect (Postgis 1.x EWKT).
+     *
      * @return
      */
     public static WktDecoder newDecoder() {
@@ -135,6 +135,7 @@ public class Wkt {
 
     /**
      * Creates a <code>WktEncoder</code> for the default dialect (Postgis 1.x EWKT).
+     *
      * @return an <code>WktEncoder</code> that supports the default dialect
      */
     public static WktEncoder newEncoder() {

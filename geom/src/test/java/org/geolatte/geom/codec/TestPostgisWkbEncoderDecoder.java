@@ -23,9 +23,10 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.testcases.PostgisTestCases;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.junit.Test;
-
 import static junit.framework.Assert.assertNotNull;
+import static org.geolatte.geom.builder.DSL.point;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -222,8 +223,8 @@ public class TestPostgisWkbEncoderDecoder {
         ByteBuffer byteBuffer = testcases.getWKB(PostgisTestCases.EMPTY_POINT);
         Geometry<?> geom = decode(byteBuffer);
         assertTrue(geom.isEmpty());
-        assertEquals(expected, geom);
-        testEncoding(byteBuffer, geom);
+        Point<C2D> empty = point(CoordinateReferenceSystems.PROJECTED_2D_METER);
+        testEncoding(byteBuffer, empty);
     }
 
     @Test

@@ -28,12 +28,12 @@ import org.geolatte.geom.Position;
  * An Encoder for WKT (Well-Known Text) representations.
  * <p>In general <code>WktEncoder</code> implementations are not be thread-safe.</p>
  *
- *
  * @author Karel Maesen, Geovise BVBA
  */
 public interface WktEncoder {
     /**
      * Encodes an object to its WKT representation.
+     *
      * @param geometry the <code>Geometry</code> instance to encode
      * @return a WKT representation of the specified object.
      */

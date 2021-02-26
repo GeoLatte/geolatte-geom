@@ -21,13 +21,8 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.*;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.FieldPosition;
-import java.text.NumberFormat;
-import java.util.Locale;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
 
 /**
  * Encodes geometries to Postgis WKT/EWKT representations.
@@ -45,7 +40,7 @@ class PostgisWktEncoder extends BaseWktEncoder {
         super(new PostgisWktDialect());
     }
 
-    public PostgisWktEncoder(PostgisWktDialect dialect){
+    public PostgisWktEncoder(PostgisWktDialect dialect) {
         super(dialect);
     }
 
@@ -54,7 +49,7 @@ class PostgisWktEncoder extends BaseWktEncoder {
     }
 
     protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> positions, int pos, double[] coords) {
-        for(int i = 0; i < positions.getCoordinateDimension(); i++) {
+        for (int i = 0; i < positions.getCoordinateDimension(); i++) {
             coords[i] = positions.getPositionN(pos).getCoordinate(i);
         }
     }

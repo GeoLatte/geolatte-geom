@@ -26,7 +26,7 @@ public class PointHolder extends Holder {
                 .collect(Collectors.toList());
     }
 
-    public void push(double co){
+    public void push(double co) {
         this.coordinates.add(co);
     }
 
@@ -35,7 +35,7 @@ public class PointHolder extends Holder {
         return this.coordinates.size() == 0;
     }
 
-    public double[] getCoordinates(){
+    public double[] getCoordinates() {
         return coordinates.stream().mapToDouble(x -> x).toArray();
     }
 

@@ -27,15 +27,14 @@ import org.geolatte.geom.Position;
 /**
  * An {@code Encoder} encodes geometries in instances of type {@code N}
  *
- * @author Karel Maesen, Geovise BVBA.
- *
  * @param <N> the type of encoding result
+ * @author Karel Maesen, Geovise BVBA.
  */
 public interface Encoder<N> {
 
 
-	public <P extends Position, G extends Geometry<P>> N encode(G geom);
+    <P extends Position, G extends Geometry<P>> N encode(G geom);
 
-	public <P extends Position> boolean accepts(Geometry<P> geom);
+    <P extends Position> boolean accepts(Geometry<P> geom);
 
 }

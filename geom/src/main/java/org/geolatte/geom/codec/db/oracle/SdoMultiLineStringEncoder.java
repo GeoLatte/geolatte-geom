@@ -17,7 +17,7 @@ public class SdoMultiLineStringEncoder extends AbstractSDOEncoder {
     @Override
     @SuppressWarnings("unchecked")
     public <P extends Position, G extends Geometry<P>> SDOGeometry encode(G geom) {
-        MultiLineString<P> multiLineString = (MultiLineString<P>)geom;
+        MultiLineString<P> multiLineString = (MultiLineString<P>) geom;
         final int dim = multiLineString.getCoordinateDimension();
         final int lrsDim = getLRSDim(multiLineString);
         final boolean isLrs = (lrsDim != 0);

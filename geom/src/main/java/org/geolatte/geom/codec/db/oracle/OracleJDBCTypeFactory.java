@@ -33,103 +33,100 @@ import java.util.Arrays;
 
 /**
  * Factory for Oracle JDBC extension types (ARRAY, STRUCT, ...).
- *
+ * <p>
  * This factory creates the Oracle extension types using reflection in order to
  * avoid creating compile-time dependencies on the proprietary Oracle driver.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jul 3, 2010
+ * creation-date: Jul 3, 2010
  */
 public class OracleJDBCTypeFactory implements SQLTypeFactory {
 
-	private final Class<?> datumClass;
-	private final Method structDescriptorCreator;
-	private final Method arrayDescriptorCreator;
-	private final Constructor<?> numberConstructor;
-	private final Constructor<?> bigDecimalConstructor;
-	private final Constructor<?> arrayConstructor;
-	private final Constructor<?> structConstructor;
-	private final ConnectionFinder connectionFinder;
+    private final Class<?> datumClass;
+    private final Method structDescriptorCreator;
+    private final Method arrayDescriptorCreator;
+    private final Constructor<?> numberConstructor;
+    private final Constructor<?> bigDecimalConstructor;
+    private final Constructor<?> arrayConstructor;
+    private final Constructor<?> structConstructor;
+    private final ConnectionFinder connectionFinder;
 
-	/**
-	 * Constructs an instance.
-	 *
-	 * @param connectionFinder the {@code ConnectionFinder} the use for retrieving the {@code OracleConnection} instance.
-	 */
-	public OracleJDBCTypeFactory(ConnectionFinder connectionFinder) {
+    /**
+     * Constructs an instance.
+     *
+     * @param connectionFinder the {@code ConnectionFinder} the use for retrieving the {@code OracleConnection} instance.
+     */
+    public OracleJDBCTypeFactory(ConnectionFinder connectionFinder) {
 
-		this.connectionFinder = connectionFinder;
-		Object[] obj = findDescriptorCreator( "oracle.sql.StructDescriptor" );
-		Class<?> structDescriptorClass = (Class<?>) obj[0];
-		structDescriptorCreator = (Method) obj[1];
-		obj = findDescriptorCreator( "oracle.sql.ArrayDescriptor" );
-		Class<?> arrayDescriptorClass = (Class<?>) obj[0];
-		arrayDescriptorCreator = (Method) obj[1];
-		datumClass = findClass( "oracle.sql.Datum" );
-		Class<?> numberClass = findClass( "oracle.sql.NUMBER" );
-		Class<?> arrayClass = findClass( "oracle.sql.ARRAY" );
-		Class<?> structClass = findClass( "oracle.sql.STRUCT" );
+        this.connectionFinder = connectionFinder;
+        Object[] obj = findDescriptorCreator("oracle.sql.StructDescriptor");
+        Class<?> structDescriptorClass = (Class<?>) obj[0];
+        structDescriptorCreator = (Method) obj[1];
+        obj = findDescriptorCreator("oracle.sql.ArrayDescriptor");
+        Class<?> arrayDescriptorClass = (Class<?>) obj[0];
+        arrayDescriptorCreator = (Method) obj[1];
+        datumClass = findClass("oracle.sql.Datum");
+        Class<?> numberClass = findClass("oracle.sql.NUMBER");
+        Class<?> arrayClass = findClass("oracle.sql.ARRAY");
+        Class<?> structClass = findClass("oracle.sql.STRUCT");
 
-		numberConstructor = findConstructor( numberClass, java.lang.Integer.TYPE );
-		bigDecimalConstructor = findConstructor(numberClass, BigDecimal.class);
-		arrayConstructor = findConstructor( arrayClass, arrayDescriptorClass, Connection.class, Object.class );
-		structConstructor = findConstructor( structClass, structDescriptorClass, Connection.class, Object[].class );
-	}
+        numberConstructor = findConstructor(numberClass, java.lang.Integer.TYPE);
+        bigDecimalConstructor = findConstructor(numberClass, BigDecimal.class);
+        arrayConstructor = findConstructor(arrayClass, arrayDescriptorClass, Connection.class, Object.class);
+        structConstructor = findConstructor(structClass, structDescriptorClass, Connection.class, Object[].class);
+    }
 
 
     private Class<?> findClass(String name) {
         try {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            if ( classLoader != null ) {
+            if (classLoader != null) {
                 return classLoader.loadClass(name);
             }
-        } catch ( Throwable ignore ) {}
+        } catch (Throwable ignore) {
+        }
         try {
             return Class.forName(name);
-        } catch( ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException("Can't load class " + name);
         }
     }
 
 
     private Constructor<?> findConstructor(Class clazz, Class<?>... arguments) {
-		try {
-			return clazz.getConstructor( arguments );
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new RuntimeException( "Error finding constructor for oracle.sql type.", e );
-		}
-	}
-
-
-
-	private Object[] findDescriptorCreator(String className) {
-		try {
-			final Class clazz = findClass(className);
-			final Method m = clazz.getMethod( "createDescriptor", String.class, Connection.class );
-			return new Object[] { clazz, m };
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new RuntimeException( "Class 'StructDescriptor' has no method 'createDescriptor(String,Connection)'" );
-		}
-	}
-
-	@Override
-	public Struct createStruct(SDOGeometry geom, Connection conn) throws SQLException {
-        Connection oracleConnection = connectionFinder.find( conn );
-
-
-        final Object structDescriptor = createStructDescriptor( SDOGeometry.getTypeName(), oracleConnection );
-        final Object[] attributes = createDatumArray( 5 );
-        attributes[0] = createInteger( geom.getGType().intValue() );
-        if ( geom.getSRID() > 0 ) {
-            attributes[1] = createInteger( geom.getSRID() );
+        try {
+            return clazz.getConstructor(arguments);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Error finding constructor for oracle.sql type.", e);
         }
-        else {
+    }
+
+
+    private Object[] findDescriptorCreator(String className) {
+        try {
+            final Class clazz = findClass(className);
+            final Method m = clazz.getMethod("createDescriptor", String.class, Connection.class);
+            return new Object[]{clazz, m};
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Class 'StructDescriptor' has no method 'createDescriptor(String,Connection)'");
+        }
+    }
+
+    @Override
+    public Struct createStruct(SDOGeometry geom, Connection conn) throws SQLException {
+        Connection oracleConnection = connectionFinder.find(conn);
+
+
+        final Object structDescriptor = createStructDescriptor(SDOGeometry.getTypeName(), oracleConnection);
+        final Object[] attributes = createDatumArray(5);
+        attributes[0] = createInteger(geom.getGType().intValue());
+        if (geom.getSRID() > 0) {
+            attributes[1] = createInteger(geom.getSRID());
+        } else {
             attributes[1] = null;
         }
         if (geom.getPoint() != null) {
-            final Object pointStructDescriptor = createStructDescriptor( SDOGeometry.getPointTypeName(), oracleConnection );
+            final Object pointStructDescriptor = createStructDescriptor(SDOGeometry.getPointTypeName(), oracleConnection);
             final Object[] pointAttributes = createDatumArray(3);
             SDOPoint sdoPnt = geom.getPoint();
             pointAttributes[0] = createDouble(sdoPnt.x);
@@ -137,120 +134,104 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
             pointAttributes[2] = createDouble(sdoPnt.z);
             attributes[2] = createStruct(pointStructDescriptor, oracleConnection, pointAttributes);
         } else {
-            attributes[3] = createElemInfoArray( geom.getInfo(), oracleConnection );
-            attributes[4] = createOrdinatesArray( geom.getOrdinates(), oracleConnection );
+            attributes[3] = createElemInfoArray(geom.getInfo(), oracleConnection);
+            attributes[4] = createOrdinatesArray(geom.getOrdinates(), oracleConnection);
         }
-        return createStruct( structDescriptor, oracleConnection, attributes );
+        return createStruct(structDescriptor, oracleConnection, attributes);
     }
 
-	@Override
-	public Array createElemInfoArray(ElemInfo elemInfo, Connection conn) {
-		final Object arrayDescriptor = createArrayDescriptor( ElemInfo.TYPE_NAME, conn );
-		return createArray( arrayDescriptor, conn, elemInfo.getElements() );
-	}
+    @Override
+    public Array createElemInfoArray(ElemInfo elemInfo, Connection conn) {
+        final Object arrayDescriptor = createArrayDescriptor(ElemInfo.TYPE_NAME, conn);
+        return createArray(arrayDescriptor, conn, elemInfo.getElements());
+    }
 
-	@Override
-	public Array createOrdinatesArray(Ordinates ordinates, Connection conn) throws SQLException {
-		final Object arrayDescriptor = createArrayDescriptor( Ordinates.TYPE_NAME, conn );
-		return createArray( arrayDescriptor, conn, ordinates.getOrdinateArray() );
+    @Override
+    public Array createOrdinatesArray(Ordinates ordinates, Connection conn) throws SQLException {
+        final Object arrayDescriptor = createArrayDescriptor(Ordinates.TYPE_NAME, conn);
+        return createArray(arrayDescriptor, conn, ordinates.getOrdinateArray());
 
-	}
+    }
 
-	private Array createArray(Object descriptor, Connection conn, Object[] data) {
-		boolean shouldConvertToBigDecimal = Arrays.stream(data).allMatch(e -> e instanceof Double || e == null);
-		try {
-			if (shouldConvertToBigDecimal) {
-				BigDecimal[] dataAsBigDecimal = new BigDecimal[data.length];
-				for (int i = 0; i < data.length; i++) {
-					dataAsBigDecimal[i] = data[i] == null ? null : BigDecimal.valueOf((Double) data[i]);
-				}
-				return (Array) arrayConstructor.newInstance( descriptor, conn, dataAsBigDecimal );
-			}
-			return (Array) arrayConstructor.newInstance( descriptor, conn, data );
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException( "Problem creating ARRAY.", e );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Problem creating ARRAY.", e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Problem creating ARRAY.", e );
-		}
-	}
+    private Array createArray(Object descriptor, Connection conn, Object[] data) {
+        boolean shouldConvertToBigDecimal = Arrays.stream(data).allMatch(e -> e instanceof Double || e == null);
+        try {
+            if (shouldConvertToBigDecimal) {
+                BigDecimal[] dataAsBigDecimal = new BigDecimal[data.length];
+                for (int i = 0; i < data.length; i++) {
+                    dataAsBigDecimal[i] = data[i] == null ? null : BigDecimal.valueOf((Double) data[i]);
+                }
+                return (Array) arrayConstructor.newInstance(descriptor, conn, dataAsBigDecimal);
+            }
+            return (Array) arrayConstructor.newInstance(descriptor, conn, data);
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Problem creating ARRAY.", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Problem creating ARRAY.", e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Problem creating ARRAY.", e);
+        }
+    }
 
-	private Struct createStruct(Object descriptor, Connection conn, Object[] attributes) {
-		try {
-			return (Struct) structConstructor.newInstance( descriptor, conn, attributes );
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException( "Problem creating STRUCT.", e );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Problem creating STRUCT.", e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Problem creating STRUCT.", e );
-		}
-	}
+    private Struct createStruct(Object descriptor, Connection conn, Object[] attributes) {
+        try {
+            return (Struct) structConstructor.newInstance(descriptor, conn, attributes);
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Problem creating STRUCT.", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Problem creating STRUCT.", e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Problem creating STRUCT.", e);
+        }
+    }
 
-	private Object createStructDescriptor(String sqlType, Connection conn) {
-		try {
-			return structDescriptorCreator.invoke( null, sqlType, conn );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Error creating oracle STRUCT", e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Error creating oracle STRUCT", e );
-		}
-	}
+    private Object createStructDescriptor(String sqlType, Connection conn) {
+        try {
+            return structDescriptorCreator.invoke(null, sqlType, conn);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error creating oracle STRUCT", e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Error creating oracle STRUCT", e);
+        }
+    }
 
-	private Object createArrayDescriptor(String name, Connection conn) {
-		try {
-			return arrayDescriptorCreator.invoke( null, name, conn );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Error creating oracle ARRAY", e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Error creating oracle ARRAY", e );
-		}
-	}
+    private Object createArrayDescriptor(String name, Connection conn) {
+        try {
+            return arrayDescriptorCreator.invoke(null, name, conn);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error creating oracle ARRAY", e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Error creating oracle ARRAY", e);
+        }
+    }
 
-	private Object[] createDatumArray(int size) {
-		return (Object[]) java.lang.reflect.Array.newInstance( datumClass, size );
+    private Object[] createDatumArray(int size) {
+        return (Object[]) java.lang.reflect.Array.newInstance(datumClass, size);
 
-	}
+    }
 
-	private Object createInteger(int obj) {
-		try {
-			return numberConstructor.newInstance( obj );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-	}
+    private Object createInteger(int obj) {
+        try {
+            return numberConstructor.newInstance(obj);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        }
+    }
 
-	private Object createDouble(Double obj) {
-		try {
-			return obj == null ? null : bigDecimalConstructor.newInstance( BigDecimal.valueOf( obj ) );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-		catch ( InstantiationException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new RuntimeException( "Error creating oracle NUMBER", e );
-		}
-	}
+    private Object createDouble(Double obj) {
+        try {
+            return obj == null ? null : bigDecimalConstructor.newInstance(BigDecimal.valueOf(obj));
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Error creating oracle NUMBER", e);
+        }
+    }
 
 }

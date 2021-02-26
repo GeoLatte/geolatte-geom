@@ -42,7 +42,8 @@ class HANAWkbDialect extends WkbDialect {
 
     final public static HANAWkbDialect INSTANCE = new HANAWkbDialect();
 
-    private HANAWkbDialect(){}
+    private HANAWkbDialect() {
+    }
 
     @Override
     boolean emptyPointAsNaN() {
@@ -84,7 +85,6 @@ class HANAWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
     }
 
 
-
     @Override
     protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
         int typeCode = geometryTypeCode(geometry);
@@ -102,7 +102,7 @@ class HANAWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
         if (!this.hasWrittenSrid) {
             int srid = geometry.getSRID();
             // Write the SRID, the HANA default SRID is 0
-            output.putInt(srid < 0 ? 0 : srid);
+            output.putInt(Math.max(srid, 0));
             this.hasWrittenSrid = true;
         }
     }

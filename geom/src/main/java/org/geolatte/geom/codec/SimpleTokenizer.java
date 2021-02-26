@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 public class SimpleTokenizer {
 
-    final public static char openListChar ='(';
-    final public static char closeListChar =')';
+    final public static char openListChar = '(';
+    final public static char closeListChar = ')';
     final public static char elementSeparator = ',';
 
     final private CharSequence input;
@@ -33,7 +33,7 @@ public class SimpleTokenizer {
         currentPos -= numPos;
     }
 
-    public int currentPos(){
+    public int currentPos() {
         return currentPos;
     }
 
@@ -47,7 +47,7 @@ public class SimpleTokenizer {
         }
     }
 
-    private boolean endOfInput(){
+    private boolean endOfInput() {
         return currentPos >= input.length();
     }
 
@@ -73,7 +73,7 @@ public class SimpleTokenizer {
         }
         try {
             return Double.parseDouble(stb.toString());
-        } catch(NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             throw new WktDecodeException("Expected double", ex);
         }
     }
@@ -82,7 +82,7 @@ public class SimpleTokenizer {
         if (!endOfInput() && !Character.isDigit(currentChar())) {
             nextChar();
         }
-        while(!endOfInput() && Character.isDigit(currentChar())) {
+        while (!endOfInput() && Character.isDigit(currentChar())) {
             stb.append(currentChar());
             nextChar();
         }
@@ -91,7 +91,7 @@ public class SimpleTokenizer {
 
     public String readLiteralText() {
         skipWhitespace();
-        if( currentChar() != '"') throw new WktDecodeException("Expected quote character");
+        if (currentChar() != '"') throw new WktDecodeException("Expected quote character");
         StringBuilder builder = new StringBuilder();
         nextChar();
         while (currentChar() != '"') {
@@ -105,8 +105,9 @@ public class SimpleTokenizer {
         return builder.toString();
     }
 
-    public String readText(){
-        if( hasMoreInput() && !Character.isLetterOrDigit(currentChar())) throw new WktDecodeException("Expected a letter or digit");
+    public String readText() {
+        if (hasMoreInput() && !Character.isLetterOrDigit(currentChar()))
+            throw new WktDecodeException("Expected a letter or digit");
         StringBuilder builder = new StringBuilder();
         while (!endOfInput() && Character.isLetterOrDigit(currentChar())) {
             builder.append(currentChar());
@@ -124,7 +125,7 @@ public class SimpleTokenizer {
         }
     }
 
-    public boolean matchesChar(char c, boolean skipWhitespace){
+    public boolean matchesChar(char c, boolean skipWhitespace) {
         if (skipWhitespace) {
             skipWhitespace();
         }
@@ -135,7 +136,7 @@ public class SimpleTokenizer {
         return false;
     }
 
-    public boolean matchPattern(Pattern pattern){
+    public boolean matchPattern(Pattern pattern) {
         skipWhitespace();
         Matcher m = pattern.matcher(input);
         m.region(currentPos, input.length());
@@ -146,15 +147,15 @@ public class SimpleTokenizer {
         return false;
     }
 
-    public Optional<String> extractGroupFromPattern(Pattern pattern, int group){
+    public Optional<String> extractGroupFromPattern(Pattern pattern, int group) {
         skipWhitespace();
         Matcher m = pattern.matcher(input);
         m.region(currentPos, input.length());
-        if(m.lookingAt()) {
+        if (m.lookingAt()) {
             try {
                 currentPos = m.end();
                 return Optional.of(m.group(group));
-            } catch(IndexOutOfBoundsException t) {
+            } catch (IndexOutOfBoundsException t) {
                 throw new WktDecodeException("Attempted to extract non-existent capture group");
             }
         } else {
@@ -163,10 +164,10 @@ public class SimpleTokenizer {
     }
 
 
-    public Optional<Character> matchesOneOf(char... choices){
+    public Optional<Character> matchesOneOf(char... choices) {
         skipWhitespace();
-        for(char c: choices) {
-            if(currentChar() == c) {
+        for (char c : choices) {
+            if (currentChar() == c) {
                 nextChar();
                 return Optional.of(c);
             }
@@ -175,15 +176,15 @@ public class SimpleTokenizer {
     }
 
 
-    public boolean matchesOpenList(){
+    public boolean matchesOpenList() {
         return matchesChar(openListChar, true);
     }
 
-    public boolean matchesCloseList(){
+    public boolean matchesCloseList() {
         return matchesChar(closeListChar, true);
     }
 
-    public boolean matchElementSeparator(){
+    public boolean matchElementSeparator() {
         return matchesChar(elementSeparator, true);
     }
 
@@ -214,7 +215,7 @@ public class SimpleTokenizer {
             if (Character.isDigit(c)) {
                 s = 10 * s + (c - '0');
                 digitsSeen = true;
-            } else if (c == '.' ) {
+            } else if (c == '.') {
                 if (decPntSeen) {
                     throw new WktDecodeException("Invalid number format at position " + currentPos);
                 }
@@ -236,7 +237,7 @@ public class SimpleTokenizer {
         long expSign = 1L;
         if (c == 'e' || c == 'E') {
             c = input.charAt(++currentPos);
-            if (c == '-')  {
+            if (c == '-') {
                 expSign = -1L;
                 c = input.charAt(++currentPos);
             }
@@ -247,28 +248,28 @@ public class SimpleTokenizer {
                 c = currentChar();
             }
         }
-        if (!digitsSeen){
+        if (!digitsSeen) {
             throw new WktDecodeException("Invalid number format at position " + currentPos);
         }
-        long p =  decPos >= 0 ? expSign * exp - decPos : expSign * exp;
+        long p = decPos >= 0 ? expSign * exp - decPos : expSign * exp;
         int endPos = currentPos;
         return toDouble(sign, s, p, startPos, endPos);
     }
 
     /**
      * Converts the decimal number representation into a double
-     *
+     * <p>
      * This routine tries to apply the "Fast path" to get a really fast conversion, if applicable. If not, it
      * delegates to the more expensive Double.parseDouble() StdLib conversion.
-     *
+     * <p>
      * See: http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
      * and Handbook of Floating-Point Arithmetic, p. 47-8 (Muller e.a)
      *
-     * @param sign the sign of the number
-     * @param s the decimal mantissa or significand as a long
-     * @param p the exponent as a long
+     * @param sign     the sign of the number
+     * @param s        the decimal mantissa or significand as a long
+     * @param p        the exponent as a long
      * @param startPos the start position in the input for the parsed number
-     * @param endPos the end position in the input for the parsed number
+     * @param endPos   the end position in the input for the parsed number
      * @return the double at the specified positions
      */
     private double toDouble(double sign, long s, long p, int startPos, int endPos) {
@@ -280,9 +281,9 @@ public class SimpleTokenizer {
             if (p == 0l) {
                 return sign * s;
             } else if (p < 0) {
-                return sign * (s / Math.pow(10,-p));
+                return sign * (s / Math.pow(10, -p));
             } else {
-                return sign * (s * Math.pow(10,p));
+                return sign * (s * Math.pow(10, p));
             }
         } else {
             return Double.parseDouble(input.subSequence(startPos, endPos).toString());
@@ -292,10 +293,9 @@ public class SimpleTokenizer {
     private static final long S_MAX = 9007199254740991L;
     private static final long P_MAX = 22L;
 
-    private void nextChar(){
+    private void nextChar() {
         currentPos++;
     }
-
 
 
 }

@@ -35,10 +35,10 @@ import static org.geolatte.geom.Geometries.mkMultiPoint;
 
 class MultiPointSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTIPOINT;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.MULTIPOINT;
+    }
 
     @Override
     protected MultiPoint<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {

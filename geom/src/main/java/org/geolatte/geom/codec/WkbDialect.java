@@ -85,7 +85,7 @@ class WkbDialect {
         if (geometry.getGeometryType() == GeometryType.POINT) {
             //Empty Point encoded with NaN coordinates? then same size as one position,
             // else number of elements (0 elements)
-            return emptyPointAsNaN()? getPositionSize(geometry) : ByteBuffer.UINT_SIZE;
+            return emptyPointAsNaN() ? getPositionSize(geometry) : ByteBuffer.UINT_SIZE;
         } else {
             // indicate no positions follow
             return ByteBuffer.UINT_SIZE;
@@ -114,7 +114,7 @@ class WkbDialect {
         return size;
     }
 
-    boolean emptyPointAsNaN(){
+    boolean emptyPointAsNaN() {
         return true;
     }
 

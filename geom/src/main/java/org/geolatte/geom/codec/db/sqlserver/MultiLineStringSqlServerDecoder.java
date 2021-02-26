@@ -30,16 +30,15 @@ import static org.geolatte.geom.Geometries.mkMultiLineString;
 
 class MultiLineStringSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTILINESTRING;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.MULTILINESTRING;
+    }
 
     @Override
     protected MultiLineString<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
-        return mkMultiLineString( geometries );
+        return mkMultiLineString(geometries);
     }
-
 
 
 }

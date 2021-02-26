@@ -25,7 +25,6 @@ package org.geolatte.geom.codec;
  * Thrown when the WKB cannot be parsed.
  *
  * @author Karel Maesen, Geovise BVBA
- *
  */
 public class WkbDecodeException extends RuntimeException {
 

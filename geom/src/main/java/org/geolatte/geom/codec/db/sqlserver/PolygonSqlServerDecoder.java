@@ -21,7 +21,9 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.LinearRing;
+import org.geolatte.geom.Polygon;
+import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
@@ -32,44 +34,43 @@ import java.util.List;
  */
 class PolygonSqlServerDecoder extends AbstractSqlServerDecoder {
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.POLYGON;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.POLYGON;
+    }
 
-	protected  Polygon<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+    protected Polygon<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
         return new Polygon(crs);
     }
 
-	protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom) {
-		return createGeometry( nativeGeom, 0 );
-	}
+    protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom) {
+        return createGeometry(nativeGeom, 0);
+    }
 
-	protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
-		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return (Polygon<?>)createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
-		}
-		//polygons consist of one exterior ring figure, and several interior ones.
-		IndexRange figureRange = nativeGeom.getFiguresForShape( shapeIndex );
-		List<LinearRing<?>> rings = new ArrayList<LinearRing<?>>(figureRange.length());
+    protected Polygon<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+        if (nativeGeom.isEmptyShape(shapeIndex)) {
+            return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
+        }
+        //polygons consist of one exterior ring figure, and several interior ones.
+        IndexRange figureRange = nativeGeom.getFiguresForShape(shapeIndex);
+        List<LinearRing<?>> rings = new ArrayList<LinearRing<?>>(figureRange.length());
         //the rings should contain all inner rings from index 1 to index length - 1
         // index = 0 should be reserved for the shell.
-		for ( int figureIdx = figureRange.start, i = 1; figureIdx < figureRange.end; figureIdx++ ) {
-			IndexRange pntIndexRange = nativeGeom.getPointsForFigure( figureIdx );
-			if ( nativeGeom.isFigureInteriorRing( figureIdx ) ) {
-				rings.add(i++,toLinearRing( nativeGeom, pntIndexRange));
-			}
-			else {
-				rings.add(0, toLinearRing( nativeGeom, pntIndexRange));
-			}
-		}
-        LinearRing<?>[] ringArr = (LinearRing<?>[])new LinearRing[rings.size()];
+        for (int figureIdx = figureRange.start, i = 1; figureIdx < figureRange.end; figureIdx++) {
+            IndexRange pntIndexRange = nativeGeom.getPointsForFigure(figureIdx);
+            if (nativeGeom.isFigureInteriorRing(figureIdx)) {
+                rings.add(i++, toLinearRing(nativeGeom, pntIndexRange));
+            } else {
+                rings.add(0, toLinearRing(nativeGeom, pntIndexRange));
+            }
+        }
+        LinearRing<?>[] ringArr = (LinearRing<?>[]) new LinearRing[rings.size()];
         return new Polygon(rings.toArray(ringArr));
     }
 
-	private LinearRing<?> toLinearRing(SqlServerGeometry nativeGeom, IndexRange range) {
+    private LinearRing<?> toLinearRing(SqlServerGeometry nativeGeom, IndexRange range) {
         PositionSequence<?> positionSequence = nativeGeom.coordinateRange(range);
         return new LinearRing(positionSequence, nativeGeom.getCoordinateReferenceSystem());
-	}
+    }
 
 }

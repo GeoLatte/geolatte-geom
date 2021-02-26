@@ -21,43 +21,46 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.LineString;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.PositionSequence;
 
 import java.util.List;
 
 
 class LineStringSqlServerEncoder extends AbstractSqlServerEncoder {
 
-	@Override
-	protected  void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
-		if ( !( geom instanceof LineString ) ) {
-			throw new IllegalArgumentException( "Require LineString geometry" );
-		}
-		if ( geom.isEmpty() ) {
-			shapes.add( new Shape( parentShapeIndex, -1, OpenGisType.LINESTRING ) );
-			return;
-		}
-		int figureOffset = figures.size();
+    @Override
+    protected void encode(Geometry<?> geom, int parentShapeIndex, CountingPositionSequenceBuilder<?> coordinates, List<Figure> figures, List<Shape> shapes) {
+        if (!(geom instanceof LineString)) {
+            throw new IllegalArgumentException("Require LineString geometry");
+        }
+        if (geom.isEmpty()) {
+            shapes.add(new Shape(parentShapeIndex, -1, OpenGisType.LINESTRING));
+            return;
+        }
+        int figureOffset = figures.size();
         int pointOffset = coordinates.getNumAdded();
         double[] c = new double[coordinates.getCoordinateDimension()];
-        for ( Position pos : geom.getPositions() ) {
-			coordinates.add( pos.toArray(c) );
-		}
-		figures.add( new Figure( FigureAttribute.Stroke, pointOffset ) );
-		shapes.add( new Shape( parentShapeIndex, figureOffset, OpenGisType.LINESTRING ) );
-	}
+        for (Position pos : geom.getPositions()) {
+            coordinates.add(pos.toArray(c));
+        }
+        figures.add(new Figure(FigureAttribute.Stroke, pointOffset));
+        shapes.add(new Shape(parentShapeIndex, figureOffset, OpenGisType.LINESTRING));
+    }
 
-	@Override
-	protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
-		super.encodePoints( nativeGeom, coordinates );
-		if ( coordinates.size() == 2 ) {
-			nativeGeom.setIsSingleLineSegment();
-		}
-	}
+    @Override
+    protected void encodePoints(SqlServerGeometry nativeGeom, PositionSequence<?> coordinates) {
+        super.encodePoints(nativeGeom, coordinates);
+        if (coordinates.size() == 2) {
+            nativeGeom.setIsSingleLineSegment();
+        }
+    }
 
-	public boolean accepts(Geometry geom) {
-		return geom instanceof LineString;
-	}
+    public boolean accepts(Geometry geom) {
+        return geom instanceof LineString;
+    }
 
 
 }

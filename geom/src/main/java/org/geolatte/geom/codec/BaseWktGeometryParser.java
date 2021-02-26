@@ -1,13 +1,16 @@
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.support.*;
-import org.geolatte.geom.crs.*;
-import org.locationtech.jts.geom.Coordinate;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static org.geolatte.geom.codec.SimpleTokenizer.*;
 

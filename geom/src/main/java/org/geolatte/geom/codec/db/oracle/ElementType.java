@@ -23,7 +23,7 @@ package org.geolatte.geom.codec.db.oracle;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jul 1, 2010
+ * creation-date: Jul 1, 2010
  */
 enum ElementType {
     UNSUPPORTED(0, true),
@@ -52,19 +52,19 @@ enum ElementType {
     COMPOUND_EXTERIOR_RING(1005, true),
     COMPOUND_INTERIOR_RING(2005, true);
 
-    private int etype;
+    private final int etype;
 
     private int interpretation = 2;
 
     private boolean compound;
 
-    private ElementType(int etype, int interp) {
+    ElementType(int etype, int interp) {
         this.etype = etype;
         this.interpretation = interp;
 
     }
 
-    private ElementType(int etype, boolean compound) {
+    ElementType(int etype, boolean compound) {
         this.etype = etype;
         this.compound = compound;
     }

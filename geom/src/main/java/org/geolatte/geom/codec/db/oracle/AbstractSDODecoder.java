@@ -3,7 +3,9 @@ package org.geolatte.geom.codec.db.oracle;
 import org.geolatte.geom.*;
 import org.geolatte.geom.cga.CircularArcLinearizer;
 import org.geolatte.geom.codec.db.Decoder;
-import org.geolatte.geom.crs.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
 
 import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
 
@@ -14,7 +16,7 @@ abstract public class AbstractSDODecoder implements Decoder<SDOGeometry> {
 
 
     //TODO -- this should be parameterized.
-    private static double LINEARIZER_EPSILON = 0.0001;
+    private static final double LINEARIZER_EPSILON = 0.0001;
     private CoordinateReferenceSystem<?> crs;
 
     @Override

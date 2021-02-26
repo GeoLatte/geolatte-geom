@@ -2,13 +2,12 @@ package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.LineString;
-import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
-* Created by Karel Maesen, Geovise BVBA on 18/02/15.
-*/
+ * Created by Karel Maesen, Geovise BVBA on 18/02/15.
+ */
 public class LineStringSdoDecoder extends AbstractSDODecoder {
 
 

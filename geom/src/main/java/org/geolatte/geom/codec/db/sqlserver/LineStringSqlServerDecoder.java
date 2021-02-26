@@ -28,31 +28,31 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 class LineStringSqlServerDecoder extends AbstractSqlServerDecoder {
 
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.LINESTRING;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.LINESTRING;
+    }
 
-	protected LineString<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
-		return new LineString(crs);
-	}
+    protected LineString<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return new LineString(crs);
+    }
 
-	protected LineString<?> createGeometry(SqlServerGeometry nativeGeom) {
-		return createLineString( nativeGeom, new IndexRange( 0, nativeGeom.getNumPoints() ) );
-	}
+    protected LineString<?> createGeometry(SqlServerGeometry nativeGeom) {
+        return createLineString(nativeGeom, new IndexRange(0, nativeGeom.getNumPoints()));
+    }
 
-	@Override
-	protected LineString<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
-		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
-		}
-		int figureOffset = nativeGeom.getFiguresForShape( shapeIndex ).start;
-		IndexRange pntIndexRange = nativeGeom.getPointsForFigure( figureOffset );
-		return createLineString( nativeGeom, pntIndexRange );
-	}
+    @Override
+    protected LineString<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+        if (nativeGeom.isEmptyShape(shapeIndex)) {
+            return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
+        }
+        int figureOffset = nativeGeom.getFiguresForShape(shapeIndex).start;
+        IndexRange pntIndexRange = nativeGeom.getPointsForFigure(figureOffset);
+        return createLineString(nativeGeom, pntIndexRange);
+    }
 
-	protected LineString<?> createLineString(SqlServerGeometry nativeGeom, IndexRange pntIndexRange) {
-		PositionSequence<?> coordinates = nativeGeom.coordinateRange( pntIndexRange );
+    protected LineString<?> createLineString(SqlServerGeometry nativeGeom, IndexRange pntIndexRange) {
+        PositionSequence<?> coordinates = nativeGeom.coordinateRange(pntIndexRange);
         CoordinateReferenceSystem<?> coordinateReferenceSystem = nativeGeom.getCoordinateReferenceSystem();
         return new LineString(coordinates, coordinateReferenceSystem);
     }

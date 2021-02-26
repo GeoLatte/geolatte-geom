@@ -14,7 +14,7 @@ public class SdoMultiPolygonEncoder extends AbstractSDOEncoder {
     @Override
     @SuppressWarnings("unchecked")
     public <P extends Position, G extends Geometry<P>> SDOGeometry encode(G geom) {
-        MultiPolygon<P> multiPolygon = (MultiPolygon<P>)geom;
+        MultiPolygon<P> multiPolygon = (MultiPolygon<P>) geom;
         final int dim = multiPolygon.getCoordinateDimension();
         final int lrsPos = getLRSDim(multiPolygon);
 

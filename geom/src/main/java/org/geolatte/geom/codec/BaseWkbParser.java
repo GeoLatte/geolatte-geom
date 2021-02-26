@@ -5,7 +5,7 @@ import org.geolatte.geom.codec.support.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
-class BaseWkbParser<P extends Position>{
+class BaseWkbParser<P extends Position> {
 
     final protected ByteBuffer buffer;
     final protected WkbDialect dialect;
@@ -16,7 +16,7 @@ class BaseWkbParser<P extends Position>{
     protected GeometryType gtype;
 
     @SuppressWarnings("unchecked")
-    BaseWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs){
+    BaseWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         this.buffer = buffer;
         this.buffer.rewind();
         this.dialect = dialect;
@@ -27,7 +27,7 @@ class BaseWkbParser<P extends Position>{
         GeometryBuilder builder = parseGeometry();
         try {
             return builder.createGeometry(crs);
-        }catch(DecodeException de) {
+        } catch (DecodeException de) {
             throw new WkbDecodeException(de);
         }
     }
@@ -35,7 +35,7 @@ class BaseWkbParser<P extends Position>{
     private GeometryBuilder parseGeometry() {
         parseByteOrder();
         GeometryBuilder builder = parseWkbType();
-        switch(gtype) {
+        switch (gtype) {
             case POINT:
                 matchPoint(builder);
                 break;
@@ -55,7 +55,7 @@ class BaseWkbParser<P extends Position>{
                 matchMultiPolygon(builder);
                 break;
             case GEOMETRYCOLLECTION:
-                matchGeometryCollection((CollectionGeometryBuilder)builder);
+                matchGeometryCollection((CollectionGeometryBuilder) builder);
                 break;
             default:
                 throw new WkbDecodeException("Can't decode a WKB of type " + gtype);
@@ -78,7 +78,7 @@ class BaseWkbParser<P extends Position>{
         return GeometryBuilder.create(gtype);
     }
 
-    protected void matchPoint(GeometryBuilder builder ){
+    protected void matchPoint(GeometryBuilder builder) {
         PointHolder ph = readPosition();
         builder.setPositions(ph);
     }
@@ -92,7 +92,7 @@ class BaseWkbParser<P extends Position>{
         return ph;
     }
 
-    protected void matchLineString(GeometryBuilder builder){
+    protected void matchLineString(GeometryBuilder builder) {
         LinearPositionsHolder lh = readLinestring();
         builder.setPositions(lh);
     }
@@ -100,13 +100,13 @@ class BaseWkbParser<P extends Position>{
     protected LinearPositionsHolder readLinestring() {
         LinearPositionsHolder lh = new LinearPositionsHolder();
         long numPositions = buffer.getUInt();
-        for(long i = 0; i < numPositions; i++){
-          lh.push(readPosition());
+        for (long i = 0; i < numPositions; i++) {
+            lh.push(readPosition());
         }
         return lh;
     }
 
-    protected void matchPolygon(GeometryBuilder builder){
+    protected void matchPolygon(GeometryBuilder builder) {
         LinearPositionsListHolder llh = readPolygon();
         builder.setPositions(llh);
     }
@@ -120,7 +120,7 @@ class BaseWkbParser<P extends Position>{
         return llh;
     }
 
-    protected void matchMultiPoint(GeometryBuilder builder){
+    protected void matchMultiPoint(GeometryBuilder builder) {
         LinearPositionsHolder lh = new LinearPositionsHolder();
         long numPnts = buffer.getUInt();
         for (long i = 0; i < numPnts; i++) {
@@ -131,10 +131,10 @@ class BaseWkbParser<P extends Position>{
         builder.setPositions(lh);
     }
 
-    protected void matchMultiLineString(GeometryBuilder builder){
+    protected void matchMultiLineString(GeometryBuilder builder) {
         LinearPositionsListHolder llh = new LinearPositionsListHolder();
         long numl = buffer.getUInt();
-        for(long i = 0; i < numl; i++){
+        for (long i = 0; i < numl; i++) {
             parseByteOrder();
             buffer.getUInt(); //skip type
             llh.push(readLinestring());
@@ -142,10 +142,10 @@ class BaseWkbParser<P extends Position>{
         builder.setPositions(llh);
     }
 
-    protected void matchMultiPolygon(GeometryBuilder builder){
+    protected void matchMultiPolygon(GeometryBuilder builder) {
         PolygonListHolder plh = new PolygonListHolder();
         long nump = buffer.getUInt();
-        for(long i = 0; i < nump; i++){
+        for (long i = 0; i < nump; i++) {
             parseByteOrder();
             buffer.getUInt();
             plh.push(readPolygon());
@@ -155,7 +155,7 @@ class BaseWkbParser<P extends Position>{
 
     private void matchGeometryCollection(CollectionGeometryBuilder builder) {
         long numg = buffer.getUInt();
-        for(long i = 0 ; i < numg; i++) {
+        for (long i = 0; i < numg; i++) {
             builder.push(parseGeometry());
         }
     }

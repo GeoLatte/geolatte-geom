@@ -31,20 +31,20 @@ import java.util.List;
 
 /**
  * @author Karel Maesen, Geovise BVBA.
- *         Date: Nov 2, 2009
+ * Date: Nov 2, 2009
  */
 class PointSqlServerEncoder extends AbstractSqlServerEncoder {
 
     /**
      * Encodes a point as an <code>SQLGeometryV1</code> object.
-     *
+     * <p>
      * This is a specific implementation because points don't explicitly serialize figure and shape components.
      *
      * @param geom Geometry to serialize
      * @return
      */
     @Override
-    public <P extends Position, G extends Geometry<P>>  SqlServerGeometry encode(G geom) {
+    public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 
         SqlServerGeometry sqlServerGeom = new SqlServerGeometry();
         if (geom.getSRID() > 0) {

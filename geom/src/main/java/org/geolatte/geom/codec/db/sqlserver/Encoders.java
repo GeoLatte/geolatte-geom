@@ -21,7 +21,7 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.db.Encoder;
 
 import java.util.ArrayList;
@@ -34,34 +34,34 @@ import java.util.List;
  */
 public class Encoders {
 
-	final private static List<AbstractSqlServerEncoder> ENCODERS = new ArrayList<AbstractSqlServerEncoder>();
+    final private static List<AbstractSqlServerEncoder> ENCODERS = new ArrayList<AbstractSqlServerEncoder>();
 
 
-	static {
-		//Encoders
-		ENCODERS.add( new PointSqlServerEncoder() );
-		ENCODERS.add( new LineStringSqlServerEncoder() );
-		ENCODERS.add( new PolygonSqlServerEncoder() );
-		ENCODERS.add( new GeometryCollectionSqlServerEncoder(OpenGisType.MULTIPOINT) );
-		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.MULTILINESTRING ) );
-		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.MULTIPOLYGON ) );
-		ENCODERS.add( new GeometryCollectionSqlServerEncoder( OpenGisType.GEOMETRYCOLLECTION ) );
+    static {
+        //Encoders
+        ENCODERS.add(new PointSqlServerEncoder());
+        ENCODERS.add(new LineStringSqlServerEncoder());
+        ENCODERS.add(new PolygonSqlServerEncoder());
+        ENCODERS.add(new GeometryCollectionSqlServerEncoder(OpenGisType.MULTIPOINT));
+        ENCODERS.add(new GeometryCollectionSqlServerEncoder(OpenGisType.MULTILINESTRING));
+        ENCODERS.add(new GeometryCollectionSqlServerEncoder(OpenGisType.MULTIPOLYGON));
+        ENCODERS.add(new GeometryCollectionSqlServerEncoder(OpenGisType.GEOMETRYCOLLECTION));
 
-	}
+    }
 
-	public static Encoder<SqlServerGeometry> encoderFor(Geometry<?> geom) {
-		for ( Encoder<SqlServerGeometry> encoder : ENCODERS ) {
-			if ( encoder.accepts( geom ) ) {
-				return encoder;
-			}
-		}
-		throw new IllegalArgumentException( "No encoder for type " + geom.getGeometryType() );
-	}
+    public static Encoder<SqlServerGeometry> encoderFor(Geometry<?> geom) {
+        for (Encoder<SqlServerGeometry> encoder : ENCODERS) {
+            if (encoder.accepts(geom)) {
+                return encoder;
+            }
+        }
+        throw new IllegalArgumentException("No encoder for type " + geom.getGeometryType());
+    }
 
-	public static byte[] encode(Geometry<?> geom) {
-		Encoder<SqlServerGeometry> encoder = encoderFor( geom );
-		SqlServerGeometry sqlServerGeometry = encoder.encode( geom );
-		return SqlServerGeometry.serialize( sqlServerGeometry );
-	}
+    public static byte[] encode(Geometry<?> geom) {
+        Encoder<SqlServerGeometry> encoder = encoderFor(geom);
+        SqlServerGeometry sqlServerGeometry = encoder.encode(geom);
+        return SqlServerGeometry.serialize(sqlServerGeometry);
+    }
 
 }

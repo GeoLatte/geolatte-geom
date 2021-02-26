@@ -1,6 +1,5 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import org.locationtech.jts.geom.Coordinate;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Polygon;
@@ -22,7 +21,7 @@ public class SdoPolygonEncoder extends AbstractSDOEncoder {
 
         SDOGType sdogType = new SDOGType(dim, lrsPos, TypeGeometry.POLYGON);
         SDOGeometry base = new SDOGeometry(sdogType, geom.getSRID(), null, null, null);
-        Polygon<?> polygon = (Polygon<?>)geom;
+        Polygon<?> polygon = (Polygon<?>) geom;
         return addPolygon(base, polygon);
     }
 

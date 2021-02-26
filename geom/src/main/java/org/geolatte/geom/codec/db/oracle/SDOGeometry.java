@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jun 30, 2010
+ * creation-date: Jun 30, 2010
  */
 
 public class SDOGeometry {
@@ -92,7 +92,7 @@ public class SDOGeometry {
 
         return new SDOGeometry(SDOGType.parse(data[0]), parseSRID(data[1]),
                 data[2] == null ? null : new SDOPoint((Struct) data[2]), new ElemInfo((Array) data[3]),
-                new Ordinates( (Array) data[4] )
+                new Ordinates((Array) data[4])
         );
 
     }
@@ -146,7 +146,7 @@ public class SDOGeometry {
 
     /**
      * Gets the number of elements or compound elements.
-	 *
+     * <p>
      * Subelements of a compound element are not counted.
      *
      * @return the number of elements
@@ -174,9 +174,9 @@ public class SDOGeometry {
     }
 
     /**
-	 * If this SDOGeometry is a COLLECTION, this method returns an array of
-	 * the SDO_GEOMETRIES that make up the collection. If not a Collection,
-	 * an array containing this SDOGeometry is returned.
+     * If this SDOGeometry is a COLLECTION, this method returns an array of
+     * the SDO_GEOMETRIES that make up the collection. If not a Collection,
+     * an array containing this SDOGeometry is returned.
      *
      * @return collection elements as individual SDO_GEOMETRIES
      */
@@ -213,20 +213,20 @@ public class SDOGeometry {
         Double[] ordinateArray = this.ordinates.getOrdinateArray();
         int length;
         int srcPos = elemInfos[start].getStartingOffset();
-        if(next < elemInfos.length){
+        if (next < elemInfos.length) {
             length = elemInfos[next].getStartingOffset() - srcPos;
         } else {
             length = (ordinateArray.length + 1) - srcPos;
         }
         Double[] out = new Double[length];
-        System.arraycopy(ordinateArray, srcPos-1, out, 0, length);
+        System.arraycopy(ordinateArray, srcPos - 1, out, 0, length);
         return new Ordinates(out);
     }
 
 
     //start is the next Geometry in the collection
     private ElemInfo buildElemInfo(ElemInfoTriplet[] elemInfos, int start, int next) {
-        List<BigDecimal> out = new ArrayList<>(3*(next - start));
+        List<BigDecimal> out = new ArrayList<>(3 * (next - start));
         int startingOffset = elemInfos[start].getStartingOffset();
         for (int idx = start; idx < next; idx++) {
             ElemInfoTriplet adjusted = elemInfos[idx].shiftStartingOffset(-startingOffset + 1);
@@ -249,7 +249,7 @@ public class SDOGeometry {
                 next++;
             }
         } else if (elemInfo.isCompound()) {
-            next = i + ((CompoundIElemInfoTriplet)elemInfo).numParts() + 1;
+            next = i + ((CompoundIElemInfoTriplet) elemInfo).numParts() + 1;
         }
         return next;
     }
@@ -271,10 +271,7 @@ public class SDOGeometry {
             return false;
         if (ordinates != null ? !ordinates.equals(that.ordinates) : that.ordinates != null)
             return false;
-        if (point != null ? !point.equals(that.point) : that.point != null)
-            return false;
-
-        return true;
+        return point != null ? point.equals(that.point) : that.point == null;
     }
 
     @Override

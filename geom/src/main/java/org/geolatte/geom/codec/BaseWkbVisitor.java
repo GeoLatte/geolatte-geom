@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/1/12
+ * creation-date: 11/1/12
  */
 class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
@@ -38,20 +38,19 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
     BaseWkbVisitor(ByteBuffer byteBuffer, WkbDialect dialect) {
         this.output = byteBuffer;
-        //TODO -- this is only temporary
-        this.dialect = dialect == null ? new WkbDialect() : dialect;
+        this.dialect = dialect;
     }
 
-    ByteBuffer buffer(){
+    ByteBuffer buffer() {
         return output;
     }
 
-    ByteBuffer result(){
+    ByteBuffer result() {
         output.rewind();
         return output;
     }
 
-    WkbDialect dialect(){
+    WkbDialect dialect() {
         return this.dialect;
     }
 
@@ -60,10 +59,10 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
         writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
-            if(dialect.emptyPointAsNaN()){
+            if (dialect.emptyPointAsNaN()) {
                 double[] co = new double[geom.getCoordinateDimension()];
                 Arrays.fill(co, Double.NaN);
-               writePoint(co, output);
+                writePoint(co, output);
             } else {
                 //empty point encoded as something that can have 0 subsequent elements (positions or rings or geometries)
                 output.putUInt(0);
@@ -100,7 +99,7 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
     }
 
     @Override
-    public  <G extends Geometry<P>>  void visit(AbstractGeometryCollection<P,G> geom) {
+    public <G extends Geometry<P>> void visit(AbstractGeometryCollection<P, G> geom) {
         writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         output.putUInt(geom.getNumGeometries());

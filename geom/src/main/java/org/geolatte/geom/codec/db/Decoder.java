@@ -23,19 +23,17 @@ package org.geolatte.geom.codec.db;
 
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
 
 /**
  * Decodes native database objects to geometries of type T.
  *
- * @author Karel Maesen, Geovise BVBA.
- *
  * @param <N> the type of native database object that can be decoded to a {@code Geometry}
-  */
+ * @author Karel Maesen, Geovise BVBA.
+ */
 public interface Decoder<N> {
 
-	public Geometry<?> decode(N nativeGeom);
+    Geometry<?> decode(N nativeGeom);
 
-	public boolean accepts(N nativeGeom);
+    boolean accepts(N nativeGeom);
 
 }

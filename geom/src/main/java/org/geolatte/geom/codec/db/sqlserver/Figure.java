@@ -26,33 +26,33 @@ import java.nio.ByteBuffer;
 class Figure {
 
 
-	final FigureAttribute figureAttribute;
-	final int pointOffset;
+    final FigureAttribute figureAttribute;
+    final int pointOffset;
 
-	Figure(FigureAttribute attribute, int offset) {
-		this.figureAttribute = attribute;
-		this.pointOffset = offset;
-	}
+    Figure(FigureAttribute attribute, int offset) {
+        this.figureAttribute = attribute;
+        this.pointOffset = offset;
+    }
 
-	static int getByteSize() {
-		return 5;
-	}
+    static int getByteSize() {
+        return 5;
+    }
 
-	void store(ByteBuffer buffer) {
-		buffer.put( figureAttribute.byteValue );
-		buffer.putInt( pointOffset );
-	}
+    void store(ByteBuffer buffer) {
+        buffer.put(figureAttribute.byteValue);
+        buffer.putInt(pointOffset);
+    }
 
-	boolean isInteriorRing() {
-		return this.figureAttribute.equals( FigureAttribute.InteriorRing );
-	}
+    boolean isInteriorRing() {
+        return this.figureAttribute.equals(FigureAttribute.InteriorRing);
+    }
 
-	boolean isExteriorRing() {
-		return this.figureAttribute.equals( FigureAttribute.ExteriorRing );
-	}
+    boolean isExteriorRing() {
+        return this.figureAttribute.equals(FigureAttribute.ExteriorRing);
+    }
 
-	boolean isStroke() {
-		return this.figureAttribute.equals( FigureAttribute.Stroke );
-	}
+    boolean isStroke() {
+        return this.figureAttribute.equals(FigureAttribute.Stroke);
+    }
 
 }

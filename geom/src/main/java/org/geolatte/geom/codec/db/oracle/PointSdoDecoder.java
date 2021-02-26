@@ -1,12 +1,13 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import org.geolatte.geom.*;
-import org.geolatte.geom.codec.db.Decoder;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
-* Created by Karel Maesen, Geovise BVBA on 18/02/15.
-*/
+ * Created by Karel Maesen, Geovise BVBA on 18/02/15.
+ */
 public class PointSdoDecoder extends AbstractSDODecoder {
 
 

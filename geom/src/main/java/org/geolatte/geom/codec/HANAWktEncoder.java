@@ -20,21 +20,17 @@
  */
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
-import org.geolatte.geom.crs.CrsId;
-
 /**
  * The HANA EWKT representation differs from the Postgis EWKT representation in that HANA always requires an SRID to be
  * written, even if its not specified or 0. Also, HANA uses a slightly different set of keywords.
- * 
+ *
  * @author Jonathan Bregler, SAP
  */
 class HANAWktEncoder extends PostgisWktEncoder {
 
-	public HANAWktEncoder(){
-		super(new HANAWktDialect());
-	}
+    public HANAWktEncoder() {
+        super(new HANAWktDialect());
+    }
 
 
 }

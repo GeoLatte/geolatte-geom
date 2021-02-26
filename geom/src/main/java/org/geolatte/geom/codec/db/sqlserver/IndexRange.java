@@ -26,16 +26,16 @@ package org.geolatte.geom.codec.db.sqlserver;
  */
 class IndexRange {
 
-	final int start;
-	final int end;
+    final int start;
+    final int end;
 
-	IndexRange(int start, int end) {
-		this.start = start;
-		this.end = end;
-	}
+    IndexRange(int start, int end) {
+        this.start = start;
+        this.end = end;
+    }
 
-	int length() {
-		return this.end - this.start;
-	}
+    int length() {
+        return this.end - this.start;
+    }
 
 }

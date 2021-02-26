@@ -1,19 +1,12 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
+import org.geolatte.geom.*;
+import org.geolatte.geom.cga.NumericalMethods;
+import org.geolatte.geom.codec.db.Encoder;
 
 import java.util.Stack;
 
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.LLAPositionVisitor;
-import org.geolatte.geom.LinearRing;
-import org.geolatte.geom.Measured;
-import org.geolatte.geom.Polygon;
-import org.geolatte.geom.Position;
-import org.geolatte.geom.PositionSequence;
-import org.geolatte.geom.PositionSequenceBuilder;
-import org.geolatte.geom.cga.NumericalMethods;
-import org.geolatte.geom.codec.db.Encoder;
+import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
@@ -132,7 +125,7 @@ abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
     private boolean isCounterClockwise(LinearRing<?> ring) {
         try {
             return NumericalMethods.isCounterClockwise(ring);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             //assume true when points are (nearly) collinear
             // this can happen with very small rings or invalid rings.
             return true;

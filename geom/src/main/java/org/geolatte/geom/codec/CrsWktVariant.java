@@ -29,7 +29,7 @@ import java.util.Set;
  * The <code>WktVariant</code> used in the WKT representations of Coordinate Reference Systems.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ * creation-date: 8/2/11
  */
 class CrsWktVariant extends WktVariant {
 

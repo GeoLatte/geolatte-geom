@@ -40,70 +40,67 @@ import java.sql.Connection;
  */
 public class DefaultConnectionFinder implements ConnectionFinder {
 
-	private static final Class<?> ORACLE_CONNECTION_CLASS;
+    private static final Class<?> ORACLE_CONNECTION_CLASS;
 
-	static {
-		try {
-			ORACLE_CONNECTION_CLASS = Class.forName( "oracle.jdbc.driver.OracleConnection" );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException( "Can't find Oracle JDBC Driver on classpath." );
-		}
-	}
+    static {
+        try {
+            ORACLE_CONNECTION_CLASS = Class.forName("oracle.jdbc.driver.OracleConnection");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Can't find Oracle JDBC Driver on classpath.");
+        }
+    }
 
-	@Override
-	public Connection find(Connection con) {
-		if ( con == null ) {
-			return null;
-		}
+    @Override
+    public Connection find(Connection con) {
+        if (con == null) {
+            return null;
+        }
 
-		if ( ORACLE_CONNECTION_CLASS.isInstance( con ) ) {
-			return con;
-		}
-		// try to find the Oracleconnection recursively
-		for ( Method method : con.getClass().getMethods() ) {
-			if ( java.sql.Connection.class.isAssignableFrom(
-					method.getReturnType()
-			)
-					&& method.getParameterTypes().length == 0 ) {
+        if (ORACLE_CONNECTION_CLASS.isInstance(con)) {
+            return con;
+        }
+        // try to find the Oracleconnection recursively
+        for (Method method : con.getClass().getMethods()) {
+            if (java.sql.Connection.class.isAssignableFrom(
+                    method.getReturnType()
+            )
+                    && method.getParameterTypes().length == 0) {
 
-				try {
-					method.setAccessible( true );
-					final Connection oc = find( (Connection) ( method.invoke( con, new Object[] { } ) ) );
-					if ( oc == null ) {
-						throw new RuntimeException(
-								String.format(
-										"Tried retrieving OracleConnection from %s using method %s, but received null.",
-										con.getClass().getCanonicalName(),
-										method.getName()
-								)
-						);
-					}
-					return oc;
-				}
-				catch ( IllegalAccessException e ) {
-					throw new RuntimeException(
-							String.format(
-									"Illegal access on executing method %s when finding OracleConnection",
-									method.getName()
-							)
-					);
-				}
-				catch ( InvocationTargetException e ) {
-					throw new RuntimeException(
-							String.format(
-									"Invocation exception on executing method %s when finding OracleConnection",
-									method.getName()
-							)
-					);
-				}
+                try {
+                    method.setAccessible(true);
+                    final Connection oc = find((Connection) (method.invoke(con, new Object[]{})));
+                    if (oc == null) {
+                        throw new RuntimeException(
+                                String.format(
+                                        "Tried retrieving OracleConnection from %s using method %s, but received null.",
+                                        con.getClass().getCanonicalName(),
+                                        method.getName()
+                                )
+                        );
+                    }
+                    return oc;
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(
+                            String.format(
+                                    "Illegal access on executing method %s when finding OracleConnection",
+                                    method.getName()
+                            )
+                    );
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException(
+                            String.format(
+                                    "Invocation exception on executing method %s when finding OracleConnection",
+                                    method.getName()
+                            )
+                    );
+                }
 
 
-			}
-		}
-		throw new RuntimeException(
-				"Couldn't get at the OracleSpatial Connection object from the PreparedStatement."
-		);
-	}
+            }
+        }
+        throw new RuntimeException(
+                "Couldn't get at the OracleSpatial Connection object from the PreparedStatement."
+        );
+    }
 
 }

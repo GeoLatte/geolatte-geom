@@ -29,16 +29,16 @@ import java.util.List;
 
 /**
  * A decoder for <code>CoordinateReferenceSystem</code> definitions in WKT.
- * 
+ *
  * <p> The current implementation ensures that the postgis CRS WKT's are correctly interpreted. There are
  * some minor differences with the OGC specification: "Coordinate Transformation Services (rev. 1.00)". </p>
- * 
+ *
  * <p>The implementation uses a recursive-decent parsing approach.</p>
- * 
+ *
  * <p>This class is not thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
+ * creation-date: 8/2/11
  */
 public class CrsWktDecoder {
 
@@ -91,7 +91,7 @@ public class CrsWktDecoder {
     }
 
     /**
-e     * Currently not used in Postgis and also not implemented here!
+     * e     * Currently not used in Postgis and also not implemented here!
      *
      * @throws UnsupportedConversionException Geocentric CRS is currently not implemented
      */
@@ -108,7 +108,7 @@ e     * Currently not used in Postgis and also not implemented here!
         matchesCloseList();
         GeocentricCartesianCoordinateReferenceSystem system = new GeocentricCartesianCoordinateReferenceSystem(cr, crsName,
                 datum, primem,
-                new CartesianCoordinateSystem3D((StraightLineAxis)axes[0], (StraightLineAxis)axes[1], (VerticalStraightLineAxis) axes[2])
+                new CartesianCoordinateSystem3D((StraightLineAxis) axes[0], (StraightLineAxis) axes[1], (VerticalStraightLineAxis) axes[2])
         );
         return system;
     }
@@ -164,15 +164,15 @@ e     * Currently not used in Postgis and also not implemented here!
         CrsId crsId = decodeOptionalAuthority(srid);
         matchesCloseList();
         return new ProjectedCoordinateReferenceSystem(crsId, crsName, geogcs, projection, parameters,
-                new CartesianCoordinateSystem2D((StraightLineAxis)twinAxes[0], (StraightLineAxis)twinAxes[1]), extension);
+                new CartesianCoordinateSystem2D((StraightLineAxis) twinAxes[0], (StraightLineAxis) twinAxes[1]), extension);
     }
 
     private <P extends Position> CompoundCoordinateReferenceSystem<P> decodeCompoundCrs() {
         String crsName = decodeName();
         matchesElementSeparator();
-        SingleCoordinateReferenceSystem<?> head = (SingleCoordinateReferenceSystem<?>)decode();
+        SingleCoordinateReferenceSystem<?> head = (SingleCoordinateReferenceSystem<?>) decode();
         matchesElementSeparator();
-        SingleCoordinateReferenceSystem<?> tail = (SingleCoordinateReferenceSystem<?>)decode();
+        SingleCoordinateReferenceSystem<?> tail = (SingleCoordinateReferenceSystem<?>) decode();
         CrsId cr = decodeOptionalAuthority(srid);
         return new CompoundCoordinateReferenceSystem<P>(cr, crsName, head, tail);
     }
@@ -182,9 +182,9 @@ e     * Currently not used in Postgis and also not implemented here!
         matchesElementSeparator();
         VerticalDatum vdatum = decodeVertDatum();
         matchesElementSeparator();
-        LinearUnit unit =(LinearUnit) decodeUnit(true);
+        LinearUnit unit = (LinearUnit) decodeUnit(true);
         matchesElementSeparator();
-        VerticalStraightLineAxis axis = (VerticalStraightLineAxis)decodeAxis(unit, VerticalCoordinateReferenceSystem.class);
+        VerticalStraightLineAxis axis = (VerticalStraightLineAxis) decodeAxis(unit, VerticalCoordinateReferenceSystem.class);
         CrsId id = decodeOptionalAuthority();
         return new VerticalCoordinateReferenceSystem(id, crsName, vdatum, axis);
     }
@@ -255,23 +255,23 @@ e     * Currently not used in Postgis and also not implemented here!
 
         if (Geographic2DCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new GeodeticLongitudeCSAxis("Lon", (AngularUnit)unit),
-                    new GeodeticLatitudeCSAxis("Lat", (AngularUnit)unit)
+                    new GeodeticLongitudeCSAxis("Lon", (AngularUnit) unit),
+                    new GeodeticLatitudeCSAxis("Lat", (AngularUnit) unit)
             };
         }
 
         if (ProjectedCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, (LinearUnit)unit),
-                    new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, (LinearUnit)unit)
+                    new StraightLineAxis("X", CoordinateSystemAxisDirection.EAST, (LinearUnit) unit),
+                    new StraightLineAxis("Y", CoordinateSystemAxisDirection.NORTH, (LinearUnit) unit)
             };
         }
 
         if (GeocentricCartesianCoordinateReferenceSystem.class.isAssignableFrom(crsClass)) {
             return new CoordinateSystemAxis[]{
-                    new StraightLineAxis("X", CoordinateSystemAxisDirection.GeocentricX, (LinearUnit)unit),
-                    new StraightLineAxis("Y", CoordinateSystemAxisDirection.GeocentricY, (LinearUnit)unit),
-                    new StraightLineAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, (LinearUnit)unit)
+                    new StraightLineAxis("X", CoordinateSystemAxisDirection.GeocentricX, (LinearUnit) unit),
+                    new StraightLineAxis("Y", CoordinateSystemAxisDirection.GeocentricY, (LinearUnit) unit),
+                    new StraightLineAxis("Z", CoordinateSystemAxisDirection.GeocentricZ, (LinearUnit) unit)
             };
         }
 
@@ -405,7 +405,7 @@ e     * Currently not used in Postgis and also not implemented here!
         return decodeOptionalAuthority(CrsId.UNDEFINED.getCode());
     }
 
-    private Extension decodeOptionalExtension(){
+    private Extension decodeOptionalExtension() {
         matchesElementSeparator();
         if (currentToken != CrsWktVariant.EXTENSION) {
             return null;
@@ -465,7 +465,7 @@ e     * Currently not used in Postgis and also not implemented here!
             double num = ((WktNumberToken) currentToken).getNumber();
             nextToken();
             try {
-                return (int)num;
+                return (int) num;
             } catch (Exception e) {
                 throw new WktDecodeException("Expected Integer, received " + currentToken.toString());
             }

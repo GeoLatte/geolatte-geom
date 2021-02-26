@@ -28,35 +28,35 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
  * @author Karel Maesen, Geovise BVBA.
- *         Date: Nov 2, 2009
+ * Date: Nov 2, 2009
  */
 class PointSqlServerDecoder extends AbstractSqlServerDecoder {
 
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.POINT;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.POINT;
+    }
 
-	protected Point<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
-		return new Point(crs);
-	}
+    protected Point<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return new Point(crs);
+    }
 
     protected Point<?> createGeometry(SqlServerGeometry nativeGeom) {
-		return createPoint( nativeGeom, 0 );
-	}
+        return createPoint(nativeGeom, 0);
+    }
 
-	@Override
-	protected Point<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
-		if ( nativeGeom.isEmptyShape( shapeIndex ) ) {
-			return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
-		}
-		int figureOffset = nativeGeom.getFiguresForShape( shapeIndex ).start;
-		int pntOffset = nativeGeom.getPointsForFigure( figureOffset ).start;
-		return createPoint( nativeGeom, pntOffset );
-	}
+    @Override
+    protected Point<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+        if (nativeGeom.isEmptyShape(shapeIndex)) {
+            return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
+        }
+        int figureOffset = nativeGeom.getFiguresForShape(shapeIndex).start;
+        int pntOffset = nativeGeom.getPointsForFigure(figureOffset).start;
+        return createPoint(nativeGeom, pntOffset);
+    }
 
-	private Point<?> createPoint(SqlServerGeometry nativeGeom, int pntOffset) {
+    private Point<?> createPoint(SqlServerGeometry nativeGeom, int pntOffset) {
         PositionSequence<?> positionSequence = nativeGeom.coordinateRange(new IndexRange(pntOffset, pntOffset + 1));
         return new Point(positionSequence, nativeGeom.getCoordinateReferenceSystem());
     }

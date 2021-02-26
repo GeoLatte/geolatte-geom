@@ -25,7 +25,7 @@ package org.geolatte.geom.codec;
  * A text token (e.g. the name of a coordinate reference system).
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/19/11
+ * creation-date: 11/19/11
  */
 class WktTextToken implements WktToken {
 

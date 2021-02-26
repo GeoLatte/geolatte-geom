@@ -22,13 +22,6 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.GeometryType;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-
-import java.util.*;
-
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 
 /**
  * Punctuation and keywords for HANA EWKT/WKT representations.
@@ -37,23 +30,23 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
  */
 class HANAWktDialect extends PostgisWktDialect {
 
-	@Override
-	void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
-		if(geometry.hasZ()) {
-			buffer.append(" Z");
-			if (geometry.hasM()) {
-				buffer.append('M');
-			}
-		} else if(geometry.hasM()) {
-			buffer.append(" M");
-		}
-	}
+    @Override
+    void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+        if (geometry.hasZ()) {
+            buffer.append(" Z");
+            if (geometry.hasM()) {
+                buffer.append('M');
+            }
+        } else if (geometry.hasM()) {
+            buffer.append(" M");
+        }
+    }
 
-	@Override
-	public void addSrid(StringBuffer builder, int srid) {
-		if (srid < 0) srid = 0;
-		builder.append("SRID=")
-				.append(srid)
-				.append(";");
-	}
+    @Override
+    public void addSrid(StringBuffer builder, int srid) {
+        if (srid < 0) srid = 0;
+        builder.append("SRID=")
+                .append(srid)
+                .append(";");
+    }
 }

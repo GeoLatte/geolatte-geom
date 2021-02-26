@@ -29,14 +29,14 @@ import static org.geolatte.geom.Geometries.mkMultiPolygon;
 
 class MultiPolygonSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.MULTIPOLYGON;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.MULTIPOLYGON;
+    }
 
     @Override
     protected MultiPolygon<?> createGeometry(List geometries, SqlServerGeometry nativeGeom) {
-        return mkMultiPolygon( geometries );
+        return mkMultiPolygon(geometries);
     }
 
 

@@ -26,10 +26,9 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.codec.support.GeometryBuilder;
-import org.geolatte.geom.crs.*;
-
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
-import static org.geolatte.geom.crs.CoordinateSystemAxisDirection.OTHER;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
@@ -46,12 +45,13 @@ class PostgisWkbDecoder implements WkbDecoder {
         BaseWkbParser<P> parser = new PostgisWkbParser<>(PostgisWkbV1Dialect.INSTANCE, byteBuffer, crs);
         try {
             return parser.parse();
-        }catch (Throwable e) {
+        } catch (Throwable e) {
             throw new WkbDecodeException(e);
         }
     }
 
 }
+
 class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
 
     private boolean crsRead = false;
@@ -63,9 +63,9 @@ class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
     @Override
     protected GeometryBuilder parseWkbType() {
         long tpe = buffer.getUInt();
-        gtype = dialect.parseType((byte)tpe);
-        if (!crsRead){
-            this.crs = readCrs(buffer, (int)tpe, crs);
+        gtype = dialect.parseType((byte) tpe);
+        if (!crsRead) {
+            this.crs = readCrs(buffer, (int) tpe, crs);
             crsRead = true;
         }
         return GeometryBuilder.create(gtype);

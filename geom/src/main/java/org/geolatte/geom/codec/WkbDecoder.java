@@ -32,7 +32,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * <p>In general <code>WkbDecoder</code> implementations are not be thread-safe.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 9/29/12
+ * creation-date: 9/29/12
  */
 public interface WkbDecoder {
 

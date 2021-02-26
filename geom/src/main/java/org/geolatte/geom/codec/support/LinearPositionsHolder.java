@@ -32,11 +32,11 @@ public class LinearPositionsHolder extends Holder {
 
     @Override
     public <P extends Position> Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
-        if(geomType == LINESTRING) {
-            return isEmpty()? Geometries.mkEmptyLineString(crs): Geometries.mkLineString(toPositionSequence(crs), crs);
+        if (geomType == LINESTRING) {
+            return isEmpty() ? Geometries.mkEmptyLineString(crs) : Geometries.mkLineString(toPositionSequence(crs), crs);
         }
         if (geomType == MULTIPOINT) {
-            return isEmpty()? Geometries.mkEmptyMultiPoint(crs) : Geometries.mkMultiPoint(toPositionSequence(crs), crs);
+            return isEmpty() ? Geometries.mkEmptyMultiPoint(crs) : Geometries.mkMultiPoint(toPositionSequence(crs), crs);
         }
         throw new DecodeException("Can't convert this coordinates array to requested Geomtype: " + geomType);
     }
@@ -46,7 +46,6 @@ public class LinearPositionsHolder extends Holder {
         pointHolderList.forEach(h -> builder.add(h.toPosition(crs)));
         return builder.toPositionSequence();
     }
-
 
 
 }

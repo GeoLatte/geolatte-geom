@@ -4,7 +4,6 @@ import org.geolatte.geom.Geometries;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.codec.WktDecodeException;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 public class SimpleGeometryBuilder extends GeometryBuilder {

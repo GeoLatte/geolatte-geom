@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.codec.db.sqlserver;
 
-import org.geolatte.geom.Geometry;
 import org.geolatte.geom.AbstractGeometryCollection;
+import org.geolatte.geom.Geometry;
 
 import java.util.List;
 
@@ -36,10 +36,10 @@ import static org.geolatte.geom.Geometries.mkGeometryCollection;
 class GeometryCollectionSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
 
-	@Override
-	protected OpenGisType getOpenGisType() {
-		return OpenGisType.GEOMETRYCOLLECTION;
-	}
+    @Override
+    protected OpenGisType getOpenGisType() {
+        return OpenGisType.GEOMETRYCOLLECTION;
+    }
 
     @Override
     protected AbstractGeometryCollection<?, Geometry<?>> createGeometry(List geometries, SqlServerGeometry nativeGeom) {

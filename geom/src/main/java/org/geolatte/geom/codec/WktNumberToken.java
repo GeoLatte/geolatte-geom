@@ -25,7 +25,7 @@ package org.geolatte.geom.codec;
  * A <code>WktToken</code> for numbers.
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/19/11
+ * creation-date: 11/19/11
  */
 class WktNumberToken implements WktToken {
 
@@ -40,7 +40,7 @@ class WktNumberToken implements WktToken {
         return number;
     }
 
-    public String toString(){
+    public String toString() {
         return String.valueOf(number);
     }
 }

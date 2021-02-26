@@ -31,7 +31,7 @@ import org.geolatte.geom.crs.CrsRegistry;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/1/12
+ * creation-date: 11/1/12
  */
 class MySqlWkbDecoder implements WkbDecoder {
 
@@ -41,14 +41,14 @@ class MySqlWkbDecoder implements WkbDecoder {
         BaseWkbParser<P> parser = new MySqlWkbParser<P>(MySqlWkbDialect.INSTANCE, byteBuffer, crs);
         try {
             return parser.parse();
-        } catch (Throwable t){
+        } catch (Throwable t) {
             throw new WkbDecodeException(t);
         }
     }
 }
 
-class MySqlWkbParser<P extends Position> extends BaseWkbParser<P>{
-    private int srid;
+class MySqlWkbParser<P extends Position> extends BaseWkbParser<P> {
+    private final int srid;
 
     MySqlWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         super(dialect, buffer, crs);
@@ -56,7 +56,7 @@ class MySqlWkbParser<P extends Position> extends BaseWkbParser<P>{
         srid = this.buffer.getInt();
         if (crs == null) {
             CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-           this.crs =  (CoordinateReferenceSystem<P>) crsDeclared;
+            this.crs = (CoordinateReferenceSystem<P>) crsDeclared;
         }
     }
 

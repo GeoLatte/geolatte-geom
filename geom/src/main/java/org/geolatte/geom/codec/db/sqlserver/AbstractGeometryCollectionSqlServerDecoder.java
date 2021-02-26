@@ -36,7 +36,7 @@ abstract class AbstractGeometryCollectionSqlServerDecoder extends AbstractSqlSer
 
     @Override
     protected Geometry<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
-        return createGeometry( new ArrayList<Geometry<?>>(), null);
+        return createGeometry(new ArrayList<Geometry<?>>(), null);
     }
 
     @Override

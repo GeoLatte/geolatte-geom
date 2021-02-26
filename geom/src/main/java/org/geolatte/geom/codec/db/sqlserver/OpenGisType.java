@@ -28,37 +28,37 @@ import org.geolatte.geom.*;
  * The type of geometry.
  *
  * @author Karel Maesen, Geovise BVBA.
- *         Date: Nov 2, 2009
+ * Date: Nov 2, 2009
  */
 public enum OpenGisType {
-	POINT( (byte) 1, Point.class ),
-	LINESTRING( (byte) 2, LineString.class ),
-	POLYGON( (byte) 3, Polygon.class ),
-	MULTIPOINT( (byte) 4, MultiPoint.class ),
-	MULTILINESTRING( (byte) 5, MultiLineString.class ),
-	MULTIPOLYGON( (byte) 6, MultiPolygon.class ),
-	GEOMETRYCOLLECTION( (byte) 7, AbstractGeometryCollection.class ),
-	INVALID_TYPE( (byte) 0, null );
+    POINT((byte) 1, Point.class),
+    LINESTRING((byte) 2, LineString.class),
+    POLYGON((byte) 3, Polygon.class),
+    MULTIPOINT((byte) 4, MultiPoint.class),
+    MULTILINESTRING((byte) 5, MultiLineString.class),
+    MULTIPOLYGON((byte) 6, MultiPolygon.class),
+    GEOMETRYCOLLECTION((byte) 7, AbstractGeometryCollection.class),
+    INVALID_TYPE((byte) 0, null);
 
-	final byte byteValue;
-	final Class<? extends Geometry> geomClass;
+    final byte byteValue;
+    final Class<? extends Geometry> geomClass;
 
-	OpenGisType(byte v, Class<? extends Geometry> geomClass) {
-		this.byteValue = v;
-		this.geomClass = geomClass;
-	}
+    OpenGisType(byte v, Class<? extends Geometry> geomClass) {
+        this.byteValue = v;
+        this.geomClass = geomClass;
+    }
 
-	boolean typeOf(Object o) {
-		return geomClass.isAssignableFrom( o.getClass() );
-	}
+    boolean typeOf(Object o) {
+        return geomClass.isAssignableFrom(o.getClass());
+    }
 
-	static OpenGisType valueOf(byte b) {
-		for ( OpenGisType t : values() ) {
-			if ( t.byteValue == b ) {
-				return t;
-			}
-		}
-		return INVALID_TYPE;
-	}
+    static OpenGisType valueOf(byte b) {
+        for (OpenGisType t : values()) {
+            if (t.byteValue == b) {
+                return t;
+            }
+        }
+        return INVALID_TYPE;
+    }
 
 }

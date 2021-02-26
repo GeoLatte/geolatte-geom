@@ -25,92 +25,92 @@ import org.geolatte.geom.codec.db.Decoder;
 
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: Jul 1, 2010
+ * creation-date: Jul 1, 2010
  */
 enum TypeGeometry {
 
-	UNKNOWN_GEOMETRY(0) {
-		@Override
-		Decoder createDecoder() {
-			throw new UnsupportedOperationException();
-		}
-	},
-	POINT(1) {
-		@Override
-		Decoder createDecoder() {
-			return new PointSdoDecoder();
-		}
-	},
-	LINE(2) {
-		@Override
-		Decoder createDecoder() {
-			return new LineStringSdoDecoder();
-		}
-	},
-	POLYGON(3) {
-		@Override
-		Decoder createDecoder() {
-			return new PolygonSdoDecoder();
-		}
-	},
-	COLLECTION(4) {
-		@Override
-		Decoder createDecoder() {
-			return new GeometryCollectionSdoDecoder();
-		}
-	},
-	MULTIPOINT(5) {
-		@Override
-		Decoder createDecoder() {
-			return new MultiPointSdoDecoder();
-		}
-	},
-	MULTILINE(6) {
-		@Override
-		Decoder createDecoder() {
-			return new MultiLineSdoDecoder();
-		}
-	},
-	MULTIPOLYGON(7) {
-		@Override
-		Decoder createDecoder() {
-			return new MultiPolygonSdoDecoder();
-		}
-	},
-	SOLID(8) {
-		@Override
-		Decoder createDecoder() {
-			throw new UnsupportedOperationException();
-		}
-	},
-	MULTISOLID(9) {
-		@Override
-		Decoder createDecoder() {
-			throw new UnsupportedOperationException();
-		}
-	};
+    UNKNOWN_GEOMETRY(0) {
+        @Override
+        Decoder createDecoder() {
+            throw new UnsupportedOperationException();
+        }
+    },
+    POINT(1) {
+        @Override
+        Decoder createDecoder() {
+            return new PointSdoDecoder();
+        }
+    },
+    LINE(2) {
+        @Override
+        Decoder createDecoder() {
+            return new LineStringSdoDecoder();
+        }
+    },
+    POLYGON(3) {
+        @Override
+        Decoder createDecoder() {
+            return new PolygonSdoDecoder();
+        }
+    },
+    COLLECTION(4) {
+        @Override
+        Decoder createDecoder() {
+            return new GeometryCollectionSdoDecoder();
+        }
+    },
+    MULTIPOINT(5) {
+        @Override
+        Decoder createDecoder() {
+            return new MultiPointSdoDecoder();
+        }
+    },
+    MULTILINE(6) {
+        @Override
+        Decoder createDecoder() {
+            return new MultiLineSdoDecoder();
+        }
+    },
+    MULTIPOLYGON(7) {
+        @Override
+        Decoder createDecoder() {
+            return new MultiPolygonSdoDecoder();
+        }
+    },
+    SOLID(8) {
+        @Override
+        Decoder createDecoder() {
+            throw new UnsupportedOperationException();
+        }
+    },
+    MULTISOLID(9) {
+        @Override
+        Decoder createDecoder() {
+            throw new UnsupportedOperationException();
+        }
+    };
 
-	private int gtype;
+    private final int gtype;
 
-	TypeGeometry(int gtype) {
-		this.gtype = gtype;
-	}
+    TypeGeometry(int gtype) {
+        this.gtype = gtype;
+    }
 
-	int intValue() {
-		return this.gtype;
-	}
+    int intValue() {
+        return this.gtype;
+    }
 
-	static TypeGeometry parse(int v) {
-		for ( TypeGeometry gt : values() ) {
-			if ( gt.intValue() == v ) {
-				return gt;
-			}
-		}
-		throw new RuntimeException(
-				"Value " + v
-						+ " isn't a valid TypeGeometry value"
-		);
-	}
+    static TypeGeometry parse(int v) {
+        for (TypeGeometry gt : values()) {
+            if (gt.intValue() == v) {
+                return gt;
+            }
+        }
+        throw new RuntimeException(
+                "Value " + v
+                        + " isn't a valid TypeGeometry value"
+        );
+    }
 
-	abstract Decoder createDecoder();
+    abstract Decoder createDecoder();
 }

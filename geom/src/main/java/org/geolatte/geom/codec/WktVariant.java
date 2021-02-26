@@ -22,13 +22,9 @@
 package org.geolatte.geom.codec;
 
 
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
-
 import java.util.Set;
 
 /**
- *
  * <p>There exist several dailects for WKT (e.g. postgis EWKT, SFS version 1.2.1 WKT). Instances of <code>WktVariant</code>
  * capture these differences. This allows easy customization of the <code>WktTokenizer</code> for particular WKT variants
  * or dialects. </p>
