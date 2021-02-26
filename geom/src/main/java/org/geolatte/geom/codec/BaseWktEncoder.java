@@ -13,7 +13,7 @@ class BaseWktEncoder implements WktEncoder {
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
     private StringBuffer builder;
     private final BaseWktDialect dialect;
-    private final WktPositionEncoder positionEncoder = new PositionEncoder();
+    private final PositionEncoder positionEncoder = new PositionEncoder();
 
     /**
      * Constructs an instance.
@@ -170,7 +170,7 @@ class BaseWktEncoder implements WktEncoder {
         return builder.toString();
     }
 
-    static class PositionEncoder implements WktPositionEncoder {
+    static class PositionEncoder {
         private static final int MAX_FRACTIONAL_DIGITS = 15;
         private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 

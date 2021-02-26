@@ -21,7 +21,6 @@
 
 package org.geolatte.geom.codec;
 
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import org.geolatte.geom.*;
 
 /**
