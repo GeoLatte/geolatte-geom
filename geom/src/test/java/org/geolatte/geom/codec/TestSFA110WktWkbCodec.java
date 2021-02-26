@@ -17,7 +17,6 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
     static final private Logger LOGGER = LoggerFactory.getLogger(TestSFA110WktWkbCodec.class);
     final private SFA110WkkWkbTestCases testCases = new SFA110WkkWkbTestCases();
 
-
     @Test
     public void test_3d_crs_passed() {
         //TODO check what happens when we have 3d, 2dm or 3dm CRS's
@@ -55,6 +54,6 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
 
     @Override
     protected WkbEncoder getWkbEncoder() {
-        return null;
+        return new SFA110WkbEncoder();
     }
 }

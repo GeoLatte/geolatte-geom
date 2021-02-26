@@ -23,6 +23,8 @@ package org.geolatte.geom;
 
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A byte buffer class.
@@ -144,6 +146,24 @@ public class ByteBuffer {
     public static ByteBuffer from(byte[] bytes) {
         java.nio.ByteBuffer buffer = java.nio.ByteBuffer.wrap(bytes);
         return new ByteBuffer(buffer);
+    }
+
+    /**
+     * Transforms a List of ByteBuffers to a single ByteBuffer
+     */
+    public static ByteBuffer collect(List<ByteBuffer> buffers) {
+        if(buffers == null || buffers.isEmpty()) return allocate(0);
+        int totalSize = 0;
+        for( ByteBuffer b: buffers){
+            totalSize += b.capacity();
+        }
+        byte[]  bytes = new byte[totalSize];
+        int p = 0;
+        for( ByteBuffer b: buffers){
+            java.lang.System.arraycopy(b.toByteArray(), 0, bytes, p, b.capacity());
+            p += b.capacity();
+        }
+        return from(bytes);
     }
 
     /**
@@ -408,11 +428,8 @@ public class ByteBuffer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ByteBuffer that = (ByteBuffer) o;
-
         if (buffer != null ? !buffer.equals(that.buffer) : that.buffer != null) return false;
-
         return true;
     }
 

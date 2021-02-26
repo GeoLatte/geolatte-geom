@@ -20,9 +20,6 @@
  */
 package org.geolatte.geom.codec;
 
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
-
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -56,11 +53,11 @@ class HANAWkbEncoder extends PostgisWkb2Encoder {
 	}
 
 	@Override
-	protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
+	protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
 		return new HANAWkbVisitor<P>(output);
 	}
 
-	static private class HANAWkbVisitor<P extends Position> extends WkbVisitor<P> {
+	static private class HANAWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
 
 		private boolean hasWrittenSrid = false;
 

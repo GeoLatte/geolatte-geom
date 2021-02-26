@@ -4,7 +4,7 @@ import org.geolatte.geom.*;
 
 public class PostgisWkb2Encoder extends PostgisWkbEncoder{
 
-    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
+    protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
         return new PostgisWkb2Visitor<P>(output);
     }
 
@@ -28,13 +28,13 @@ class PostgisWkb2Visitor<P extends Position> extends PostgisWkbEncoder.PostgisWk
 
     @Override
     public void visit(Point<P> geom) {
-        writeByteOrder(output);
-        writeTypeCodeAndSrid(geom, output);
+        writeByteOrder(buffer());
+        writeTypeCodeAndSrid(geom, buffer());
         if (geom.isEmpty()) {
-            output.putDouble(Double.NaN);
-            output.putDouble(Double.NaN);
+            buffer().putDouble(Double.NaN);
+            buffer().putDouble(Double.NaN);
         } else {
-            writePoints(geom.getPositions(), geom.getCoordinateDimension(), output);
+            writePoints(geom.getPositions(), geom.getCoordinateDimension(), buffer());
         }
     }
 

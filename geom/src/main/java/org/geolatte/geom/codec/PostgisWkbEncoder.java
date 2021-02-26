@@ -27,9 +27,6 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
-
 /**
  * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
  *
@@ -47,11 +44,11 @@ class PostgisWkbEncoder extends AbstractWkbEncoder {
     }
 
 
-    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
+    protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
         return new PostgisWkbVisitor<P>(output);
     }
 
-    static class PostgisWkbVisitor<P extends Position> extends WkbVisitor<P> {
+    static class PostgisWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
 
         private boolean hasWrittenSrid = false;
 

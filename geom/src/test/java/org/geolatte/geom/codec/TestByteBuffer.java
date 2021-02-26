@@ -25,6 +25,9 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -149,8 +152,26 @@ public class TestByteBuffer {
         } catch (RuntimeException e) {
             //OK
         }
-
     }
+
+    @Test
+    public void test_collect_buffers() {
+        List<ByteBuffer> list = new ArrayList<>();
+        list.add(ByteBuffer.from("A23DFE"));
+        list.add(ByteBuffer.from("03FE"));
+        list.add(ByteBuffer.allocate(0));
+
+        ByteBuffer byteBuffer = ByteBuffer.collect(list);
+        assertEquals("A23DFE03FE", byteBuffer.toString());
+    }
+
+    @Test
+    public void test_collect_on_empty_list() {
+        List<ByteBuffer> list = new ArrayList<>();
+        ByteBuffer byteBuffer = ByteBuffer.collect(list);
+        assertTrue(byteBuffer.isEmpty());
+    }
+
 
     @Test
     public void test_get_unsigned_as_long() {

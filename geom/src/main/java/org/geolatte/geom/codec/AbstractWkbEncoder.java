@@ -52,8 +52,8 @@ abstract class AbstractWkbEncoder implements WkbEncoder {
         geom.accept(newWkbVisitor(output, geom));
     }
 
-    protected <P extends Position> WkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geometry) {
-        return new WkbVisitor<P>(output);
+    protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geometry) {
+        return new BaseWkbVisitor<P>(output);
     }
 
     protected <P extends Position>  int calculateSize(Geometry<P> geom, boolean includeSrid) {

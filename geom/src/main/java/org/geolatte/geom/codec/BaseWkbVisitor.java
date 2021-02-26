@@ -27,13 +27,22 @@ import org.geolatte.geom.*;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-class WkbVisitor<P extends Position> implements GeometryVisitor<P> {
+class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
 
-    protected final ByteBuffer output;
+    private final ByteBuffer output;
 
-    WkbVisitor(ByteBuffer byteBuffer) {
+    BaseWkbVisitor(ByteBuffer byteBuffer) {
         this.output = byteBuffer;
+    }
+
+    ByteBuffer buffer(){
+        return output;
+    }
+
+    ByteBuffer result(){
+        output.rewind();
+        return output;
     }
 
     @Override
