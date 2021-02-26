@@ -23,7 +23,9 @@ package org.geolatte.geom.codec;
 
 
 import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.codec.support.GeometryBuilder;
 import org.geolatte.geom.crs.*;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
@@ -37,25 +39,48 @@ import static org.geolatte.geom.crs.CoordinateSystemAxisDirection.OTHER;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Nov 11, 2010
  */
-class PostgisWkbDecoder extends AbstractWkbDecoder {
-
-     @Override
-    protected void prepare(ByteBuffer byteBuffer) {
-        //do nothing
-    }
-
+class PostgisWkbDecoder implements WkbDecoder {
 
     @Override
+    public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        BaseWkbParser<P> parser = new PostgisWkbParser<>(PostgisWkbV1Dialect.INSTANCE, byteBuffer, crs);
+        try {
+            return parser.parse();
+        }catch (Throwable e) {
+            throw new WkbDecodeException(e);
+        }
+    }
+
+}
+class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
+
+    private boolean crsRead = false;
+
+    PostgisWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
+        super(dialect, buffer, crs);
+    }
+
+    @Override
+    protected GeometryBuilder parseWkbType() {
+        long tpe = buffer.getUInt();
+        gtype = dialect.parseType((byte)tpe);
+        if (!crsRead){
+            this.crs = readCrs(buffer, (int)tpe, crs);
+            crsRead = true;
+        }
+        return GeometryBuilder.create(gtype);
+    }
+
     @SuppressWarnings("unchecked")
     protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
-        boolean hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
-        boolean hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
+        hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
+        hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
 
-        // if set, just validate
-        if (crs != null) {
-            validateCrs(crs, hasM, hasZ);
-            return crs;
-        }
+//        // if set, just validate
+//        if (crs != null) {
+//            validateCrs(crs, hasM, hasZ);
+//            return crs;
+//        }
 
         CoordinateReferenceSystem<?> crsDeclared;
         if (hasSrid(typeCode)) {
@@ -75,9 +100,9 @@ class PostgisWkbDecoder extends AbstractWkbDecoder {
         }
     }
 
-    @Override
     protected boolean hasSrid(int typeCode) {
         return (typeCode & PostgisWkbTypeMasks.SRID_FLAG) == PostgisWkbTypeMasks.SRID_FLAG;
     }
+
 
 }

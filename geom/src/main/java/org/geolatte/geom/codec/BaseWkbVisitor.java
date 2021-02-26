@@ -23,6 +23,8 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 
+import java.util.Arrays;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
@@ -31,9 +33,13 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
 
     private final ByteBuffer output;
+    private final WkbDialect dialect;
 
-    BaseWkbVisitor(ByteBuffer byteBuffer) {
+
+    BaseWkbVisitor(ByteBuffer byteBuffer, WkbDialect dialect) {
         this.output = byteBuffer;
+        //TODO -- this is only temporary
+        this.dialect = dialect == null ? new WkbDialect() : dialect;
     }
 
     ByteBuffer buffer(){
@@ -45,12 +51,23 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
         return output;
     }
 
+    WkbDialect dialect(){
+        return this.dialect;
+    }
+
     @Override
     public void visit(Point<P> geom) {
-        writeByteOrder(output);
+        writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
-            output.putUInt(0);
+            if(dialect.emptyPointAsNaN()){
+                double[] co = new double[geom.getCoordinateDimension()];
+                Arrays.fill(co, Double.NaN);
+               writePoint(co, output);
+            } else {
+                //empty point encoded as something that can have 0 subsequent elements (positions or rings or geometries)
+                output.putUInt(0);
+            }
         } else {
             writePoints(geom.getPositions(), geom.getCoordinateDimension(), output);
         }
@@ -58,7 +75,7 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
     @Override
     public void visit(LineString<P> geom) {
-        writeByteOrder(output);
+        writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
             output.putUInt(0);
@@ -70,7 +87,7 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
     @Override
     public void visit(Polygon<P> geom) {
-        writeByteOrder(output);
+        writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         if (geom.isEmpty()) {
             output.putUInt(0);
@@ -84,7 +101,7 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
 
     @Override
     public  <G extends Geometry<P>>  void visit(AbstractGeometryCollection<P,G> geom) {
-        writeByteOrder(output);
+        writeByteOrder(geom, output);
         writeTypeCodeAndSrid(geom, output);
         output.putUInt(geom.getNumGeometries());
     }
@@ -112,30 +129,13 @@ class BaseWkbVisitor<P extends Position> implements GeometryVisitor<P> {
         }
     }
 
-    protected void writeByteOrder(ByteBuffer output) {
+    protected void writeByteOrder(Geometry<P> geom, ByteBuffer output) {
         output.put(output.getByteOrder().byteValue());
     }
 
     protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-        int typeCode = geometryTypeCode(geometry);
+        long typeCode = dialect.geometryTypeCode(geometry);
         output.putUInt(typeCode);
-    }
-
-    protected int geometryTypeCode(Geometry<P> geometry) {
-        //empty geometries have the same representation as an empty geometry collection
-        if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
-            return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
-        }
-        WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
-        if (type == null) {
-            throw new UnsupportedConversionException(
-                    String.format(
-                            "Can't convert geometries of type %s",
-                            geometry.getClass().getCanonicalName()
-                    )
-            );
-        }
-        return type.getTypeCode();
     }
 
 }

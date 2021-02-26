@@ -9,16 +9,24 @@ import static org.geolatte.geom.GeometryType.*;
 
 class WkbDialect {
 
-    private final Map<Long, GeometryType> typemap = new HashMap<>();
+    final private Map<Long, GeometryType> typemap = new HashMap<>();
+
+    final public static Long WKB_POINT = 1L;
+    final public static Long WKB_LINESTRING = 2L;
+    final public static Long WKB_POLYGON = 3L;
+    final public static Long WKB_MULTIPOINT = 4L;
+    final public static Long WKB_MULTILINESTRING = 5L;
+    final public static Long WKB_MULTIPOLYGON = 6L;
+    final public static Long WKB_GEOMETRYCOLLECTION = 7L;
 
     protected WkbDialect() {
-        typemap.put(1L, POINT);
-        typemap.put(2L, LINESTRING);
-        typemap.put(3L, POLYGON);
-        typemap.put(4L, MULTIPOINT);
-        typemap.put(5L, MULTILINESTRING);
-        typemap.put(6L, MULTIPOLYGON);
-        typemap.put(7L, GEOMETRYCOLLECTION);
+        typemap.put(WKB_POINT, POINT);
+        typemap.put(WKB_LINESTRING, LINESTRING);
+        typemap.put(WKB_POLYGON, POLYGON);
+        typemap.put(WKB_MULTIPOINT, MULTIPOINT);
+        typemap.put(WKB_MULTILINESTRING, MULTILINESTRING);
+        typemap.put(WKB_MULTIPOLYGON, MULTIPOLYGON);
+        typemap.put(WKB_GEOMETRYCOLLECTION, GEOMETRYCOLLECTION);
     }
 
     GeometryType parseType(long tpe) {
@@ -35,12 +43,17 @@ class WkbDialect {
         return false;
     }
 
-    <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo){
+    <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo) {
+        ByteBuffer buffer = mkByteBuffer(geom, bo);
+        return new BaseWkbVisitor<>(buffer, this);
+    }
+
+    protected <P extends Position> ByteBuffer mkByteBuffer(Geometry<P> geom, ByteOrder bo) {
         ByteBuffer buffer = ByteBuffer.allocate(calculateSize(geom, true));
-        if(bo != null) {
+        if (bo != null) {
             buffer.setByteOrder(bo);
         }
-        return new BaseWkbVisitor<>(buffer);
+        return buffer;
     }
 
     protected <P extends Position> int calculateSize(Geometry<P> geom, boolean topLevel) {
@@ -70,8 +83,9 @@ class WkbDialect {
 
     protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
         if (geometry.getGeometryType() == GeometryType.POINT) {
-            //Empty Point encoded with NaN coordinates
-            return getPositionSize(geometry);
+            //Empty Point encoded with NaN coordinates? then same size as one position,
+            // else number of elements (0 elements)
+            return emptyPointAsNaN()? getPositionSize(geometry) : ByteBuffer.UINT_SIZE;
         } else {
             // indicate no positions follow
             return ByteBuffer.UINT_SIZE;
@@ -98,5 +112,28 @@ class WkbDialect {
             size += calculateSize(g, false);
         }
         return size;
+    }
+
+    boolean emptyPointAsNaN(){
+        return true;
+    }
+
+    protected <P extends Position> Long geometryTypeCode(Geometry<P> geometry) {
+//        //empty geometries have the same representation as an empty geometry collection
+//        if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
+//            return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
+//        }
+        for (Map.Entry<Long, GeometryType> tpe : typemap.entrySet()) {
+            if (tpe.getValue() == geometry.getGeometryType()) {
+                return tpe.getKey();
+            }
+        }
+        throw new UnsupportedConversionException(
+                String.format(
+                        "Can't convert geometries of type %s",
+                        geometry.getClass().getCanonicalName()
+                )
+        );
+
     }
 }

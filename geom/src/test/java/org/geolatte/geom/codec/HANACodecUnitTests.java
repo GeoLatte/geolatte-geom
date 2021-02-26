@@ -65,6 +65,7 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
         for (Integer testCase : testCases.getCases()) {
             ByteBuffer wkb = addSRID(testCases.getWKB(testCase));
             Geometry geom = getWkbDecoder().decode(wkb);
+            wkb.rewind();
             assertEquals("WKB decoder gives incorrect result for case: " + testCase, testCases.getExpected(testCase), geom);
             assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(geom, ByteOrder.NDR));
             assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
@@ -110,7 +111,9 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
     		eBytes[i+4] = bytes[i];
     	}
 
-    	return ByteBuffer.from( eBytes );
+    	ByteBuffer result = ByteBuffer.from( eBytes );
+    	result.rewind();
+    	return result;
     }
     
     private String addSRID(String wkt) {

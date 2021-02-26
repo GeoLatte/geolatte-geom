@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 
 import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -35,50 +36,22 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: Nov 11, 2010
  */
-class PostgisWkbEncoder extends AbstractWkbEncoder {
+class PostgisWkbEncoder implements WkbEncoder {
+    final private WkbDialect dialect;
+    protected PostgisWkbEncoder(WkbDialect dialect){
+        this.dialect = dialect;
+    }
 
-    //size of an empty geometry is the size of an empty
+    protected PostgisWkbEncoder(){
+        this(PostgisWkbV1Dialect.INSTANCE);
+    }
+
     @Override
-    protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
-        return ByteBuffer.UINT_SIZE;
+    public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
+        BaseWkbVisitor<P> visitor = dialect.mkVisitor(geometry, byteOrder);
+        geometry.accept(visitor);
+        return visitor.result();
     }
-
-
-    protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
-        return new PostgisWkbVisitor<P>(output);
-    }
-
-    static class PostgisWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
-
-        private boolean hasWrittenSrid = false;
-
-        PostgisWkbVisitor(ByteBuffer byteBuffer) {
-            super(byteBuffer);
-        }
-
-        protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-            int typeCode = geometryTypeCode(geometry);
-            boolean hasSrid = (geometry.getSRID() > 0);
-            CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
-            if (hasSrid && !hasWrittenSrid) {
-                typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
-            }
-            if (geometry.hasM()) {
-                typeCode |= PostgisWkbTypeMasks.M_FLAG;
-            }
-            if (geometry.hasZ()) {
-                typeCode |= PostgisWkbTypeMasks.Z_FLAG;
-            }
-            output.putUInt(typeCode);
-            if (hasSrid && !hasWrittenSrid) {
-                output.putInt(geometry.getSRID());
-                hasWrittenSrid = true;
-            }
-        }
-
-    }
-
-
 }
 
 

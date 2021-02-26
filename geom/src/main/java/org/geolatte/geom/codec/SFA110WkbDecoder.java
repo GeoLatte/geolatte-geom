@@ -7,10 +7,6 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 public class SFA110WkbDecoder implements WkbDecoder{
 
-    @Override
-    public Geometry<? extends Position> decode(ByteBuffer byteBuffer) {
-        return decode(byteBuffer, null);
-    }
 
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {

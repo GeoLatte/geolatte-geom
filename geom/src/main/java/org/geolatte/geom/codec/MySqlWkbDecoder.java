@@ -23,6 +23,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
@@ -32,35 +33,31 @@ import org.geolatte.geom.crs.CrsRegistry;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-class MySqlWkbDecoder extends AbstractWkbDecoder {
+class MySqlWkbDecoder implements WkbDecoder {
 
+
+    @Override
+    public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        BaseWkbParser<P> parser = new MySqlWkbParser<P>(MySqlWkbDialect.INSTANCE, byteBuffer, crs);
+        try {
+            return parser.parse();
+        } catch (Throwable t){
+            throw new WkbDecodeException(t);
+        }
+    }
+}
+
+class MySqlWkbParser<P extends Position> extends BaseWkbParser<P>{
     private int srid;
 
-
-    /**
-     * Read the first four bytes: this contains the SRID
-     *
-     * @param byteBuffer
-     */
-    @Override
-    protected void prepare(ByteBuffer byteBuffer) {
-        byteBuffer.setByteOrder(ByteOrder.NDR);
-        srid = byteBuffer.getInt();
-
-    }
-
-
-    @Override
-    protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
-        // if a CRS is already specified, ignore this value
-        if (crs != null) return crs;
-        CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-        return (CoordinateReferenceSystem<P>)crsDeclared;
-    }
-
-    @Override
-    protected boolean hasSrid(int typeCode) {
-        return true;
+    MySqlWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
+        super(dialect, buffer, crs);
+        this.buffer.setByteOrder(ByteOrder.NDR);
+        srid = this.buffer.getInt();
+        if (crs == null) {
+            CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+           this.crs =  (CoordinateReferenceSystem<P>) crsDeclared;
+        }
     }
 
 }

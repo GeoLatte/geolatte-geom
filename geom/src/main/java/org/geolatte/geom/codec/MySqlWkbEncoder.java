@@ -21,26 +21,33 @@
 
 package org.geolatte.geom.codec;
 
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import org.geolatte.geom.*;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
-class MySqlWkbEncoder extends AbstractWkbEncoder {
+class MySqlWkbEncoder implements WkbEncoder {
 
     @Override
     public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
-        if (geometry == null || hasEmpty(geometry)) return null;
-        //size is size for WKB + 4 bytes for the SRID
-        ByteBuffer output = ByteBuffer.allocate(calculateSize(geometry, false) + 4);
-        if (byteOrder != null) {
-            output.setByteOrder(byteOrder);
-        }
-        output.putInt(geometry.getSRID() == -1 ? 0 : geometry.getSRID());
-        writeGeometry(geometry, output);
-        output.rewind();
-        return output;
+        BaseWkbVisitor<P> visitor = MySqlWkbDialect.INSTANCE.mkVisitor(geometry, byteOrder);
+        //first write SRID
+        visitor.buffer().putInt(Math.max(geometry.getSRID(), 0));
+        geometry.accept(visitor);
+        return visitor.result();
+    }
+}
+
+class MySqlWkbDialect extends WkbDialect {
+    final public static WkbDialect INSTANCE = new MySqlWkbDialect();
+
+    private MySqlWkbDialect(){}
+
+    @Override
+    protected <P extends Position> int extraHeaderSize(Geometry<P> geom) {
+        return 4;
     }
 
     @Override

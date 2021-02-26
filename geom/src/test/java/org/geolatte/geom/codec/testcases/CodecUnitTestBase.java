@@ -44,7 +44,7 @@ abstract public class CodecUnitTestBase {
             ByteBuffer wkb = getTestCases().getWKB(idx);
             Geometry<?> geom = getWkbDecoder().decode(wkb);
             String wkt = getTestCases().getWKT(idx);
-            assertEquals(format("WKB decoder gives incorrect result for case: %s (%d))", wkt, idx), getTestCases().getExpected(idx), geom);
+            assertEquals(format("WKB decoder gives incorrect result for case: %s (testcase: %d)", wkt, idx), getTestCases().getExpected(idx), geom);
         }
     }
 
@@ -55,7 +55,7 @@ abstract public class CodecUnitTestBase {
             Geometry<?> geom = getTestCases().getExpected(idx);
             ByteBuffer encoded= getWkbEncoder().encode(geom);
             String wkt = getTestCases().getWKT(idx);
-            assertEquals(format("WKB decoder gives incorrect result for case: %s (%d))", wkt, idx), wkb, encoded);
+            assertEquals(format("WKB encoder gives incorrect result for case: %s (%d))", wkt, idx), wkb, encoded);
         }
     }
 
@@ -77,7 +77,7 @@ abstract public class CodecUnitTestBase {
             String wkt = getTestCases().getWKT(idx);
             Geometry<?> geom = getTestCases().getExpected(idx);
             String encoded = getWktEncoder().encode(geom);
-            assertEquals(format("WKT decoder gives incorrect result for case: %s (%d))", wkt, idx), wkt, encoded);
+            assertEquals(format("WKT encoder gives incorrect result for case: %s (%d))", wkt, idx), wkt, encoded);
         }
     }
 

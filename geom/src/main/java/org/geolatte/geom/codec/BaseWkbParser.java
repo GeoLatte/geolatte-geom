@@ -7,24 +7,29 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
 class BaseWkbParser<P extends Position>{
 
-    final private ByteBuffer buffer;
-    final private WkbDialect dialect;
-    final private CoordinateReferenceSystem<P> crs;
+    final protected ByteBuffer buffer;
+    final protected WkbDialect dialect;
+    protected CoordinateReferenceSystem<P> crs;
 
-    private boolean hasZ = false;
-    private boolean hasM = false;
-    private GeometryType gtype;
+    protected boolean hasZ = false;
+    protected boolean hasM = false;
+    protected GeometryType gtype;
 
     @SuppressWarnings("unchecked")
     BaseWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs){
         this.buffer = buffer;
+        this.buffer.rewind();
         this.dialect = dialect;
         this.crs = crs == null ? (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.PROJECTED_2D_METER : crs;
     }
 
     Geometry<P> parse() throws WkbDecodeException {
         GeometryBuilder builder = parseGeometry();
-        return builder.createGeometry(crs);
+        try {
+            return builder.createGeometry(crs);
+        }catch(DecodeException de) {
+            throw new WkbDecodeException(de);
+        }
     }
 
     private GeometryBuilder parseGeometry() {

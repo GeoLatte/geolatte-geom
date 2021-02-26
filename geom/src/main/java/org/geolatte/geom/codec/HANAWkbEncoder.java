@@ -26,84 +26,103 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 /**
  * The HANA EWKB representation differs from the Postgis EWKB representation in
  * that HANA always requires an SRID to be written, even if its not specified or 0.
- * 
+ *
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbEncoder extends PostgisWkb2Encoder {
-
-	@Override
-	protected <P extends Position> int calculateSize(Geometry<P> geom, boolean includeSrid) {
-		int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
-		if (includeSrid) {
-			size += 4;
-		}
-
-		if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
-		if (geom instanceof AbstractGeometryCollection) {
-			size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
-		} else if (geom instanceof Polygon) {
-			size += getPolygonSize((Polygon<P>) geom);
-		} else if (geom instanceof Point) {
-			size += getPointByteSize(geom);
-		} else {
-			size += ByteBuffer.UINT_SIZE; //to hold number of points
-			size += getPointByteSize(geom) * geom.getNumPositions();
-		}
-		return size;
-	}
-
-	@Override
-	protected <P extends Position> BaseWkbVisitor<P> newWkbVisitor(ByteBuffer output, Geometry<P> geom) {
-		return new HANAWkbVisitor<P>(output);
-	}
-
-	static private class HANAWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
-
-		private boolean hasWrittenSrid = false;
-
-		HANAWkbVisitor(ByteBuffer byteBuffer) {
-			super(byteBuffer);
-		}
-
-		@Override
-		protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
-			int typeCode = geometryTypeCode(geometry);
-			CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
-			if (!this.hasWrittenSrid) {
-				typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
-			}
-			if (geometry.hasM()) {
-				typeCode |= PostgisWkbTypeMasks.M_FLAG;
-			}
-			if (geometry.hasZ()) {
-				typeCode |= PostgisWkbTypeMasks.Z_FLAG;
-			}
-			output.putUInt(typeCode);
-			if (!this.hasWrittenSrid) {
-				int srid = geometry.getSRID();
-				// Write the SRID, the HANA default SRID is 0
-				output.putInt(srid < 0 ? 0 : srid);
-				this.hasWrittenSrid = true;
-			}
-		}
-
-		protected int geometryTypeCode(Geometry<P> geometry) {
-			//empty geometries have the same representation as an empty geometry collection
-			if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
-				return WkbGeometryType.MULTI_POINT.getTypeCode();
-			}
-			WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
-			if (type == null) {
-				throw new UnsupportedConversionException(
-						String.format(
-								"Can't convert geometries of type %s",
-								geometry.getClass().getCanonicalName()
-						)
-				);
-			}
-			return type.getTypeCode();
-		}
-	}
-
-
+class HANAWkbEncoder implements WkbEncoder {
+    @Override
+    public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
+        BaseWkbVisitor<P> visitor = HANAWkbDialect.INSTANCE.mkVisitor(geometry, byteOrder);
+        geometry.accept(visitor);
+        return visitor.result();
+    }
 }
+
+class HANAWkbDialect extends WkbDialect {
+
+    final public static HANAWkbDialect INSTANCE = new HANAWkbDialect();
+
+    private HANAWkbDialect(){}
+
+    @Override
+    boolean emptyPointAsNaN() {
+        return false;
+    }
+
+    protected <P extends Position> int calculateSize(Geometry<P> geom, boolean includeSrid) {
+        int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
+        if (includeSrid) {
+            size += 4;
+        }
+
+        if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
+        if (geom instanceof AbstractGeometryCollection) {
+            size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
+        } else if (geom instanceof Polygon) {
+            size += getPolygonSize((Polygon<P>) geom);
+        } else if (geom instanceof Point) {
+            size += getPositionSize(geom);
+        } else {
+            size += ByteBuffer.UINT_SIZE; //to hold number of points
+            size += getPositionSize(geom) * geom.getNumPositions();
+        }
+        return size;
+    }
+
+    @Override
+    <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo) {
+        return new HANAWkbVisitor<P>(mkByteBuffer(geom, bo), this);
+    }
+}
+
+class HANAWkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
+
+    private boolean hasWrittenSrid = false;
+
+    HANAWkbVisitor(ByteBuffer byteBuffer, WkbDialect dialect) {
+        super(byteBuffer, dialect);
+    }
+
+
+
+    @Override
+    protected void writeTypeCodeAndSrid(Geometry<P> geometry, ByteBuffer output) {
+        int typeCode = geometryTypeCode(geometry);
+        CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
+        if (!this.hasWrittenSrid) {
+            typeCode |= PostgisWkbTypeMasks.SRID_FLAG;
+        }
+        if (geometry.hasM()) {
+            typeCode |= PostgisWkbTypeMasks.M_FLAG;
+        }
+        if (geometry.hasZ()) {
+            typeCode |= PostgisWkbTypeMasks.Z_FLAG;
+        }
+        output.putUInt(typeCode);
+        if (!this.hasWrittenSrid) {
+            int srid = geometry.getSRID();
+            // Write the SRID, the HANA default SRID is 0
+            output.putInt(srid < 0 ? 0 : srid);
+            this.hasWrittenSrid = true;
+        }
+    }
+
+    protected int geometryTypeCode(Geometry<P> geometry) {
+        //empty geometries have the same representation as an empty geometry collection
+        if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
+            return WkbGeometryType.MULTI_POINT.getTypeCode();
+        }
+        WkbGeometryType type = WkbGeometryType.forClass(geometry.getClass());
+        if (type == null) {
+            throw new UnsupportedConversionException(
+                    String.format(
+                            "Can't convert geometries of type %s",
+                            geometry.getClass().getCanonicalName()
+                    )
+            );
+        }
+        return type.getTypeCode();
+    }
+}
+
+
