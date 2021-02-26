@@ -72,7 +72,9 @@ public abstract class Geometry<P extends Position> implements Serializable {
             if (complex.getNumGeometries() == 0) {
                 return Geometries.mkGeometry(complex.getClass(), crs);
             }
-            Geometry<Q>[] targetParts = (Geometry<Q>[]) Array.newInstance(complex.getComponentType(), complex.getNumGeometries());//new Geometry[complex.getNumGeometries()];
+            Geometry<Q>[] targetParts = (Geometry<Q>[]) Array.newInstance(
+                    complex.getComponentType(), complex.getNumGeometries()
+            );
             int idx = 0;
             for (Geometry<?> part : complex) {
                 targetParts[idx++] = forceToCrs(part, crs);

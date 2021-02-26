@@ -53,7 +53,7 @@ public class PointHolder extends Holder {
     }
 
     public <P extends Position> Point<P> toGeometry(CoordinateReferenceSystem<P> crs, GeometryType geomType) {
-        if (isEmpty()) return Geometries.mkEmptyPoint(crs);
+        if (isEmpty() || Double.isNaN(coordinates.get(0))) return Geometries.mkEmptyPoint(crs);
         return Geometries.mkPoint(toPosition(crs), crs);
     }
 

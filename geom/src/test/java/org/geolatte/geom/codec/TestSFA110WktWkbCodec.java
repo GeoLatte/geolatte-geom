@@ -17,18 +17,6 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
     static final private Logger LOGGER = LoggerFactory.getLogger(TestSFA110WktWkbCodec.class);
     final private SFA110WkkWkbTestCases testCases = new SFA110WkkWkbTestCases();
 
-    @Test
-    public void test_codec() {
-
-        for (Integer idx : testCases.getCases()) {
-            ByteBuffer wkb = testCases.getWKB(idx);
-            Geometry<?> geom = getWkbDecoder().decode(wkb);
-            String wkt = testCases.getWKT(idx);
-            assertEquals(format("WKB decoder gives incorrect result for case: %s (%d))", wkt, idx), testCases.getExpected(idx), geom);
-//            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(geom, ByteOrder.NDR));
-//            assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
-        }
-    }
 
     @Test
     public void test_3d_crs_passed() {

@@ -19,6 +19,12 @@ public class SFA110WkkWkbTestCases extends WktWkbCodecTestBase {
                 point(crs, c(1.52, 2.43))
         );
 
+        addCase(14,
+                "POINT EMPTY",
+                "0101000000000000000000f87f000000000000f87f",
+                point(crs)
+        );
+
         addCase(2,
                 "LINESTRING(1.52 2.43,4.23 5.32)",
                 "01020000000200000052b81e85eb51f83f713d0ad7a3700340ec51b81e85eb104048e17a14ae471540",

@@ -21,17 +21,15 @@
 
 package org.geolatte.geom.codec.testcases;
 
-import junit.framework.Assert;
 import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.WkbDecoder;
 import org.geolatte.geom.codec.WkbEncoder;
 import org.geolatte.geom.codec.WktDecoder;
 import org.geolatte.geom.codec.WktEncoder;
-import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.junit.Test;
 
+import static java.lang.String.format;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -41,34 +39,51 @@ import static junit.framework.Assert.assertEquals;
 abstract public class CodecUnitTestBase {
 
     @Test
-    public void test_wkt_codec() {
-        for (Integer testCase : getTestCases().getCases()) {
-            String wkt = getTestCases().getWKT(testCase);
-            Geometry geom = getWktDecoder().decode(wkt);
-            assertEquals(String.format("Wkt decoder gives incorrect result for case: %d : ", testCase) + wkt, getTestCases().getExpected(testCase), geom);
-            if (getTestCases().getTestEncoding(testCase)) {
-                Assert.assertEquals("Wkt encoder gives incorrect result for case:" + wkt, wkt, getWktEncoder().encode(geom));
-            }
+    public void test_decode_wkb() {
+        for (Integer idx : getTestCases().getCases()) {
+            ByteBuffer wkb = getTestCases().getWKB(idx);
+            Geometry<?> geom = getWkbDecoder().decode(wkb);
+            String wkt = getTestCases().getWKT(idx);
+            assertEquals(format("WKB decoder gives incorrect result for case: %s (%d))", wkt, idx), getTestCases().getExpected(idx), geom);
         }
     }
 
     @Test
-    public void test_wkb_codec() {
-        for (Integer testCase : getTestCases().getCases()) {
-            ByteBuffer wkb = getTestCases().getWKB(testCase);
-            Geometry geom = getWkbDecoder().decode(wkb);
-            Assert.assertEquals("WKB decoder gives incorrect result for case: " + testCase, getTestCases().getExpected(testCase), geom);
-            Assert.assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(geom, ByteOrder.NDR));
-            Assert.assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(getTestCases().getExpected(testCase), ByteOrder.NDR));
+    public void test_encode_wkb() {
+        for (Integer idx : getTestCases().getCases()) {
+            ByteBuffer wkb = getTestCases().getWKB(idx);
+            Geometry<?> geom = getTestCases().getExpected(idx);
+            ByteBuffer encoded= getWkbEncoder().encode(geom);
+            String wkt = getTestCases().getWKT(idx);
+            assertEquals(format("WKB decoder gives incorrect result for case: %s (%d))", wkt, idx), wkb, encoded);
         }
     }
 
+    @Test
+    public void test_decode_wkt() {
+        for (Integer idx : getTestCases().getCases()) {
+            String wkt = getTestCases().getWKT(idx);
+            Geometry<?> geom = getWktDecoder().decode(wkt);
+            assertEquals(format("WKT decoder gives incorrect result for case: %s (%d))", wkt, idx), getTestCases().getExpected(idx), geom);
+        }
+    }
+
+    @Test
+    public void test_encode_wkt() {
+        for (Integer idx : getTestCases().getCases()) {
+            if (!getTestCases().getTestEncoding(idx)) {
+                break;
+            }
+            String wkt = getTestCases().getWKT(idx);
+            Geometry<?> geom = getTestCases().getExpected(idx);
+            String encoded = getWktEncoder().encode(geom);
+            assertEquals(format("WKT decoder gives incorrect result for case: %s (%d))", wkt, idx), wkt, encoded);
+        }
+    }
 
     abstract protected WktWkbCodecTestBase getTestCases();
-
     abstract protected WktDecoder getWktDecoder();
     abstract protected WktEncoder getWktEncoder();
-
     abstract protected WkbDecoder getWkbDecoder();
     abstract protected WkbEncoder getWkbEncoder();
 
