@@ -28,7 +28,7 @@ import org.geolatte.geom.Geometry;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktDialect extends BaseWktDialect {
+class PostgisWktDialect extends WktDialect {
 
     @Override
     void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {

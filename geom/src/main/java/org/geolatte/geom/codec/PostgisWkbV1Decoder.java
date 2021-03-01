@@ -38,7 +38,7 @@ import org.geolatte.geom.crs.CrsRegistry;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Nov 11, 2010
  */
-class PostgisWkbDecoder implements WkbDecoder {
+class PostgisWkbV1Decoder implements WkbDecoder {
 
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {

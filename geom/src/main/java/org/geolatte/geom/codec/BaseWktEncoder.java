@@ -12,13 +12,13 @@ class BaseWktEncoder implements WktEncoder {
 
     //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
     private StringBuffer builder;
-    private final BaseWktDialect dialect;
+    private final WktDialect dialect;
     private final PositionEncoder positionEncoder = new PositionEncoder();
 
     /**
      * Constructs an instance.
      */
-    public BaseWktEncoder(BaseWktDialect variant) {
+    public BaseWktEncoder(WktDialect variant) {
         this.dialect = variant;
     }
 
@@ -91,9 +91,13 @@ class BaseWktEncoder implements WktEncoder {
     }
 
     protected <P extends Position> void addMultiPointText(Geometry<P> geometry) {
-        addStartList();
-        addGeometries((AbstractGeometryCollection<P, ?>) geometry, false);
-        addEndList();
+        if(dialect.writeMultiPointAsListOfPositions()) {
+            addPointList(geometry.getPositions());
+        } else {
+            addStartList();
+            addGeometries((AbstractGeometryCollection<P, ?>) geometry, false);
+            addEndList();
+        }
     }
 
     protected <P extends Position, G extends Geometry<P>> void addGeometries(AbstractGeometryCollection<P, G> collection, boolean withTag) {
@@ -130,12 +134,21 @@ class BaseWktEncoder implements WktEncoder {
     }
 
     protected <P extends Position> double[] createCoordinateBuffer(PositionSequence<P> positions) {
-        return new double[2];
+        if(dialect.isLimitedTo2D()) {
+            return new double[2];
+        }
+        return new double[positions.getCoordinateDimension()];
     }
 
     protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> positions, int pos, double[] coords) {
-        coords[0] = positions.getPositionN(pos).getCoordinate(0);
-        coords[1] = positions.getPositionN(pos).getCoordinate(1);
+        if(dialect.isLimitedTo2D()) {
+            coords[0] = positions.getPositionN(pos).getCoordinate(0);
+            coords[1] = positions.getPositionN(pos).getCoordinate(1);
+        } else {
+            for (int i = 0; i < positions.getCoordinateDimension(); i++) {
+                coords[i] = positions.getPositionN(pos).getCoordinate(i);
+            }
+        }
     }
 
     private <P extends Position> void addPositions(PositionSequence<P> positions) {

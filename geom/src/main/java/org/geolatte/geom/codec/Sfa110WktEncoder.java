@@ -9,7 +9,7 @@ class Sfa110WktEncoder extends BaseWktEncoder {
      * Constructs an instance.
      */
     public Sfa110WktEncoder() {
-        super(new BaseWktDialect());
+        super(new WktDialect());
     }
 
     @Override

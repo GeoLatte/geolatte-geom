@@ -44,13 +44,5 @@ class PostgisWktEncoder extends BaseWktEncoder {
         super(dialect);
     }
 
-    protected <P extends Position> double[] createCoordinateBuffer(PositionSequence<P> positions) {
-        return new double[positions.getCoordinateDimension()];
-    }
 
-    protected <P extends Position> void setCoordinatesToWrite(PositionSequence<P> positions, int pos, double[] coords) {
-        for (int i = 0; i < positions.getCoordinateDimension(); i++) {
-            coords[i] = positions.getPositionN(pos).getCoordinate(i);
-        }
-    }
 }

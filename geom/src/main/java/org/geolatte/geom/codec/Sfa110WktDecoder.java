@@ -17,9 +17,9 @@ public class Sfa110WktDecoder implements WktDecoder {
     }
 }
 
-class Sfa110WktParser<P extends Position> extends BaseWktGeometryParser<P> {
+class Sfa110WktParser<P extends Position> extends BaseWktParser<P> {
 
-    private final static BaseWktDialect dialect = new BaseWktDialect();
+    private final static WktDialect dialect = new WktDialect();
 
     Sfa110WktParser(String wkt, CoordinateReferenceSystem<P> crs) {
         super(dialect, wkt, crs);

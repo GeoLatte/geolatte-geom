@@ -193,7 +193,7 @@ public class TestPostgisWkbEncoderDecoder {
 
     @Test
     public void testReuseDecoder() throws Exception {
-        PostgisWkbDecoder decoder = new PostgisWkbDecoder();
+        PostgisWkbV1Decoder decoder = new PostgisWkbV1Decoder();
 
         ByteBuffer pointWithNoSridBuffer = testcases.getWKB(PostgisTestCases.POINT_2D);
         Geometry<?> decodedBefore = decoder.decode(pointWithNoSridBuffer);
@@ -252,7 +252,7 @@ public class TestPostgisWkbEncoderDecoder {
     }
 
     protected WkbDecoder decoder() {
-        return new PostgisWkbDecoder();
+        return new PostgisWkbV1Decoder();
     }
 
     protected void testEncoding(ByteBuffer byteBuffer, Geometry<?> geom) {

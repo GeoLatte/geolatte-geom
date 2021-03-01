@@ -47,7 +47,7 @@ public class PostgisWktDecoder implements WktDecoder {
     }
 }
 
-class PostgisWktParser<P extends Position> extends BaseWktGeometryParser<P> {
+class PostgisWktParser<P extends Position> extends BaseWktParser<P> {
 
     private final static PostgisWktDialect dialect = new PostgisWktDialect();
     private final static Pattern SRID_RE = Pattern.compile("^SRID=(.*);", Pattern.CASE_INSENSITIVE);

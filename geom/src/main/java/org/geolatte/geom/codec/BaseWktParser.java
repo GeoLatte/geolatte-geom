@@ -14,12 +14,12 @@ import java.util.regex.Pattern;
 
 import static org.geolatte.geom.codec.SimpleTokenizer.*;
 
-class BaseWktGeometryParser<P extends Position> {
+class BaseWktParser<P extends Position> {
 
     private final static CoordinateReferenceSystem<C2D> DEFAULT_CRS = CoordinateReferenceSystems.PROJECTED_2D_METER;
     private final static Pattern EMPTY_PATTERN = Pattern.compile("empty", Pattern.CASE_INSENSITIVE);
 
-    private final BaseWktDialect dialect;
+    private final WktDialect dialect;
     private final CoordinateReferenceSystem<P> overrideCrs;
 
     private CoordinateReferenceSystem<?> matchedSrid;
@@ -42,7 +42,7 @@ class BaseWktGeometryParser<P extends Position> {
      * @param wkt        The WKT string to parser
      * @param crs        the CoordinateReferenceSystem for the parse result
      */
-    BaseWktGeometryParser(BaseWktDialect wktDialect, String wkt, CoordinateReferenceSystem<P> crs) {
+    BaseWktParser(WktDialect wktDialect, String wkt, CoordinateReferenceSystem<P> crs) {
         dialect = wktDialect;
         tokenizer = new SimpleTokenizer(wkt);
         this.overrideCrs = crs;

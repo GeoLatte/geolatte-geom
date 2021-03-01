@@ -25,6 +25,6 @@ package org.geolatte.geom.codec;
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbDecoder extends PostgisWkb2Decoder {
+class HANAWkbDecoder extends PostgisWkbV2Decoder {
 
 }

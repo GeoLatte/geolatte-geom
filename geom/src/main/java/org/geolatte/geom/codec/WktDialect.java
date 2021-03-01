@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import static org.geolatte.geom.GeometryType.*;
 
-public class BaseWktDialect {
+public class WktDialect {
 
     final static Map<GeometryType, Pattern> GEOMETRY_TYPE_PATTERN_MAP = new HashMap<>();
 
@@ -66,6 +66,13 @@ public class BaseWktDialect {
         }
     }
 
+    boolean isLimitedTo2D(){
+        return false;
+    }
+
+    boolean writeMultiPointAsListOfPositions(){
+        return false;
+    }
 
     void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
         if (geometry.hasM() && geometry.getCoordinateDimension() < 4)

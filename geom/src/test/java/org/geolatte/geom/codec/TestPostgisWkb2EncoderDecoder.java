@@ -30,6 +30,6 @@ public class TestPostgisWkb2EncoderDecoder extends TestPostgisWkbEncoderDecoder{
 
     @Override
     protected WkbDecoder decoder() {
-        return new PostgisWkb2Decoder();
+        return new PostgisWkbV2Decoder();
     }
 }
