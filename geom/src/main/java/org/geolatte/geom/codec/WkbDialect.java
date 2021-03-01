@@ -45,7 +45,7 @@ class WkbDialect {
 
     <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo) {
         ByteBuffer buffer = mkByteBuffer(geom, bo);
-        return new BaseWkbVisitor<>(buffer, this);
+        return new SFA110WkbVisitor<>(buffer, this);
     }
 
     protected <P extends Position> ByteBuffer mkByteBuffer(Geometry<P> geom, ByteOrder bo) {
@@ -96,7 +96,6 @@ class WkbDialect {
         return geom.getCoordinateDimension() * ByteBuffer.DOUBLE_SIZE;
     }
 
-
     protected <P extends Position> int getPolygonSize(Polygon<P> geom) {
         //to hold the number of linear rings
         int size = ByteBuffer.UINT_SIZE;
@@ -135,5 +134,18 @@ class WkbDialect {
                 )
         );
 
+    }
+}
+
+class SFA110WkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
+
+    SFA110WkbVisitor(ByteBuffer byteBuffer, WkbDialect dialect) {
+        super(byteBuffer, dialect);
+    }
+
+    @Override
+    protected void writePoint(double[] coordinates, ByteBuffer output) {
+        output.putDouble(coordinates[0]);
+        output.putDouble(coordinates[1]);
     }
 }

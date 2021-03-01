@@ -20,10 +20,13 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
 
     @Test
     public void test_3d_crs_encoded() {
+        Geometry<C2D> geom = point(mercator, c(1, 2));
         Geometry<C3D> pgeom = point(mercatorZ, c(1, 2, 3));
         ByteBuffer wkb = getWkbEncoder().encode(pgeom);
-        Geometry<C2D> geom = getWkbDecoder().decode(wkb, mercator);
-        assertEquals(point(mercator, c(1,2)), geom);
+        ByteBuffer expected = getWkbEncoder().encode(geom);
+        assertEquals(expected, wkb);
+        Geometry<C2D> dgeom = getWkbDecoder().decode(wkb, mercator);
+        assertEquals(point(mercator, c(1,2)), dgeom);
     }
 
     @Test

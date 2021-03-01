@@ -27,11 +27,15 @@ import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.geolatte.geom.codec.testcases.MySqlUnitTestInputs;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+
+import static org.geolatte.geom.builder.DSL.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -61,6 +65,21 @@ public class MySqlCodecUnitTests extends CodecUnitTestBase {
                 Assert.assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(expected, ByteOrder.NDR));
             }
         }
+    }
+
+    @Ignore //can't happen in MySQL since limited to 2D
+    @Override
+    @Test(expected = WkbDecodeException.class)
+    public void test_specified_crs_is_invalid(){
+        //only 2D supported
+    }
+
+    @Test
+    public void test_specified_crs_is_valid() {
+            Geometry<C3D> pgeom = point(mercatorZ, c(1, 2, 3));
+            ByteBuffer wkb = getWkbEncoder().encode(pgeom);
+            Geometry<G2D> wgeom = getWkbDecoder().decode(wkb, wgs84);
+            assertEquals(point(wgs84, g(1, 2)), wgeom);
     }
 
     private Geometry addSrid(Geometry expected) {

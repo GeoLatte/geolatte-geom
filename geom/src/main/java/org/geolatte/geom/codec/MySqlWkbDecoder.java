@@ -25,9 +25,13 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.codec.support.DecodeException;
+import org.geolatte.geom.codec.support.GeometryBuilder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.adjustTo;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -47,15 +51,15 @@ class MySqlWkbDecoder implements WkbDecoder {
     }
 }
 
+@SuppressWarnings("unchecked")
 class MySqlWkbParser<P extends Position> extends BaseWkbParser<P> {
-    private final int srid;
 
     MySqlWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         super(dialect, buffer, crs);
         this.buffer.setByteOrder(ByteOrder.NDR);
-        srid = this.buffer.getInt();
+        int srid = this.buffer.getInt();
         if (crs == null) {
-            CoordinateReferenceSystem crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+            CoordinateReferenceSystem<?> crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
             this.crs = (CoordinateReferenceSystem<P>) crsDeclared;
         }
     }

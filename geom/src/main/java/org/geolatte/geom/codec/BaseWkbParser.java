@@ -33,7 +33,7 @@ class BaseWkbParser<P extends Position> {
         }
     }
 
-    private GeometryBuilder parseGeometry() {
+    protected GeometryBuilder parseGeometry() {
         parseByteOrder();
         GeometryBuilder builder = parseWkbType();
         switch (gtype) {
