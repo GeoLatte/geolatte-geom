@@ -1,15 +1,16 @@
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
+import org.geolatte.geom.*;
 import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
 import org.geolatte.geom.codec.testcases.SFA110WkkWkbTestCases;
 import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.String.format;
+import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 
 public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
@@ -18,18 +19,32 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
     final private SFA110WkkWkbTestCases testCases = new SFA110WkkWkbTestCases();
 
     @Test
-    public void test_3d_crs_passed() {
-        //TODO check what happens when we have 3d, 2dm or 3dm CRS's
+    public void test_3d_crs_encoded() {
+        Geometry<C3D> pgeom = point(mercatorZ, c(1, 2, 3));
+        ByteBuffer wkb = getWkbEncoder().encode(pgeom);
+        Geometry<C2D> geom = getWkbDecoder().decode(wkb, mercator);
+        assertEquals(point(mercator, c(1,2)), geom);
     }
 
     @Test
+    public void test_3d_crs_decoded() {
+        Geometry<C2D> pgeom = point(mercator, c(1, 2));
+        ByteBuffer wkb = getWkbEncoder().encode(pgeom);
+        Geometry<C3D> geom = getWkbDecoder().decode(wkb, mercatorZ);
+        assertEquals(point(mercatorZ, c(1,2,0)), geom);
+    }
+
+    @Test(expected = WkbDecodeException.class)
     public void test_failures() {
-        //TODO check what happens on invalid input
+        //invalid WKB missing last point
+        ByteBuffer wkb = ByteBuffer.from("01020000000200000052b81e85eb51f83f713d0ad7a3700340ec51b81e85eb1040");
+        getWkbDecoder().decode(wkb);
     }
 
+    @Ignore
     @Test
-    public void test_byte_order_switch() {
-        //TODO check what happens when on a multipoint byeorder of constituent points is different from multipoint
+    public void test_specified_crs_is_invalid() {
+       //WKB only supports 2D
     }
 
     @Override

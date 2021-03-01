@@ -45,6 +45,8 @@ class PostgisWkbDecoder implements WkbDecoder {
         BaseWkbParser<P> parser = new PostgisWkbParser<>(PostgisWkbV1Dialect.INSTANCE, byteBuffer, crs);
         try {
             return parser.parse();
+        } catch( WkbDecodeException e) {
+          throw e;
         } catch (Throwable e) {
             throw new WkbDecodeException(e);
         }
@@ -55,9 +57,10 @@ class PostgisWkbDecoder implements WkbDecoder {
 class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
 
     private boolean crsRead = false;
-
+    final private boolean crsUserSpecified;
     PostgisWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         super(dialect, buffer, crs);
+        crsUserSpecified = crs != null;
     }
 
     @Override
@@ -76,29 +79,21 @@ class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
         hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
         hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
 
-//        // if set, just validate
-//        if (crs != null) {
-//            validateCrs(crs, hasM, hasZ);
-//            return crs;
-//        }
-
-        CoordinateReferenceSystem<?> crsDeclared;
+        int srid = 0;
         if (hasSrid(typeCode)) {
-            int srid = byteBuffer.getInt();
-            crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+            srid = byteBuffer.getInt();
+        }
+
+        // if crs was specified, just validate rather than adjust the CRS
+        if (crsUserSpecified) {
+            isCrsCompatible(crs);
+            return crs;
         } else {
-            crsDeclared = CoordinateReferenceSystems.PROJECTED_2D_METER;
-        }
-        return (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.adjustTo(crsDeclared, hasZ, hasM);
-    }
-
-
-    private void validateCrs(CoordinateReferenceSystem<?> crs, boolean hasM, boolean hasZ) {
-        if ((hasM && !(crs.hasM())) ||
-                (hasZ && !crs.hasZ())) {
-            throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
+            CoordinateReferenceSystem<?> crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+            return (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.adjustTo(crsDeclared, hasZ, hasM);
         }
     }
+
 
     protected boolean hasSrid(int typeCode) {
         return (typeCode & PostgisWkbTypeMasks.SRID_FLAG) == PostgisWkbTypeMasks.SRID_FLAG;

@@ -25,6 +25,7 @@ class BaseWkbParser<P extends Position> {
 
     Geometry<P> parse() throws WkbDecodeException {
         GeometryBuilder builder = parseGeometry();
+        isCrsCompatible(this.crs);
         try {
             return builder.createGeometry(crs);
         } catch (DecodeException de) {
@@ -151,6 +152,14 @@ class BaseWkbParser<P extends Position> {
             plh.push(readPolygon());
         }
         builder.setPositions(plh);
+    }
+
+    //Is the CRS coordinate dimension compatible with the WKB
+    protected void isCrsCompatible(CoordinateReferenceSystem<?> crs) {
+        if ((hasM && !(crs.hasM())) ||
+                (hasZ && !crs.hasZ())) {
+            throw new WkbDecodeException("WKB inconsistent with specified Coordinate Reference System");
+        }
     }
 
     private void matchGeometryCollection(CollectionGeometryBuilder builder) {

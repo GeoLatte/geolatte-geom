@@ -22,8 +22,8 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
-import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.geolatte.geom.codec.testcases.PostgisJDBCUnitTestInputs;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 
 /**
  * @author Karel Maesen, Geovise BVBA

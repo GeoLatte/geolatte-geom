@@ -21,22 +21,27 @@
 
 package org.geolatte.geom.codec.testcases;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.codec.WkbDecoder;
-import org.geolatte.geom.codec.WkbEncoder;
-import org.geolatte.geom.codec.WktDecoder;
-import org.geolatte.geom.codec.WktEncoder;
+import org.geolatte.geom.*;
+import org.geolatte.geom.codec.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.LinearUnit;
 import org.junit.Test;
 
 import static java.lang.String.format;
-import static junit.framework.Assert.assertEquals;
+import static org.geolatte.geom.builder.DSL.*;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/1/12
  */
 abstract public class CodecUnitTestBase {
+
+    protected CoordinateReferenceSystem<C2D> mercator = CoordinateReferenceSystems.WEB_MERCATOR;
+    protected CoordinateReferenceSystem<C3D> mercatorZ = addVerticalSystem(mercator, C3D.class, LinearUnit.METER);
+    protected CoordinateReferenceSystem<G2D> wgs84 = CoordinateReferenceSystems.WGS84;
 
     @Test
     public void test_decode_wkb() {
@@ -79,6 +84,21 @@ abstract public class CodecUnitTestBase {
             String encoded = getWktEncoder().encode(geom);
             assertEquals(format("WKT encoder gives incorrect result for case: %s (%d))", wkt, idx), wkt, encoded);
         }
+    }
+
+    @Test
+    public void test_specified_crs_respected(){
+        Geometry<C2D> pgeom = point(mercator, c(1, 2));
+        ByteBuffer wkb = getWkbEncoder().encode(pgeom);
+        Geometry<G2D> wgeom = getWkbDecoder().decode(wkb, wgs84);
+        assertEquals( point(wgs84, g(1, 2)), wgeom);
+    }
+
+    @Test(expected = WkbDecodeException.class)
+    public void test_specified_crs_is_invalid(){
+        Geometry<C3D> pgeom = point(mercatorZ, c(1, 2, 3));
+        ByteBuffer wkb = getWkbEncoder().encode(pgeom);
+        Geometry<G2D> wgeom = getWkbDecoder().decode(wkb, wgs84);
     }
 
     abstract protected WktWkbCodecTestBase getTestCases();

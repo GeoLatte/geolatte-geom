@@ -11,6 +11,14 @@ public class SFA110WkbDecoder implements WkbDecoder {
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
         BaseWkbParser<P> parser = new BaseWkbParser<>(SFA110WkbDialect.INSTANCE, byteBuffer, crs);
-        return parser.parse();
+        try {
+            return parser.parse();
+        } catch( WkbDecodeException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new WkbDecodeException(e);
+        }
     }
+
+
 }
