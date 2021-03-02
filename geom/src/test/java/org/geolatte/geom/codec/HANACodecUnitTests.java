@@ -23,14 +23,18 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.codec.testcases.HANAJDBCUnitTestInputs;
 import org.geolatte.geom.codec.testcases.HANAJDBCWithSRIDTestInputs;
 import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.geolatte.geom.CrsMock.WGS84_ZM;
+import static org.geolatte.geom.builder.DSL.*;
+import static org.geolatte.geom.codec.Wkb.Dialect.HANA_EWKB;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.PROJECTED_3DM_METER;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -43,8 +47,8 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
 	HANAJDBCWithSRIDTestInputs testCases = new HANAJDBCWithSRIDTestInputs();
 	WktDecoder wktDecoder = Wkt.newDecoder(Wkt.Dialect.HANA_EWKT);
 	WktEncoder wktEncoder = Wkt.newEncoder(Wkt.Dialect.HANA_EWKT);
-	WkbDecoder wkbDecoder = Wkb.newDecoder(Wkb.Dialect.HANA_EWKB);
-	WkbEncoder wkbEncoder = Wkb.newEncoder(Wkb.Dialect.HANA_EWKB);
+	WkbDecoder wkbDecoder = Wkb.newDecoder(HANA_EWKB);
+	WkbEncoder wkbEncoder = Wkb.newEncoder(HANA_EWKB);
 	
     @Test
     public void test_wkt_codec_without_srid() {
@@ -71,6 +75,22 @@ public class HANACodecUnitTests extends CodecUnitTestBase {
             assertEquals("WKB encoder gives incorrect result for case: " + testCase, wkb, getWkbEncoder().encode(testCases.getExpected(testCase), ByteOrder.NDR));
         }
     }
+
+    @Test
+	public void test_regression_no_srid(){
+		ByteBuffer buf = ByteBuffer.from("01B90B002000000000000000000000F03F000000000000F03F000000000000F03F000000000000F03F");
+		WkbDecoder decoder = Wkb.newDecoder(HANA_EWKB);
+		Geometry<?> geom = decoder.decode(buf);
+		assertEquals(point(PROJECTED_3DM_METER, c(1, 1, 1, 1)), geom);
+	}
+
+	@Test
+	public void test_regression_wgs84(){
+		ByteBuffer buf = ByteBuffer.from("01B90B0020E6100000000000000000F03F000000000000F03F000000000000F03F000000000000F03F");
+		WkbDecoder decoder = Wkb.newDecoder(HANA_EWKB);
+		Geometry<?> geom = decoder.decode(buf);
+		assertEquals(point(WGS84_ZM, g(1, 1, 1, 1)), geom);
+	}
 
     //we require an explicit test for this because
     @Test

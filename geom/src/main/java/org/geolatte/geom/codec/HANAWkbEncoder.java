@@ -50,6 +50,11 @@ class HANAWkbDialect extends WkbDialect {
         return false;
     }
 
+    @Override
+    GeometryType parseType(long tpe) {
+        return super.parseType((tpe & 0xFFFF) % 100);
+    }
+
     protected <P extends Position> int calculateSize(Geometry<P> geom, boolean includeSrid) {
         int size = 1 + ByteBuffer.UINT_SIZE; //size for order byte + type field
         if (includeSrid) {

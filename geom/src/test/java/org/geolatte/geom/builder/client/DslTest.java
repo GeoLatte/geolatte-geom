@@ -27,16 +27,16 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import static org.geolatte.geom.CrsMock.*;
 /**
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 11/10/12
+ * creation-date: 11/10/12
  */
 public class DslTest {
 
@@ -393,26 +393,32 @@ public class DslTest {
     }
 
     @Test
-        public void testMultiPolygonCanBeEmbeddedInGeometryCollectionAlternative() {
-            AbstractGeometryCollection g1=
-                    geometrycollection(
-                            multipolygon(
-                                    polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
-                                    polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
-                            ),
-                            polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
-                    );
+    public void testMultiPolygonCanBeEmbeddedInGeometryCollectionAlternative() {
+        AbstractGeometryCollection g1 =
+                geometrycollection(
+                        multipolygon(
+                                polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                                polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
+                        ),
+                        polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
+                );
 
-        AbstractGeometryCollection g2=
-                            geometrycollection(WGS84,
-                                    multipolygon(
-                                            polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
-                                            polygon(ring(g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
-                                    ),
-                                    polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
-                            );
+        AbstractGeometryCollection g2 =
+                geometrycollection(WGS84,
+                        multipolygon(
+                                polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
+                                polygon(ring(g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
+                        ),
+                        polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
+                );
         assertEquals(g1, g2);
-        }
+    }
 
 
+    //check what we want in this case?
+//    @Test
+//    public void fail_on_inconsistent_crs_point(){
+//        Point<G2D> point = point(WGS84, g(1, 2, 3, 4));
+//
+//    }
 }

@@ -20,11 +20,86 @@
  */
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.ByteBuffer;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+import org.geolatte.geom.codec.support.GeometryBuilder;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.PROJECTED_2D_METER;
+
 /**
  * The HANA EWKB decoder is equivalent to the Postgis EWKB decoder and is there mostly for symmetry reasons.
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbDecoder extends PostgisWkbV2Decoder {
+class HANAWkbDecoder implements WkbDecoder {
+
+    @Override
+    public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
+        byteBuffer.rewind();
+        BaseWkbParser<P> parser = new HANAWkbParser<>(byteBuffer, crs);
+        try {
+            return parser.parse();
+        } catch (WkbDecodeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new WkbDecodeException(t);
+        }
+    }
 
 }
+
+class HANAWkbParser<P extends Position> extends BaseWkbParser<P> {
+
+    private boolean crsRead;
+
+    HANAWkbParser(ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
+        super(HANAWkbDialect.INSTANCE, buffer, crs);
+    }
+
+    @Override
+    protected GeometryBuilder parseWkbType() {
+        long tpe = buffer.getUInt();
+        gtype = dialect.parseType(tpe);
+        if (!crsRead) {
+            readCrs(buffer, (int) tpe);
+            crsRead = true;
+        }
+        return GeometryBuilder.create(gtype);
+    }
+
+    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
+        hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
+        hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
+
+        if ( ( typeCode & 0xFFFF ) > 3000 ) {
+            hasM = true;
+            hasZ = true;
+        }
+        else if ( ( typeCode & 0xFFFF ) > 2000 ) {
+            hasM = true;
+        }
+        else if ( ( typeCode & 0xFFFF ) > 1000 ) {
+            hasZ = true;
+        }
+
+        int srid = 0;
+        if (hasSrid(typeCode)) {
+            srid = byteBuffer.getInt();
+        }
+        embeddedCRS = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
+    }
+
+
+    protected boolean hasSrid(int typeCode) {
+        return (typeCode & PostgisWkbTypeMasks.SRID_FLAG) == PostgisWkbTypeMasks.SRID_FLAG;
+    }
+
+
+
+}
+
+

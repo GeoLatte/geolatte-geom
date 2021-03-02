@@ -60,7 +60,7 @@ class MySqlWkbParser<P extends Position> extends BaseWkbParser<P> {
         int srid = this.buffer.getInt();
         if (crs == null) {
             CoordinateReferenceSystem<?> crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-            this.crs = (CoordinateReferenceSystem<P>) crsDeclared;
+            this.embeddedCRS = (CoordinateReferenceSystem<P>) crsDeclared;
         }
     }
 

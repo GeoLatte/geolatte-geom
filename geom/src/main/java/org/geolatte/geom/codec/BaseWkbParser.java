@@ -5,31 +5,46 @@ import org.geolatte.geom.codec.support.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.PROJECTED_2D_METER;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.adjustTo;
+
 class BaseWkbParser<P extends Position> {
 
     final protected ByteBuffer buffer;
     final protected WkbDialect dialect;
-    protected CoordinateReferenceSystem<P> crs;
 
     protected boolean hasZ = false;
     protected boolean hasM = false;
     protected GeometryType gtype;
+    protected CoordinateReferenceSystem<P> outputCRS;
+    protected CoordinateReferenceSystem<?> embeddedCRS;
 
     @SuppressWarnings("unchecked")
     BaseWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         this.buffer = buffer;
         this.buffer.rewind();
         this.dialect = dialect;
-        this.crs = crs == null ? (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.PROJECTED_2D_METER : crs;
+        this.outputCRS = crs;
     }
 
     Geometry<P> parse() throws WkbDecodeException {
         GeometryBuilder builder = parseGeometry();
-        isCrsCompatible(this.crs);
+        CoordinateReferenceSystem<P> crs = resolveCrs();
         try {
             return builder.createGeometry(crs);
         } catch (DecodeException de) {
             throw new WkbDecodeException(de);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected CoordinateReferenceSystem<P> resolveCrs() {
+        if(outputCRS != null) {
+            isCrsCompatible(outputCRS);
+            return outputCRS;
+        } else {
+            CoordinateReferenceSystem<?> crs = embeddedCRS != null ? embeddedCRS : PROJECTED_2D_METER;
+            return (CoordinateReferenceSystem<P>)adjustTo(crs, hasZ, hasM);
         }
     }
 

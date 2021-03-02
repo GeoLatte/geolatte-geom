@@ -20,6 +20,10 @@ public class PostgisWkbV1Dialect extends WkbDialect {
         return super.geometryTypeCode(geometry);
     }
 
+    GeometryType parseType(long tpe) {
+        return super.parseType( tpe & 0xFFFF );
+    }
+
     @Override
     protected <P extends Position> int extraHeaderSize(Geometry<P> geom) {
         return geom.getSRID() > 0 ? 4 : 0; //4 bytes for SRID

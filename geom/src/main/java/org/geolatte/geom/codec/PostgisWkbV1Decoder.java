@@ -45,8 +45,8 @@ class PostgisWkbV1Decoder implements WkbDecoder {
         BaseWkbParser<P> parser = new PostgisWkbParser<>(PostgisWkbV1Dialect.INSTANCE, byteBuffer, crs);
         try {
             return parser.parse();
-        } catch( WkbDecodeException e) {
-          throw e;
+        } catch (WkbDecodeException e) {
+            throw e;
         } catch (Throwable e) {
             throw new WkbDecodeException(e);
         }
@@ -57,25 +57,23 @@ class PostgisWkbV1Decoder implements WkbDecoder {
 class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
 
     private boolean crsRead = false;
-    final private boolean crsUserSpecified;
+
     PostgisWkbParser(WkbDialect dialect, ByteBuffer buffer, CoordinateReferenceSystem<P> crs) {
         super(dialect, buffer, crs);
-        crsUserSpecified = crs != null;
     }
 
     @Override
     protected GeometryBuilder parseWkbType() {
         long tpe = buffer.getUInt();
-        gtype = dialect.parseType((byte) tpe);
+        gtype = dialect.parseType(tpe);
         if (!crsRead) {
-            this.crs = readCrs(buffer, (int) tpe, crs);
+            readCrs(buffer, (int) tpe);
             crsRead = true;
         }
         return GeometryBuilder.create(gtype);
     }
 
-    @SuppressWarnings("unchecked")
-    protected <P extends Position> CoordinateReferenceSystem<P> readCrs(ByteBuffer byteBuffer, int typeCode, CoordinateReferenceSystem<P> crs) {
+    protected void readCrs(ByteBuffer byteBuffer, int typeCode) {
         hasM = (typeCode & PostgisWkbTypeMasks.M_FLAG) == PostgisWkbTypeMasks.M_FLAG;
         hasZ = (typeCode & PostgisWkbTypeMasks.Z_FLAG) == PostgisWkbTypeMasks.Z_FLAG;
 
@@ -83,15 +81,7 @@ class PostgisWkbParser<P extends Position> extends BaseWkbParser<P> {
         if (hasSrid(typeCode)) {
             srid = byteBuffer.getInt();
         }
-
-        // if crs was specified, just validate rather than adjust the CRS
-        if (crsUserSpecified) {
-            isCrsCompatible(crs);
-            return crs;
-        } else {
-            CoordinateReferenceSystem<?> crsDeclared = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
-            return (CoordinateReferenceSystem<P>) CoordinateReferenceSystems.adjustTo(crsDeclared, hasZ, hasM);
-        }
+        embeddedCRS = CrsRegistry.getCoordinateReferenceSystemForEPSG(srid, CoordinateReferenceSystems.PROJECTED_2D_METER);
     }
 
 
