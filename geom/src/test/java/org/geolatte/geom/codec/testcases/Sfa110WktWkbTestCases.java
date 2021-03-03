@@ -9,13 +9,12 @@ import static org.geolatte.geom.builder.DSL.*;
 
 public class Sfa110WktWkbTestCases extends WktWkbCodecTestBase {
 
-    public static final CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
     public Sfa110WktWkbTestCases() {
 
         addCase(1,
                 "POINT(1.52 2.43)",
-                "010100000052b81e85eb51f83f713d0ad7a3700340",
+                "010100000000000000EC51F83F00000000A4700340",
                 point(crs, c(1.52, 2.43))
         );
 

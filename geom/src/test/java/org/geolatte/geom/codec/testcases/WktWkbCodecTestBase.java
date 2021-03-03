@@ -1,16 +1,26 @@
 package org.geolatte.geom.codec.testcases;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.Geometry;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.LinearUnit;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
+
 /**
  * Base class for specifying Wkt/Wkb test cases
  */
 abstract public class WktWkbCodecTestBase {
+
+    public final static CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
+    public final static CoordinateReferenceSystem<C3D> crsZ = addVerticalSystem(crs, C3D.class, LinearUnit.METER);
+    public final static CoordinateReferenceSystem<C2DM> crsM = addLinearSystem(crs, C2DM.class, LinearUnit.METER);
+    public final static CoordinateReferenceSystem<C3DM> crsZM = addLinearSystem(crsZ, C3DM.class, LinearUnit.METER);
+
     public final Map<Integer, CodecTestInput> testCases = new HashMap<Integer, CodecTestInput>();
 
     public WktWkbCodecTestBase() {

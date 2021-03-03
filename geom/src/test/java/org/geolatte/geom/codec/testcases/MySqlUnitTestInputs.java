@@ -33,8 +33,6 @@ import static org.geolatte.geom.builder.DSL.*;
  */
 public class MySqlUnitTestInputs extends WktWkbCodecTestBase {
 
-    private static CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
-
 
     public MySqlUnitTestInputs() {
         addCase(1,
