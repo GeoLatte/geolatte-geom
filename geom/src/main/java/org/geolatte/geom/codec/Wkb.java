@@ -69,12 +69,12 @@ public class Wkb {
 
 
     static {
-        DECODERS.put(Dialect.SFA_1_1_0, SFA110WkbDecoder.class);
+        DECODERS.put(Dialect.SFA_1_1_0, Sfa110WkbDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbV1Decoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkbV2Decoder.class);
         DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
         DECODERS.put(Dialect.HANA_EWKB, HANAWkbDecoder.class);
-        ENCODERS.put(Dialect.SFA_1_1_0, SFA110WkbEncoder.class);
+        ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Encoder.class);
         ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);

@@ -2,7 +2,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
-import org.geolatte.geom.codec.testcases.SFA110WkkWkbTestCases;
+import org.geolatte.geom.codec.testcases.Sfa110WkkWkbTestCases;
 import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,10 +13,10 @@ import static java.lang.String.format;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.assertEquals;
 
-public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
+public class TestSfa110WktWkbCodec extends CodecUnitTestBase  {
 
-    static final private Logger LOGGER = LoggerFactory.getLogger(TestSFA110WktWkbCodec.class);
-    final private SFA110WkkWkbTestCases testCases = new SFA110WkkWkbTestCases();
+    static final private Logger LOGGER = LoggerFactory.getLogger(TestSfa110WktWkbCodec.class);
+    final private Sfa110WkkWkbTestCases testCases = new Sfa110WkkWkbTestCases();
 
     @Test
     public void test_3d_crs_encoded() {
@@ -67,11 +67,11 @@ public class TestSFA110WktWkbCodec  extends CodecUnitTestBase  {
 
     @Override
     protected WkbDecoder getWkbDecoder() {
-        return new SFA110WkbDecoder();
+        return new Sfa110WkbDecoder();
     }
 
     @Override
     protected WkbEncoder getWkbEncoder() {
-        return new SFA110WkbEncoder();
+        return new Sfa110WkbEncoder();
     }
 }

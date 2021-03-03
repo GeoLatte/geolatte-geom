@@ -14,7 +14,7 @@ class Sfa110WktEncoder implements WktEncoder {
 class Sfa110WktWriter extends BaseWktWriter {
 
     public Sfa110WktWriter() {
-        super(SFA110WktDialect.INSTANCE, new StringBuilder());
+        super(Sfa110WktDialect.INSTANCE, new StringBuilder());
     }
 
     @Override

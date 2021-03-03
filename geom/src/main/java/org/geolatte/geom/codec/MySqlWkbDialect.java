@@ -4,7 +4,7 @@ import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
-class MySqlWkbDialect extends SFA110WkbDialect {
+class MySqlWkbDialect extends Sfa110WkbDialect {
     final public static WkbDialect INSTANCE = new MySqlWkbDialect();
 
     @Override

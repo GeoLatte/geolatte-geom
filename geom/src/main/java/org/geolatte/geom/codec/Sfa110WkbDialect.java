@@ -4,11 +4,11 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
-public class SFA110WkbDialect extends WkbDialect {
+public class Sfa110WkbDialect extends WkbDialect {
 
-    public final static SFA110WkbDialect INSTANCE = new SFA110WkbDialect();
+    public final static Sfa110WkbDialect INSTANCE = new Sfa110WkbDialect();
 
-    protected SFA110WkbDialect() {
+    protected Sfa110WkbDialect() {
 
     }
 

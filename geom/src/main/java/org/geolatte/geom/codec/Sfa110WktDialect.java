@@ -1,8 +1,8 @@
 package org.geolatte.geom.codec;
 
-public class SFA110WktDialect extends WktDialect {
+public class Sfa110WktDialect extends WktDialect {
 
-    public static final SFA110WktDialect INSTANCE = new SFA110WktDialect();
+    public static final Sfa110WktDialect INSTANCE = new Sfa110WktDialect();
 
     @Override
     boolean writeMultiPointAsListOfPositions() {
