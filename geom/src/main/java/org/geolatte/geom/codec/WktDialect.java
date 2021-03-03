@@ -32,7 +32,7 @@ public class WktDialect {
         return Collections.unmodifiableMap(GEOMETRY_TYPE_PATTERN_MAP);
     }
 
-    void addGeometryTag(StringBuffer buffer, Geometry<?> geometry) {
+    void addGeometryTag(StringBuilder buffer, Geometry<?> geometry) {
         switch (geometry.getGeometryType()) {
             case POINT:
                 buffer.append("POINT");
@@ -74,13 +74,13 @@ public class WktDialect {
         return false;
     }
 
-    void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+    void addGeometryZMMarker(StringBuilder buffer, Geometry<?> geometry) {
         if (geometry.hasM() && geometry.getCoordinateDimension() < 4)
             buffer.append('M');
     }
 
 
-    public void addSrid(StringBuffer builder, int srid) {
+    public void addSrid(StringBuilder builder, int srid) {
 
     }
 

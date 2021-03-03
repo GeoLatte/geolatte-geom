@@ -2,35 +2,20 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.FieldPosition;
-import java.text.NumberFormat;
-import java.util.Locale;
+class BaseWktWriter {
 
-class BaseWktEncoder implements WktEncoder {
-
-    //StringBuffer used so we can use DecimalFormat.format(double, StringBuffer, FieldPosition);
-    private StringBuffer builder;
+    private final StringBuilder builder;
     private final WktDialect dialect;
-    private final PositionEncoder positionEncoder = new PositionEncoder();
 
     /**
      * Constructs an instance.
      */
-    public BaseWktEncoder(WktDialect variant) {
+    public BaseWktWriter(WktDialect variant, StringBuilder builder) {
         this.dialect = variant;
+        this.builder = builder;
     }
 
-    /**
-     * Encodes the specified <code>Geometry</code>.
-     *
-     * @param geometry the <code>Geometry</code> to encode
-     * @return the WKT representation of the given geometry
-     */
-    @Override
-    public <P extends Position> String encode(Geometry<P> geometry) {
-        builder = new StringBuffer();
+    public <P extends Position> String writeGeometry(Geometry<P> geometry) {
         addSrid(geometry.getSRID());
         addGeometry(geometry, true);
         return result();
@@ -158,7 +143,19 @@ class BaseWktEncoder implements WktEncoder {
                 addDelimiter();
             }
             setCoordinatesToWrite(positions, i, coords);
-            positionEncoder.addPoint(builder, coords);
+            for (int k = 0; k < coords.length; k++) {
+                //this is locale independent as it should be
+                if (k > 0) builder.append(' ');
+                builder.append(formatCoordinate(coords[k]));
+            }
+        }
+    }
+
+    private String formatCoordinate(double coord) {
+        if (coord == (long) coord) {
+            return String.valueOf((long) coord);
+        } else {
+            return String.valueOf(coord);
         }
     }
 
@@ -183,26 +180,5 @@ class BaseWktEncoder implements WktEncoder {
         return builder.toString();
     }
 
-    static class PositionEncoder {
-        private static final int MAX_FRACTIONAL_DIGITS = 15;
-        private static final DecimalFormatSymbols US_DECIMAL_FORMAT_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
-
-        private final FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
-        private final NumberFormat formatter;
-
-        PositionEncoder() {
-            formatter = new DecimalFormat("0.#", US_DECIMAL_FORMAT_SYMBOLS);
-            formatter.setMaximumFractionDigits(MAX_FRACTIONAL_DIGITS);
-        }
-
-        public void addPoint(StringBuffer buffer, double[] coords) {
-            for (int i = 0; i < coords.length; i++) {
-                if (i > 0) {
-                    buffer.append(' ');
-                }
-                formatter.format(coords[i], buffer, fp);
-            }
-        }
-    }
 }
 

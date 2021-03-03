@@ -30,15 +30,17 @@ import org.geolatte.geom.Geometry;
  */
 class PostgisWktDialect extends WktDialect {
 
+    final static PostgisWktDialect INSTANCE = new PostgisWktDialect();
+
     @Override
-    void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+    void addGeometryZMMarker(StringBuilder builder, Geometry<?> geometry) {
         if (geometry.hasM() && geometry.getCoordinateDimension() < 4) {
-            buffer.append('M');
+            builder.append('M');
         }
     }
 
     @Override
-    public void addSrid(StringBuffer builder, int srid) {
+    public void addSrid(StringBuilder builder, int srid) {
         if (srid > 0) {
             builder.append("SRID=")
                     .append(srid)

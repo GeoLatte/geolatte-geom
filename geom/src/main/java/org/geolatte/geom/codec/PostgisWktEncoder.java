@@ -21,8 +21,8 @@
 
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.PositionSequence;
 
 /**
  * Encodes geometries to Postgis WKT/EWKT representations.
@@ -31,18 +31,11 @@ import org.geolatte.geom.PositionSequence;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktEncoder extends BaseWktEncoder {
+class PostgisWktEncoder implements WktEncoder {
 
-    /**
-     * Constructs an instance.
-     */
-    public PostgisWktEncoder() {
-        super(new PostgisWktDialect());
+
+    @Override
+    public <P extends Position> String encode(Geometry<P> geometry) {
+        return new BaseWktWriter(PostgisWktDialect.INSTANCE, new StringBuilder()).writeGeometry(geometry);
     }
-
-    public PostgisWktEncoder(PostgisWktDialect dialect) {
-        super(dialect);
-    }
-
-
 }

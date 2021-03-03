@@ -30,8 +30,10 @@ import org.geolatte.geom.Geometry;
  */
 class HANAWktDialect extends PostgisWktDialect {
 
+    final static HANAWktDialect INSTANCE = new HANAWktDialect();
+
     @Override
-    void addGeometryZMMarker(StringBuffer buffer, Geometry<?> geometry) {
+    void addGeometryZMMarker(StringBuilder buffer, Geometry<?> geometry) {
         if (geometry.hasZ()) {
             buffer.append(" Z");
             if (geometry.hasM()) {
@@ -43,7 +45,7 @@ class HANAWktDialect extends PostgisWktDialect {
     }
 
     @Override
-    public void addSrid(StringBuffer builder, int srid) {
+    public void addSrid(StringBuilder builder, int srid) {
         if (srid < 0) srid = 0;
         builder.append("SRID=")
                 .append(srid)

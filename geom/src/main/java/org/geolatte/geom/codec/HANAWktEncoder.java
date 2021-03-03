@@ -20,17 +20,20 @@
  */
 package org.geolatte.geom.codec;
 
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+
 /**
  * The HANA EWKT representation differs from the Postgis EWKT representation in that HANA always requires an SRID to be
  * written, even if its not specified or 0. Also, HANA uses a slightly different set of keywords.
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWktEncoder extends PostgisWktEncoder {
+class HANAWktEncoder implements WktEncoder {
 
-    public HANAWktEncoder() {
-        super(new HANAWktDialect());
+
+    @Override
+    public <P extends Position> String encode(Geometry<P> geometry) {
+        return new BaseWktWriter(HANAWktDialect.INSTANCE, new StringBuilder()).writeGeometry(geometry);
     }
-
-
 }
