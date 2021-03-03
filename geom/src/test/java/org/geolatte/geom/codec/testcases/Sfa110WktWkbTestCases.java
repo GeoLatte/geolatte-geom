@@ -7,11 +7,11 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
 import static org.geolatte.geom.builder.DSL.*;
 
-public class Sfa110WkkWkbTestCases extends WktWkbCodecTestBase {
+public class Sfa110WktWkbTestCases extends WktWkbCodecTestBase {
 
     public static final CoordinateReferenceSystem<C2D> crs = CoordinateReferenceSystems.PROJECTED_2D_METER;
 
-    public Sfa110WkkWkbTestCases() {
+    public Sfa110WktWkbTestCases() {
 
         addCase(1,
                 "POINT(1.52 2.43)",

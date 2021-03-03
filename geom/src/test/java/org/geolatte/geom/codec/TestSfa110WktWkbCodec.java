@@ -2,7 +2,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.testcases.CodecUnitTestBase;
-import org.geolatte.geom.codec.testcases.Sfa110WkkWkbTestCases;
+import org.geolatte.geom.codec.testcases.Sfa110WktWkbTestCases;
 import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class TestSfa110WktWkbCodec extends CodecUnitTestBase  {
 
     static final private Logger LOGGER = LoggerFactory.getLogger(TestSfa110WktWkbCodec.class);
-    final private Sfa110WkkWkbTestCases testCases = new Sfa110WkkWkbTestCases();
+    final private Sfa110WktWkbTestCases testCases = new Sfa110WktWkbTestCases();
 
     @Test
     public void test_3d_crs_encoded() {
