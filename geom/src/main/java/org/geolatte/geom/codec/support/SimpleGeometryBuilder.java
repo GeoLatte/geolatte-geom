@@ -29,4 +29,9 @@ public class SimpleGeometryBuilder extends GeometryBuilder {
         this.positions = positions;
     }
 
+    @Override
+    public boolean isEmpty() {
+        return positions == null || positions.isEmpty();
+    }
+
 }

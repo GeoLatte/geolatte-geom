@@ -29,6 +29,7 @@ class BaseWktParser<P extends Position> {
     GeometryType type;
     GeometryBuilder builder;
     boolean hasMMark = false;
+    boolean hasZMark = false;
 
     enum Delimiter {CLOSE, OPEN, SEP, NO_DELIM}
 
@@ -78,6 +79,9 @@ class BaseWktParser<P extends Position> {
     }
 
     protected CoordinateReferenceSystem<?> widenCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
+        if (builder.isEmpty()) {
+            return CoordinateReferenceSystems.adjustTo(crs, hasZMark, hasMMark);
+        }
         return CoordinateReferenceSystems.adjustTo(crs, builder.getCoordinateDimension(), hasMMark);
     }
 
@@ -137,9 +141,35 @@ class BaseWktParser<P extends Position> {
 
     }
 
+
     protected Holder matchesMultiPointList() {
-        return matchesPositionList();
+        if (!tokenizer.matchesOpenList()) {
+            throw new WktDecodeException("Expected '(' near position " + tokenizer.currentPos());
+        }
+        LinearPositionsHolder lplh = new LinearPositionsHolder();
+        Delimiter d;
+        do {
+            boolean expectClose = matchesOptionalOpenList();
+            lplh.push(matchesPosition());
+            expectCloseList(expectClose);
+            d = matchesDelimiter();
+            if (d == Delimiter.NO_DELIM) {
+                throw new WktDecodeException(String.format("Expected ')' or ',' near %d", tokenizer.currentPos()));
+            }
+        } while (d != Delimiter.CLOSE);
+        return lplh;
     }
+
+    protected boolean matchesOptionalOpenList() {
+        return tokenizer.matchesOpenList();
+    }
+
+    protected void expectCloseList(boolean expect) {
+        if (expect && !tokenizer.matchesCloseList()) {
+            throw new WktDecodeException(String.format("Expected ')' or ',' near %d", tokenizer.currentPos()));
+        }
+    }
+
 
     protected void matchGeometries(CollectionGeometryBuilder builder) {
         if (!tokenizer.matchesOpenList()) {

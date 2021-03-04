@@ -27,7 +27,7 @@ class BaseWktWriter {
 
     protected <P extends Position> void addGeometry(Geometry<P> geometry, boolean topLevel) {
         addGeometryTag(geometry);
-        if (topLevel) addGeometryZMMarker(geometry);
+        addGeometryZMMarker(geometry);
         addGeometryText(geometry);
     }
 

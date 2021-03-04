@@ -45,7 +45,7 @@ class WkbDialect {
 
     <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo) {
         ByteBuffer buffer = mkByteBuffer(geom, bo);
-        return new SFA110WkbVisitor<>(buffer, this);
+        return new BaseWkbVisitor<>(buffer, this);
     }
 
     protected <P extends Position> ByteBuffer mkByteBuffer(Geometry<P> geom, ByteOrder bo) {
@@ -118,10 +118,6 @@ class WkbDialect {
     }
 
     protected <P extends Position> Long geometryTypeCode(Geometry<P> geometry) {
-//        //empty geometries have the same representation as an empty geometry collection
-//        if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
-//            return WkbGeometryType.GEOMETRY_COLLECTION.getTypeCode();
-//        }
         for (Map.Entry<Long, GeometryType> tpe : typemap.entrySet()) {
             if (tpe.getValue() == geometry.getGeometryType()) {
                 return tpe.getKey();
@@ -134,18 +130,5 @@ class WkbDialect {
                 )
         );
 
-    }
-}
-
-class SFA110WkbVisitor<P extends Position> extends BaseWkbVisitor<P> {
-
-    SFA110WkbVisitor(ByteBuffer byteBuffer, WkbDialect dialect) {
-        super(byteBuffer, dialect);
-    }
-
-    @Override
-    protected void writePoint(double[] coordinates, ByteBuffer output) {
-        output.putDouble(coordinates[0]);
-        output.putDouble(coordinates[1]);
     }
 }

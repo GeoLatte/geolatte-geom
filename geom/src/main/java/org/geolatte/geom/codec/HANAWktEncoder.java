@@ -29,11 +29,23 @@ import org.geolatte.geom.Position;
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWktEncoder implements WktEncoder {
+public class HANAWktEncoder implements WktEncoder {
 
 
     @Override
     public <P extends Position> String encode(Geometry<P> geometry) {
-        return new BaseWktWriter(HANAWktDialect.INSTANCE, new StringBuilder()).writeGeometry(geometry);
+        return new HANAWktWriter(new StringBuilder()).writeGeometry(geometry);
     }
 }
+
+class HANAWktWriter extends BaseWktWriter {
+
+    public HANAWktWriter(StringBuilder builder) {
+        super(HANAWktDialect.INSTANCE, builder);
+    }
+
+    protected <P extends Position> void addGeometry(Geometry<P> geometry, boolean topLevel) {
+        addGeometryTag(geometry);
+        if(topLevel) addGeometryZMMarker(geometry);
+        addGeometryText(geometry);
+    }}

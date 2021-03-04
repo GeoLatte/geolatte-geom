@@ -34,4 +34,9 @@ public class CollectionGeometryBuilder extends GeometryBuilder {
     public void setPositions(Holder positions) {
         throw new IllegalStateException("Can't set positions directly on this instance");
     }
+
+    @Override
+    public boolean isEmpty() {
+        return this.components.isEmpty();
+    }
 }

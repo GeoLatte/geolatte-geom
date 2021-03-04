@@ -19,5 +19,7 @@ abstract public class GeometryBuilder {
     abstract public int getCoordinateDimension();
 
     abstract public void setPositions(Holder positions);
+
+    abstract public boolean isEmpty();
 }
 

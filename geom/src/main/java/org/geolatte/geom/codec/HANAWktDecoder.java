@@ -49,7 +49,7 @@ class HANAWktParser<P extends Position> extends PostgisWktParser<P> {
     protected void matchesOptionalZMMarkers() {
         tokenizer.skipWhitespace();
         if (tokenizer.matchesOneOf('Z', 'z').isPresent()) {
-            //no need to remember, just consume the token
+            this.hasZMark = true;
         }
         if (tokenizer.matchesOneOf('M', 'm').isPresent()) {
             this.hasMMark = true;

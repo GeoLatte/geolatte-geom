@@ -63,6 +63,9 @@ class PostgisWktParser<P extends Position> extends BaseWktParser<P> {
     @Override
     protected void matchesOptionalZMMarkers() {
         tokenizer.skipWhitespace();
+        if (tokenizer.matchesOneOf('Z', 'z').isPresent()) {
+            this.hasZMark = true;
+        }
         if (tokenizer.matchesOneOf('M', 'm').isPresent()) {
             this.hasMMark = true;
         }
@@ -81,32 +84,5 @@ class PostgisWktParser<P extends Position> extends BaseWktParser<P> {
         }
     }
 
-    @Override
-    protected Holder matchesMultiPointList() {
-        if (!tokenizer.matchesOpenList()) {
-            throw new WktDecodeException("Expected '(' near position " + tokenizer.currentPos());
-        }
-        LinearPositionsHolder lplh = new LinearPositionsHolder();
-        Delimiter d;
-        do {
-            boolean expectClose = matchesOptionalOpenList();
-            lplh.push(matchesPosition());
-            expectCloseList(expectClose);
-            d = matchesDelimiter();
-            if (d == Delimiter.NO_DELIM) {
-                throw new WktDecodeException(String.format("Expected ')' or ',' near %d", tokenizer.currentPos()));
-            }
-        } while (d != Delimiter.CLOSE);
-        return lplh;
-    }
 
-    protected boolean matchesOptionalOpenList() {
-        return tokenizer.matchesOpenList();
-    }
-
-    protected void expectCloseList(boolean expect) {
-        if (expect && !tokenizer.matchesCloseList()) {
-            throw new WktDecodeException(String.format("Expected ')' or ',' near %d", tokenizer.currentPos()));
-        }
-    }
 }
