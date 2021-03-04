@@ -14,7 +14,7 @@ public class Sfa110WktWkbTestCases extends WktWkbCodecTestBase {
 
         addCase(1,
                 "POINT(1.52 2.43)",
-                "010100000000000000EC51F83F00000000A4700340",
+                "010100000052b81e85eb51f83f713d0ad7a3700340",
                 point(crs, c(1.52, 2.43))
         );
 
