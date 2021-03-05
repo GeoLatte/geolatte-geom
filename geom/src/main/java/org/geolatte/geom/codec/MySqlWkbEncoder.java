@@ -27,6 +27,8 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
 /**
+ * A WKB Encoder for MySQL
+ *
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 11/1/12
  */

@@ -27,8 +27,6 @@ import org.geolatte.geom.Position;
 /**
  * Encodes geometries to Postgis WKT/EWKT representations.
  *
- * <p>This class is not thread-safe.</p>
- *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
 public class PostgisWktEncoder implements WktEncoder {

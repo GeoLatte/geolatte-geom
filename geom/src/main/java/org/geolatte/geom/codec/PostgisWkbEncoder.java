@@ -28,12 +28,15 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
 /**
- * A WKBEncoder for the PostGIS EWKB dialect (versions 1.0 to 1.5).
+ * A WKBEncoder for the PostGIS EWKB dialect (for Postgis  versions < 2.2.2).
  *
- * <p>This class is not thread-safe.</p>
+ *<p>This {@code WKBEncoder} encodes empty points as empty GeometryCollections. This convention
+ * was changed in Postgis version 2.2.2 to an encoding with NaN coordinates. For the later convention
+ * use the {@code PostgisWkbV2Encoder}</p>
  *
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Nov 11, 2010
+ * @see PostgisWkbV2Encoder
  */
 public class PostgisWkbEncoder implements WkbEncoder {
     final private WkbDialect dialect;

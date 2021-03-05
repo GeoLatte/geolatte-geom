@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
-public class TestPostgisWkb2EncoderDecoder extends TestPostgisWkbEncoderDecoder{
+public class TestPostgisWkbV2EncoderDecoder extends TestPostgisWkbEncoderDecoder{
 
     @Test
     public void test_empty_point() {
@@ -25,11 +25,11 @@ public class TestPostgisWkb2EncoderDecoder extends TestPostgisWkbEncoderDecoder{
 
     @Override
     protected WkbEncoder encoder() {
-        return new PostgisWkb2Encoder();
+        return new PostgisWkbV2Encoder();
     }
 
     @Override
     protected WkbDecoder decoder() {
-        return new PostgisWkbV2Decoder();
+        return new PostgisWkbDecoder();
     }
 }

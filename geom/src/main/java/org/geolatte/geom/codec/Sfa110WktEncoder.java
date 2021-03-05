@@ -3,6 +3,9 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
+/**
+ * A WKT encoder for the format specified in Simple Feature Access, version 1.1.0
+ */
 public class Sfa110WktEncoder implements WktEncoder {
 
     @Override

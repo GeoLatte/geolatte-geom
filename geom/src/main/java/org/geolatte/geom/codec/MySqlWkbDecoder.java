@@ -30,6 +30,8 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 
 /**
+ * A WKB Decoder for MySQL
+ *
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 11/1/12
  */

@@ -5,6 +5,9 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+/**
+ * A WKB decoder for the format specified in Simple Feature Access, version 1.2.1
+ */
 public class Sfa121WkbDecoder implements WkbDecoder {
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {

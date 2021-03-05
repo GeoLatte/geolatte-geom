@@ -4,6 +4,9 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
+/**
+ * A WKT decoder for the format specified in Simple Feature Access, version 1.2.1
+ */
 public class Sfa121WktDecoder implements WktDecoder {
 
     @Override

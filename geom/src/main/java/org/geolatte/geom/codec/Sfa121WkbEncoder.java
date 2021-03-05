@@ -5,6 +5,9 @@ import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
+/**
+ * A WKB encoder for the format specified in Simple Feature Access, version 1.2.1
+ */
 public class Sfa121WkbEncoder implements WkbEncoder {
 
     @Override

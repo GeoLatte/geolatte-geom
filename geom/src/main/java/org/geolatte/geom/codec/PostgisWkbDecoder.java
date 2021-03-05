@@ -32,13 +32,13 @@ import org.geolatte.geom.crs.CrsRegistry;
 
 /**
  * A Wkb Decoder for PostGIS EWKB
- * <p>This WKBDecoder supports the EWKB dialect of PostGIS versions 1.0 tot 1.5+.</p>
- * <p>This implementation is not thread-safe.</p>
+ *
+ * <p>This WKB Decoder interprets Points with NaN coordinates as empty points.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Nov 11, 2010
  */
-public class PostgisWkbV1Decoder implements WkbDecoder {
+public class PostgisWkbDecoder implements WkbDecoder {
 
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {
