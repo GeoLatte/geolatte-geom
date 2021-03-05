@@ -2,7 +2,7 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 
-public class Sfa121WktDialect extends WktDialect{
+class Sfa121WktDialect extends WktDialect{
 
     final static Sfa121WktDialect INSTANCE = new Sfa121WktDialect();
 

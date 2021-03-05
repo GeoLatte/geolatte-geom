@@ -31,7 +31,7 @@ import org.geolatte.geom.Position;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-class PostgisWktEncoder implements WktEncoder {
+public class PostgisWktEncoder implements WktEncoder {
 
 
     @Override

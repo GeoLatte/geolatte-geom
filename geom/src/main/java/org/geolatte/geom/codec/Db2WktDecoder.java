@@ -10,7 +10,7 @@ package org.geolatte.geom.codec;
  * Created by Karel Maesen,Geovise BVBA on 05/06/17.
  */
 
-class Db2Decoder extends HANAWktDecoder {
+public class Db2WktDecoder extends HANAWktDecoder {
 
     //DB2 and HANA use the same (E)WKT format, so we just inherit (so later we can substitute a different implementation should the need arise
 }

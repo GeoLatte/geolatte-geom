@@ -3,7 +3,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
-public class PostgisWkbV1Dialect extends WkbDialect {
+class PostgisWkbV1Dialect extends WkbDialect {
 
     final public static WkbDialect INSTANCE = new PostgisWkbV1Dialect();
 

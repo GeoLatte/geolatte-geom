@@ -29,7 +29,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbEncoder implements WkbEncoder {
+public class HANAWkbEncoder implements WkbEncoder {
     @Override
     public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
         BaseWkbVisitor<P> visitor = HANAWkbDialect.INSTANCE.mkVisitor(geometry, byteOrder);

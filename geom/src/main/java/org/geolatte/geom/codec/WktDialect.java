@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import static org.geolatte.geom.GeometryType.*;
 
-public class WktDialect {
+class WktDialect {
 
     final static Map<GeometryType, Pattern> GEOMETRY_TYPE_PATTERN_MAP = new HashMap<>();
 

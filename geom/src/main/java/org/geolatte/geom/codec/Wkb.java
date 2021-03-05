@@ -24,6 +24,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,11 @@ public class Wkb {
         SFA_1_1_0,
 
         /**
+         * Implements SFA vs 1.2.1, OGC document <a href="https://portal.ogc.org/files/?artifact_id=25355">06-103r4</a>
+         */
+        SFA_1_2_1,
+
+        /**
          * the PostGIS EWKB dialect (version < 2.2.1).
          * This encodes an empty {@code Point} as an empty {@code GeometryCollection}
          */
@@ -54,7 +60,7 @@ public class Wkb {
 
         /**
          * the PostGIS EWKB dialect (version >= 2.2.2).
-         * This encodes an empty {@code Point} as an {@Point} with coordinates (NaN, NaN).
+         * This encodes an empty {@code Point} as an {@code Point} with coordinates (NaN, NaN).
          */
         POSTGIS_EWKB_2,
 
@@ -64,17 +70,19 @@ public class Wkb {
 
     private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKB_2;
 
-    private static final Map<Dialect, Class<? extends WkbDecoder>> DECODERS = new HashMap<Dialect, Class<? extends WkbDecoder>>();
-    private static final Map<Dialect, Class<? extends WkbEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WkbEncoder>>();
+    private static final Map<Dialect, Class<? extends WkbDecoder>> DECODERS = new HashMap<>();
+    private static final Map<Dialect, Class<? extends WkbEncoder>> ENCODERS = new HashMap<>();
 
 
     static {
         DECODERS.put(Dialect.SFA_1_1_0, Sfa110WkbDecoder.class);
+        DECODERS.put(Dialect.SFA_1_2_1, Sfa121WkbDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbV1Decoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkbV2Decoder.class);
         DECODERS.put(Dialect.MYSQL_WKB, MySqlWkbDecoder.class);
         DECODERS.put(Dialect.HANA_EWKB, HANAWkbDecoder.class);
         ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WkbEncoder.class);
+        ENCODERS.put(Dialect.SFA_1_2_1, Sfa121WkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_1, PostgisWkbEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKB_2, PostgisWkb2Encoder.class);
         ENCODERS.put(Dialect.MYSQL_WKB, MySqlWkbEncoder.class);
@@ -90,7 +98,7 @@ public class Wkb {
      * @param geometry The <code>Geometry</code> to be encoded as WKB.
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
-    public static ByteBuffer toWkb(Geometry geometry) {
+    public static <P extends Position> ByteBuffer toWkb(Geometry<P> geometry) {
         return toWkb(geometry, ByteOrder.NDR);
     }
 
@@ -172,9 +180,7 @@ public class Wkb {
         }
         try {
             return codecClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

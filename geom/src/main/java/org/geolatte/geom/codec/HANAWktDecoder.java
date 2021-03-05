@@ -30,7 +30,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWktDecoder implements WktDecoder {
+public class HANAWktDecoder implements WktDecoder {
 
     @Override
     public <P extends Position> Geometry<P> decode(String wkt, CoordinateReferenceSystem<P> crs) {

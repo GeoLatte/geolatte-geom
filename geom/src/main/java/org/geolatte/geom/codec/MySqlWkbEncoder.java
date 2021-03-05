@@ -30,7 +30,7 @@ import org.geolatte.geom.Position;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 11/1/12
  */
-class MySqlWkbEncoder implements WkbEncoder {
+public class MySqlWkbEncoder implements WkbEncoder {
 
     @Override
     public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {

@@ -4,7 +4,7 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
 
-public class PostgisWkbV2Dialect extends PostgisWkbV1Dialect {
+class PostgisWkbV2Dialect extends PostgisWkbV1Dialect {
 
     final public static PostgisWkbV2Dialect INSTANCE = new PostgisWkbV2Dialect();
 

@@ -4,7 +4,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SimpleTokenizer {
+class SimpleTokenizer {
 
     final public static char openListChar = '(';
     final public static char closeListChar = ')';

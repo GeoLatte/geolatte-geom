@@ -1,8 +1,10 @@
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.*;
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryType;
+import org.geolatte.geom.Position;
 
-public class Sfa121WkbDialect extends WkbDialect {
+class Sfa121WkbDialect extends WkbDialect {
 
     final static Sfa121WkbDialect INSTANCE = new Sfa121WkbDialect();
 

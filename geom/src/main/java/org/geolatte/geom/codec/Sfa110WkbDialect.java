@@ -5,7 +5,7 @@ import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
-public class Sfa110WkbDialect extends WkbDialect {
+class Sfa110WkbDialect extends WkbDialect {
 
     public final static Sfa110WkbDialect INSTANCE = new Sfa110WkbDialect();
 

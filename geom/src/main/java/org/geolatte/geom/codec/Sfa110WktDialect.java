@@ -1,6 +1,6 @@
 package org.geolatte.geom.codec;
 
-public class Sfa110WktDialect extends WktDialect {
+class Sfa110WktDialect extends WktDialect {
 
     public static final Sfa110WktDialect INSTANCE = new Sfa110WktDialect();
 

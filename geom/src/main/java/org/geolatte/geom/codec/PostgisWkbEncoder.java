@@ -35,7 +35,7 @@ import org.geolatte.geom.Position;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Nov 11, 2010
  */
-class PostgisWkbEncoder implements WkbEncoder {
+public class PostgisWkbEncoder implements WkbEncoder {
     final private WkbDialect dialect;
 
     protected PostgisWkbEncoder(WkbDialect dialect) {

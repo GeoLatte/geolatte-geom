@@ -43,6 +43,12 @@ public class Wkt {
          * Implements SFA vs 1.1.0, OGC document <a href="http://portal.opengeospatial.org/files/?artifact_id=13227">05_126</a>
          */
         SFA_1_1_0,
+
+        /**
+         * Implements SFA vs 1.2.1, OGC document <a href="https://portal.ogc.org/files/?artifact_id=25355">06-103r4</a>
+         */
+        SFA_1_2_1,
+
         /**
          * the PostGIS EWKT dialect (versions 1.0 and later).
          */
@@ -54,16 +60,18 @@ public class Wkt {
 
     private static final Dialect DEFAULT_DIALECT = Dialect.POSTGIS_EWKT_1;
 
-    private static final Map<Dialect, Class<? extends WktDecoder>> DECODERS = new HashMap<Dialect, Class<? extends WktDecoder>>();
-    private static final Map<Dialect, Class<? extends WktEncoder>> ENCODERS = new HashMap<Dialect, Class<? extends WktEncoder>>();
+    private static final Map<Dialect, Class<? extends WktDecoder>> DECODERS = new HashMap<>();
+    private static final Map<Dialect, Class<? extends WktEncoder>> ENCODERS = new HashMap<>();
 
     static {
         DECODERS.put(Dialect.SFA_1_1_0, Sfa110WktDecoder.class);
+        DECODERS.put(Dialect.SFA_1_2_1, Sfa121WktDecoder.class);
         DECODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktDecoder.class);
         DECODERS.put(Dialect.MYSQL_WKT, PostgisWktDecoder.class); // use also the PostgisWktDecoder since it can handle everything from Mysql
         DECODERS.put(Dialect.HANA_EWKT, HANAWktDecoder.class);
-        DECODERS.put(Dialect.DB2_WKT, Db2Decoder.class);
+        DECODERS.put(Dialect.DB2_WKT, Db2WktDecoder.class);
         ENCODERS.put(Dialect.SFA_1_1_0, Sfa110WktEncoder.class);
+        ENCODERS.put(Dialect.SFA_1_2_1, Sfa121WktEncoder.class);
         ENCODERS.put(Dialect.POSTGIS_EWKT_1, PostgisWktEncoder.class);
         ENCODERS.put(Dialect.MYSQL_WKT, PostgisWktEncoder.class); // this is temporary, not everything it produces can be understood by MySQL
         ENCODERS.put(Dialect.HANA_EWKT, HANAWktEncoder.class);
@@ -115,7 +123,7 @@ public class Wkt {
     /**
      * Creates a <code>WktDecoder</code> for the default dialect (Postgis 1.x EWKT).
      *
-     * @return
+     * @return an instance of the default {@code WktDecoder}
      */
     public static WktDecoder newDecoder() {
         return newDecoder(DEFAULT_DIALECT);

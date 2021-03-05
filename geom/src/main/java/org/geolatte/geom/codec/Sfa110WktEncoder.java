@@ -3,7 +3,7 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
-class Sfa110WktEncoder implements WktEncoder {
+public class Sfa110WktEncoder implements WktEncoder {
 
     @Override
     public <P extends Position> String encode(Geometry<P> geometry) {

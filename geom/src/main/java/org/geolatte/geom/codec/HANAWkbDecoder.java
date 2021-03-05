@@ -28,14 +28,12 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
 
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.PROJECTED_2D_METER;
-
 /**
  * The HANA EWKB decoder is equivalent to the Postgis EWKB decoder and is there mostly for symmetry reasons.
  *
  * @author Jonathan Bregler, SAP
  */
-class HANAWkbDecoder implements WkbDecoder {
+public class HANAWkbDecoder implements WkbDecoder {
 
     @Override
     public <P extends Position> Geometry<P> decode(ByteBuffer byteBuffer, CoordinateReferenceSystem<P> crs) {

@@ -23,8 +23,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.codec.support.Holder;
-import org.geolatte.geom.codec.support.LinearPositionsHolder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;

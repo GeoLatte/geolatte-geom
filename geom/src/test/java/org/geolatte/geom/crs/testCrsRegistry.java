@@ -21,7 +21,6 @@
 
 package org.geolatte.geom.crs;
 
-import jdk.internal.util.xml.impl.Input;
 import org.geolatte.geom.codec.CrsWktDecoder;
 import org.junit.Test;
 

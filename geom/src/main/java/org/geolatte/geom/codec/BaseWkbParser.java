@@ -3,7 +3,6 @@ package org.geolatte.geom.codec;
 import org.geolatte.geom.*;
 import org.geolatte.geom.codec.support.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.PROJECTED_2D_METER;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.adjustTo;

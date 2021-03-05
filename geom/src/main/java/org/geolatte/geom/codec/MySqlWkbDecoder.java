@@ -25,19 +25,15 @@ import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.ByteOrder;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.codec.support.DecodeException;
-import org.geolatte.geom.codec.support.GeometryBuilder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsRegistry;
-
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.adjustTo;
 
 /**
  * @author Karel Maesen, Geovise BVBA
  * creation-date: 11/1/12
  */
-class MySqlWkbDecoder implements WkbDecoder {
+public class MySqlWkbDecoder implements WkbDecoder {
 
 
     @Override
