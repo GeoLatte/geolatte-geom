@@ -21,7 +21,14 @@
 
 package org.geolatte.geom.crs;
 
+import jdk.internal.util.xml.impl.Input;
+import org.geolatte.geom.codec.CrsWktDecoder;
 import org.junit.Test;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -49,6 +56,25 @@ public class testCrsRegistry {
         CrsId crs = CrsRegistry.getCrsIdForEPSG(4326);
         assertNotNull(crs);
         assertEquals(4326,crs.getCode());
+    }
+
+    @Test
+    public void test_we_can_parse_everything_in_db() throws IOException {
+        InputStream in = CrsRegistry.class.getClassLoader().getResourceAsStream("spatial_ref_sys.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+        CrsWktDecoder decoder = new CrsWktDecoder();
+        String line = reader.readLine();
+        while (line != null) {
+            String[] tokens = line.split("\\|");
+            if (!"EPSG".equals(tokens[0])) {
+                line = reader.readLine();
+                continue;
+            }
+            int srid = Integer.parseInt(tokens[1]);
+            CoordinateReferenceSystem<?> crs = decoder.decode(tokens[2], srid);
+            line = reader.readLine();
+        }
+
     }
 
 }
