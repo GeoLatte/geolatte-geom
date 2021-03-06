@@ -51,7 +51,7 @@ public class LinearRing<P extends Position> extends LineString<P> {
     }
 
     private void checkIsClosed(){
-        if (isEmpty() || (isClosed() && getNumPositions() > 3)) return;
+        if (isEmpty() || (isClosed() && getNumPositions() >= 3)) return;
         throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed or contains < 4 points.");
     }
 

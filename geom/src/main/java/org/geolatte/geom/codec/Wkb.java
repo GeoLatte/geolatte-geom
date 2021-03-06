@@ -108,6 +108,33 @@ public class Wkb {
      *
      * @param geometry  The <code>Geometry</code> to be encoded as WKB.
      * @param byteOrder The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
+     * @param dialect the WKB dialect to use
+     * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
+     */
+    public static ByteBuffer toWkb(Geometry<?> geometry, ByteOrder byteOrder, Dialect dialect) {
+        WkbEncoder encoder = newEncoder(dialect);
+        return encoder.encode(geometry, byteOrder);
+    }
+
+    /**
+     * Encodes a <code>Geometry</code> into a WKB representation using the NDR (little-endian)  byte-order.
+     *
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
+     *
+     * @param geometry The <code>Geometry</code> to be encoded as WKB.
+     * @param dialect the WKB dialect to use
+     * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
+     */
+    public static <P extends Position> ByteBuffer toWkb(Geometry<P> geometry, Dialect dialect) {
+        return toWkb(geometry, ByteOrder.NDR, dialect);
+    }
+
+    /**
+     * Encodes a <code>Geometry</code> into a WKB representation using the specified byte-order.
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
+     *
+     * @param geometry  The <code>Geometry</code> to be encoded as WKB.
+     * @param byteOrder The WKB byte order, either {@link ByteOrder#XDR XDR} or {@link ByteOrder#NDR NDR}
      * @return A buffer of bytes that contains the WKB-encoded <code>Geometry</code>.
      */
     public static ByteBuffer toWkb(Geometry<?> geometry, ByteOrder byteOrder) {
@@ -124,6 +151,19 @@ public class Wkb {
      */
     public static Geometry<?> fromWkb(ByteBuffer byteBuffer) {
         WkbDecoder decoder = newDecoder(DEFAULT_DIALECT);
+        return decoder.decode(byteBuffer);
+    }
+
+    /**
+     * Decodes a WKB representation in a <code>ByteBuffer</code> to a <code>Geometry</code>.
+     * <p>This methods uses the default WKB dialect (Postgis v1.5 EWKB ).</p>
+     *
+     * @param byteBuffer A buffer of bytes that contains a WKB-encoded <code>Geometry</code>.
+     * @param dialect the WKB dialect to use
+     * @return The <code>Geometry</code> that is encoded in the WKB.
+     */
+    public static Geometry<?> fromWkb(ByteBuffer byteBuffer, Dialect dialect) {
+        WkbDecoder decoder = newDecoder(dialect);
         return decoder.decode(byteBuffer);
     }
 

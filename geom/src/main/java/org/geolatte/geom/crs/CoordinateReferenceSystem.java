@@ -106,6 +106,13 @@ public abstract class CoordinateReferenceSystem<P extends Position> extends CrsI
         return false;
     }
 
+    public <Q extends P> CoordinateReferenceSystem<Q> addVerticalSystem(LinearUnit unit, Class<Q> clazz){
+        return CoordinateReferenceSystems.addVerticalSystem(this, clazz, unit);
+    }
+
+    public <Q extends P> CoordinateReferenceSystem<Q> addLinearSystem(LinearUnit unit, Class<Q> clazz){
+        return CoordinateReferenceSystems.addLinearSystem(this, clazz, unit);
+    }
 
     @Override
     public boolean equals(Object o) {

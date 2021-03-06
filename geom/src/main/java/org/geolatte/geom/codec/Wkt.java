@@ -84,7 +84,8 @@ public class Wkt {
      * <p>This method uses the default WKT dialect (Postgis v1.5 EWKT)</p>
      *
      * @param wkt the WKT string to decode
-     * @return The decoded Geometry
+     * @param crs the Coordinate Reference System for the result
+     * @return The decoded Geometry in the specified reference system
      */
     public static <P extends Position> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs) {
         WktDecoder decoder = newDecoder();
@@ -97,6 +98,26 @@ public class Wkt {
     }
 
     /**
+     * Decodes the specified WKT String to a <code>Geometry</code>.
+     * <p>This method uses the default WKT dialect (Postgis v1.5 EWKT)</p>
+     *
+     * @param wkt the WKT string to decode*
+     * @param crs the Coordinate Reference System for the result
+     * @param dialect thw WKT Dialect of the WKT String
+     * @return The decoded Geometry in the specified reference system
+     * @return The decoded Geometry
+     */
+    public static <P extends Position> Geometry<P> fromWkt(String wkt, CoordinateReferenceSystem<P> crs, Dialect dialect) {
+        WktDecoder decoder = newDecoder(dialect);
+        return decoder.decode(wkt, crs);
+    }
+
+    public static Geometry<?> fromWkt(String wkt, Dialect dialect) {
+        WktDecoder decoder = newDecoder(dialect);
+        return decoder.decode(wkt);
+    }
+
+    /**
      * Encodes a <code>Geometry</code> to a WKT representation.
      * <p>This method uses the default WKT dialect (Postgis v1.5 EWKT)</p>
      *
@@ -105,6 +126,20 @@ public class Wkt {
      */
     public static String toWkt(Geometry<?> geometry) {
         WktEncoder encoder = newEncoder();
+        return encoder.encode(geometry);
+    }
+
+    /**
+     * Encodes a <code>Geometry</code> to a WKT representation according to
+     * a specific dialect.
+     *
+     * <p>This method uses the default WKT dialect (Postgis v1.5 EWKT)</p>
+     *
+     * @param geometry the <code>Geometry</code> to encode
+     * @return the WKT representation of the given geometry
+     */
+    public static String toWkt(Geometry<?> geometry, Dialect dialect) {
+        WktEncoder encoder = newEncoder(dialect);
         return encoder.encode(geometry);
     }
 
