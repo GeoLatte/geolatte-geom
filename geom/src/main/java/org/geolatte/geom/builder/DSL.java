@@ -200,6 +200,10 @@ public class DSL {
         return new PointToken<P>(position);
     }
 
+    public static <P extends Position> EmptyPointToken<P> emptyPoint() {
+        return new EmptyPointToken<P>();
+    }
+
     /**
      * Creates a {@code LineString}
      *
@@ -459,6 +463,18 @@ public class DSL {
             return new Point<P>(p, crs);
         }
     }
+
+    public static class EmptyPointToken<P extends Position> extends GeometryToken<P> {
+
+        EmptyPointToken() {
+        }
+
+        @Override
+        Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+            return new Point(crs);
+        }
+    }
+
 
     public static class LineStringToken<P extends Position> extends GeometryToken<P> {
         private P[] positions;

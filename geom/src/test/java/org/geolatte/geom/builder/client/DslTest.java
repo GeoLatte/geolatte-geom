@@ -414,6 +414,13 @@ public class DslTest {
         assertEquals(g1, g2);
     }
 
+    @Test
+    public void testEmptyPoint(){
+        GeometryCollection<G2D> gc = geometrycollection(WGS84, point(g(3.2, 40.2)), emptyPoint());
+        assertEquals(gc.components()[0], point(WGS84, g(3.2, 40.2)));
+        assertTrue(gc.components()[1].isEmpty());
+    }
+
 
     //check what we want in this case?
 //    @Test
