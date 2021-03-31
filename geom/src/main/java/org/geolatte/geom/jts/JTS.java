@@ -129,15 +129,15 @@ public class JTS {
         Coordinate testCo = jtsGeometry.getCoordinate();
         boolean hasZ = !(testCo == null || Double.isNaN(testCo.z));
         CoordinateReferenceSystem<?> crs = CrsRegistry.ifAbsentReturnProjected2D(jtsGeometry.getSRID());
-        boolean hasM = isMeasuredCoordinate(testCo)
-                && !Double.isNaN(testCo.getM());
+        boolean hasM = isMeasuredCoordinate(testCo);
         
         crs = CoordinateReferenceSystems.adjustTo(crs, hasZ, hasM);
         return from(jtsGeometry, crs);
     }
 
     private static boolean isMeasuredCoordinate(Coordinate testCo) {
-        return testCo instanceof CoordinateXYZM || testCo instanceof CoordinateXYM;
+        return (testCo instanceof CoordinateXYZM || testCo instanceof CoordinateXYM) &&
+                !Double.isNaN(testCo.getM());
     }
 
     /**

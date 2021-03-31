@@ -56,11 +56,12 @@ public class Db2ClobDecoder implements Decoder<Clob> {
      */
     private String clobToString(Clob clob) {
         InputStream in = null;
+        Reader in2 = null;
         final char[] buffer = new char[0x10000];
         StringBuilder out = new StringBuilder();
         try {
             in = clob.getAsciiStream();
-            Reader in2 = new InputStreamReader(in);
+            in2 = new InputStreamReader(in);
             int read;
             do {
                 read = in2.read(buffer, 0, buffer.length);
@@ -76,12 +77,14 @@ public class Db2ClobDecoder implements Decoder<Clob> {
                 if (in != null) {
                     in.close();
                 }
+                if (in2 != null) {
+                    in2.close();
+                }
             } catch (IOException e) {
                 // nothing to do
             }
         }
-        String result = out.toString();
-        return result;
+        return out.toString();
     }
 
 }

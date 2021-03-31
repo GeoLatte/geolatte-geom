@@ -262,7 +262,7 @@ public class MortonCode<P extends C2D> {
         int firstSignificantBit = mortonContext.getDepth() * 2;
         //the bit-mask for the label (in base-4) of the node at a certain tree-depth
         // we start at the max depth, so first shift the mask to the firstSignificantBit
-        long mask = 3 << firstSignificantBit - 2;
+        long mask = 3L << firstSignificantBit - 2;
         for (int level = 1; level <= mortonContext.getDepth(); level++) {
             // if the base-4 bits when XOR-ed equal to 0 they are the same
             if (((mc1 & mask) ^ (mc2 & mask)) != 0) {
@@ -272,7 +272,7 @@ public class MortonCode<P extends C2D> {
             mask >>= 2; //right-shift the mask;
         }
         //drop all bits to the left of commonPrefixLength * 2
-        mc1 >>= firstSignificantBit - (commonPrefixLength * 2);
+        mc1 >>= firstSignificantBit - (commonPrefixLength * 2L);
         return toRadix4String(mc1, commonPrefixLength);
     }
 

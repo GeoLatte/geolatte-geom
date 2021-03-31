@@ -287,17 +287,16 @@ public class Circle {
 		}
 		else {
 			// everything is acceptable do the y calculation
-			y = ( a13 * c23 - a23 * c13 ) / ( a13 * b23 - a23 * b13 );
+			y = (a13 * c23 - a23 * c13) / (a13 * b23 - a23 * b13);
 			// x calculation
 			// choose best formula for calculation
-			if ( Math.abs( a13 ) > Math.abs( a23 ) ) {
-				x = ( c13 - b13 * y ) / a13;
-			}
-			else {
-				x = ( c23 - b23 * y ) / a23;
+			if (Math.abs(a13) > Math.abs(a23)) {
+				x = (c13 - b13 * y) / a13;
+			} else {
+				x = (c23 - b23 * y) / a23;
 			}
 			// radius calculation
-			rad = Math.sqrt( ( x - p1.x ) * ( x - p1.x ) + ( y - p1.y ) * ( y - p1.y ) );
+			rad = Math.sqrt( ((x - p1.x) * (x - p1.x)) + ((y - p1.y) * (y - p1.y)));
 		}
 		this.center.x = x;
 		this.center.y = y;
