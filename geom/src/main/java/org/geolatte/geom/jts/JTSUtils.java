@@ -8,16 +8,20 @@ import org.locationtech.jts.geom.*;
  */
 public class JTSUtils {
 
+    private JTSUtils() {
+    }
+
     /**
      * Determines equality between geometries taking into
      * account all coordinates, and the SRID.
      *
-     * This is used e.g. for Dirty-checking of geometry values
-     * in Hibernate
+     * Note that doubles are compared exactly, i.e. _not_ to without some error-bound.
      *
-     * @param g1
-     * @param g2
-     * @return
+     * This method is used e.g. for dirty-checking in Hibernate
+     *
+     * @param g1 first geometry to compare (may be null)
+     * @param g2 second geometry to compare (may be null)
+     * @return if g1 is exactly equal to g2
      */
     static public boolean equalsExact3D(Geometry g1, Geometry g2) {
         if (g1 == g2) return true;
@@ -61,7 +65,7 @@ public class JTSUtils {
         for (int i = 0; i < np1; i++){
             if (!equalsExact3D(g1.getPointN(i), g2.getPointN(i))){
                 return false;
-            };
+            }
         }
         return true;
     }
