@@ -17,13 +17,13 @@ import java.util.Map;
  */
 public class Projections {
 
-    final private static Map<CrsId, Class<? extends CoordinateOperation>> METHODS = new HashMap<>();
+//    final private static Map<CrsId, Class<? extends CoordinateOperation>> METHODS = new HashMap<>();
 
-    static {
-        //TODO do this using reflection
-        METHODS.put(CrsId.valueOf(1024), PseudoMercator.class);
-        METHODS.put(CrsId.valueOf(9802), PseudoMercator.class);
-    }
+//    static {
+//        //TODO do this using reflection
+//        METHODS.put(CrsId.valueOf(1024), PseudoMercator.class);
+//        METHODS.put(CrsId.valueOf(9802), PseudoMercator.class);
+//    }
 
     public static CoordinateOperation buildFrom(ProjectedCoordinateReferenceSystem projected) {
         Projection projection  = projected.getProjection();
