@@ -2,7 +2,6 @@ package org.geolatte.geom.jts;
 
 
 import org.locationtech.jts.geom.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Some utility functions for working with JTS geometries
