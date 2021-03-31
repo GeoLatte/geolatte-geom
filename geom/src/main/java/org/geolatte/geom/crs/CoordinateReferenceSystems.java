@@ -61,7 +61,6 @@ public class CoordinateReferenceSystems {
      * <p>
      * A generic system is one without a precisely defined datum or ellipsoid.
      *
-     * @param
      * @param unit the unit to use for the planar coordinates.
      * @return a {@code CoordinateReferenceSystem}
      */
