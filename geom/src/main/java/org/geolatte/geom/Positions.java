@@ -52,7 +52,7 @@ public class Positions {
 
 	/**
 	 * Factory method for {@code Position}s in the reference system.
-	 * 
+	 *
 	 * The coordinates array should be in normalized order. See
 	 * {@link Position}
 	 *
@@ -96,19 +96,21 @@ public class Positions {
 
 	/**
 	 * Copies the source positions to a new PositionSequence.
-	 * 
+	 *
 	 * <P>The coordinates are taken as-is. If the target coordinate reference systems has a larger coordinate
-	 * dimensions then the source, NaN coordinate values are created.</p>
+	 * dimensions then the source, the specified defaultValue is used for the missing coordinate values.</p>
 	 *
 	 * @param source
 	 * @param targetPosClass target type of {@code Position}
+	 * @param defaultValue default coordinate value
 	 * @param <P>
 	 *
 	 * @return a copy of the source positions
 	 */
 	public static <Q extends Position, P extends Position> PositionSequence<P> copy(
 			final PositionSequence<Q> source,
-			final Class<P> targetPosClass) {
+			final Class<P> targetPosClass,
+			double defaultValue) {
 		PositionFactory<P> factory = Positions.getFactoryFor( targetPosClass );
 		final PositionSequenceBuilder<P> builder = PositionSequenceBuilders.fixedSized( source.size(), targetPosClass );
 		if ( source.isEmpty() ) {
@@ -119,7 +121,7 @@ public class Positions {
 				source.getCoordinateDimension(),
 				factory.getCoordinateDimension()
 		)];
-		Arrays.fill( coords, Double.NaN );
+		Arrays.fill( coords, defaultValue );
 		PositionVisitor<Q> visitor = new PositionVisitor<Q>() {
 			public void visit(Q position) {
 				position.toArray( coords );
@@ -130,6 +132,24 @@ public class Positions {
 		return builder.toPositionSequence();
 	}
 
+	/**
+	 * Copies the source positions to a new PositionSequence.
+	 *
+	 * <P>The coordinates are taken as-is. If the target coordinate reference systems has a larger coordinate
+	 * dimensions then the source, Double.NaN is used for the missing coordinate values.</p>
+	 *
+	 * @param source
+	 * @param targetPosClass target type of {@code Position}
+	 * @param <P>
+	 *
+	 * @return a copy of the source positions
+	 */
+	public static <Q extends Position, P extends Position> PositionSequence<P> copy(
+			final PositionSequence<Q> source,
+			final Class<P> targetPosClass) {
+		return copy(source, targetPosClass, Double.NaN);
+	}
+	
 	//Factories
 	public static class CanMakeP2D implements PositionFactory<C2D> {
 

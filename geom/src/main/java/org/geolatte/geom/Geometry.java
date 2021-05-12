@@ -51,21 +51,25 @@ public abstract class Geometry<P extends Position> implements Serializable {
 
     /**
      * Creates a new {@code Geometry} with the positions from the specified geometry and having the specified
-     * {@code CoordinateReferenceSystem}
+     * {@code CoordinateReferenceSystem}.
+     *
+     * When forcing from a smaller to a larger coordinate dimension, the coordinateValue specified will be used
+     * for filling the missing coordinate values.
      *
      * @param geometry source {@code Geometry} that supplies the {@code Position}s for the returned {@code Geometry}
      * @param crs the {@code CoordinateReferenceSystem} for the returned {@code Geometry}
-     * @param <Q> the {@code Position} type for the returned Geometry
+     * @param coordinateValue the default to fill in when for missing coordinate values (if any)
+     * @param <Q> the {@code Position} type for the returned Geometry*
      * @return a {@code Geometry} with the positions of the specified geometry and having
      * the specified {@code CoordinateReferenceSystem}
      */
     @SuppressWarnings("unchecked")
-    public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
+    public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs, double coordinateValue) {
         if (crs == null || geometry == null) return (Geometry<Q>) geometry;
         if (crs.equals(geometry.getCoordinateReferenceSystem())) return (Geometry<Q>) geometry;
         if (geometry instanceof Simple) {
             Simple simple = (Simple) geometry;
-            PositionSequence<Q> positions = Positions.copy(geometry.getPositions(), crs.getPositionClass());
+            PositionSequence<Q> positions = Positions.copy(geometry.getPositions(), crs.getPositionClass(), coordinateValue);
             return Geometries.mkGeometry(simple.getClass(), positions, crs);
         } else {
             Complex<?, ?> complex = (Complex<?, ?>) geometry;
@@ -81,6 +85,23 @@ public abstract class Geometry<P extends Position> implements Serializable {
             }
             return Geometries.mkGeometry(complex.getClass(), targetParts);
         }
+    }
+
+    /**
+     * Creates a new {@code Geometry} with the positions from the specified geometry and having the specified
+     * {@code CoordinateReferenceSystem}.
+     *
+     * When forcing from a smaller to a larger coordinate dimension, the NaN will be used for the missing coordinate
+     * values.
+     *
+     * @param geometry source {@code Geometry} that supplies the {@code Position}s for the returned {@code Geometry}
+     * @param crs the {@code CoordinateReferenceSystem} for the returned {@code Geometry}
+     * @param <Q> the {@code Position} type for the returned Geometry*
+     * @return a {@code Geometry} with the positions of the specified geometry and having
+     * the specified {@code CoordinateReferenceSystem}
+     */
+    public static <Q extends Position> Geometry<Q> forceToCrs(Geometry<?> geometry, CoordinateReferenceSystem<Q> crs) {
+        return forceToCrs(geometry, crs, Double.NaN);
     }
 
     /**
