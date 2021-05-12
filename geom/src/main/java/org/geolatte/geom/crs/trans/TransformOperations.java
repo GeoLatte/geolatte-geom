@@ -149,6 +149,7 @@ class ExtendedCoordinateOperation implements CoordinateOperation {
 
     @Override
     public void reverse(double[] inCoordinate, double[] outCoordinate) {
+        baseOp.reverse(inCoordinate, outCoordinate);
         if (target == null && source != null) {
             outCoordinate[inCoDim - 1] = 0d;
         }

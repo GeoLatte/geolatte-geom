@@ -15,13 +15,13 @@ public interface TransformOperation<P extends Position, Q extends Position> {
     CoordinateOperation getOperation();
 
     default Q forward(P pos) {
-        double[] out = pos.toArray(null);
+        double[] out = new double[getTarget().getCoordinateDimension()];
         getOperation().forward(pos.toArray(null), out);
         return Positions.mkPosition(getTarget().getPositionClass(), out);
     }
 
     default P reverse(Q pos) {
-        double[] out = pos.toArray(null);
+        double[] out = new double[getSource().getCoordinateDimension()];
         getOperation().reverse(pos.toArray(null), out);
         return Positions.mkPosition(getSource().getPositionClass(), out);
     }

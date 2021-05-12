@@ -20,7 +20,6 @@ public class TestTransformVisitor {
     private CoordinateReferenceSystem<G2D> source = WGS84;
     private CoordinateReferenceSystem<C2D> target = WEB_MERCATOR;
     private TransformOperation<G2D, C2D> op = TransformOperations.from(source, target);
-
     private TransformVisitor<G2D, C2D> visitor = new TransformVisitor<>(op);
 
     @Test
