@@ -149,7 +149,7 @@ public class Positions {
 			final Class<P> targetPosClass) {
 		return copy(source, targetPosClass, Double.NaN);
 	}
-	
+
 	//Factories
 	public static class CanMakeP2D implements PositionFactory<C2D> {
 

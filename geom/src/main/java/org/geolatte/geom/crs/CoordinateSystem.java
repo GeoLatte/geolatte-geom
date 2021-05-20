@@ -23,6 +23,7 @@ package org.geolatte.geom.crs;
 
 import org.geolatte.geom.Position;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +38,9 @@ import java.util.List;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
-abstract public class CoordinateSystem<P extends Position> {
+abstract public class CoordinateSystem<P extends Position> implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     private final CoordinateSystemAxis[] axes;
 

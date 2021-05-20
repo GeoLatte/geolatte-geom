@@ -42,6 +42,8 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
  */
 class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactory, Serializable {
 
+    private static final long serialVersionUID = 6884205871950410216L;
+
     @Override
     public CoordinateSequence create(Coordinate[] coordinates) {
         CoordinateReferenceSystem<?> crs = determineCRS(coordinates);

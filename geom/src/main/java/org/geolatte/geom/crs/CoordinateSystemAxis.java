@@ -21,13 +21,18 @@
 
 package org.geolatte.geom.crs;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * An axis of a <code>CoordinateSystem.</code>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/29/11
  */
-abstract public class CoordinateSystemAxis {
+abstract public class CoordinateSystemAxis implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     private final String axisName;
     private final CoordinateSystemAxisDirection coordinateSystemAxisDirection;
@@ -87,7 +92,7 @@ abstract public class CoordinateSystemAxis {
     /**
      * Returns the name of this axis.
      *
-     * @return
+     * @return the Axis name
      */
     public String getAxisName() {
         return axisName;
@@ -119,10 +124,10 @@ abstract public class CoordinateSystemAxis {
 
         CoordinateSystemAxis that = (CoordinateSystemAxis) o;
 
-        if (axisName != null ? !axisName.equals(that.axisName) : that.axisName != null) return false;
+        if (!Objects.equals(axisName, that.axisName)) return false;
         if (coordinateSystemAxisDirection != that.coordinateSystemAxisDirection) return false;
         if (normalOrder != that.normalOrder) return false;
-        return !(unit != null ? !unit.equals(that.unit) : that.unit != null);
+        return Objects.equals(unit, that.unit);
     }
 
     @Override

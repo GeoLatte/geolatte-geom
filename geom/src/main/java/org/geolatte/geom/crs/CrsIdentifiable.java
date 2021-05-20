@@ -21,6 +21,8 @@
 
 package org.geolatte.geom.crs;
 
+import java.io.Serializable;
+
 /**
  * Abstract base class for classes the are identified by a <code>CrsId</code> (e.g. by EPSG-code).
  *
@@ -32,7 +34,9 @@ package org.geolatte.geom.crs;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/21/11
  */
-abstract public class CrsIdentifiable {
+abstract public class CrsIdentifiable implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     private final CrsId crsId;
     private final String name;

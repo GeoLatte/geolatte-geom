@@ -1,5 +1,7 @@
 package org.geolatte.geom.crs;
 
+import java.io.Serializable;
+
 /**
  * An identifier for a <code>CoordinateReferenceSystem</code> or other object referenced in a
  * <code>CoordinateReferenceSystem</code> definition.
@@ -14,7 +16,9 @@ package org.geolatte.geom.crs;
  *
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-public class CrsId {
+public class CrsId implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     final static public String DEFAULT_AUTHORITY = "EPSG";
 

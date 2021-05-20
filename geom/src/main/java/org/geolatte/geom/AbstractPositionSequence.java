@@ -31,6 +31,8 @@ import java.io.Serializable;
  */
 abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, CoordinateSequence, Serializable {
 
+    private static final long serialVersionUID = 6884205871950410216L;
+
     private final PositionFactory<P> factory;
 
     public AbstractPositionSequence(PositionFactory<P> factory) {
