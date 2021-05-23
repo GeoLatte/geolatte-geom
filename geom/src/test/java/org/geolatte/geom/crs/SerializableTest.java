@@ -20,8 +20,7 @@ public class SerializableTest {
                 .addLinearSystem(LinearUnit.METER, G3DM.class);
 
         Serializable ser = (Serializable) crs;
-        Path tmpDir = Paths.get("/tmp");
-        File tempFile = Files.createTempFile(tmpDir, "", ".ser").toFile();
+        File tempFile = Files.createTempFile("", ".ser").toFile();
         tempFile.deleteOnExit();
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(tempFile))){
             out.writeObject(crs);
