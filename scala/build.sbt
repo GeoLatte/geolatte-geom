@@ -1,4 +1,4 @@
-val geolatteGeomVersion = "1.7.0"
+val geolatteGeomVersion = "1.8.1"
 
 val commonResolvers = Seq(
   Resolver.mavenLocal,
@@ -91,7 +91,8 @@ lazy val slick = (project in file("slick"))
   .dependsOn(geom)
 
 lazy val root = (project in file(".")).settings(
-  commonSettings ++ disablePublishingRoot, 
+  commonSettings ++ disablePublishingRoot,
+  name := "geom-scala",
   crossScalaVersions := Nil
   ).aggregate(
     geom,

@@ -2,6 +2,7 @@ package org.geolatte.geom.circejson
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.geolatte.geom._
+import org.geolatte.geom.codec.Wkt
 import org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84
 import org.geolatte.geom.crs.{CoordinateReferenceSystem, CoordinateReferenceSystems, CrsRegistry}
 import org.geolatte.geom.generator.GeometryGenerators
@@ -25,14 +26,22 @@ object GeoJsonGen {
   }
 
   private val mapper = buildMapper(WGS84)
-
   private val noCrsMapper = buildMapper(WGS84, Setting.SUPPRESS_CRS_SERIALIZATION -> true)
 
   implicit class JsonStringable[P <: Position](geom: Geometry[P]) {
+
     def asFasterXMLJsonString(withCrs: Boolean = true): String =
       if (withCrs) mapper.writeValueAsString(geom)
       else
         noCrsMapper.writeValueAsString(geom)
+
+    def asWktString(withCrs: Boolean = true) : String = {
+      val encoder = Wkt.newEncoder(Wkt.Dialect.SFA_1_2_1)
+      val wkt = encoder.encode(geom)
+      if (withCrs)
+        s"SRID=${geom.getSRID()};$wkt"
+      else wkt
+    }
   }
 
   /**

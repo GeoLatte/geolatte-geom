@@ -1,7 +1,7 @@
 package org.geolatte.geom.syntax
 
 import org.geolatte.geom.crs.CoordinateReferenceSystems._
-import org.geolatte.geom.crs.{CoordinateReferenceSystem, Unit}
+import org.geolatte.geom.crs.{CoordinateReferenceSystem, Unit=>U}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -33,7 +33,7 @@ class ImplicitConversionTests extends AnyFlatSpec with Matchers {
 
   "A 2DM Geodetic Geometry" should "be easily constructed from a tuple of doubles" in {
     implicit val crs: CoordinateReferenceSystem[G2DM] =
-      addLinearSystem(WGS84, classOf[G2DM], Unit.METER)
+      addLinearSystem(WGS84, classOf[G2DM], U.METER)
     val p = point(2.0, 3.0, 4.0)
     assertResult(new geom.Point(new G2DM(2.0, 3.0, 4.0), crs))(p)
   }
@@ -48,7 +48,7 @@ class ImplicitConversionTests extends AnyFlatSpec with Matchers {
     implicit val crs: CoordinateReferenceSystem[G3D] = addVerticalSystem(
       WGS84,
       classOf[G3D],
-      Unit.METER
+      U.METER
     )
     val p = point(2.0, 3.0, 4.0)
     assertResult(new geom.Point(new G3D(2.0, 3.0, 4.0), crs))(p)
@@ -56,7 +56,7 @@ class ImplicitConversionTests extends AnyFlatSpec with Matchers {
 
   "A 2DM linestring " should "be easily constructed form tuples " in {
     implicit val crs: CoordinateReferenceSystem[G2DM] =
-      addLinearSystem(WGS84, classOf[G2DM], Unit.METER)
+      addLinearSystem(WGS84, classOf[G2DM], U.METER)
     val l = lineString((2.0, 3.0, 4.0), (20.0, 40.0, 30.0))
     val positionSequence = geom.PositionSequenceBuilders
       .fixedSized(2, classOf[G2DM])
@@ -69,14 +69,14 @@ class ImplicitConversionTests extends AnyFlatSpec with Matchers {
 
   "We " should " easily create Point geometries for a given (non-implicit) CRS" in {
 
-    val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem(WGS84, classOf[G2DM], Unit.METER)
+    val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem(WGS84, classOf[G2DM], U.METER)
     val p: Point[G2DM]                       = point(crs)((2.0, 3.0, 4.0))
     assertResult(new geom.Point(new G2DM(2.0, 3.0, 4.0), crs))(p)
   }
 
   "We " should " easily create LineString geometries for a given (non-implicit) CRS" in {
 
-    val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem(WGS84, classOf[G2DM], Unit.METER)
+    val crs: CoordinateReferenceSystem[G2DM] = addLinearSystem(WGS84, classOf[G2DM], U.METER)
     val l: LineString[G2DM]                  = lineString(crs)((2.0, 3.0, 4.0), (33.0, 5.0, 8.0))
 
     val positionSequence = geom.PositionSequenceBuilders

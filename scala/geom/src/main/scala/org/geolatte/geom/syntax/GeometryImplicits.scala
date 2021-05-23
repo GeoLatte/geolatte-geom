@@ -263,6 +263,7 @@ object ExtendDim {
 
 }
 
+@Deprecated
 trait CoordinateSystemExtender {
 
   import ExtendDim._
@@ -285,6 +286,11 @@ trait CoordinateSystemExtender {
 
 }
 
+/**
+  * Extend a CRS with a Vertical/Linear reference system
+  * @deprecated Use Java method on CRS
+  */
+@Deprecated
 trait CoordinateReferenceSystemSyntax extends CoordinateSystemExtender {
 
   self =>

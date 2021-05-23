@@ -94,6 +94,14 @@ class GeometryDecodersSpec extends Specification {
     received.map(_.getCoordinateReferenceSystem) must beRight(WEB_MERCATOR)
   }
 
+  "Decoding with a user-specified default CRS" >> {
+    implicit val gDecoder       = geometryDecoder(WEB_MERCATOR)
+    val expected: Geometry[G2D] = point2DGen.sample.get
+    val jsonString              = expected.asFasterXMLJsonString(false)
+    val received                = decode[Geometry[_]](jsonString)
+    received.map(_.getCoordinateReferenceSystem) must beRight(WEB_MERCATOR)
+  }
+
   def testScalaCheckGen[P <: Position](generator: Gen[_ <: Geometry[P]]): MatchResult[Any] = {
 
     val expected: Geometry[P] = generator.sample.get
