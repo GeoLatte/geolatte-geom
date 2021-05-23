@@ -1,6 +1,7 @@
 package org.geolatte.geom.jts;
 
 
+import org.geolatte.geom.Simple;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -14,9 +15,9 @@ public class JTSUtils {
     /**
      * Determines equality between geometries taking into
      * account all coordinates, and the SRID.
-     *
+     * <p>
      * Note that doubles are compared exactly, i.e. _not_ to without some error-bound.
-     *
+     * <p>
      * This method is used e.g. for dirty-checking in Hibernate
      *
      * @param g1 first geometry to compare (may be null)
@@ -27,7 +28,7 @@ public class JTSUtils {
         if (g1 == g2) return true;
         if (g1 == null || g2 == null) return false;
         if (!g1.getGeometryType().equals(g2.getGeometryType())) return false;
-        if(g1.getSRID() != g2.getSRID()) return false;
+        if (g1.getSRID() != g2.getSRID()) return false;
 
         //empty geometries of the same type are the same
         if (g1.isEmpty() && g2.isEmpty()) return true;
@@ -36,7 +37,7 @@ public class JTSUtils {
         int ng2 = g2.getNumGeometries();
         if (ng1 != ng2) return false;
 
-        if (ng1 == 1) {
+        if (ng1 == 1 && !(g1 instanceof GeometryCollection)) {
             return equals3DPrimitiveGeometries(g1, g2);
         }
 
@@ -58,12 +59,12 @@ public class JTSUtils {
                 ((Double.isNaN(c1.getM()) && Double.isNaN(c2.getM())) || c1.getM() == c2.getM());
     }
 
-    private static boolean equalLineStringCoordinates(LineString g1, LineString g2){
+    private static boolean equalLineStringCoordinates(LineString g1, LineString g2) {
         int np1 = g1.getNumPoints();
         int np2 = g2.getNumPoints();
         if (np1 != np2) return false;
-        for (int i = 0; i < np1; i++){
-            if (!equalsExact3D(g1.getPointN(i), g2.getPointN(i))){
+        for (int i = 0; i < np1; i++) {
+            if (!equalsExact3D(g1.getPointN(i), g2.getPointN(i))) {
                 return false;
             }
         }
@@ -74,7 +75,7 @@ public class JTSUtils {
         int nr1 = g1.getNumInteriorRing();
         int nr2 = g2.getNumInteriorRing();
         if (nr1 != nr2) return false;
-        for (int i = 0; i < nr1; i++){
+        for (int i = 0; i < nr1; i++) {
             if (!equalLineStringCoordinates(g1.getInteriorRingN(i), g2.getInteriorRingN(i))) {
                 return false;
             }
@@ -82,7 +83,7 @@ public class JTSUtils {
         return equalLineStringCoordinates(g1.getExteriorRing(), g2.getExteriorRing());
     }
 
-    private static boolean equals3DPrimitiveGeometries(Geometry g1, Geometry g2){
+    private static boolean equals3DPrimitiveGeometries(Geometry g1, Geometry g2) {
         //this method assumes that g1 and g2 are of the same type
         assert (g1.getClass().equals(g2.getClass()));
         if (g1 instanceof Point) {
@@ -93,7 +94,7 @@ public class JTSUtils {
             return equalLineStringCoordinates((LineString) g1, (LineString) g2);
         }
 
-        if(g1 instanceof Polygon) {
+        if (g1 instanceof Polygon) {
             return equalPolygonCoordinates((Polygon) g1, (Polygon) g2);
         }
         throw new IllegalStateException("Only simple geometries should be used");

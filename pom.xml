@@ -37,7 +37,7 @@
     </organization>
 
     <properties>
-        <revision>1.8.1</revision>
+        <revision>1.9.0-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jts-core.version>[1.18.0, 1.19.0)</jts-core.version>

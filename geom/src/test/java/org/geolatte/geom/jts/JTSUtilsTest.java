@@ -189,4 +189,46 @@ public class JTSUtilsTest {
         assertFalse(equalsExact3D(ml1, ml3));
     }
 
+    @Test
+    public void testMultiPointsWithOneGeom() {
+        MultiPoint mp1 = (MultiPoint) JTS.to(multipoint(WGS84, g(3.1, 50.2)));
+        MultiPoint mp2 = (MultiPoint) JTS.to(multipoint(WGS84, g(3.1, 50.2)));
+        MultiPoint mp3 = (MultiPoint) JTS.to(multipoint(WGS84, g(3.1, 51.2)));
+        assertTrue(equalsExact3D(mp1, mp2));
+        assertFalse(equalsExact3D(mp1, mp3));
+    }
+
+    @Test
+    public void testMultiLineStringWithOneGeom() {
+        MultiLineString ml1 = (MultiLineString) JTS.to(multilinestring(WGS84,
+                linestring(g(3, 50), g(3.1, 50.2))
+        ));
+        MultiLineString ml2 = (MultiLineString) JTS.to(multilinestring(WGS84,
+                linestring(g(3, 50), g(3.1, 50.2))
+        ));
+        MultiLineString ml3 = (MultiLineString) JTS.to(multilinestring(WGS84,
+                linestring(g(3, 50), g(3.2, 50.2))
+        ));
+        assertTrue(equalsExact3D(ml1, ml2));
+        assertFalse(equalsExact3D(ml1, ml3));
+    }
+
+    @Test
+    public void testMultiPolygonsWithOneGeom() {
+        MultiPolygon mpg1 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
+                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+        )));
+        MultiPolygon mpg2 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
+                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+        )));
+        MultiPolygon mpg3 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
+                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.03, 40.09), g(3.01, 40.01))
+        )));
+        assertTrue(equalsExact3D(mpg1, mpg2));
+        assertFalse(equalsExact3D(mpg1, mpg3));
+    }
+
 }
