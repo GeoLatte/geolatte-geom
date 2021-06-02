@@ -31,8 +31,10 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
 
         ObjectCodec oc = p.getCodec();
         JsonNode root = oc.readTree(p);
+        return readFeature(oc, root);
+    }
 
-
+    GeoJsonFeature<?, Object> readFeature(ObjectCodec oc, JsonNode root) throws JsonProcessingException {
         JsonNode geomNode = root.get("geometry");
         Geometry<?> geom = null == geomNode ? null : geomParser.parseGeometry(geomNode);
 
@@ -45,7 +47,7 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
                 id = idNode.asText();
             }
         }
-        HashMap<String, Object> properties =  (HashMap<String, Object>)oc.treeToValue(root.get("properties"), HashMap.class);
+        HashMap<String, Object> properties =  (HashMap<String, Object>) oc.treeToValue(root.get("properties"), HashMap.class);
 
         return new GeoJsonFeature<>(geom, id, properties);
     }

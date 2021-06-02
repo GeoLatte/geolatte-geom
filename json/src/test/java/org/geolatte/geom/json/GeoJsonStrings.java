@@ -66,4 +66,7 @@ public class GeoJsonStrings {
     static String crslambert72TextWithUrnCrs = "{\"type\":\"name\",\"properties\":{\"name\":\"urn:ogc:def:crs:EPSG::31370\"}}";
     static String crswgs84WithLink = "{\"type\":\"link\",\"properties\":{\"href\":\"http://wwww.opengis.net/def/crs/EPSG/4326\"}}";
 
+    //FeatureCollection
+    static String featureCollection = "{\"features\":[{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[102.0,0.5]},\"id\":\"1\",\"properties\":{\"prop0\":\"value0\"},\"type\":\"Feature\"},{\"geometry\":{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[[102.0,0.0],[103.0,1.0],[104.0,0.0],[105.0,1.0]]},\"id\":\"2\",\"properties\":{\"prop1\":0.0,\"prop0\":\"value0\"},\"type\":\"Feature\"}],\"type\":\"FeatureCollection\"}";
+    static String emptyFeatureCollection = "{\"features\":[],\"type\":\"FeatureCollection\"}";
 }

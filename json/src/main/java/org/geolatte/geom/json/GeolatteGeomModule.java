@@ -24,7 +24,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
     private final Map<Class, JsonDeserializer> dezers = new HashMap<>();
 
-    private  GeometrySerializer geometrySerializer;
+    private GeometrySerializer geometrySerializer;
     private CrsSerializer crsSerializer;
 
     public GeolatteGeomModule() {
@@ -34,8 +34,7 @@ public class GeolatteGeomModule extends SimpleModule {
     @SuppressWarnings("unchecked")
     public <P extends Position> GeolatteGeomModule(CoordinateReferenceSystem<P> defaultCrs) {
 
-        super("GeolatteGeomModule", new Version(1, 0, 0, "", "org.geolatte", "geolatte-json"));
-
+        super("GeolatteGeomModule", new Version(1, 8, 0, "", "org.geolatte", "geolatte-json"));
 
         geometrySerializer = new GeometrySerializer(defaultCrs, settings);
         GeometryDeserializer parser = new GeometryDeserializer(defaultCrs, settings);
@@ -51,6 +50,7 @@ public class GeolatteGeomModule extends SimpleModule {
         dezers.put(MultiPolygon.class, parser);
         dezers.put(GeometryCollection.class, parser);
         dezers.put(Feature.class, new FeatureDeserializer(defaultCrs, settings));
+        dezers.put(FeatureCollection.class, new FeatureCollectionDeserializer(defaultCrs, settings));
         dezers.put(CoordinateReferenceSystem.class, new CrsDeserializer(defaultCrs, settings));
 
         dezers.forEach(this::addDeserializer);
@@ -61,13 +61,13 @@ public class GeolatteGeomModule extends SimpleModule {
     }
 
 
-    public GeometrySerializer getGeometrySerializer(){
+    public GeometrySerializer getGeometrySerializer() {
         return this.geometrySerializer;
     }
 
     /**
      * Return the the GeoJson deserializers for Geometry class
-     *
+     * <p>
      * This method is provided for interoperability reasons
      */
     public Map<Class, JsonDeserializer> getGeometryDeserializers() {
