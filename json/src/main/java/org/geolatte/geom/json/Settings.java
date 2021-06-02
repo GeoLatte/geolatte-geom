@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
+//TODO -- Replace by Builder pattern so that the behavior is immutable after creation of the module
 class Settings {
 
     private final Map<Setting, Boolean> overrides = new HashMap<Setting, Boolean>();

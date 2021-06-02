@@ -1,8 +1,9 @@
 package org.geolatte.geom.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Point;
+import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.LinearUnit;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
+import static org.geolatte.geom.json.GeoJsonStrings.pointText3DM;
 import static org.geolatte.geom.json.GeoJsonStrings.pointTextWithUrnCrs;
 import static org.junit.Assert.assertEquals;
 
@@ -24,6 +26,13 @@ public class ForceCrsToDefaultTest extends GeoJsonTest {
         ObjectMapper mapper = createMapper(Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
         Point<?> pnt = point(WGS84, g(1, 2));
         assertEquals(pnt, mapper.readValue( pointTextWithUrnCrs, Geometry.class ));
+    }
+
+    @Test
+    public void test3DM() throws IOException {
+        ObjectMapper mapper = createMapper(Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
+        Point<G2D> pnt = point(WGS84, g(1, 2));
+        assertEquals(pnt, mapper.readValue( pointText3DM, Geometry.class ));
     }
 
 }

@@ -19,11 +19,9 @@ import static org.geolatte.geom.GeometryType.*;
  */
 public class GeometrySerializer<P extends Position> extends JsonSerializer<Geometry<P>> {
 
-    final private CoordinateReferenceSystem<P> defaultCRS;
     final private Settings settings;
 
-    public GeometrySerializer(CoordinateReferenceSystem<P> defaultCRS, Settings settings) {
-        this.defaultCRS = defaultCRS;
+    public GeometrySerializer(Settings settings) {
         this.settings = settings;
     }
 

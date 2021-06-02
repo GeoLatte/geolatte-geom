@@ -9,8 +9,9 @@ public enum Setting {
      *  Force the JSON strings to the CRS set as default for the {@code GeometryModule}.
      *
      *  <p>This ignores the CRS identifier present in the JSON object.</p>
-     *
+     * @deprecated  Use IGNORE_CRS
      */
+    @Deprecated
     FORCE_DEFAULT_CRS_DIMENSION(false),
 
     /**

@@ -36,7 +36,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
         super("GeolatteGeomModule", new Version(1, 8, 0, "", "org.geolatte", "geolatte-json"));
 
-        geometrySerializer = new GeometrySerializer(defaultCrs, settings);
+        geometrySerializer = new GeometrySerializer(settings);
         GeometryDeserializer parser = new GeometryDeserializer(defaultCrs, settings);
         addSerializer(Geometry.class, geometrySerializer); //use raw to get this compiled
         crsSerializer = new CrsSerializer<>(defaultCrs, settings);

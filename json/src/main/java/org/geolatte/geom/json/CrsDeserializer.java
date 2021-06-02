@@ -39,7 +39,7 @@ public class CrsDeserializer extends JsonDeserializer<CoordinateReferenceSystem>
 
     private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
-        return id.equals(CrsId.UNDEFINED) || settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ?
+        return id.equals(CrsId.UNDEFINED) || settings.isSet(Setting.IGNORE_CRS) ?
                 this.defaultCrs :
                 CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
     }
