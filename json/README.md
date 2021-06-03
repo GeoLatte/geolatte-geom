@@ -60,7 +60,7 @@ You can set a feature flag after creation of the `GeolatteGeomModule`:
 
 The following settings are currently supported:
 - `IGNORE_CRS`: ignore the`crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`) 
-- `SERIALIZE_CRS_AS_URN`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
-- `SUPPRESS_CRS_SERIALIZATION`: serialize `crs` as a URN (default: `false`)
+- `SUPPRESS_CRS_SERIALIZATION`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
+- `SERIALIZE_CRS_AS_URN`: serialize `crs` as a URN (default: `false`)
 
 
