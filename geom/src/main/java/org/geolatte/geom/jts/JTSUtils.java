@@ -37,11 +37,10 @@ public class JTSUtils {
         int ng2 = g2.getNumGeometries();
         if (ng1 != ng2) return false;
 
-        if (ng1 == 1 && !(g1 instanceof GeometryCollection)) {
-            return equals3DPrimitiveGeometries(g1, g2);
+        if ((g1 instanceof GeometryCollection)) {
+            return equalComponentGeometries(g1, g2, ng1);
         }
-
-        return equalComponentGeometries(g1, g2, ng1);
+        return equals3DPrimitiveGeometries(g1, g2);
     }
 
     private static boolean equalComponentGeometries(Geometry g1, Geometry g2, int ng1) {
