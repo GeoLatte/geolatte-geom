@@ -21,6 +21,7 @@
 
 package org.geolatte.geom.crs;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,9 @@ import java.util.Map;
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class CrsParameter {
+public class CrsParameter implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     private final String name;
     private final double value;
