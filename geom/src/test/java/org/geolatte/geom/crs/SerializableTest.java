@@ -6,8 +6,6 @@ import org.junit.Test;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,5 +33,24 @@ public class SerializableTest {
 
     }
 
+    @Test
+    public void testProjectedCrsCastToSerializable() throws IOException, ClassNotFoundException {
+        ProjectedCoordinateReferenceSystem crs = CoordinateReferenceSystems.WEB_MERCATOR;
+
+        Serializable ser = (Serializable) crs;
+        File tempFile = Files.createTempFile("pcrs", ".ser").toFile();
+        tempFile.deleteOnExit();
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(tempFile))){
+            out.writeObject(crs);
+        };
+
+        ProjectedCoordinateReferenceSystem deser;
+        try (ObjectInputStream ins = new ObjectInputStream(new FileInputStream(tempFile))) {
+            deser = (ProjectedCoordinateReferenceSystem) ins.readObject();
+        }
+
+        assertEquals(crs, deser);
+
+    }
 
 }

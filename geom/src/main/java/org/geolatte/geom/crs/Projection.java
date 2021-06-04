@@ -21,13 +21,17 @@
 
 package org.geolatte.geom.crs;
 
+import java.io.Serializable;
+
 /**
  * A projection from geographic coordinates to projected coordinates in a Cartesian plan.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 8/2/11
  */
-public class Projection {
+public class Projection implements Serializable {
+
+    private static final long serialVersionUID = 6884205871950410216L;
 
     public final static Projection UNKNOWN = new Projection(CrsId.UNDEFINED, "unknown");
 
