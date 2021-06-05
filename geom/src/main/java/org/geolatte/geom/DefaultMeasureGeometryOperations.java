@@ -53,9 +53,9 @@ public class DefaultMeasureGeometryOperations implements MeasureGeometryOperatio
         if (geometry.isEmpty()) return new Point<P>(geometry.getCoordinateReferenceSystem());
         if (C2D.class.isAssignableFrom(geometry.getPositionClass()) &&
                 Measured.class.isAssignableFrom(geometry.getPositionClass())) {
-            MeasureInterpolatingVisitor visitor = new MeasureInterpolatingVisitor(geometry, startMeasure, endMeasure);
-            geometry.accept((GeometryVisitor<P>) visitor);
-            return (Geometry<P>) visitor.result();
+            MeasureInterpolatingVisitor<P> visitor = new MeasureInterpolatingVisitor<>(geometry, startMeasure, endMeasure);
+            geometry.accept(visitor);
+            return visitor.result();
         }
         throw new IllegalArgumentException("Requires projected coordinates");
     }

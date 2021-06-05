@@ -148,7 +148,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
 
     private P  interpolate(P p0, P p1, double r) {
         int dim = getCrs().getCoordinateDimension();
-        double result[] = new double[dim];
+        double[] result = new double[dim];
         for (int i = 0; i < dim; i++) {
             result[i] = p0.getCoordinate(i) + r * (p1.getCoordinate(i) - p0.getCoordinate(i));
         }
@@ -156,7 +156,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
     }
 
     @Override
-    public void visit(Polygon polygon) {
+    public void visit(Polygon<P> polygon) {
         throw new IllegalArgumentException(INVALID_TYPE_MSG);
     }
 
@@ -170,7 +170,7 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
         int number0Dimensional = 0;
         int number1Dimensional = 0;
 
-        for (PositionSequence ps : positionSequences) {
+        for (PositionSequence<P> ps : positionSequences) {
             assert (!ps.isEmpty());
             if (ps.size() > 1) {
                 number1Dimensional++;
@@ -190,22 +190,21 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
             for (PositionSequence<P> ps : positionSequences) {
                 pnts[i++] = new Point<P>(ps, this.geometry.getCoordinateReferenceSystem());
             }
-            return new MultiPoint<P>(pnts);
+            return new MultiPoint<>(pnts);
         }
 
         if (number0Dimensional == 1 && number1Dimensional == 0) {
-            return new MultiPoint<P>(
-                    new Point[]{new Point<P>(positionSequences.get(0), this.geometry.getCoordinateReferenceSystem())}
-            );
+            return new MultiPoint<>(
+                    new Point<>(positionSequences.get(0), this.geometry.getCoordinateReferenceSystem()));
         }
 
         if (number0Dimensional == 0 && number1Dimensional >= 1) {
             LineString<P>[] lineStrings = (LineString<P>[])new LineString[number1Dimensional];
             int i = 0;
-            for (PositionSequence ps : positionSequences) {
+            for (PositionSequence<P> ps : positionSequences) {
                 lineStrings[i++] = new LineString<P>(ps, this.geometry.getCoordinateReferenceSystem());
             }
-            return new MultiLineString<P>(lineStrings);
+            return new MultiLineString<>(lineStrings);
         }
 
         if (number0Dimensional > 0 && number1Dimensional > 0) {
