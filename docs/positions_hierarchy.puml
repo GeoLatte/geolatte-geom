@@ -1,0 +1,22 @@
+@startuml
+
+abstract class Position
+interface Measured
+
+Position <|--  G2D
+G2D <|-- G2DM
+Measured   <|-- G2DM
+G2D <|-- G3D
+
+G3D <|-- G3DM
+Measured   <|-- G3DM
+
+
+Position <|--  C2D
+C2D <|-- C2DM
+Measured   <|-- C2DM
+C2D <|-- C3D
+
+C3D <|-- C3DM
+Measured   <|-- C3DM
+@enduml

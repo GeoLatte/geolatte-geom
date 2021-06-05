@@ -26,6 +26,7 @@ import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Test;
 
+import static org.geolatte.geom.GeometryOperations.projectedGeometryOperations;
 import static org.geolatte.geom.jts.JTS.to;
 import static org.junit.Assert.assertTrue;
 
@@ -41,7 +42,7 @@ public class ContainsTest {
 
         Geometry<C2D> projectedGeometry = JTS.from(JTS.to(geometry), CoordinateReferenceSystems.WEB_MERCATOR);
         Point<C2D> projectedPoint = (Point<C2D>) JTS.from(to(point), CoordinateReferenceSystems.WEB_MERCATOR);
-        boolean containsPoint = new JTSGeometryOperations().contains(projectedGeometry, projectedPoint);
+        boolean containsPoint = projectedGeometryOperations().contains(projectedGeometry, projectedPoint);
         assertTrue("Should contain the point", containsPoint);
     }
 
