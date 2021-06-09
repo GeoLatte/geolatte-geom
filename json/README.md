@@ -1,3 +1,7 @@
+
+[![javadoc](https://javadoc.io/badge2/org.geolatte/geolatte-geojson/javadoc.svg)](https://javadoc.io/doc/org.geolatte/geolatte-geojson)
+
+
 # GeoJson module
 
 This modules provides a Jackson module to (de)serialize `Geometry`, `Feature` and `FeatureCollection` instances to 

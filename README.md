@@ -1,5 +1,6 @@
 ![Build Status](https://github.com/GeoLatte/geolatte-geom/workflows/Java%20CI/badge.svg)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/GeoLatte/geolatte-geom.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/GeoLatte/geolatte-geom/context:java)
+[![javadoc](https://javadoc.io/badge2/org.geolatte/geolatte-geom/javadoc.svg)](https://javadoc.io/doc/org.geolatte/geolatte-geom)
 
 # Geolatte-geom
 
@@ -35,6 +36,7 @@ The library is published on Maven Central. For Maven, you can include the follow
 ```
 
 # Quick start
+
 
 ## Creating Geometries
 
@@ -98,6 +100,19 @@ There is a very similar API for WKB encoding/decoding (see the `Wkb` codec class
 
 For historical and practical reasons. The default dialects for WKB/WKT are those used in [Postgis](http://postgis.org).
 
+
+## Encoding and Decoding to GeoJson
+
+See [the json module](json/README.md)
+
+## Using Scala?
+
+There is an experimental module for using this library in idiomatic Scala. See the [scala module](scala)
+
+## Javadoc
+
+The JavaDoc is [published on javadoc.io](https://javadoc.io/doc/org.geolatte/geolatte-geom).
+
 # The Geometry model
 
 ## Positions
@@ -109,7 +124,7 @@ The coordinate space can be 2-, 3- or 4-dimensional. The first two dimensions ar
 surface. The third dimension usually represent altitude or elevation, and the fourth a measurement.
 
 There are two major types of 2D coordinate reference systems. `GeographicCoordinateReferenceSystem`s specify points on
-the earth's surface using spherical coordinates (i.e. latitude` and longitude).
+the earth's surface using spherical coordinates (i.e. latitude and longitude).
 `ProjectedCoordinateReferenceSystem`s use cartesian coordinates (x and y) on a projected plane.
 
 From these 2D base systems we can construct higher-dimensional systems by adding a
