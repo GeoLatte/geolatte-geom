@@ -100,7 +100,7 @@ class BaseWktParser<P extends Position> {
                 return;
             }
         }
-        throw new WkbDecodeException("Expected geometryKeyword starting at position: " + tokenizer.currentPos());
+        throw new WktDecodeException("Expected geometryKeyword starting at position: " + tokenizer.currentPos());
     }
 
     protected void matchesOptionalZMMarkers() {
