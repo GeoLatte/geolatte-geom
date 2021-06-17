@@ -323,6 +323,21 @@ public abstract class Geometry<P extends Position> implements Serializable {
     public abstract int getDimension();
 
     /**
+     * Returns a copy of this Geometry, but with the specified Coordinate Reference System.
+     * This does <em>not</em> transform the coordinate values.
+     * <p>
+     * See {@link Geometry#forceToCrs}
+     * </p>
+     * @param crs the CRS for the returned Geometry
+     * @param defaultCoordinateValue default value used in case the coordinate dimension is expanded
+     * @param <Q>  Position type of the result
+     * @return a copy of this Geometry with the specified Coordinate Reference System
+     */
+    public <Q extends Position> Geometry<Q> toCrs(CoordinateReferenceSystem<Q> crs, double defaultCoordinateValue) {
+        return forceToCrs(this, crs, defaultCoordinateValue);
+    }
+
+    /**
      * Accepts a <code>GeometryVisitor</code>.
      * <p>If this <code>Geometry</code> instance is a <code>GeometryCollection</code> then it will pass the
      * visitor to its contained <code>Geometries</code>.</p>
@@ -351,7 +366,6 @@ public abstract class Geometry<P extends Position> implements Serializable {
         private Object readResolve() throws ObjectStreamException {
             return Wkb.fromWkb(ByteBuffer.from(this.buffer));
         }
-
     }
 
     private static class EnvelopeVisitor<P extends Position> implements PositionVisitor<P> {

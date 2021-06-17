@@ -39,7 +39,7 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
 
     @Override
     public PositionSequenceBuilder<P> add(double... coordinates) {
-        if (coordinates.length != this.factory.getCoordinateDimension())
+        if (coordinates.length < this.factory.getCoordinateDimension())
             throw new IllegalArgumentException(String.format("Parameter must be array of length %d", factory.getCoordinateDimension()));
         for (int i = 0; i < factory.getCoordinateDimension(); i++) {
             addCoordinate(coordinates[i]);

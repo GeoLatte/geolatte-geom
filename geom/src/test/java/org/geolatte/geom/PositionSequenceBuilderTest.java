@@ -34,10 +34,10 @@ public class PositionSequenceBuilderTest {
 
     @Test
     public void testMethodInvocationInconsistentWithDimensionThrowsIllegalStateException() {
-        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, C2D.class);
-        builder.add(1.0, 1.0);
+        PositionSequenceBuilder builder = PositionSequenceBuilders.fixedSized(2, C3D.class);
+        builder.add(1.0, 1.0, 1.0);
         try {
-            builder.add(1.0, 1.0, 1.0);
+            builder.add(1.0, 1.0);
             fail("Adding 3D point to 2D PointSequence should throw IllegalStateException");
         }catch(IllegalArgumentException e){
         }
