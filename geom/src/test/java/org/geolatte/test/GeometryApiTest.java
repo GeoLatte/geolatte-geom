@@ -3,6 +3,7 @@ package org.geolatte.test;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
+import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.LinearUnit;
 import org.geolatte.geom.jts.JTS;
 import org.junit.Test;
@@ -72,6 +73,11 @@ public class GeometryApiTest {
 
     @Test
     public void readme_crs(){
+        CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+        assert crs != null;
+        CoordinateReferenceSystem<C3D> crsZ = crs.addVerticalSystem(LinearUnit.METER, C3D.class);
+        CoordinateReferenceSystem<C3DM> crsZM = crsZ.addLinearSystem(LinearUnit.METER, C3DM.class);
+        assertEquals(4, crsZM.getCoordinateDimension());
 
     }
 }

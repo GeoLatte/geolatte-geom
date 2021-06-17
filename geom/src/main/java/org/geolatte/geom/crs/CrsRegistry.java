@@ -42,7 +42,6 @@ import java.util.function.Function;
  * <p>Currently, the registry is limited to EPSG-defined coordinate reference systems.</p>
  *
  * @author Karel Maesen, Geovise BVBA
- *         creation-date: 8/2/11
  */
 public class CrsRegistry {
 
@@ -117,7 +116,7 @@ public class CrsRegistry {
      * returns the <code>CoordinateReferenceSystem</code> for the specified {@code CrsId}
      *
      * @param crsId the identifier for the Coordinate Reference System
-     * @param fallback the coordinate
+     * @param fallback the coordinate reference system to use, if the specified crsId is registered
      * @return the <code>CoordinateReferenceSystem</code> corresponding to the specified EPSG code, or null if
      * no such system is registered.
      */
@@ -193,6 +192,12 @@ public class CrsRegistry {
         return crsMap.containsKey(CrsId.valueOf(epsgCode));
     }
 
+    /**
+     * Returns the Geographic Coordinate Reference System for the specified EPSG
+     * @param epsgCode the EPSG code for the reference system
+     * @return the requested system, or null when not found
+     * @throws RuntimeException when the system is not geographic
+     */
     public static Geographic2DCoordinateReferenceSystem getGeographicCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(CrsId.valueOf(epsgCode));
         if (crs == null) return null;
@@ -202,6 +207,12 @@ public class CrsRegistry {
         throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
     }
 
+    /**
+     * Returns the Projected Coordinate Reference System for the specified EPSG
+     * @param epsgCode the EPSG code for the reference system
+     * @return the requested system, or null when not found
+     * @throws RuntimeException when the system is not projected
+     */
     public static ProjectedCoordinateReferenceSystem getProjectedCoordinateReferenceSystemForEPSG(int epsgCode) {
         CoordinateReferenceSystem<? extends Position> crs = crsMap.get(CrsId.valueOf(epsgCode));
         if (crs == null) return null;
@@ -210,7 +221,6 @@ public class CrsRegistry {
         }
         throw new RuntimeException(String.format("EPSG code %d doesn't refer to geographic projection system", epsgCode));
     }
-
 
     /**
      * Returns the {@code CrsId} for the specified EPSG Code.

@@ -156,7 +156,12 @@ public class CoordinateReferenceSystems {
     @SuppressWarnings("unchecked")
     public static <P extends Position, R extends Position> CompoundCoordinateReferenceSystem<R> combine
     (CoordinateReferenceSystem<P> base, SingleCoordinateReferenceSystem ods, Class<R> resultCSPtype) {
-        return (CompoundCoordinateReferenceSystem<R>) combine(base, ods);
+        CompoundCoordinateReferenceSystem<R> result = (CompoundCoordinateReferenceSystem<R>) combine(base, ods);
+        //check whether resultCSPtype fits
+        if(!result.getPositionClass().equals(resultCSPtype)) {
+            throw new IllegalArgumentException("Specified Position class inconsistent with result");
+        };
+        return result;
     }
 
     public static <P extends Position, R extends Position> CompoundCoordinateReferenceSystem<R> addLinearSystem

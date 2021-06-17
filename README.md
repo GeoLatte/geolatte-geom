@@ -37,7 +37,6 @@ The library is published on Maven Central. For Maven, you can include the follow
 
 # Quick start
 
-
 ## Creating Geometries
 
 To create a Geometry we first need to specify the Coordinate Reference System we will be working in. Let's say we use
@@ -76,9 +75,9 @@ from WGS84 by adding a Vertical system for the elevation.
 
 ```java
   CoordinateReferenceSystem<G3D>  wgs84E=WGS84.addVerticalSystem(LinearUnit.METER,G3D.class);
-  ...
-          
-  Point<G3D> pntWithElevation=point(wgs84E,g(4.33,53.21,350));
+        ...
+
+        Point<G3D> pointWithElevation=point(wgs84E,g(4.33,53.21,350));
 ```
 
 ## Encoding and Decoding Geometries to WKT/WKB
@@ -89,17 +88,16 @@ Now let's write these out as WKT string.
 import org.geolatte.geom.codec.Wkt;
   
   String wkt=Wkt.toWkt(pnt);
-  // "SRID=4326;POINT(4.33 53.21)"
-  
-  // or maybe using a specific dialect such as SFA 1.2.1
-  String wktZ=Wkt.toWkt(pntWithElevation,Wkt.Dialect.SFA_1_2_1);
-  // "POINT Z (4.33 53.21 350)"
+          // "SRID=4326;POINT(4.33 53.21)"
+
+          // or maybe using a specific dialect such as SFA 1.2.1
+          String wktZ=Wkt.toWkt(pntWithElevation,Wkt.Dialect.SFA_1_2_1);
+// "POINT Z (4.33 53.21 350)"
 ```
 
 There is a very similar API for WKB encoding/decoding (see the `Wkb` codec class).
 
 For historical and practical reasons. The default dialects for WKB/WKT are those used in [Postgis](http://postgis.org).
-
 
 ## Encoding and Decoding to GeoJson
 
@@ -154,8 +152,8 @@ The instantiable subclasses of `Geometry` are:
 
 - `Point`: a single position
 - `LineString`: a 1-dimensional curve specified by linear interpolation between its vertices
-- `Polygon`: a 2-dimensional space enclosed by an outer `LinearRing` (a closed `LineString`), minus the space enclosed by
-  any inner `LinearRing`s.
+- `Polygon`: a 2-dimensional space enclosed by an outer `LinearRing` (a closed `LineString`), minus the space enclosed
+  by any inner `LinearRing`s.
 - `MultiPoint`: a collection of `Point`s
 - `MultiLineString`: a collection of `LineString`s
 - `MultiPolygon`: a collection of `Polygon`s
@@ -163,11 +161,21 @@ The instantiable subclasses of `Geometry` are:
 
 ## <a name="crs"></a>Coordinate Reference Systems
 
-For many operations a `CoordinateReferenceSystem` is required. The most important ways to create or get hold of an 
+For many operations a `CoordinateReferenceSystem` is required. The most important ways to create or get hold of an
 `CoordinateReferenceSystem` instance is:
-- Using the statically declared systems in the `CoordinateReferenceSystems` class (e.g. `WGS84`, `WEB_MERCATOR`)
-- Looking the system up by its [EPSG](https://epsg.org/home.html) ID in the `CrsRepository`. This repository contains most of the coordinate reference
-systems in use.
+
+- Using one of the statically declared systems in the `CoordinateReferenceSystems` class (e.g. `WGS84`, `WEB_MERCATOR`)
+- Find the system by its [EPSG](https://epsg.org/home.html) ID in the `CrsRepository`. The `CrsRegistry` has most of the
+  coordinate reference systems in use.
+
+As already mentioned, you can create higher-dimensional coordinate reference systems by adding a vertical or linear
+system.
+
+```java
+  CoordinateReferenceSystem<C2D> crs=CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+  CoordinateReferenceSystem<C3D> crsZ=crs.addVerticalSystem(LinearUnit.METER,C3D.class);
+  CoordinateReferenceSystem<C3DM> crsZM=crsZ.addLinearSystem(LinearUnit.METER,C3DM.class);
+```
 
 ## Geometry operations
 
@@ -194,15 +202,15 @@ corresponding JTS implementation.
 ```java
     // example of a contains test with planar geometries
     ProjectedGeometryOperations pgo=GeometryOperations.projectedGeometryOperations();
-    Point<C2D> point=point(WEB_MERCATOR,c(4.33,53.21));
-    Polygon<C2D> polygon=polygon(WEB_MERCATOR,ring(c(4.43,53.21),c(4.44,53.22),c(4.43,53.21)));
-    boolean isPntInPoly=pgo.contains(polygon,point);
+            Point<C2D> point=point(WEB_MERCATOR,c(4.33,53.21));
+        Polygon<C2D> polygon=polygon(WEB_MERCATOR,ring(c(4.43,53.21),c(4.44,53.22),c(4.43,53.21)));
+        boolean isPntInPoly=pgo.contains(polygon,point);
 
-    // example  op an operation on measured geometries
-    MeasureGeometryOperations mgo=GeometryOperations.measureGeometryOperations();
-    LineString<C2DM> linestring=linestring(crsM,cM(4.43,53.21,0),cM(4.44,53.20,1),cM(4.45,53.19,2));
-    //create a geometry along the linestring that is between 1.5 and 1.8
-    Geometry<C2DM> c2DMGeometry=mgo.locateBetween(linestring,1.5,1.8);
+        // example  op an operation on measured geometries
+        MeasureGeometryOperations mgo=GeometryOperations.measureGeometryOperations();
+        LineString<C2DM> linestring=linestring(crsM,cM(4.43,53.21,0),cM(4.44,53.20,1),cM(4.45,53.19,2));
+        //create a geometry along the linestring that is between 1.5 and 1.8
+        Geometry<C2DM> c2DMGeometry=mgo.locateBetween(linestring,1.5,1.8);
 ```
 
 # JTS interop
@@ -212,12 +220,12 @@ The `JTS` class supports conversion from/to JTS `Geometry` instances.
 
 ```java
   import org.geolatte.geom.jts.JTS;
-  //Geolatte to JTS
+//Geolatte to JTS
   org.locationtech.jts.geom.Point jtsPoint=JTS.to(point(WGS84,g(4.32,53.12)));
-  //.. and back
-  org.geolatte.geom.Point<?> glPnt=JTS.from(jtsPoint);
-  //or if you know the CRS in advance
-  org.geolatte.geom.Point<G2D> glPnt2=JTS.from(jtsPoint,WGS84);
+          //.. and back
+          org.geolatte.geom.Point<?> glPnt=JTS.from(jtsPoint);
+        //or if you know the CRS in advance
+        org.geolatte.geom.Point<G2D> glPnt2=JTS.from(jtsPoint,WGS84);
 ```
 
 
