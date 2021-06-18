@@ -5,6 +5,7 @@ import static org.geolatte.geom.crs.Unit.UNKNOWN_LINEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.geolatte.geom.G2DM;
 import org.geolatte.geom.G3D;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class TestCrsExtendedId {
     @Test
     public void testAsKeysInCrsRegistry() {
         Geographic2DCoordinateReferenceSystem crs = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-        CompoundCoordinateReferenceSystem<G3D> extended = CoordinateReferenceSystems.addVerticalSystem(crs, G3D.class, METER);
+        CompoundCoordinateReferenceSystem<G2DM> extended = CoordinateReferenceSystems.addLinearSystem(crs, G2DM.class, METER);
 
         CrsId newCrsId = crs.getCrsId().extend(null, METER);
         CrsRegistry.registerCoordinateReferenceSystem(newCrsId, extended);

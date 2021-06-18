@@ -161,6 +161,7 @@ public class CoordinateReferenceSystems {
         if(!result.getPositionClass().equals(resultCSPtype)) {
             throw new IllegalArgumentException("Specified Position class inconsistent with result");
         };
+        //TODO -- also change the CrsId of the result, if not we risk inconsistency between CRS and CrsId
         return result;
     }
 
