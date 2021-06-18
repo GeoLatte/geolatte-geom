@@ -7,6 +7,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import org.geolatte.geom.C2D;
+import org.geolatte.geom.C3D;
 import org.geolatte.geom.LineString;
 import org.geolatte.geom.PositionSequence;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -46,8 +47,7 @@ public class CircularArcLinearizerTest {
 	/* Point on arc in fourth quadrant seen counter-clockwise. */
 	private static C2D POINT_QUADRANT_4 = new C2D(27.0711, 12.9289);
 	
-	private static final CoordinateReferenceSystem<C2D> coordinateRefSystem = CoordinateReferenceSystems.addVerticalSystem(CoordinateReferenceSystems.PROJECTED_2D_METER, C2D.class,
-	            LinearUnit.METER);
+	private static final CoordinateReferenceSystem<C2D> coordinateRefSystem = CoordinateReferenceSystems.PROJECTED_2D_METER;
 	
     private static final int SAMPLE_SIZE = 100;
     private static final double EPSILON = 0.0001d;

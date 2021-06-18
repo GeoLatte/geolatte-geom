@@ -21,17 +21,8 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.*;
-import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 import org.geolatte.geom.codec.testcases.PostgisJDBCWithSRIDTestInputs;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.geolatte.geom.crs.LinearUnit;
-import org.junit.Test;
-
-import static org.geolatte.geom.builder.DSL.*;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.addVerticalSystem;
-import static org.junit.Assert.assertEquals;
+import org.geolatte.geom.codec.testcases.WktWkbCodecTestBase;
 
 /**
  * @author Karel Maesen, Geovise BVBA

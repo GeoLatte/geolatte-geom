@@ -47,7 +47,7 @@ public class TestCrsExtendedId {
     @Test
     public void testAsKeysInCrsRegistry() {
         Geographic2DCoordinateReferenceSystem crs = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
-        CompoundCoordinateReferenceSystem<G3D> extended = CoordinateReferenceSystems.addLinearSystem(crs, G3D.class, METER);
+        CompoundCoordinateReferenceSystem<G3D> extended = CoordinateReferenceSystems.addVerticalSystem(crs, G3D.class, METER);
 
         CrsId newCrsId = crs.getCrsId().extend(null, METER);
         CrsRegistry.registerCoordinateReferenceSystem(newCrsId, extended);
