@@ -19,7 +19,7 @@ abstract class ElemInfoTriplet {
         int interp = triplet[2].intValue();
         ElementType et = ElementType.parseType(etype, interp);
         if (et.isCompound()) {
-            return new CompoundIElemInfoTriplet(sOffset, et);
+            return new CompoundIElemInfoTriplet(sOffset, et, interp);
         } else {
             return new SimpleIElemInfoTriplet(sOffset, et);
         }
@@ -44,6 +44,8 @@ abstract class ElemInfoTriplet {
 
     abstract boolean isCompound();
 
+    abstract int getInterpretation();
+
     ElementType getElementType() {
         return elementType;
     }
@@ -53,7 +55,7 @@ abstract class ElemInfoTriplet {
     void addTo(List<BigDecimal> list) {
         list.add(BigDecimal.valueOf(startingOffset));
         list.add(BigDecimal.valueOf(elementType.getEType()));
-        list.add(BigDecimal.valueOf(elementType.getInterpretation()));
+        list.add(BigDecimal.valueOf(getInterpretation()));
     }
 
 }
@@ -74,6 +76,11 @@ class SimpleIElemInfoTriplet extends ElemInfoTriplet {
         return false;
     }
 
+    @Override
+    int getInterpretation() {
+        return this.getElementType().getInterpretation();
+    }
+
     ElemInfoTriplet shiftStartingOffset(int offset) {
         return new SimpleIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
     }
@@ -82,8 +89,11 @@ class SimpleIElemInfoTriplet extends ElemInfoTriplet {
 
 class CompoundIElemInfoTriplet extends ElemInfoTriplet {
 
-    CompoundIElemInfoTriplet(int sOffset, ElementType et) {
+    private final int numParts;
+
+    CompoundIElemInfoTriplet(int sOffset, ElementType et, int numParts) {
         super(sOffset, et);
+        this.numParts = numParts;
     }
 
     @Override
@@ -97,10 +107,15 @@ class CompoundIElemInfoTriplet extends ElemInfoTriplet {
     }
 
     int numParts() {
-        return getElementType().getInterpretation();
+        return this.numParts;
+    }
+
+    @Override
+    int getInterpretation() {
+        return this.numParts;
     }
 
     ElemInfoTriplet shiftStartingOffset(int offset) {
-        return new CompoundIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
+        return new CompoundIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType(), this.numParts);
     }
 }

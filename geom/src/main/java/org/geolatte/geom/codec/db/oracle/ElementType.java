@@ -29,7 +29,7 @@ enum ElementType {
     UNSUPPORTED(0, true),
     POINT(1, 1),
     ORIENTATION(1, 0),
-    POINT_CLUSTER(1, false),
+    POINT_CLUSTER(1, true),
     LINE_STRAITH_SEGMENTS(2, 1),
     LINE_ARC_SEGMENTS(2, 2),
     INTERIOR_RING_STRAIGHT_SEGMENTS(2003, 1),

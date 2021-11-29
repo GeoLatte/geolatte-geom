@@ -155,7 +155,7 @@ public class SDOGeometry {
         int cnt = 0;
         int i = 0;
         while (i < info.getSize()) {
-            if (info.getElementType(i).isCompound()) {
+            if (info.getElementType(i).isCompound() && info.getElementType(i) != ElementType.POINT_CLUSTER) {
                 final int numCompounds = info.getNumCompounds(i);
                 i += 1 + numCompounds;
             } else {
@@ -248,7 +248,7 @@ public class SDOGeometry {
                 }
                 next++;
             }
-        } else if (elemInfo.isCompound()) {
+        } else if (elemInfo.isCompound() && et.getEType() != 1) {
             next = i + ((CompoundIElemInfoTriplet) elemInfo).numParts() + 1;
         }
         return next;
