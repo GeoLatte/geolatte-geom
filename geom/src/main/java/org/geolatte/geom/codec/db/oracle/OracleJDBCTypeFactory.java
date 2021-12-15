@@ -143,7 +143,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     @Override
     public Array createElemInfoArray(ElemInfo elemInfo, Connection conn) {
         final Object arrayDescriptor = createArrayDescriptor(ElemInfo.TYPE_NAME, conn);
-        return createArray(arrayDescriptor, conn, elemInfo.getElements());
+        return createArray(arrayDescriptor, conn, elemInfo.asRawArray());
     }
 
     @Override

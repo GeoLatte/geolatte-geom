@@ -23,7 +23,9 @@ package org.geolatte.geom.codec.db.oracle;
 
 import java.math.BigDecimal;
 import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Karel Maesen, Geovise BVBA
@@ -34,15 +36,15 @@ class ElemInfo {
     static final String TYPE_NAME = "MDSYS.SDO_ELEM_INFO_ARRAY";
     private BigDecimal[] triplets;
 
-    public ElemInfo(int size) {
-        this.triplets = new BigDecimal[3 * size];
+    public ElemInfo(int numTriplets) {
+        this.triplets = new BigDecimal[3 * numTriplets];
     }
 
-    public ElemInfo(BigDecimal[] elemInfo) {
+    ElemInfo(BigDecimal[] elemInfo) {
         this.triplets = elemInfo;
     }
 
-    public ElemInfo(Array array) {
+    ElemInfo(Array array) {
         if (array == null) {
             this.triplets = new BigDecimal[]{};
             return;
@@ -54,26 +56,60 @@ class ElemInfo {
         }
     }
 
-    public BigDecimal[] getElements() {
+    BigDecimal[] asRawArray() {
         return this.triplets;
     }
 
-    public ElemInfoTriplet[] interpret() {
-        ElemInfoTriplet[] result = new ElemInfoTriplet[getSize()];
-        for (int idx = 0; idx < getSize(); idx++) {
-            BigDecimal[] triplet = new BigDecimal[3];
-            System.arraycopy(this.triplets, 3 * idx, triplet, 0, 3);
-            result[idx] = ElemInfoTriplet.parse(triplet);
+    List<Element> interpret(SDOGType gtype, Double[] ordinates) {
+        int numElements = this.triplets.length / 3;
+        ElementType[] etypes = new ElementType[numElements];
+        //offsets has the start/end ordinate indexes for each element. so
+        //element i has ordinates starting from index offsets[i] up to offsets[i+1]
+        int[] offsets = new int[numElements + 1];
+        int[] interpretations = new int[numElements];
+        for (int idx = 0; idx < numElements; idx++) {
+            offsets[idx] = this.triplets[3 * idx].intValue() - 1;
+            int etype = this.triplets[3 * idx + 1].intValue();
+            int interp = this.triplets[3 * idx + 2].intValue();
+            etypes[idx] = ElementType.parseType(etype, interp);
+            interpretations[idx] = interp;
         }
-        return result;
+        //.. and pointer to after last ordinate
+        offsets[numElements] = ordinates.length;
+
+        List<Element> elements = new ArrayList<>();
+        int i = 0;
+        while (i < etypes.length) {
+            if (etypes[i].isCompound()) {
+                int numSubElems = interpretations[i];
+                List<Element> subElems = new ArrayList<>();
+                for (int k = 0; k < numSubElems; k++) {
+                    // +1 because we need to skip the "header" element
+                    int ordinateStartIndex = offsets[i + k + 1];
+                    int ordinateEndIndex = offsets[i + k + 2];
+                    if (k < numSubElems - 1) {
+                        //the ordinate end coordinate of this sub element is the first coordinate of the next subelement
+                        ordinateEndIndex += gtype.getDimension();
+                    }
+                    subElems.add(new SimpleElement(etypes[i + k + 1],
+                            Arrays.copyOfRange(ordinates, ordinateStartIndex, ordinateEndIndex)));
+                }
+                elements.add(new CompoundElement(etypes[i], subElems));
+                i += numSubElems + 1;
+            } else {
+                elements.add(new SimpleElement(etypes[i], Arrays.copyOfRange(ordinates, offsets[i], offsets[i + 1])));
+                i += 1;
+            }
+        }
+        return elements;
     }
 
     /**
-     * Returns the number of elements
+     * Returns the number of triplets
      *
      * @return
      */
-    public int getSize() {
+    int getNumTriplets() {
         return this.triplets.length / 3;
     }
 
@@ -83,25 +119,22 @@ class ElemInfo {
      * @param i the idx of the element (0-based)
      * @return
      */
-    public int getOrdinatesOffset(int i) {
+    int getOrdinatesOffset(int i) {
         return this.triplets[i * 3].intValue();
     }
 
-    public void setOrdinatesOffset(int i, int offset) {
+    void setOrdinatesOffset(int i, int offset) {
         this.triplets[i * 3] = new BigDecimal(offset);
     }
 
-    public ElementType getElementType(int i) {
+    ElementType getElementType(int i) {
         final int etype = this.triplets[i * 3 + 1].intValue();
         final int interp = this.triplets[i * 3 + 2].intValue();
         return ElementType.parseType(etype, interp);
     }
 
-    public boolean isCompound(int i) {
-        return getElementType(i).isCompound();
-    }
 
-    public int getNumCompounds(int i) {
+    int getNumCompounds(int i) {
         if (getElementType(i).isCompound()) {
             return this.triplets[i * 3 + 2].intValue();
         } else {
@@ -109,51 +142,40 @@ class ElemInfo {
         }
     }
 
-    public void setElement(int i, int ordinatesOffset, ElementType et, int numCompounds) {
-        if (i > getSize()) {
-            throw new RuntimeException(
-                    "Attempted to set more elements in ElemInfo Array than capacity."
-            );
+    void setElement(int i, int ordinatesOffset, ElementType et){
+        if (i > getNumTriplets()) {
+            throw new RuntimeException("Attempted to set more elements in ElemInfo Array than capacity.");
         }
         this.triplets[i * 3] = new BigDecimal(ordinatesOffset);
         this.triplets[i * 3 + 1] = new BigDecimal(et.getEType());
-        this.triplets[i * 3 + 2] = et.isCompound() ?
-                new BigDecimal(numCompounds) :
-                new BigDecimal(et.getInterpretation());
+        this.triplets[i * 3 + 2] = new BigDecimal(et.getInterpretation());
+    }
+
+    void setElement(int i, int ordinatesOffset, ElementType et, int numElements) {
+        if (i > getNumTriplets()) {
+            throw new RuntimeException("Attempted to set more elements in ElemInfo Array than capacity.");
+        }
+        this.triplets[i * 3] = new BigDecimal(ordinatesOffset);
+        this.triplets[i * 3 + 1] = new BigDecimal(et.getEType());
+        this.triplets[i * 3 + 2] = new BigDecimal(numElements);
     }
 
     public String toString() {
         return SDOGeometry.arrayToString(this.triplets);
     }
 
-    public void addElement(BigDecimal[] element) {
+    void addElement(BigDecimal[] element) {
         final BigDecimal[] newTriplets = new BigDecimal[this.triplets.length + element.length];
-        System.arraycopy(
-                this.triplets, 0, newTriplets, 0,
-                this.triplets.length
-        );
-        System.arraycopy(
-                element, 0, newTriplets, this.triplets.length,
-                element.length
-        );
+        System.arraycopy(this.triplets, 0, newTriplets, 0, this.triplets.length);
+        System.arraycopy(element, 0, newTriplets, this.triplets.length, element.length);
         this.triplets = newTriplets;
     }
 
-    public void addElement(ElemInfo element) {
-        this.addElement(element.getElements());
+
+    void addElement(ElemInfo element) {
+        this.addElement(element.asRawArray());
     }
 
-    public BigDecimal[] getElement(int i) {
-        BigDecimal[] ea = null;
-        if (this.getElementType(i).isCompound()) {
-            final int numCompounds = this.getNumCompounds(i);
-            ea = new BigDecimal[numCompounds + 1];
-        } else {
-            ea = new BigDecimal[3];
-        }
-        System.arraycopy(this.triplets, 3 * i, ea, 0, ea.length);
-        return ea;
-    }
 
     @Override
     public boolean equals(Object o) {

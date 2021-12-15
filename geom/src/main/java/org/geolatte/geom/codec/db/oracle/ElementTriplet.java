@@ -8,25 +8,26 @@ import java.util.List;
  * <p>
  * Created by Karel Maesen, Geovise BVBA on 15/02/2020.
  */
-abstract class ElemInfoTriplet {
+@Deprecated
+abstract class ElementTriplet {
 
     private final int startingOffset;
     private final ElementType elementType;
 
-    static ElemInfoTriplet parse(BigDecimal[] triplet) {
+    static ElementTriplet parse(BigDecimal[] triplet) {
         int sOffset = triplet[0].intValue();
         int etype = triplet[1].intValue();
         int interp = triplet[2].intValue();
         ElementType et = ElementType.parseType(etype, interp);
         if (et.isCompound()) {
-            return new CompoundIElemInfoTriplet(sOffset, et);
+            return new CompoundElementTriplet(sOffset, et);
         } else {
-            return new SimpleIElemInfoTriplet(sOffset, et);
+            return new SimpleElementTriplet(sOffset, et);
         }
     }
 
 
-    ElemInfoTriplet(int sOffset, ElementType et) {
+    ElementTriplet(int sOffset, ElementType et) {
         startingOffset = sOffset;
         elementType = et;
     }
@@ -48,7 +49,7 @@ abstract class ElemInfoTriplet {
         return elementType;
     }
 
-    abstract ElemInfoTriplet shiftStartingOffset(int offset);
+    abstract ElementTriplet shiftStartingOffset(int offset);
 
     void addTo(List<BigDecimal> list) {
         list.add(BigDecimal.valueOf(startingOffset));
@@ -58,9 +59,10 @@ abstract class ElemInfoTriplet {
 
 }
 
-class SimpleIElemInfoTriplet extends ElemInfoTriplet {
+@Deprecated
+class SimpleElementTriplet extends ElementTriplet {
 
-    SimpleIElemInfoTriplet(int sOffset, ElementType et) {
+    SimpleElementTriplet(int sOffset, ElementType et) {
         super(sOffset, et);
     }
 
@@ -74,15 +76,15 @@ class SimpleIElemInfoTriplet extends ElemInfoTriplet {
         return false;
     }
 
-    ElemInfoTriplet shiftStartingOffset(int offset) {
-        return new SimpleIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
+    ElementTriplet shiftStartingOffset(int offset) {
+        return new SimpleElementTriplet(this.getStartingOffset() + offset, this.getElementType());
     }
 }
 
+@Deprecated
+class CompoundElementTriplet extends ElementTriplet {
 
-class CompoundIElemInfoTriplet extends ElemInfoTriplet {
-
-    CompoundIElemInfoTriplet(int sOffset, ElementType et) {
+    CompoundElementTriplet(int sOffset, ElementType et) {
         super(sOffset, et);
     }
 
@@ -100,7 +102,8 @@ class CompoundIElemInfoTriplet extends ElemInfoTriplet {
         return getElementType().getInterpretation();
     }
 
-    ElemInfoTriplet shiftStartingOffset(int offset) {
-        return new CompoundIElemInfoTriplet(this.getStartingOffset() + offset, this.getElementType());
+    @Deprecated
+    ElementTriplet shiftStartingOffset(int offset) {
+        return new CompoundElementTriplet(this.getStartingOffset() + offset, this.getElementType());
     }
 }

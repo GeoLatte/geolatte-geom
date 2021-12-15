@@ -18,7 +18,7 @@ public class TestSdoEncodeBug78 {
 
         Geometry<G2D> poly = Wkt.fromWkt(WKT, CoordinateReferenceSystems.WGS84);
 
-        SdoPolygonEncoder encoder = new SdoPolygonEncoder();
+        PolygonSdoEncoder encoder = new PolygonSdoEncoder();
 
         assertNotNull(encoder.encode(poly));
 

@@ -4,8 +4,6 @@ import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -15,47 +13,32 @@ public class MultiPolygonSdoDecoder extends AbstractSDODecoder {
 
     @Override
     public boolean accepts(SDOGeometry nativeGeom) {
-        return nativeGeom.getGType().getTypeGeometry() == TypeGeometry.MULTIPOLYGON;
+        return nativeGeom.getGType().getTypeGeometry() == SdoGeometryType.MULTIPOLYGON;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    Geometry<?> internalDecode(SDOGeometry sdoGeom) {
-        CoordinateReferenceSystem<?> crs = getCoordinateReferenceSystem(sdoGeom);
-        Deque<LinearRing> holes = new LinkedList<LinearRing>();
-        final List<Polygon> polygons = new ArrayList<Polygon>();
-        final ElemInfo info = sdoGeom.getInfo();
-        LinearRing shell = null;
-        int i = 0;
-        while (i < info.getSize()) {
-            PositionSequence cs = null;
-            int numCompounds = 0;
-            if (info.getElementType(i).isCompound()) {
-                numCompounds = info.getNumCompounds(i);
-                cs = add(cs, getCompoundCSeq(i + 1, i + numCompounds, sdoGeom));
-            } else {
-                cs = add(cs, getElementCSeq(i, sdoGeom, false, crs));
+    Geometry<?> internalDecode() {
+        return decode(nativeGeom.getGType(), nativeGeom.getElements(), nativeGeom.getCoordinateReferenceSystem());
+    }
+
+    @Override
+    protected <P extends Position> Geometry<P> decode(SDOGType gtype, List<Element> elements, CoordinateReferenceSystem<P> crs) {
+        List<Polygon<P>> polys = new ArrayList<>();
+        List<Element> rings = new ArrayList<>();
+        AbstractSDODecoder decoder = new PolygonSdoDecoder();
+        for (Element element : elements) {
+            if (element.isExteriorRing() && !rings.isEmpty()) {
+                polys.add((Polygon<P>)decoder.decode(gtype, rings, crs));
+                rings.clear();
             }
-            if (info.getElementType(i).isInteriorRing()) {
-                final LinearRing lr = new LinearRing(cs, crs);
-                holes.addLast(lr);
-            } else {
-                if (shell != null) {
-                    holes.addFirst(shell);
-                    final Polygon polygon = new Polygon(holes.toArray(new LinearRing[holes.size()]));
-                    polygons.add(polygon);
-                    shell = null;
-                }
-                shell = new LinearRing(cs, crs);
-                holes = new LinkedList<LinearRing>();
-            }
-            i += 1 + numCompounds;
+            rings.add(element);
         }
-        if (shell != null) {
-            holes.addFirst(shell);
-            final Polygon polygon = new Polygon(holes.toArray(new LinearRing[holes.size()]));
-            polygons.add(polygon);
+        if (!rings.isEmpty()) {
+            polys.add((Polygon<P>)decoder.decode(gtype, rings, crs));
         }
-        return new MultiPolygon(polygons.toArray(new Polygon[polygons.size()]));
+        return polys.isEmpty() ?
+                new MultiPolygon<>(crs) :
+                new MultiPolygon<>(polys.toArray(new Polygon[0]));
     }
 }

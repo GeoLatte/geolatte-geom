@@ -165,6 +165,7 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         }
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,9 +174,7 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         NestedPositionSequence that = (NestedPositionSequence) o;
 
         if (size != that.size) return false;
-        if (!Arrays.equals(children, that.children)) return false;
-
-        return true;
+        return Arrays.equals(children, that.children);
     }
 
     @Override

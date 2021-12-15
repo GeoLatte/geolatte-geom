@@ -464,13 +464,14 @@ public class DSL {
         }
     }
 
-    public static class EmptyPointToken<P extends Position> extends GeometryToken<P> {
+    public static class EmptyPointToken<P extends Position> extends PointToken<P> {
 
         EmptyPointToken() {
+            super(null);
         }
 
         @Override
-        Geometry<P> toGeometry(CoordinateReferenceSystem<P> crs) {
+        Point<P> toGeometry(CoordinateReferenceSystem<P> crs) {
             return new Point(crs);
         }
     }

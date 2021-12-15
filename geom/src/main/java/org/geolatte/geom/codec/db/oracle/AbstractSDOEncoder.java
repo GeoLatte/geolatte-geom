@@ -14,6 +14,15 @@ import static org.geolatte.geom.PositionSequenceBuilders.fixedSized;
 abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
 
 
+    /**
+     * Returns the dimension for the Measured coordinate
+     * @param geom  geometry to inspect
+     * @param <P> Position type of the geometry
+     * @return the dimension for the Measured coordinate
+     * @deprecated  Use SDOGtype.gtypeFor(Geometry)
+     *
+     */
+    @Deprecated
     protected <P extends Position> int getLRSDim(Geometry<P> geom) {
         if (Measured.class.isAssignableFrom(geom.getPositionClass())) {
             if (geom.getCoordinateDimension() == 3) {
@@ -34,7 +43,7 @@ abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
         }
         int ordinatesOffset = ordinatesPreviousOffset + 1;
         Double[] ordinates = new Double[]{};
-        for (int i = 0; i < info.getSize(); i++) {
+        for (int i = 0; i < info.getNumTriplets(); i++) {
             ElementType et;
             PositionSequence<?> positionSequence;
             if (i == 0) {
@@ -52,7 +61,7 @@ abstract public class AbstractSDOEncoder implements Encoder<SDOGeometry> {
                     positionSequence = reverse(positionSequence);
                 }
             }
-            info.setElement(i, ordinatesOffset, et, 0);
+            info.setElement(i, ordinatesOffset, et);
             ordinates = addOrdinates(ordinates, convertPositionSequence(positionSequence));
             ordinatesOffset = ordinatesPreviousOffset + ordinates.length + 1;
         }

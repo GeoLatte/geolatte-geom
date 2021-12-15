@@ -8,7 +8,7 @@ import org.geolatte.geom.Position;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoGeometryCollectionEncoder extends AbstractSDOEncoder {
+public class GeometryCollectionSdoEncoder extends AbstractSDOEncoder {
 
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
@@ -31,20 +31,20 @@ public class SdoGeometryCollectionEncoder extends AbstractSDOEncoder {
 
     public SDOGeometry join(SDOGeometry[] sdoElements) {
         if (sdoElements == null || sdoElements.length == 0) {
-            return new SDOGeometry(new SDOGType(2, 0, TypeGeometry.COLLECTION), 0, null, null, null);
+            return new SDOGeometry(new SDOGType(2, 0, SdoGeometryType.COLLECTION), 0, null, null, null);
         } else {
             final SDOGeometry firstElement = sdoElements[0];
             final int dim = firstElement.getGType().getDimension();
             final int lrsDim = firstElement.getGType().getLRSDimension();
             final int srid = firstElement.getSRID();
-            SDOGType gtype = new SDOGType(dim, lrsDim, TypeGeometry.COLLECTION);
+            SDOGType gtype = new SDOGType(dim, lrsDim, SdoGeometryType.COLLECTION);
             int ordinatesOffset = 1;
             ElemInfo resultInfo = null;
             Ordinates resultOrdinates = null;
             for (int i = 0; i < sdoElements.length; i++) {
                 final ElemInfo element = sdoElements[i].getInfo();
                 final Double[] ordinates = sdoElements[i].getOrdinates().getOrdinateArray();
-                if (element != null && element.getSize() > 0) {
+                if (element != null && element.getNumTriplets() > 0) {
                     final int shift = ordinatesOffset - element.getOrdinatesOffset(0);
                     SDOGeometry.shiftOrdinateOffset(element, shift);
                     resultInfo = addElementInfo(resultInfo, element);

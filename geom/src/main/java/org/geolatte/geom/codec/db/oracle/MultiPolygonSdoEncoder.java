@@ -5,7 +5,7 @@ import org.geolatte.geom.*;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoMultiPolygonEncoder extends AbstractSDOEncoder {
+public class MultiPolygonSdoEncoder extends AbstractSDOEncoder {
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
         return GeometryType.MULTIPOLYGON.equals(geom.getGeometryType());
@@ -18,7 +18,7 @@ public class SdoMultiPolygonEncoder extends AbstractSDOEncoder {
         final int dim = multiPolygon.getCoordinateDimension();
         final int lrsPos = getLRSDim(multiPolygon);
 
-        SDOGType gType = new SDOGType(dim, lrsPos, TypeGeometry.MULTIPOLYGON);
+        SDOGType gType = new SDOGType(dim, lrsPos, SdoGeometryType.MULTIPOLYGON);
         SDOGeometry sdoGeom = new SDOGeometry(gType, geom.getSRID(), null, null, null);
         for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
             try {

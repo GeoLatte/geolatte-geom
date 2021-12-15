@@ -8,7 +8,7 @@ import org.geolatte.geom.Position;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoMultiLineStringEncoder extends AbstractSDOEncoder {
+public class MultiLineStringSdoEncoder extends AbstractSDOEncoder {
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
         return GeometryType.MULTILINESTRING.equals(geom.getGeometryType());
@@ -22,13 +22,13 @@ public class SdoMultiLineStringEncoder extends AbstractSDOEncoder {
         final int lrsDim = getLRSDim(multiLineString);
         final boolean isLrs = (lrsDim != 0);
 
-        SDOGType sdoGtype = new SDOGType(dim, lrsDim, TypeGeometry.MULTILINE);
+        SDOGType sdoGtype = new SDOGType(dim, lrsDim, SdoGeometryType.MULTILINE);
 
         final ElemInfo info = new ElemInfo(multiLineString.getNumGeometries());
         int oordinatesOffset = 1;
         Double[] ordinates = new Double[]{};
         for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-            info.setElement(i, oordinatesOffset, ElementType.LINE_STRAITH_SEGMENTS, 0);
+            info.setElement(i, oordinatesOffset, ElementType.LINE_STRAIGTH_SEGMENTS);
             ordinates = addOrdinates(ordinates, convertPositionSequence(multiLineString.getGeometryN(i).getPositions()));
             oordinatesOffset = ordinates.length + 1;
         }
