@@ -36,7 +36,7 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
 
     GeoJsonFeature<?, Object> readFeature(ObjectCodec oc, JsonNode root) throws JsonProcessingException {
         JsonNode geomNode = root.get("geometry");
-        Geometry<?> geom = null == geomNode ? null : geomParser.parseGeometry(geomNode);
+        Geometry<?> geom = (null == geomNode || geomNode.isNull()) ? null : geomParser.parseGeometry(geomNode);
 
         Object id = null;
         JsonNode idNode = root.get("id");
