@@ -58,6 +58,7 @@ public class GeoJsonStrings {
 
     static String featureIntId = "{\"type\" : \"Feature\", \"id\": 1, \"geometry\":  {\"type\":\"Point\",\"coordinates\":[1.0,2.0]}, " +
             "\"properties\": { \"a\" : 1 }}";
+    static String featureNullGeometry = "{\"geometry\":null,\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
 
     // crs
     static String crswgs84 = "{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}}";
