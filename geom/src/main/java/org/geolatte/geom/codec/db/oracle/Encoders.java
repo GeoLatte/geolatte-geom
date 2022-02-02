@@ -18,13 +18,13 @@ public class Encoders {
 
 
     static {
-        ENCODERS.add(new SdoPointEncoder());
-        ENCODERS.add(new SdoLineStringEncoder());
-        ENCODERS.add(new SdoPolygonEncoder());
-        ENCODERS.add(new SdoMultiPointEncoder());
-        ENCODERS.add(new SdoMultiLineStringEncoder());
-        ENCODERS.add(new SdoMultiPolygonEncoder());
-        ENCODERS.add(new SdoGeometryCollectionEncoder());
+        ENCODERS.add(new PointSdoEncoder());
+        ENCODERS.add(new LineStringSdoEncoder());
+        ENCODERS.add(new PolygonSdoEncoder());
+        ENCODERS.add(new MultiPointSdoEncoder());
+        ENCODERS.add(new MultiLineStringSdoEncoder());
+        ENCODERS.add(new MultiPolygonSdoEncoder());
+        ENCODERS.add(new GeometryCollectionSdoEncoder());
     }
 
     public static Encoder<SDOGeometry> encoderFor(Geometry<?> geom) {

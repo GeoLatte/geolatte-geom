@@ -7,7 +7,7 @@ import org.geolatte.geom.Position;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoPointEncoder extends AbstractSDOEncoder {
+public class PointSdoEncoder extends AbstractSDOEncoder {
 
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
@@ -24,16 +24,16 @@ public class SdoPointEncoder extends AbstractSDOEncoder {
 
         if (Settings.useSdoPointType() && !isLrs && !geom.isEmpty()) {
             return new SDOGeometry(
-                    new SDOGType(dim, lrsDim, TypeGeometry.POINT),
+                    new SDOGType(dim, lrsDim, SdoGeometryType.POINT),
                     geom.getSRID(),
                     new SDOPoint(coord), null, null
             );
         }
 
         final ElemInfo info = new ElemInfo(1);
-        info.setElement(0, 1, ElementType.POINT, 1);
+        info.setElement(0, 1, ElementType.POINT);
         return new SDOGeometry(
-                new SDOGType(dim, lrsDim, TypeGeometry.POINT),
+                new SDOGType(dim, lrsDim, SdoGeometryType.POINT),
                 geom.getSRID(),
                 null,
                 info,

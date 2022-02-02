@@ -30,43 +30,48 @@ enum ElementType {
     POINT(1, 1),
     ORIENTATION(1, 0),
     POINT_CLUSTER(1, false),
-    LINE_STRAITH_SEGMENTS(2, 1),
+    LINE_STRAIGTH_SEGMENTS(2, 1),
     LINE_ARC_SEGMENTS(2, 2),
     INTERIOR_RING_STRAIGHT_SEGMENTS(2003, 1),
+    EXTERIOR_RING_STRAIGHT_SEGMENTS(1003, 1),
+    EXTERIOR_RING_ARC_SEGMENTS(1003, 2),
+    INTERIOR_RING_ARC_SEGMENTS(2003, 2),
+    INTERIOR_RING_RECT(2003, 3),
+    EXTERIOR_RING_RECT(1003, 3),
+    EXTERIOR_RING_CIRCLE(1003, 4),
+    INTERIOR_RING_CIRCLE(2003, 4),
+    COMPOUND_LINESTRING(4, true),
+    COMPOUND_EXTERIOR_RING(1005, true),
+    COMPOUND_INTERIOR_RING(2005, true),
+
     /**
      * Some sort of old geometry.
      */
     PLAIN_OLD_EXTERIOR_RING_STRAIGHT_SEGMENTS(3, 1),
-    PLAIN_OLD_COMPOUND_EXTERIOR_RING(5, true),
-    /**
-     * Straight segments.
-     */
-    EXTERIOR_RING_STRAIGHT_SEGMENTS(1003, 1),
-    INTERIOR_RING_ARC_SEGMENTS(2003, 2),
-    EXTERIOR_RING_ARC_SEGMENTS(1003, 2),
-    INTERIOR_RING_RECT(2003, 3),
-    EXTERIOR_RING_RECT(1003, 3),
-    INTERIOR_RING_CIRCLE(2003, 4),
-    EXTERIOR_RING_CIRCLE(1003, 4),
-    COMPOUND_LINE(4, true),
-    COMPOUND_EXTERIOR_RING(1005, true),
-    COMPOUND_INTERIOR_RING(2005, true);
+    PLAIN_OLD_COMPOUND_EXTERIOR_RING(5, true);
 
     private final int etype;
 
     private int interpretation = 2;
 
-    private boolean compound;
+    private final boolean compound;
+    private final boolean hasArcSegments;
+    private final boolean isCircle;
 
     ElementType(int etype, int interp) {
-        this.etype = etype;
-        this.interpretation = interp;
-
+        this(etype, interp, false);
     }
 
     ElementType(int etype, boolean compound) {
+        this(etype, -1, compound);
+    }
+
+    ElementType(int etype, int interp, boolean compound) {
         this.etype = etype;
+        this.interpretation = interp;
         this.compound = compound;
+        this.isCircle = (etype == 1003 || etype == 2003) && interpretation == 4;
+        this.hasArcSegments = (etype == 1003 || etype == 2003 || etype == 2) && interpretation == 2;
     }
 
     public int getEType() {
@@ -97,16 +102,12 @@ enum ElementType {
         return (etype == 1003 || etype == 1005);
     }
 
-    public boolean isStraightSegment() {
-        return (interpretation == 1);
-    }
-
-    public boolean isArcSegment() {
-        return (interpretation == 2);
+    public boolean hasArcSegment() {
+        return this.hasArcSegments;
     }
 
     public boolean isCircle() {
-        return (interpretation == 4);
+        return this.isCircle;
     }
 
     public boolean isRect() {
@@ -114,12 +115,16 @@ enum ElementType {
     }
 
     public static ElementType parseType(int etype, int interpretation) {
+
         for (ElementType t : values()) {
             if (t.etype == etype) {
                 if (t.isCompound() || t.getInterpretation() == interpretation) {
                     return t;
                 }
             }
+        }
+        if (etype == 1 && interpretation > 1) {
+            return POINT_CLUSTER;
         }
         throw new RuntimeException("Can't determine ElementType from etype:" + etype + " and interp.:" + interpretation);
     }

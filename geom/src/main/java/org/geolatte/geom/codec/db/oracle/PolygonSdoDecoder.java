@@ -1,10 +1,12 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.LinearRing;
-import org.geolatte.geom.Polygon;
-import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 19/03/15.
@@ -13,36 +15,34 @@ public class PolygonSdoDecoder extends AbstractSDODecoder {
 
     @Override
     public boolean accepts(SDOGeometry nativeGeom) {
-        return nativeGeom.getGType().getTypeGeometry() == TypeGeometry.POLYGON;
+        return nativeGeom.getGType().getTypeGeometry() == SdoGeometryType.POLYGON;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    Geometry<?> internalDecode(SDOGeometry sdoGeom) {
-        CoordinateReferenceSystem crs = getCoordinateReferenceSystem(sdoGeom);
-        LinearRing shell = null;
-        final LinearRing[] rings = new LinearRing[sdoGeom.getNumElements()];
-        final ElemInfo info = sdoGeom.getInfo();
-        int i = 0;
-        int idxInteriorRings = 1;
-        while (i < info.getSize()) {
-            PositionSequence cs = null;
-            int numCompounds = 0;
-            if (info.getElementType(i).isCompound()) {
-                numCompounds = info.getNumCompounds(i);
-                cs = add(cs, getCompoundCSeq(i + 1, i + numCompounds, sdoGeom));
-            } else {
-                cs = add(cs, getElementCSeq(i, sdoGeom, false, crs));
+    Geometry<?> internalDecode() {
+        return decode(nativeGeom.getGType(), nativeGeom.getElements(), nativeGeom.getCoordinateReferenceSystem());
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Override
+    protected <P extends Position> Geometry<P> decode(SDOGType gtype, List<Element> elements, CoordinateReferenceSystem<P> crs) {
+        LinearRing[] rings = new LinearRing[elements.size()];
+
+        int idx = 1;
+        for(Element element: elements ) {
+            if (element.getElementType().isInteriorRing()) {
+                rings[idx++] = new LinearRing(element.linearizedPositions(gtype, crs), crs);
             }
-            if (info.getElementType(i).isInteriorRing()) {
-                rings[idxInteriorRings] = new LinearRing(cs, crs);
-                idxInteriorRings++;
-            } else {
-                rings[0] = new LinearRing(cs, crs);
+            else {
+                rings[0] = new LinearRing(element.linearizedPositions(gtype, crs), crs);
             }
-            i += 1 + numCompounds;
+        }
+
+        if( !Arrays.stream(rings).allMatch(Objects::nonNull)){
+            //only possible when number of exterior rings != 1.
+            throw new IllegalStateException("Invalid null ring found when attempting to construct polygon");
         }
         return new Polygon(rings);
-
     }
 }

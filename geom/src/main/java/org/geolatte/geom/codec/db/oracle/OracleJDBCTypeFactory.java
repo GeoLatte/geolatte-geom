@@ -40,6 +40,7 @@ import java.util.Arrays;
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jul 3, 2010
  */
+@SuppressWarnings("unused") //very much used in Hibernate Spatial
 public class OracleJDBCTypeFactory implements SQLTypeFactory {
 
     private final Class<?> datumClass;
@@ -143,7 +144,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     @Override
     public Array createElemInfoArray(ElemInfo elemInfo, Connection conn) {
         final Object arrayDescriptor = createArrayDescriptor(ElemInfo.TYPE_NAME, conn);
-        return createArray(arrayDescriptor, conn, elemInfo.getElements());
+        return createArray(arrayDescriptor, conn, elemInfo.asRawArray());
     }
 
     @Override
@@ -164,9 +165,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
                 return (Array) arrayConstructor.newInstance(descriptor, conn, dataAsBigDecimal);
             }
             return (Array) arrayConstructor.newInstance(descriptor, conn, data);
-        } catch (InstantiationException e) {
-            throw new RuntimeException("Problem creating ARRAY.", e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException("Problem creating ARRAY.", e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException("Problem creating ARRAY.", e);
@@ -176,11 +175,9 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     private Struct createStruct(Object descriptor, Connection conn, Object[] attributes) {
         try {
             return (Struct) structConstructor.newInstance(descriptor, conn, attributes);
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | InvocationTargetException e) {
             throw new RuntimeException("Problem creating STRUCT.", e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Problem creating STRUCT.", e);
-        } catch (InvocationTargetException e) {
             throw new RuntimeException("Problem creating STRUCT.", e);
         }
     }
@@ -198,9 +195,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     private Object createArrayDescriptor(String name, Connection conn) {
         try {
             return arrayDescriptorCreator.invoke(null, name, conn);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Error creating oracle ARRAY", e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Error creating oracle ARRAY", e);
         }
     }
@@ -213,9 +208,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     private Object createInteger(int obj) {
         try {
             return numberConstructor.newInstance(obj);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Error creating oracle NUMBER", e);
-        } catch (InstantiationException e) {
+        } catch (InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Error creating oracle NUMBER", e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Error creating oracle NUMBER", e);
@@ -225,9 +218,7 @@ public class OracleJDBCTypeFactory implements SQLTypeFactory {
     private Object createDouble(Double obj) {
         try {
             return obj == null ? null : bigDecimalConstructor.newInstance(BigDecimal.valueOf(obj));
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException("Error creating oracle NUMBER", e);
-        } catch (InstantiationException e) {
+        } catch (InvocationTargetException | InstantiationException e) {
             throw new RuntimeException("Error creating oracle NUMBER", e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Error creating oracle NUMBER", e);

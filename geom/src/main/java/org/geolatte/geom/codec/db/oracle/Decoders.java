@@ -10,7 +10,7 @@ import java.sql.Struct;
  */
 public class Decoders {
 
-    public static Decoder decoderFor(SDOGeometry object) {
+    public static Decoder<SDOGeometry> decoderFor(SDOGeometry object) {
         return object.getGType().getTypeGeometry().createDecoder();
     }
 
@@ -20,13 +20,13 @@ public class Decoders {
      * @param raw
      * @return
      */
-    public static Geometry decode(Struct raw) {
+    public static Geometry<?> decode(Struct raw) {
         SDOGeometry sdo = SDOGeometry.load(raw);
         return decode(sdo);
     }
 
-    public static Geometry decode(SDOGeometry sdo) {
-        Decoder decoder = decoderFor(sdo);
+    public static Geometry<?> decode(SDOGeometry sdo) {
+        Decoder<SDOGeometry> decoder = decoderFor(sdo);
         return decoder.decode(sdo);
     }
 

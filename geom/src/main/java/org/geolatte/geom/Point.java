@@ -36,6 +36,9 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
 
     public Point(PositionSequence<P> sequence, CoordinateReferenceSystem<P> crs) {
         super(sequence, crs);
+        if (sequence.size() > 1) {
+            throw new IllegalArgumentException("Points can only contain a single position");
+        }
     }
 
     public Point(P position, CoordinateReferenceSystem<P> crs) {

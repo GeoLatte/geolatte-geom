@@ -21,6 +21,9 @@
 
 package org.geolatte.geom.codec.db.oracle;
 
+import org.geolatte.geom.Geometry;
+import org.geolatte.geom.Position;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  * creation-date: Jun 30, 2010
@@ -31,27 +34,38 @@ class SDOGType {
 
     private int lrsDimension;
 
-    private TypeGeometry typeGeometry = TypeGeometry.UNKNOWN_GEOMETRY;
+    private SdoGeometryType sdoGeometryType = SdoGeometryType.UNKNOWN_GEOMETRY;
 
-    static SDOGType derive(ElementType elementType, SDOGeometry origGeom) {
+    static <P extends Position> SDOGType gtypeFor(Geometry<P> geometry) {
+        SdoGeometryType sdoGeometryType = SdoGeometryType.forGeometry(geometry);
+        if (sdoGeometryType == null) {
+            throw new IllegalStateException("Can't determine TypeGeometry for geometries of type " + geometry.getGeometryType());
+        }
+        int lrsDimension = geometry.hasM() ? geometry.getCoordinateDimension() : 0;
+        return new SDOGType(geometry.getCoordinateDimension(), lrsDimension, sdoGeometryType);
+    }
+
+
+    @Deprecated
+    static SDOGType derive(ElementType elementType, SDOGType gtype) {
         switch (elementType) {
             case POINT:
             case ORIENTATION:
                 return new SDOGType(
-                        origGeom.getDimension(), origGeom
-                        .getLRSDimension(), TypeGeometry.POINT
+                        gtype.getDimension(), gtype
+                        .getLRSDimension(), SdoGeometryType.POINT
                 );
             case POINT_CLUSTER:
                 return new SDOGType(
-                        origGeom.getDimension(), origGeom
-                        .getLRSDimension(), TypeGeometry.MULTIPOINT
+                        gtype.getDimension(), gtype
+                        .getLRSDimension(), SdoGeometryType.MULTIPOINT
                 );
             case LINE_ARC_SEGMENTS:
-            case LINE_STRAITH_SEGMENTS:
-            case COMPOUND_LINE:
+            case LINE_STRAIGTH_SEGMENTS:
+            case COMPOUND_LINESTRING:
                 return new SDOGType(
-                        origGeom.getDimension(), origGeom
-                        .getLRSDimension(), TypeGeometry.LINE
+                        gtype.getDimension(), gtype
+                        .getLRSDimension(), SdoGeometryType.LINE
                 );
             case COMPOUND_EXTERIOR_RING:
             case EXTERIOR_RING_ARC_SEGMENTS:
@@ -59,20 +73,18 @@ class SDOGType {
             case EXTERIOR_RING_RECT:
             case EXTERIOR_RING_STRAIGHT_SEGMENTS:
                 return new SDOGType(
-                        origGeom.getDimension(), origGeom
-                        .getLRSDimension(), TypeGeometry.POLYGON
+                        gtype.getDimension(), gtype
+                        .getLRSDimension(), SdoGeometryType.POLYGON
                 );
             default:
                 return null;
         }
     }
 
-
-    public SDOGType(int dimension, int lrsDimension,
-                    TypeGeometry typeGeometry) {
+    public SDOGType(int dimension, int lrsDimension, SdoGeometryType sdoGeometryType) {
         setDimension(dimension);
         setLrsDimension(lrsDimension);
-        setTypeGeometry(typeGeometry);
+        setTypeGeometry(sdoGeometryType);
     }
 
     public int getDimension() {
@@ -81,26 +93,26 @@ class SDOGType {
 
     public void setDimension(int dimension) {
         if (dimension < 2 || dimension > 4) {
-            throw new IllegalArgumentException(
-                    "Dimension can only be 2,3 or 4."
-            );
+            throw new IllegalArgumentException("Dimension can only be 2,3 or 4.");
         }
         this.dimension = dimension;
     }
 
-    public TypeGeometry getTypeGeometry() {
-        return typeGeometry;
+    public SdoGeometryType getTypeGeometry() {
+        return sdoGeometryType;
     }
 
-    public void setTypeGeometry(TypeGeometry typeGeometry) {
+    public void setTypeGeometry(SdoGeometryType sdoGeometryType) {
 
-        this.typeGeometry = typeGeometry;
+        this.sdoGeometryType = sdoGeometryType;
     }
 
     public int getLRSDimension() {
         if (this.lrsDimension > 0) {
             return this.lrsDimension;
-        } else if (this.lrsDimension == 0 && this.dimension == 4) {
+        }
+        //TODO -- why would this be necessary?
+        else if (this.lrsDimension == 0 && this.dimension == 4) {
             return 4;
         }
         return 0;
@@ -124,9 +136,7 @@ class SDOGType {
 
     public void setLrsDimension(int lrsDimension) {
         if (lrsDimension != 0 && lrsDimension > this.dimension) {
-            throw new IllegalArgumentException(
-                    "lrsDimension must be 0 or lower or equal to dimenstion."
-            );
+            throw new IllegalArgumentException("lrsDimension must be 0 or lower or equal to dimension.");
         }
         this.lrsDimension = lrsDimension;
     }
@@ -134,7 +144,7 @@ class SDOGType {
     public int intValue() {
         int v = this.dimension * 1000;
         v += lrsDimension * 100;
-        v += typeGeometry.intValue();
+        v += sdoGeometryType.intValue();
         return v;
     }
 
@@ -143,8 +153,8 @@ class SDOGType {
         v -= dim * 1000;
         final int lrsDim = v / 100;
         v -= lrsDim * 100;
-        final TypeGeometry typeGeometry = TypeGeometry.parse(v);
-        return new SDOGType(dim, lrsDim, typeGeometry);
+        final SdoGeometryType sdoGeometryType = SdoGeometryType.parse(v);
+        return new SDOGType(dim, lrsDim, sdoGeometryType);
     }
 
     public static SDOGType parse(Object datum) {
@@ -171,14 +181,14 @@ class SDOGType {
 
         if (dimension != sdogType.dimension) return false;
         if (lrsDimension != sdogType.lrsDimension) return false;
-        return typeGeometry == sdogType.typeGeometry;
+        return sdoGeometryType == sdogType.sdoGeometryType;
     }
 
     @Override
     public int hashCode() {
         int result = dimension;
         result = 31 * result + lrsDimension;
-        result = 31 * result + (typeGeometry != null ? typeGeometry.hashCode() : 0);
+        result = 31 * result + (sdoGeometryType != null ? sdoGeometryType.hashCode() : 0);
         return result;
     }
 }

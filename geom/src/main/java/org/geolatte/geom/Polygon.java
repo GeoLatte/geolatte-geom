@@ -88,7 +88,6 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
         this.rings = Arrays.copyOf(rings, rings.length);
     }
 
-
     private void checkRings(LinearRing<P>[] rings) {
         CoordinateReferenceSystem<P> crs = getCrs(rings);
         for (LinearRing<P> ring : rings) {

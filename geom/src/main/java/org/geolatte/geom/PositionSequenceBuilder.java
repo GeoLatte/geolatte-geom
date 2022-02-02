@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import java.util.Collection;
+
 /**
  * A builder for <code>PositionSequence</code>s.
  *
@@ -37,6 +39,11 @@ public interface PositionSequenceBuilder<P extends Position> {
      * @return this instance
      */
     PositionSequenceBuilder<P> add(double... coordinates);
+
+    default PositionSequenceBuilder<P> addAll(Collection<P> positions) {
+        positions.forEach(this::add);
+        return this;
+    }
 
     /**
      * Adds a {@code} Position to the <code>PositionSequence</code> being built.

@@ -8,7 +8,7 @@ import org.geolatte.geom.Position;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class SdoMultiPointEncoder extends AbstractSDOEncoder {
+public class MultiPointSdoEncoder extends AbstractSDOEncoder {
     @Override
     public <P extends Position> boolean accepts(Geometry<P> geom) {
         return GeometryType.MULTIPOINT.equals(geom.getGeometryType());
@@ -22,20 +22,21 @@ public class SdoMultiPointEncoder extends AbstractSDOEncoder {
         final boolean isLrs = (lrsDim != 0);
         MultiPoint<P> multiPoint = (MultiPoint<P>) geom;
 
-        final ElemInfo info = new ElemInfo(multiPoint.getNumGeometries());
-        int oordinatesOffset = 1;
+        final ElemInfo info = new ElemInfo(1);
+        info.setElement(0, 1, ElementType.POINT, multiPoint.getNumGeometries());
         Double[] ordinates = new Double[]{};
         for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
-            info.setElement(i, oordinatesOffset, ElementType.POINT, 0);
             ordinates = addOrdinates(ordinates, pointToOrdinates(multiPoint, i));
-            oordinatesOffset = ordinates.length + 1;
         }
 
-        return new SDOGeometry(new SDOGType(dim, lrsDim, TypeGeometry.MULTIPOINT), geom.getSRID(), null, info, new
+        return new SDOGeometry(new SDOGType(dim, lrsDim, SdoGeometryType.MULTIPOINT), geom.getSRID(), null, info, new
                 Ordinates(ordinates));
     }
 
     private Double[] pointToOrdinates(MultiPoint<?> multiPoint, int i) {
+        if (multiPoint.getGeometryN(i).isEmpty()) {
+            return new Double[]{};
+        }
         Double[] pointOrdinates = new Double[multiPoint.getCoordinateDimension()];
         int idx = 0;
         for (double d : multiPoint.getGeometryN(i).getPosition().toArray(null)) {

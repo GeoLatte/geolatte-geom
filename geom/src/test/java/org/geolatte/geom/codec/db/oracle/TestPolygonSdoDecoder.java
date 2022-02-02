@@ -1,10 +1,8 @@
 package org.geolatte.geom.codec.db.oracle;
 
 import org.geolatte.geom.*;
-import org.geolatte.geom.crs.CompoundCoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.GeographicCoordinateReferenceSystem;
-import org.geolatte.geom.crs.LinearUnit;
 import org.junit.Test;
 
 import static org.geolatte.geom.builder.DSL.*;
@@ -15,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class TestSdoGeometryPolygonDecoder {
+public class TestPolygonSdoDecoder {
 
     GeographicCoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 

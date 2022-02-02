@@ -101,12 +101,12 @@ public class JTSUtilsTest {
     @Test
     public void testEqualPolygonsAreEqual() {
         Polygon pg1 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         ));
         Polygon pg2 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         ));
         assertTrue(equalsExact3D(pg1, pg2));
     }
@@ -114,20 +114,21 @@ public class JTSUtilsTest {
     @Test
     public void testUnEqualPolygonsAreUnEqual() {
         Polygon pg1 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)))
+                        ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40))
+                )
         );
         Polygon pg2 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.3, 40.2), g(3, 40)))
-        );
+                ring(g(3, 40), g(3.2, 40.2), g(3.1, 40), g(3, 40))
+        ));
         assertFalse(equalsExact3D(pg1, pg2));
 
         pg1 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         ));
         pg2 = (Polygon) JTS.to(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.03, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.08), g(3.12, 39.9), g(3.01, 40.01))
         ));
         assertFalse(equalsExact3D(pg1, pg2));
     }
@@ -165,24 +166,24 @@ public class JTSUtilsTest {
                 linestring(g(3, 50), g(3.1, 50.2)),
                 point(g(4, 52)),
                 polygon(
-                        ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                        ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
                 )
         ));
         Geometry ml2 = JTS.to(geometrycollection(WGS84,
                 linestring(g(3, 50), g(3.1, 50.2)),
                 point(g(4, 52)),
                 polygon(
-                        ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                        ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
                 )
         ));
         Geometry ml3 = JTS.to(geometrycollection(WGS84,
                 linestring(g(3, 50), g(3.1, 50.2)),
                 point(g(4, 52)),
                 polygon(
-                        ring(g(3, 40), g(3.1, 40.1), g(3, 40)),
-                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                        ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                        ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.8), g(3.01, 40.01))
                 )
         ));
         assertTrue(equalsExact3D(ml1, ml2));
@@ -216,16 +217,16 @@ public class JTSUtilsTest {
     @Test
     public void testMultiPolygonsWithOneGeom() {
         MultiPolygon mpg1 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         )));
         MultiPolygon mpg2 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.02, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         )));
         MultiPolygon mpg3 = (MultiPolygon) JTS.to(multipolygon(polygon(WGS84,
-                ring(g(3, 40), g(3.2, 40.1), g(3, 40)),
-                ring(g(3.01, 40.01), g(3.03, 40.09), g(3.01, 40.01))
+                ring(g(3, 40), g(3.2, 40.1), g(3.1, 40), g(3, 40)),
+                ring(g(3.01, 40.01), g(3.022, 40.09), g(3.12, 39.9), g(3.01, 40.01))
         )));
         assertTrue(equalsExact3D(mpg1, mpg2));
         assertFalse(equalsExact3D(mpg1, mpg3));

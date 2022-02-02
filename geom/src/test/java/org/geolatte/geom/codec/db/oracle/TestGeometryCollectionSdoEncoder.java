@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by Karel Maesen, Geovise BVBA on 01/04/15.
  */
-public class TestSdoGeometryCollectionEncoder {
+public class TestGeometryCollectionSdoEncoder {
 
     GeographicCoordinateReferenceSystem<G2D> wgs84 = CrsRegistry.getGeographicCoordinateReferenceSystemForEPSG(4326);
 
