@@ -11,6 +11,7 @@ import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.GeoJsonStrings.*;
+
 import static org.junit.Assert.assertEquals;
 
 /**
