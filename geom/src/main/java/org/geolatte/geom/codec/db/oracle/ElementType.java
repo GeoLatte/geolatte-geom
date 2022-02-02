@@ -66,13 +66,14 @@ enum ElementType {
         this(etype, -1, compound);
     }
 
-    ElementType(int etype, int interp, boolean compound ) {
+    ElementType(int etype, int interp, boolean compound) {
         this.etype = etype;
         this.interpretation = interp;
         this.compound = compound;
         this.isCircle = (etype == 1003 || etype == 2003) && interpretation == 4;
         this.hasArcSegments = (etype == 1003 || etype == 2003 || etype == 2) && interpretation == 2;
     }
+
     public int getEType() {
         return this.etype;
     }
@@ -101,10 +102,6 @@ enum ElementType {
         return (etype == 1003 || etype == 1005);
     }
 
-    public boolean isStraightSegment() {
-        return (interpretation == 1);
-    }
-
     public boolean hasArcSegment() {
         return this.hasArcSegments;
     }
@@ -117,15 +114,11 @@ enum ElementType {
         return (interpretation == 3);
     }
 
-    public int getNumElements(){
-        return (etype == 1 && interpretation > 1 )|| isCompound() ? interpretation : 1;
-    }
-
     public static ElementType parseType(int etype, int interpretation) {
 
         for (ElementType t : values()) {
             if (t.etype == etype) {
-                if (t.isCompound() || t.getInterpretation() == interpretation ) {
+                if (t.isCompound() || t.getInterpretation() == interpretation) {
                     return t;
                 }
             }

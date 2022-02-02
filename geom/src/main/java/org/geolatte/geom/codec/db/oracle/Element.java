@@ -1,6 +1,6 @@
 package org.geolatte.geom.codec.db.oracle;
 
-import org.geolatte.LLAPositionVisitors;
+import org.geolatte.geom.LLAPositionVisitors;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
@@ -38,10 +38,6 @@ abstract class Element {
 
     boolean isInteriorRing(){
         return this.elementType.isInteriorRing();
-    }
-
-    boolean isPolygonRing(){
-        return this.isExteriorRing() || this.isInteriorRing();
     }
 
     abstract <P extends Position> PositionSequence<P> linearizedPositions(SDOGType gtype, CoordinateReferenceSystem<P> crs);

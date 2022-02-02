@@ -1,9 +1,4 @@
-package org.geolatte;
-
-import org.geolatte.geom.LLAPositionVisitor;
-import org.geolatte.geom.Position;
-import org.geolatte.geom.PositionSequence;
-import org.geolatte.geom.PositionSequenceBuilder;
+package org.geolatte.geom;
 
 public class LLAPositionVisitors {
 

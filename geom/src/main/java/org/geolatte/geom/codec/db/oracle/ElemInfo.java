@@ -127,22 +127,7 @@ class ElemInfo {
         this.triplets[i * 3] = new BigDecimal(offset);
     }
 
-    ElementType getElementType(int i) {
-        final int etype = this.triplets[i * 3 + 1].intValue();
-        final int interp = this.triplets[i * 3 + 2].intValue();
-        return ElementType.parseType(etype, interp);
-    }
-
-
-    int getNumCompounds(int i) {
-        if (getElementType(i).isCompound()) {
-            return this.triplets[i * 3 + 2].intValue();
-        } else {
-            return 1;
-        }
-    }
-
-    void setElement(int i, int ordinatesOffset, ElementType et){
+    void setElement(int i, int ordinatesOffset, ElementType et) {
         if (i > getNumTriplets()) {
             throw new RuntimeException("Attempted to set more elements in ElemInfo Array than capacity.");
         }

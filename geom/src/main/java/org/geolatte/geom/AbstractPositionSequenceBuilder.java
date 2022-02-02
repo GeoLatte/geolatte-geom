@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import java.util.Collection;
+
 /**
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/25/11
