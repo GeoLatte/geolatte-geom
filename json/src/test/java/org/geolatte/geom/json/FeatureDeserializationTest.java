@@ -1,10 +1,6 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Feature;
-import org.geolatte.geom.G2D;
-import org.geolatte.geom.LineString;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,7 +11,7 @@ import static org.geolatte.geom.builder.DSL.g;
 import static org.geolatte.geom.builder.DSL.point;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.geolatte.geom.json.GeoJsonStrings.*;
-import static org.geolatte.geom.json.Setting.SUPPRESS_CRS_SERIALIZATION;
+
 import static org.junit.Assert.assertEquals;
 
 /**
