@@ -17,6 +17,8 @@ public interface Feature< P extends Position, ID> {
 
     Map<String, Object> getProperties();
 
+    Box<P> getBbox();
+
     default String getType(){
         return TYPE;
     }
