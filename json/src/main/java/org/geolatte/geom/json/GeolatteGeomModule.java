@@ -26,6 +26,7 @@ public class GeolatteGeomModule extends SimpleModule {
 
     private GeometrySerializer geometrySerializer;
     private CrsSerializer crsSerializer;
+    private BoxSerializer boxSerializer;
 
     public GeolatteGeomModule() {
         this(WGS84);
@@ -41,6 +42,8 @@ public class GeolatteGeomModule extends SimpleModule {
         addSerializer(Geometry.class, geometrySerializer); //use raw to get this compiled
         crsSerializer = new CrsSerializer<>(defaultCrs, settings);
         addSerializer(CoordinateReferenceSystem.class, crsSerializer);
+        boxSerializer = new BoxSerializer<>();
+        addSerializer(Box.class, boxSerializer);
         dezers.put(Geometry.class, parser);
         dezers.put(Point.class, parser);
         dezers.put(LineString.class, parser);

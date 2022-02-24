@@ -54,11 +54,13 @@ public class GeoJsonStrings {
 
     // Features
     static String feature = "{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[1.0,2.0]},\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
+    static String featureWithLineString = "{\"geometry\":{\"type\":\"LineString\",\"coordinates\":[[1.0,2.0],[3.0,4.0]]},\"id\":\"1\",\"properties\":{\"a\":1},\"bbox\":[1.0,2.0,3.0,4.0],\"type\":\"Feature\"}";
 
 
     static String featureIntId = "{\"type\" : \"Feature\", \"id\": 1, \"geometry\":  {\"type\":\"Point\",\"coordinates\":[1.0,2.0]}, " +
             "\"properties\": { \"a\" : 1 }}";
     static String featureNullGeometry = "{\"geometry\":null,\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
+    static String featureEmptyPolygon = "{\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[]},\"id\":\"1\",\"properties\":{\"a\":1},\"type\":\"Feature\"}";
 
     // crs
     static String crswgs84 = "{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}}";
@@ -68,6 +70,6 @@ public class GeoJsonStrings {
     static String crswgs84WithLink = "{\"type\":\"link\",\"properties\":{\"href\":\"http://wwww.opengis.net/def/crs/EPSG/4326\"}}";
 
     //FeatureCollection
-    static String featureCollection = "{\"features\":[{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[102.0,0.5]},\"id\":\"1\",\"properties\":{\"prop0\":\"value0\"},\"type\":\"Feature\"},{\"geometry\":{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[[102.0,0.0],[103.0,1.0],[104.0,0.0],[105.0,1.0]]},\"id\":\"2\",\"properties\":{\"prop1\":0.0,\"prop0\":\"value0\"},\"type\":\"Feature\"}],\"type\":\"FeatureCollection\"}";
+    static String featureCollection = "{\"features\":[{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[102.0,0.5]},\"id\":\"1\",\"properties\":{\"prop0\":\"value0\"},\"type\":\"Feature\"},{\"geometry\":{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[[102.0,0.0],[103.0,1.0],[104.0,0.0],[105.0,1.0]]},\"id\":\"2\",\"properties\":{\"prop1\":0.0,\"prop0\":\"value0\"},\"bbox\":[102.0,0.0,105.0,1.0],\"type\":\"Feature\"}],\"bbox\":[102.0,0.0,105.0,1.0],\"type\":\"FeatureCollection\"}";
     static String emptyFeatureCollection = "{\"features\":[],\"type\":\"FeatureCollection\"}";
 }
