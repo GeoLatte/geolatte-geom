@@ -1,6 +1,7 @@
 package org.geolatte.geom.codec;
 
 import org.geolatte.geom.AbstractGeometryCollection;
+import org.geolatte.geom.ByteBuffer;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
@@ -14,7 +15,7 @@ class MySqlWkbDialect extends Sfa110WkbDialect {
 
     @Override
     protected <P extends Position> int sizeEmptyGeometry(Geometry<P> geometry) {
-        return 0;
+        return ByteBuffer.UINT_SIZE;
     }
 
     private <P extends Position> boolean hasEmpty(Geometry<P> geometry) {

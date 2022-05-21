@@ -21,10 +21,7 @@
 
 package org.geolatte.geom.codec;
 
-import org.geolatte.geom.ByteBuffer;
-import org.geolatte.geom.ByteOrder;
-import org.geolatte.geom.Geometry;
-import org.geolatte.geom.Position;
+import org.geolatte.geom.*;
 
 /**
  * A WKB Encoder for MySQL
@@ -36,11 +33,16 @@ public class MySqlWkbEncoder implements WkbEncoder {
 
     @Override
     public <P extends Position> ByteBuffer encode(Geometry<P> geometry, ByteOrder byteOrder) {
-        BaseWkbVisitor<P> visitor = MySqlWkbDialect.INSTANCE.mkVisitor(geometry, byteOrder);
+        Geometry<P> toEncode = geometry;
+        if(geometry.isEmpty()) {
+            toEncode = Geometries.mkEmptyGeometryCollection(geometry.getCoordinateReferenceSystem());
+        }
+        BaseWkbVisitor<P> visitor = MySqlWkbDialect.INSTANCE.mkVisitor(toEncode, byteOrder);
         //first write SRID
-        visitor.buffer().putInt(Math.max(geometry.getSRID(), 0));
-        geometry.accept(visitor);
+        visitor.buffer().putInt(Math.max(toEncode.getSRID(), 0));
+        toEncode.accept(visitor);
         return visitor.result();
     }
+
 }
 
