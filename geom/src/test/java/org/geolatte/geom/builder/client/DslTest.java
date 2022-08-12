@@ -29,8 +29,8 @@ import java.util.List;
 
 import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasMeasureAxis;
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.hasVerticalAxis;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class DslTest {
 
-    static private double DELTA = 0.00000001;
+    static final private double DELTA = 0.00000001;
 
 
     @Test
@@ -68,7 +68,7 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLineString() {
-        LineString<G2D> ls = linestring(WGS84, g(0, 0));
+        linestring(WGS84, g(0, 0));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLinearRing3D() {
-        LinearRing<G3D> lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0));
+        ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0));
     }
 
     @Test
@@ -130,15 +130,15 @@ public class DslTest {
 
     @Test
     public void testValidPolygonAlternativeSyntax() {
-        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
-        Polygon p2 = polygon(WGS84, ring(g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
+        Polygon<G2D> p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
+        Polygon<G2D> p2 = polygon(WGS84, ring(g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
         assertEquals(p, p2);
     }
 
 
     @Test
     public void testValidPolygon2DM() {
-        Polygon p = polygon(ring(WGS84_M, gM(0, 0, 2), gM(0, 1, 3), gM(1, 1, 4), gM(1, 0, 3), gM(0, 0, 2)));
+        Polygon<G2DM> p = polygon(ring(WGS84_M, gM(0, 0, 2), gM(0, 1, 3), gM(1, 1, 4), gM(1, 0, 3), gM(0, 0, 2)));
         assertEquals(0, p.getNumInteriorRing());
         assertTrue(hasMeasureAxis(p.getCoordinateReferenceSystem()));
         assertEquals(4326, p.getSRID());
@@ -173,7 +173,7 @@ public class DslTest {
 
     @Test
     public void testvalidPolygonWithInteriorRing() {
-        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
+        Polygon<G2D> p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPositions(), 10);
         assertEquals(p.getNumInteriorRing(), 1);
@@ -221,39 +221,40 @@ public class DslTest {
 
     }
 
+    @Test
     public void testvalidPolygonWithInteriorRingAlternativeSyntax() {
-        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
-        Polygon p2 = polygon(WGS84, ring(g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
+        Polygon<G2D> p = polygon(ring(WGS84, g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(WGS84, g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
+        Polygon<G2D> p2 = polygon(WGS84, ring(g(0, 0), g(0, 10), g(10, 10), g(10, 0), g(0, 0)), ring(g(3, 3), g(3, 6), g(6, 6), g(6, 3), g(3, 3)));
         assertEquals(p, p2);
     }
 
     @Test
     public void testvalidPoint2D() {
-        Point pnt = point(WGS84, g(1, 2));
-        assertEquals(pnt, new Point<G2D>(new G2D(1, 2), WGS84));
+        Point<G2D> pnt = point(WGS84, g(1, 2));
+        assertEquals(pnt, new Point<>(new G2D(1, 2), WGS84));
     }
 
     @Test
     public void testvalidPoint3D() {
-        Point pnt = point(WGS84_Z, g(1, 2, 3));
-        assertEquals(pnt, new Point<G3D>(new G3D(1, 2, 3), WGS84_Z));
+        Point<G3D> pnt = point(WGS84_Z, g(1, 2, 3));
+        assertEquals(pnt, new Point<>(new G3D(1, 2, 3), WGS84_Z));
     }
 
     @Test
     public void testvalidPoint2DM() {
-        Point pnt = point(WGS84_M, gM(1, 2, 3));
-        assertEquals(pnt, new Point<G2DM>(new G2DM(1, 2, 3), WGS84_M));
+        Point<G2DM> pnt = point(WGS84_M, gM(1, 2, 3));
+        assertEquals(pnt, new Point<>(new G2DM(1, 2, 3), WGS84_M));
     }
 
     @Test
     public void testvalidPoint3DM() {
-        Point pnt = point(WGS84_ZM, g(1, 2, 3, 4));
-        assertEquals(pnt, new Point<G3DM>(new G3DM(1, 2, 3, 4), WGS84_ZM));
+        Point<G3DM> pnt = point(WGS84_ZM, g(1, 2, 3, 4));
+        assertEquals(pnt, new Point<>(new G3DM(1, 2, 3, 4), WGS84_ZM));
     }
 
     @Test
     public void testValidGeometryCollection() {
-        AbstractGeometryCollection gc = geometrycollection(
+        GeometryCollection<G2D> gc = geometrycollection(
                 point(WGS84, g(1, 2)),
                 linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
@@ -264,12 +265,12 @@ public class DslTest {
 
     @Test
     public void testValidGeometryCollectionAlternativeSyntax() {
-        AbstractGeometryCollection gc = geometrycollection(
+        GeometryCollection<G2D> gc = geometrycollection(
                 point(WGS84, g(1, 2)),
                 linestring(WGS84, g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
         );
-        AbstractGeometryCollection gc2 = geometrycollection(WGS84,
+        GeometryCollection<G2D> gc2 = geometrycollection(WGS84,
                 point(g(1, 2)),
                 linestring(g(0, 0), g(1, 1), g(2, 1)),
                 polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
@@ -278,22 +279,22 @@ public class DslTest {
 
     }
 
-//    @Test
-//    public void testValidGeometryCollectionOfGeometryCollections() {
-//        GeometryCollection gc = geometrycollection(4326,
-//                point(c(1, 2)),
-//                linestring(c(0, 0), c(1, 1), c(2, 1)),
-//                polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
-//                geometrycollection(point(c(1, 1)),
-//                        linestring(c(1, 2), c(2, 3)))
-//        );
-//        assertEquals(4, gc.getNumGeometries());
-//        assertEquals(GeometryType.GEOMETRYCOLLECTION, gc.getGeometryN(3).getGeometryType());
-//    }
+    @Test
+    public void testValidGeometryCollectionOfGeometryCollections() {
+        GeometryCollection<C2D> gc = geometrycollection(WEB_MERCATOR,
+                point(c(1, 2)),
+                linestring(c(0, 0), c(1, 1), c(2, 1)),
+                polygon(ring(c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0))),
+                geometrycollection(point(c(1, 1)),
+                        linestring(c(1, 2), c(2, 3)))
+        );
+        assertEquals(4, gc.getNumGeometries());
+        assertEquals(GeometryType.GEOMETRYCOLLECTION, gc.getGeometryN(3).getGeometryType());
+    }
 
     @Test
     public void testValidMultiPoint() {
-        MultiPoint mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
+        MultiPoint<G3DM> mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
         assertEquals(GeometryType.MULTIPOINT, mp.getGeometryType());
         assertEquals(2, mp.getNumGeometries());
         assertEquals(4326, mp.getSRID());
@@ -302,14 +303,14 @@ public class DslTest {
 
     @Test
     public void testValidMultiPointAlternativeSyntax() {
-        MultiPoint mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
-        MultiPoint mp2 = multipoint(WGS84_ZM, point(g(2, 1, 3, 4)), point(g(3, 1, 5, 6)));
+        MultiPoint<G3DM> mp = multipoint(point(WGS84_ZM, g(2, 1, 3, 4)), point(WGS84_ZM, g(3, 1, 5, 6)));
+        MultiPoint<G3DM> mp2 = multipoint(WGS84_ZM, point(g(2, 1, 3, 4)), point(g(3, 1, 5, 6)));
         assertEquals(mp, mp2);
     }
 
     @Test
     public void testMultiPointCanBeEmbeddedInGeometryCollection() {
-        AbstractGeometryCollection geometryCollection = geometrycollection(
+        GeometryCollection<G2D> geometryCollection = geometrycollection(
                 multipoint(point(WGS84, g(1, 2))),
                 point(WGS84, g(3, 4))
         );
@@ -318,7 +319,7 @@ public class DslTest {
 
     @Test
     public void testValidMultiLineString() {
-        MultiLineString mls = multilinestring(
+        MultiLineString<G3D> mls = multilinestring(
                 linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
                 linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0)));
         assertEquals(GeometryType.MULTILINESTRING, mls.getGeometryType());
@@ -329,10 +330,10 @@ public class DslTest {
 
     @Test
     public void testValidMultiLineStringAlternativeSyntax() {
-        MultiLineString mls = multilinestring(
+        MultiLineString<G3D> mls = multilinestring(
                 linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
                 linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0)));
-        MultiLineString mls2 = multilinestring(WGS84_Z,
+        MultiLineString<G3D> mls2 = multilinestring(WGS84_Z,
                 linestring(g(1, 2, 5), g(3, 4, 2)),
                 linestring(g(4, 5, 1), g(6, 5, 0)));
         assertEquals(mls, mls2);
@@ -341,7 +342,7 @@ public class DslTest {
 
     @Test
     public void testMultiLineStringCanBeEmbeddedInGeometryCollection() {
-        AbstractGeometryCollection geometryCollection = geometrycollection(
+        GeometryCollection<G3D> geometryCollection = geometrycollection(
                 multilinestring(
                         linestring(WGS84_Z, g(1, 2, 5), g(3, 4, 2)),
                         linestring(WGS84_Z, g(4, 5, 1), g(6, 5, 0))
@@ -353,7 +354,7 @@ public class DslTest {
 
     @Test
     public void testValidMultiPolygonString() {
-        MultiPolygon mp = multipolygon(
+        MultiPolygon<G2D> mp = multipolygon(
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
                 polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
@@ -365,12 +366,12 @@ public class DslTest {
 
     @Test
     public void testValidMultiPolygonStringAlternativeSyntax() {
-        MultiPolygon mp = multipolygon(
+        MultiPolygon<G2D> mp = multipolygon(
                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
                 polygon(ring(WGS84, g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
 
-        MultiPolygon mp2 = multipolygon(WGS84,
+        MultiPolygon<G2D> mp2 = multipolygon(WGS84,
                 polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
                 polygon(ring(g(0, 0), g(10, 0), g(10, 10), g(0, 10), g(0, 0)))
         );
@@ -379,7 +380,7 @@ public class DslTest {
 
     @Test
     public void testMultiPolygonCanBeEmbeddedInGeometryCollection() {
-        AbstractGeometryCollection geometryCollection =
+        GeometryCollection<G2D> geometryCollection =
                 geometrycollection(
                         multipolygon(
                                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
@@ -392,7 +393,7 @@ public class DslTest {
 
     @Test
     public void testMultiPolygonCanBeEmbeddedInGeometryCollectionAlternative() {
-        AbstractGeometryCollection g1 =
+        GeometryCollection<G2D> g1 =
                 geometrycollection(
                         multipolygon(
                                 polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
@@ -401,7 +402,7 @@ public class DslTest {
                         polygon(ring(WGS84, g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0)))
                 );
 
-        AbstractGeometryCollection g2 =
+        GeometryCollection<G2D> g2 =
                 geometrycollection(WGS84,
                         multipolygon(
                                 polygon(ring(g(0, 0), g(1, 0), g(1, 1), g(0, 1), g(0, 0))),
@@ -419,11 +420,4 @@ public class DslTest {
         assertTrue(gc.components()[1].isEmpty());
     }
 
-
-    //check what we want in this case?
-//    @Test
-//    public void fail_on_inconsistent_crs_point(){
-//        Point<G2D> point = point(WGS84, g(1, 2, 3, 4));
-//
-//    }
 }
