@@ -21,14 +21,16 @@
 
 package org.geolatte.geom;
 
+import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
  * A <code>PositionSequence</code> is an ordered sequence of <code>Position</code>s.
- * 
+ *
  * <p>A <code>PositionSequence</code> is typically used to store the <code>Position</code>s (vertices) that define a
  * curve (a 1-dimensional geometric primitive), with the subtype of the curve specifying the form of interpolation between
  * consecutive <code>Position</code>s. (E.g.a <code>LineString</code> uses linear interpolation between <code>Position</code>s.)</p>
@@ -52,7 +54,7 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     /**
      * Returns the coordinate dimension of this <code>PositionSequence</code>.
-     * 
+     *
      * <p>The coordinate dimension is number of measurements or axes needed to describe <code>Position</code>
      * in the coordinate system associated with this <code>PositionSequence</code>.</p>
      *
@@ -69,7 +71,8 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
 
     /**
      * Copies the coordinates at position i into the specified array.
-     * @param position the position index to copy
+     *
+     * @param position    the position index to copy
      * @param coordinates the destination array
      * @throws IllegalArgumentException if the destination array is smaller than the coordiante dimension.
      */
@@ -82,12 +85,12 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
     }
 
     default P last() {
-        return getPositionN(size()-1);
+        return getPositionN(size() - 1);
     }
 
     /**
      * Accepts a <code>PositionVisitor</code>.
-     * 
+     *
      * <p>This instance will pass the visitor to all of its <code>Position</code>s.</p>
      *
      * @param visitor the visitor for this instance's <code>Position</code>s
@@ -108,11 +111,15 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
      */
     PositionSequence<P> reverse();
 
-    default Stream<P>  stream() {
+    default Stream<P> stream() {
         return StreamSupport.stream(this.spliterator(), false);
     }
 
-    default Spliterator<P> splitIterator(){
+    default List<P> toList() {
+        return this.stream().collect(Collectors.toList());
+    }
+
+    default Spliterator<P> splitIterator() {
         return Spliterators.spliteratorUnknownSize(this.iterator(), Spliterator.ORDERED | Spliterator.IMMUTABLE);
     }
 }

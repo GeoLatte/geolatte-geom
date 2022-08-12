@@ -21,11 +21,11 @@
 
 package org.geolatte.geom.builder.client;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.geolatte.geom.*;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
@@ -51,8 +51,7 @@ public class DslTest {
         assertEquals(2, ls.getCoordinateDimension());
         assertEquals(WGS84, ls.getCoordinateReferenceSystem());
 
-        ArrayList<G2D> points = new ArrayList<G2D>();
-        CollectionUtils.addAll(points, ls.getPositions().iterator());
+        ArrayList<G2D> points = new ArrayList<>(ls.getPositions().toList());
         assertEquals(points.get(0).getLon(), 0, DELTA);
         assertEquals(points.get(0).getLat(), 0, DELTA);
         assertEquals(points.get(1).getLon(), 1, DELTA);
@@ -63,23 +62,22 @@ public class DslTest {
 
     @Test
     public void testEmptyLineString2D() {
-        LineString ls = linestring(WGS84);
+        LineString<G2D> ls = linestring(WGS84);
         assertTrue(ls.isEmpty());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLineString() {
-        LineString ls = linestring(WGS84, g(0, 0));
+        LineString<G2D> ls = linestring(WGS84, g(0, 0));
     }
 
     @Test
     public void testLinearRing3D() {
 
-        LinearRing lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0), g(0, 0, 0));
+        LinearRing<G3D> lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0), g(0, 0, 0));
         assertTrue(hasVerticalAxis(lr.getCoordinateReferenceSystem()));
 
-        ArrayList<G3D> points = new ArrayList<G3D>();
-        CollectionUtils.addAll(points, lr.getPositions().iterator());
+        List<G3D> points = lr.getPositions().toList();
         assertEquals(points.get(0).getLon(), 0, DELTA);
         assertEquals(points.get(0).getLat(), 0, DELTA);
         assertEquals(points.get(0).getHeight(), 0, DELTA);
@@ -99,12 +97,12 @@ public class DslTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidLinearRing3D() {
-        LinearRing lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0));
+        LinearRing<G3D> lr = ring(WGS84_Z, g(0, 0, 0), g(1, 0, 0), g(1, 1, 0), g(0, 1, 0));
     }
 
     @Test
     public void testValidPolygon() {
-        Polygon p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
+        Polygon<G2D> p = polygon(ring(WGS84, g(0, 0), g(0, 1), g(1, 1), g(1, 0), g(0, 0)));
         assertEquals(p.getSRID(), 4326);
         assertEquals(p.getNumPositions(), 5);
 

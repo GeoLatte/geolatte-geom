@@ -39,7 +39,7 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
     }
 
 
-    private JsonNode getRoot(JsonParser p) throws IOException{
+    private JsonNode getRoot(JsonParser p) throws IOException {
         ObjectCodec oc = p.getCodec();
         return oc.readTree(p);
     }
@@ -54,7 +54,8 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
     Geometry<?> parseGeometry(JsonNode root) throws GeoJsonProcessingException {
         CoordinateReferenceSystem<?> crs = resolveBaseCrs(root);
         GeometryBuilder parser = GeometryBuilder.create(root);
-        CoordinateReferenceSystem<?> adjustedCrs = settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION)  ?
+        CoordinateReferenceSystem<?> adjustedCrs = settings.isSet(Setting.FORCE_DEFAULT_CRS_DIMENSION) ||
+                settings.isSet(Setting.IGNORE_CRS) ?
                 crs :
                 CoordinateReferenceSystems.adjustTo(crs, parser.getCoordinateDimension());
         return parser.parse(adjustedCrs);
@@ -63,7 +64,6 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
     protected CoordinateReferenceSystem<?> getDefaultCrs() {
         return defaultCRS;
     }
-
 
 
     private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {

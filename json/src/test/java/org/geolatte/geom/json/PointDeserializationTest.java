@@ -3,6 +3,8 @@ package org.geolatte.geom.json;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.*;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.crs.Unit;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -99,7 +101,7 @@ public class PointDeserializationTest extends GeoJsonTest{
     public void testDeserializePointTextWithLimitToCrsReduce() throws IOException {
         mapper = new ObjectMapper();
         GeolatteGeomModule module = new GeolatteGeomModule(WGS84);
-        module.set(Setting.FORCE_DEFAULT_CRS_DIMENSION, true);
+        module.set(Setting.IGNORE_CRS, true);
         mapper.registerModule(module);
         Point<?> pnt = mapper.readValue(pointText3D, Point.class);
         Point<G2D> expected = point(WGS84, g(1, 2));
@@ -108,7 +110,19 @@ public class PointDeserializationTest extends GeoJsonTest{
 
 
     @Test
-    public void testDeserializeEmpptyPoint() throws IOException {
+    public void testDeserializePointTextWithLimitToCrs2DM() throws IOException {
+        mapper = new ObjectMapper();
+        CoordinateReferenceSystem<G2DM> crs = WGS84.addLinearSystem(Unit.METER, G2DM.class);
+        GeolatteGeomModule module = new GeolatteGeomModule(crs);
+        module.set(Setting.IGNORE_CRS, true);
+        mapper.registerModule(module);
+        Point<?> pnt = mapper.readValue(pointText2DM, Point.class);
+        Point<G2DM> expected = point(crs, gM(1, 2, 4));
+        assertEquals(expected, pnt);
+    }
+
+    @Test
+    public void testDeserializeEmptyPoint() throws IOException {
         Point<?> pnt = mapper.readValue(emptyPointText, Point.class);
         Point<?> expected = new Point<>(WGS84);
         assertEquals(expected, pnt);

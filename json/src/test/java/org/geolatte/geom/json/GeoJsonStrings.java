@@ -69,5 +69,6 @@ public class GeoJsonStrings {
 
     //FeatureCollection
     static String featureCollection = "{\"features\":[{\"geometry\":{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[102.0,0.5]},\"id\":\"1\",\"properties\":{\"prop0\":\"value0\"},\"type\":\"Feature\"},{\"geometry\":{\"type\":\"LineString\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[[102.0,0.0],[103.0,1.0],[104.0,0.0],[105.0,1.0]]},\"id\":\"2\",\"properties\":{\"prop1\":0.0,\"prop0\":\"value0\"},\"type\":\"Feature\"}],\"type\":\"FeatureCollection\"}";
+
     static String emptyFeatureCollection = "{\"features\":[],\"type\":\"FeatureCollection\"}";
 }
