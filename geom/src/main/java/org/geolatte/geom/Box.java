@@ -154,7 +154,7 @@ public class Box<P extends Position> {
      * @return true iff this instance  is empty (the empty set).
      */
     public boolean isEmpty() {
-        return this.lowerLeft.isEmpty() && this.upperRight.isEmpty() || this.lowerLeft.equals(this.upperRight);
+        return this.lowerLeft.isEmpty() && this.upperRight.isEmpty() ;
     }
 
     /**
