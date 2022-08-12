@@ -15,7 +15,7 @@ class PostgisWkbV1Dialect extends WkbDialect {
     @Override
     protected <P extends Position> Long geometryTypeCode(Geometry<P> geometry) {
         if (geometry.isEmpty() && geometry.getGeometryType() == GeometryType.POINT) {
-            return WKB_GEOMETRYCOLLECTION;
+            return (long) WKB_GEOMETRYCOLLECTION;
         }
         return super.geometryTypeCode(geometry);
     }

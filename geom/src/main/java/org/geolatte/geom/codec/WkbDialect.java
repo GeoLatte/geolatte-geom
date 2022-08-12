@@ -2,37 +2,40 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.geolatte.geom.GeometryType.*;
 
 class WkbDialect {
 
-    final private Map<Long, GeometryType> typemap = new HashMap<>();
 
-    final public static Long WKB_POINT = 1L;
-    final public static Long WKB_LINESTRING = 2L;
-    final public static Long WKB_POLYGON = 3L;
-    final public static Long WKB_MULTIPOINT = 4L;
-    final public static Long WKB_MULTILINESTRING = 5L;
-    final public static Long WKB_MULTIPOLYGON = 6L;
-    final public static Long WKB_GEOMETRYCOLLECTION = 7L;
-
-    protected WkbDialect() {
-        typemap.put(WKB_POINT, POINT);
-        typemap.put(WKB_LINESTRING, LINESTRING);
-        typemap.put(WKB_POLYGON, POLYGON);
-        typemap.put(WKB_MULTIPOINT, MULTIPOINT);
-        typemap.put(WKB_MULTILINESTRING, MULTILINESTRING);
-        typemap.put(WKB_MULTIPOLYGON, MULTIPOLYGON);
-        typemap.put(WKB_GEOMETRYCOLLECTION, GEOMETRYCOLLECTION);
-    }
+    final public static int WKB_POINT = 1;
+    final public static int WKB_LINESTRING = 2;
+    final public static int WKB_POLYGON = 3;
+    final public static int WKB_MULTIPOINT = 4;
+    final public static int WKB_MULTILINESTRING = 5;
+    final public static int WKB_MULTIPOLYGON = 6;
+    final public static int WKB_GEOMETRYCOLLECTION = 7;
 
     GeometryType parseType(long tpe) {
-        GeometryType gt = typemap.get(tpe);
-        if (gt == null) throw new WkbDecodeException("Unsupported WKB type code: " + tpe);
-        return gt;
+        switch ((int) tpe) {
+            case WKB_POINT:
+                return POINT;
+            case WKB_LINESTRING:
+                return LINESTRING;
+            case WKB_POLYGON:
+                return POLYGON;
+            case WKB_MULTIPOINT:
+                return MULTIPOINT;
+            case WKB_MULTIPOLYGON:
+                return MULTIPOLYGON;
+            case WKB_MULTILINESTRING:
+                return MULTILINESTRING;
+            case WKB_GEOMETRYCOLLECTION:
+                return GEOMETRYCOLLECTION;
+            default:
+                throw new WkbDecodeException("Unsupported WKB type code: " + tpe);
+        }
     }
 
     boolean hasZ(long tpe) {
@@ -118,17 +121,34 @@ class WkbDialect {
     }
 
     protected <P extends Position> Long geometryTypeCode(Geometry<P> geometry) {
-        for (Map.Entry<Long, GeometryType> tpe : typemap.entrySet()) {
-            if (tpe.getValue() == geometry.getGeometryType()) {
-                return tpe.getKey();
-            }
-        }
-        throw new UnsupportedConversionException(
-                String.format(
-                        "Can't convert geometries of type %s",
-                        geometry.getClass().getCanonicalName()
-                )
-        );
+        return (long) wkbTypeCode(geometry);
+    }
 
+    private <P extends Position> int wkbTypeCode(Geometry<P> geometry) {
+        switch (geometry.getGeometryType()) {
+            case POINT:
+                return WKB_POINT;
+            case LINESTRING:
+            case LINEARRING:
+                return WKB_LINESTRING;
+            case POLYGON:
+                return WKB_POLYGON;
+            case MULTIPOINT:
+                return WKB_MULTIPOINT;
+            case MULTILINESTRING:
+                return WKB_MULTILINESTRING;
+            case MULTIPOLYGON:
+                return WKB_MULTIPOLYGON;
+            case GEOMETRYCOLLECTION:
+                return WKB_GEOMETRYCOLLECTION;
+            default:
+                throw new UnsupportedConversionException(
+                        String.format(
+                                "Can't convert geometries of type %s",
+                                geometry.getClass().getCanonicalName()
+                        )
+                );
+
+        }
     }
 }
