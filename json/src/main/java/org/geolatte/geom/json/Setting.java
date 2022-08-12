@@ -26,7 +26,17 @@ public enum Setting {
     /**
      * Serialize the CRS as a URN, rather than the traditional AUTH:CODE format.
      */
-    SERIALIZE_CRS_AS_URN(false);
+    SERIALIZE_CRS_AS_URN(false),
+
+    /**
+     * Serialized a BBOX for a FeatureCollection
+     */
+    SERIALIZE_FEATURE_COLLECTION_BBOX(false),
+
+    /**
+     * Serialize a BBOX for a feature
+     */
+    SERIALIZE_FEATURE_BBOX(false);
 
     private boolean setByDefault;
 

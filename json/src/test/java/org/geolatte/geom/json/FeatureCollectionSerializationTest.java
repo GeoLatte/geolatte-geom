@@ -1,7 +1,7 @@
 package org.geolatte.geom.json;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.FeatureCollection;
-import org.geolatte.geom.G2D;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
@@ -19,17 +19,9 @@ public class FeatureCollectionSerializationTest extends GeoJsonTest {
 
     @Test
     public void testSerialize() throws IOException {
-        Map<String, Object> map1 = new HashMap<>();
-        map1.put("prop0", "value0");
-        Map<String, Object> map2 = new HashMap<>();
-        map2.put("prop1", 0.0d);
-        map2.put("prop0", "value0");
-        FeatureCollection<?, ?> fc = new GeoJsonFeatureCollection<>(
-                new GeoJsonFeature<G2D, String>(point(WGS84, g(102, 0.5)), "1", map1),
-                new GeoJsonFeature<G2D, String>(linestring(WGS84, g(102, 0), g(103, 1),
-                        g(104, 0), g(105, 1)), "2", map2));
+        FeatureCollection<?, ?> fc = mkExample();
         String rec = mapper.writeValueAsString(fc);
-        assertEquals(featureCollection, rec) ;
+        assertEquals(featureCollectionNoBbox, rec) ;
     }
 
     @Test
@@ -37,5 +29,24 @@ public class FeatureCollectionSerializationTest extends GeoJsonTest {
         FeatureCollection<?, ?> fc = new GeoJsonFeatureCollection<>(new ArrayList<>());
         String rec = mapper.writeValueAsString(fc);
         assertEquals(emptyFeatureCollection, rec) ;
+    }
+
+    @Test
+    public void testWithBbox() throws IOException {
+        ObjectMapper mapper = createMapper(Setting.SERIALIZE_FEATURE_COLLECTION_BBOX, true);
+        String rec = mapper.writeValueAsString(mkExample());
+        assertEquals(featureCollection, rec);
+    }
+
+    private static FeatureCollection<?, ?> mkExample() {
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("prop0", "value0");
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("prop1", 0.0d);
+        map2.put("prop0", "value0");
+        return new GeoJsonFeatureCollection<>(
+                new GeoJsonFeature<>(point(WGS84, g(102, 0.5)), "1", map1),
+                new GeoJsonFeature<>(linestring(WGS84, g(102, 0), g(103, 1),
+                        g(104, 0), g(105, 1)), "2", map2));
     }
 }

@@ -17,6 +17,7 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
  * <p>
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
+@SuppressWarnings("rawtypes")
 public class GeolatteGeomModule extends SimpleModule {
 
 
@@ -24,9 +25,8 @@ public class GeolatteGeomModule extends SimpleModule {
 
     private final Map<Class, JsonDeserializer> dezers = new HashMap<>();
 
-    private GeometrySerializer geometrySerializer;
-    private CrsSerializer crsSerializer;
-    private BoxSerializer boxSerializer;
+    private final GeometrySerializer geometrySerializer;
+    private final CrsSerializer crsSerializer;
 
     public GeolatteGeomModule() {
         this(WGS84);
@@ -35,15 +35,19 @@ public class GeolatteGeomModule extends SimpleModule {
     @SuppressWarnings("unchecked")
     public <P extends Position> GeolatteGeomModule(CoordinateReferenceSystem<P> defaultCrs) {
 
-        super("GeolatteGeomModule", new Version(1, 8, 0, "", "org.geolatte", "geolatte-json"));
+        super("GeolatteGeomModule", new Version(1, 9, 0, "", "org.geolatte", "geolatte-json"));
 
         geometrySerializer = new GeometrySerializer(settings);
+        FeatureSerializer featureSerializer = new FeatureSerializer(settings);
+        addSerializer(Feature.class, featureSerializer);
+        FeatureCollectionSerializer featureCollectionSerializer = new FeatureCollectionSerializer(settings);
         GeometryDeserializer parser = new GeometryDeserializer(defaultCrs, settings);
         addSerializer(Geometry.class, geometrySerializer); //use raw to get this compiled
         crsSerializer = new CrsSerializer<>(defaultCrs, settings);
         addSerializer(CoordinateReferenceSystem.class, crsSerializer);
-        boxSerializer = new BoxSerializer<>();
+        BoxSerializer boxSerializer = new BoxSerializer<>();
         addSerializer(Box.class, boxSerializer);
+        addSerializer(FeatureCollection.class, featureCollectionSerializer);
         dezers.put(Geometry.class, parser);
         dezers.put(Point.class, parser);
         dezers.put(LineString.class, parser);

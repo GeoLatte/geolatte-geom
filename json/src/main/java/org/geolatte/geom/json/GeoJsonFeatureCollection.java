@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.geolatte.geom.Box;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.FeatureCollection;
@@ -10,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 public class GeoJsonFeatureCollection<P extends Position, ID> implements FeatureCollection<P, ID> {
     private final List<Feature<P, ID>> features;
@@ -34,7 +31,6 @@ public class GeoJsonFeatureCollection<P extends Position, ID> implements Feature
     }
 
     @Override
-    @JsonInclude(NON_EMPTY)
     public Box<P> getBbox() {
         Box<P> bbox = null;
         for (Feature<P, ID> feature : features) {
