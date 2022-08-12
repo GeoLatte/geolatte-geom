@@ -24,23 +24,12 @@ class HANAWkbDialect extends WkbDialect {
         if (includeSrid) {
             size += 4;
         }
-
         if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
-        if (geom instanceof AbstractGeometryCollection) {
-            size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
-        } else if (geom instanceof Polygon) {
-            size += getPolygonSize((Polygon<P>) geom);
-        } else if (geom instanceof Point) {
-            size += getPositionSize(geom);
-        } else {
-            size += ByteBuffer.UINT_SIZE; //to hold number of points
-            size += getPositionSize(geom) * geom.getNumPositions();
-        }
-        return size;
+        return size + geometrySize(geom);
     }
 
     @Override
     <P extends Position> BaseWkbVisitor<P> mkVisitor(Geometry<P> geom, ByteOrder bo) {
-        return new HANAWkbVisitor<P>(mkByteBuffer(geom, bo), this);
+        return new HANAWkbVisitor<>(mkByteBuffer(geom, bo), this);
     }
 }

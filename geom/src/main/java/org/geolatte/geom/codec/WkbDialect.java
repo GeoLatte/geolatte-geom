@@ -2,8 +2,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.*;
 
-import java.util.Map;
-
 import static org.geolatte.geom.GeometryType.*;
 
 class WkbDialect {
@@ -65,19 +63,10 @@ class WkbDialect {
         if (topLevel) {
             size += extraHeaderSize(geom);
         }
-        //empty geoms have same representation as an empty GeometryCollection
+        //empty geometries have same representation as an empty GeometryCollection
         if (geom.isEmpty()) return size + sizeEmptyGeometry(geom);
-        if (geom instanceof AbstractGeometryCollection) {
-            size += sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
-        } else if (geom instanceof Polygon) {
-            size += getPolygonSize((Polygon<P>) geom);
-        } else if (geom instanceof Point) {
-            size += getPositionSize(geom);
-        } else {
-            size += ByteBuffer.UINT_SIZE; //to hold number of points
-            size += getPositionSize(geom) * geom.getNumPositions();
-        }
-        return size;
+
+        return size + geometrySize(geom);
     }
 
     protected <P extends Position> int extraHeaderSize(Geometry<P> geom) {
@@ -92,6 +81,19 @@ class WkbDialect {
         } else {
             // indicate no positions follow
             return ByteBuffer.UINT_SIZE;
+        }
+    }
+
+    protected <P extends Position> int geometrySize(Geometry<P> geom) {
+        if (geom instanceof AbstractGeometryCollection) {
+            return sizeOfGeometryCollection((AbstractGeometryCollection<P, ?>) geom);
+        } else if (geom instanceof Polygon) {
+            return getPolygonSize((Polygon<P>) geom);
+        } else if (geom instanceof Point) {
+            return getPositionSize(geom);
+        } else {
+            int numPoints = ByteBuffer.UINT_SIZE; //to hold number of points
+            return  numPoints + getPositionSize(geom) * geom.getNumPositions();
         }
     }
 
