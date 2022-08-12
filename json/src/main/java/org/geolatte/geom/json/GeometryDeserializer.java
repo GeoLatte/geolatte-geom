@@ -186,7 +186,7 @@ class SimpleGeometryBuilder extends GeometryBuilder {
             case MULTIPOLYGON:
                 return toPolygonalListHolder(root);
             default:
-                throw new GeoJsonProcessingException("Unsupported geometry type " + geomType.toString());
+                throw new GeoJsonProcessingException("Unsupported geometry type " + geomType);
         }
     }
 

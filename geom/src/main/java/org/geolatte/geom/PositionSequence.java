@@ -100,14 +100,14 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
     /**
      * Accepts a <code>LLAPositionVisitor</code>.
      *
-     * @param visitor
+     * @param visitor the visitor for this object
      */
     void accept(LLAPositionVisitor visitor);
 
     /**
      * Creates a new <code>PositionSequence</code> with positions in reverse order.
      *
-     * @return
+     * @return a PositionSequence with the positions of this instance in reverse order.
      */
     PositionSequence<P> reverse();
 
