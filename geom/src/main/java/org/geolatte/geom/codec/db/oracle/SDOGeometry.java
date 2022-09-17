@@ -50,7 +50,7 @@ public class SDOGeometry {
     final private List<Element> elements;
     final private CoordinateReferenceSystem<?> crs;
 
-    public SDOGeometry(SDOGType gtype, int srid, SDOPoint point, ElemInfo info, Ordinates ordinates) {
+    SDOGeometry(SDOGType gtype, int srid, SDOPoint point, ElemInfo info, Ordinates ordinates) {
         this.gtype = gtype;
         this.srid = srid;
         this.point = point;
