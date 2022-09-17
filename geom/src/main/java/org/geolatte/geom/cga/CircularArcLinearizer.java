@@ -23,7 +23,7 @@ public class CircularArcLinearizer<P extends Position> {
     final private P p1;
     final private P p2;
     final private Circle c;
-    final private boolean isCounterClockwise;
+    final private NumericalMethods.Orientation orientation;
     final private PositionSequenceBuilder<P> builder;
 
     //TODO threshold must become parameter of linearize/linearizeCircle!!
@@ -37,7 +37,7 @@ public class CircularArcLinearizer<P extends Position> {
         this.p1 = p1;
         this.p2 = p2;
         this.c = new Circle(p0, p1, p2, false);
-        this.isCounterClockwise = NumericalMethods.isCounterClockwise(p0, p1, p2);
+        this.orientation = NumericalMethods.orientation(p0, p1, p2);
         this.builder = variableSized((Class<P>) p0.getClass());
     }
 
@@ -89,23 +89,28 @@ public class CircularArcLinearizer<P extends Position> {
 
         //now we "walk" from theta, over theta1 to theta2 (or inversely)
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
-        if (isCounterClockwise) {
-	        builder.add(p0);
-	        AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
-	        builder.add(p1);
-	        AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
-	        builder.add(p2);
-	        return builder.toPositionSequence();
-        } else {
-        	// If clockwise, we have to do it reverse
-        	builder.add(p2);
-        	AddPointsBetweenPolarCoordinates(theta2, theta1, p2, p1, angleIncr, builder);
-        	builder.add(p1);
-        	AddPointsBetweenPolarCoordinates(theta1, theta0, p1, p0, angleIncr, builder);
-        	builder.add(p0);
-        	return builder.toPositionSequence().reverse();
+        switch (orientation) {
+            case Counterclockwise:
+                builder.add(p0);
+                AddPointsBetweenPolarCoordinates(theta0, theta1, p0, p1, angleIncr, builder);
+                builder.add(p1);
+                AddPointsBetweenPolarCoordinates(theta1, theta2, p1, p2, angleIncr, builder);
+                builder.add(p2);
+                return builder.toPositionSequence();
+            case Clockwise:
+                // If clockwise, we have to do it reverse
+                builder.add(p2);
+                AddPointsBetweenPolarCoordinates(theta2, theta1, p2, p1, angleIncr, builder);
+                builder.add(p1);
+                AddPointsBetweenPolarCoordinates(theta1, theta0, p1, p0, angleIncr, builder);
+                builder.add(p0);
+                return builder.toPositionSequence().reverse();
+            default:
+                builder.add(p0);
+                builder.add(p1);
+                builder.add(p2);
+                return builder.toPositionSequence();
         }
-
     }
 
     // Adds points strictly between theta and theta1, using the specified angle-increment

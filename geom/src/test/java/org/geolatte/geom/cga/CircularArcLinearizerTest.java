@@ -4,6 +4,8 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.geolatte.geom.cga.NumericalMethods.Orientation.Clockwise;
+import static org.geolatte.geom.cga.NumericalMethods.Orientation.Counterclockwise;
 import static org.junit.Assert.assertEquals;
 
 import org.geolatte.geom.C2D;
@@ -281,8 +283,8 @@ class ThreePositionsOnCircleGenerator implements Generator<ThreePointSample> {
         }
 
         // verify that we actually do return as expected.
-        assert ((isCCW && NumericalMethods.isCounterClockwise(positions[0], positions[1], positions[2])) ||
-                (!isCCW && !NumericalMethods.isCounterClockwise(positions[0], positions[1], positions[2])) );
+        assert ((isCCW && Counterclockwise ==NumericalMethods.orientation(positions[0], positions[1], positions[2])) ||
+                (!isCCW && Clockwise == NumericalMethods.orientation(positions[0], positions[1], positions[2])) );
 
         return new ThreePointSample(isCCW, theta, positions);
 

@@ -11,6 +11,14 @@ import java.util.stream.IntStream;
  */
 public class NumericalMethods {
 
+    public static enum Orientation {
+        Clockwise, Counterclockwise, Colinear
+    }
+
+    public final static int ClockWise = 1;
+    public final static int CounterClockWise = 2;
+
+
     /**
      * Calculates the determinant of a 2x2 matrix
      *
@@ -69,12 +77,12 @@ public class NumericalMethods {
      * @param p2
      * @return true if counterclockwise
      */
-    public static boolean isCounterClockwise(Position p0, Position p1, Position p2) {
+    public static Orientation orientation(Position p0, Position p1, Position p2) {
         double det = deltaDeterminant(p0, p1, p2);
         if (det == 0) {
-            throw new IllegalArgumentException("Positions are collinear in 2D");
+            return Orientation.Colinear;
         }
-        return det > 0;
+        return det > 0? Orientation.Counterclockwise : Orientation.Clockwise;
     }
 
     /**
