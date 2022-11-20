@@ -128,7 +128,7 @@ public class NumericalMethods {
      * This uses Newell's method (see Graphics Gems III, V. 5)
      *
      * @param ring the linear ring
-     * @return +1 if the specified ring is clockwise, -1 if counterclockwise, 0 if all vertices are collinear
+     * @return -1 if the specified ring is clockwise, +1 if counterclockwise, 0 if all vertices are collinear
      */
     public static double orient2d(LinearRing<?> ring) {
         return orient2d(ring.getPositions());

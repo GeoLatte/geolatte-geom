@@ -127,11 +127,15 @@ public class NumericalMethodsTest {
 
     @Test
     public void testCounterClockwiseLineString() {
-        LinearRing<C2D> cwLinestring  = ring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, -1),   c(0, 0));
-        LinearRing<C2D> ccwLinestring = ring(xy, c(0, 0), c(1, 0), c(2, 0.5), c(1, 0.5), c(0, 0));
+        LinearRing<C2D> cwLinestring  = ring(xy, c(0, 0), c(0, 1), c(1, 1), c(1, 0),   c(0, 0));
+        LinearRing<C2D> ccwLinestring = ring(xy, c(0, 0), c(1, 0), c(1, 1), c(0, 1), c(0, 0));
 
         assertFalse(NumericalMethods.isCounterClockwise(cwLinestring));
+        assertEquals((int)orient2d(cwLinestring), -1);
+
         assertTrue(NumericalMethods.isCounterClockwise(ccwLinestring));
+        assertEquals((int)orient2d(ccwLinestring), 1);
+
     }
 
     @Test

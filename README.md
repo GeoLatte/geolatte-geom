@@ -31,7 +31,7 @@ The library is published on Maven Central. For Maven, you can include the follow
 <dependency>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geom</artifactId>
-    <version>1.8.0</version>
+    <version>1.9.0</version>
 </dependency>
 ```
 

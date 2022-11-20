@@ -59,7 +59,8 @@ public class GeometryPositionEquality implements GeometryEquality {
         this.pointSeqEq = new PositionSequencePositionEquality(pointEquality);
     }
 
-
+    //FIXME - provide a means to also inject an PositionSequenceEquality, e.g.
+    // for rings equal except one is shifted n positions w.r.t the other.
 
 
     /**
