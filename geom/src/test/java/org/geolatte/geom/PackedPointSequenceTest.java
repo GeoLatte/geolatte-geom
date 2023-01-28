@@ -275,12 +275,12 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testGetZ() {
-        assertEquals(0d, testSeq3D.getPositionN(0).getZ(), Math.ulp(10d));
-        assertEquals(1d, testSeq3D.getPositionN(1).getZ(), Math.ulp(10d));
-        assertEquals(2d, testSeq3D.getPositionN(2).getZ(), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getPositionN(0).getZ(), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getPositionN(1).getZ(), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getPositionN(2).getZ(), Math.ulp(10d));
+        assertEquals(0d, testSeq3D.getZ(0), Math.ulp(10d));
+        assertEquals(1d, testSeq3D.getZ(1), Math.ulp(10d));
+        assertEquals(2d, testSeq3D.getZ(2), Math.ulp(10d));
+        assertEquals(0d, testSeq3DM.getZ(0), Math.ulp(10d));
+        assertEquals(1d, testSeq3DM.getZ(1), Math.ulp(10d));
+        assertEquals(2d, testSeq3DM.getZ(2), Math.ulp(10d));
 
         try {
             testSeq3D.getPositionN(3);
@@ -291,18 +291,26 @@ public class PackedPointSequenceTest {
 
     @Test
     public void testGetM() {
-        assertEquals(0d, testSeq2DM.getPositionN(0).getM(), Math.ulp(10d));
-        assertEquals(1d, testSeq2DM.getPositionN(1).getM(), Math.ulp(10d));
-        assertEquals(2d, testSeq2DM.getPositionN(2).getM(), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getPositionN(0).getM(), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getPositionN(1).getM(), Math.ulp(10d));
-        assertEquals(3d, testSeq3DM.getPositionN(2).getM(), Math.ulp(10d));
+        assertEquals(0d, testSeq2DM.getM(0), Math.ulp(10d));
+        assertEquals(1d, testSeq2DM.getM(1), Math.ulp(10d));
+        assertEquals(2d, testSeq2DM.getM(2), Math.ulp(10d));
+        assertEquals(1d, testSeq3DM.getM(0), Math.ulp(10d));
+        assertEquals(2d, testSeq3DM.getM(1), Math.ulp(10d));
+        assertEquals(3d, testSeq3DM.getM(2), Math.ulp(10d));
 
         try {
             testSeq3D.getX(3);
             fail();
         } catch (IndexOutOfBoundsException e) {
         }
+    }
+
+    @Test
+    public void testGetMeasures() {
+        assertEquals(0, testSeq2D.getMeasures());
+        assertEquals(0, testSeq3D.getMeasures());
+        assertEquals(1, testSeq2DM.getMeasures());
+        assertEquals(1, testSeq3DM.getMeasures());
     }
 
     @Test
@@ -326,8 +334,6 @@ public class PackedPointSequenceTest {
             Assert.assertEquals(testSeq3DM.getPositionN(i).getZ(), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
 
             //M
-            Assert.assertEquals(testSeq2DM.getPositionN(i).getM(), testSeq2DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
-
             Assert.assertEquals(testSeq3DM.getPositionN(i).getM(), testSeq3DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
 
 

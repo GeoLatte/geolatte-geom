@@ -21,8 +21,8 @@
 
 package org.geolatte.geom;
 
-import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.*;
 
 import java.io.Serializable;
 
@@ -88,6 +88,38 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     @Override
     public abstract PositionSequence<P> clone();
 
+    @Override
+    public int getMeasures() {
+        return factory.hasMComponent() ? 1 : 0;
+    }
+
+    @Override
+    public boolean hasZ() {
+        return factory.hasZComponent();
+    }
+
+    @Override
+    public boolean hasM() {
+        return factory.hasMComponent();
+    }
+
+    @Override
+    public double getZ(int index) {
+        if (hasZ()) {
+            return getOrdinate(index, 2);
+        } else {
+            return Double.NaN;
+        }
+    }
+
+    @Override
+    public double getM(int index) {
+        if (hasM()) {
+            return getOrdinate(index, factory.getMComponentIndex());
+        } else {
+            return Double.NaN;
+        }
+    }
 
     public org.locationtech.jts.geom.Coordinate getCoordinate(int i) {
         double[] c = new double[getCoordinateDimension()];
@@ -165,20 +197,11 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     public double getOrdinate(int i, int ordinateIndex) {
         double[] c = new double[getCoordinateDimension()];
         getCoordinates(i, c);
-        int idx = 0;
-        switch (ordinateIndex) {
-            case CoordinateSequence.X:
-                return c[0];
-            case CoordinateSequence.Y:
-                return c[1];
-            case CoordinateSequence.Z:
-                return factory.hasZComponent() ?
-                        c[2] : Double.NaN;
-            case CoordinateSequence.M:
-                return factory.hasMComponent()?
-                        c[factory.getMComponentIndex()] : Double.NaN;
+        if (ordinateIndex < getCoordinateDimension()) {
+            return c[ordinateIndex];
+        } else {
+            throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
         }
-        throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
     }
 
     @Override
