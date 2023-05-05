@@ -45,7 +45,7 @@ public interface ConnectionFinder extends Serializable {
      *
      * @param conn the object that is being searched for an OracleConnection
      * @return the object sought
-     * @throws RuntimeException thrown when the feature can be found;
+     * @throws RuntimeException thrown when the feature cannot be found;
      */
     Connection find(Connection conn);
 
