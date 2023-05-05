@@ -67,7 +67,8 @@ public class DefaultConnectionFinder implements ConnectionFinder {
             if (con.isWrapperFor(ORACLE_CONNECTION_INTERFACE)) {
                 return (Connection) con.unwrap(ORACLE_CONNECTION_INTERFACE);
             }
-        } catch (SQLException e1) {
+        } catch (SQLException e) {
+            // Unwrapping failed, falling back on reflection
         }
 
         // try to find the Oracleconnection recursively
