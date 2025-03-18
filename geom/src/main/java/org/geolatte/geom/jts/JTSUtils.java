@@ -1,7 +1,6 @@
 package org.geolatte.geom.jts;
 
 
-import org.geolatte.geom.Simple;
 import org.locationtech.jts.geom.*;
 
 /**
@@ -58,6 +57,16 @@ public class JTSUtils {
                 ((Double.isNaN(c1.getM()) && Double.isNaN(c2.getM())) || c1.getM() == c2.getM());
     }
 
+    private static boolean equalPoints(Point p1, Point p2) {
+        if (p1.isEmpty() != p2.isEmpty()) {
+            return false;
+        }
+        if (p1.isEmpty() && p2.isEmpty()) {
+            return true;
+        }
+        return equals3D(p1.getCoordinate(), p2.getCoordinate());
+    }
+
     private static boolean equalLineStringCoordinates(LineString g1, LineString g2) {
         int np1 = g1.getNumPoints();
         int np2 = g2.getNumPoints();
@@ -86,7 +95,7 @@ public class JTSUtils {
         //this method assumes that g1 and g2 are of the same type
         assert (g1.getClass().equals(g2.getClass()));
         if (g1 instanceof Point) {
-            return equals3D(g1.getCoordinate(), g2.getCoordinate());
+            return equalPoints((Point) g1, (Point) g2);
         }
 
         if (g1 instanceof LineString) {

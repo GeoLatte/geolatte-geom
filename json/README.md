@@ -39,8 +39,8 @@ You can configure a default Coordinate Reference System by passing it in the con
 
 ```java
     CoordinateReferenceSystem<G2D> crs=...;
-    ObjectMapper mapper=new ObjectMapper(crs);
-    mapper.registerModule(new GeolatteGeomModule());
+    ObjectMapper mapper=new ObjectMapper();
+    mapper.registerModule(new GeolatteGeomModule(crs));
 ```
 
 If no default is specified in the constructor, the default will be set to `WGS84`.

@@ -65,6 +65,23 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
         return new CoordinateArraySequence(size, dimension);
     }
 
+    @Override
+    public CoordinateSequence create(int size, int dimension, int measures) {
+        int spatial = dimension - measures;
+        if (measures > 1) {
+            measures = 1;
+        }
+
+        if (spatial > 3) {
+            spatial = 3;
+        }
+
+        if (spatial < 2) {
+            spatial = 2;
+        }
+        return new CoordinateArraySequence(size, spatial + measures, measures);
+    }
+
     @SuppressWarnings("unchecked")
     public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType,
                                                                        CoordinateReferenceSystem<P> crs) {

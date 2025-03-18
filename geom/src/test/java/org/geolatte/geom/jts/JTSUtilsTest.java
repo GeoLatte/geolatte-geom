@@ -50,6 +50,13 @@ public class JTSUtilsTest {
     }
 
     @Test
+    public void testEmptyPointDoesntEqualRealPoint() {
+        Geometry pn1 = JTS.to(point(WGS84));
+        Geometry pn2 = JTS.to(point(WGS84, g(3, 50)));
+        assertFalse(equalsExact3D(pn1, pn2));
+    }
+
+    @Test
     public void testEqualsPointsAreEqual() {
         Point pnt1 = (Point) JTS.to(point(WGS84, g(3, 50)));
         Point pnt2 = (Point) JTS.to(point(WGS84, g(3, 50)));
