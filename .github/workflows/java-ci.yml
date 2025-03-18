@@ -12,7 +12,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 11
-          distribution: 'openjdk'
+          distribution: 'temurin'
       - name: Cache Maven packages
         uses: actions/cache@v4
         with:
