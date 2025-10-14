@@ -1,10 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.GeometryType;
 import org.geolatte.geom.Position;
@@ -13,8 +8,11 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ import static org.geolatte.geom.Geometries.mkGeometryCollection;
  * A Parser for Geometry types
  * Created by Karel Maesen, Geovise BVBA on 13/09/17.
  */
-public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
+public class GeometryDeserializer extends ValueDeserializer<Geometry<?>> {
 
     private final CoordinateReferenceSystem<?> defaultCRS;
     private final Settings settings;
@@ -38,15 +36,12 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
         this.crsDeser = new CrsDeserializer(this.defaultCRS, settings);
     }
 
-
-    private JsonNode getRoot(JsonParser p) throws IOException {
-        ObjectCodec oc = p.getCodec();
-        return oc.readTree(p);
+    private JsonNode getRoot(JsonParser p) {
+        return p.readValueAsTree();
     }
 
-
     @Override
-    public Geometry<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public Geometry<?> deserialize(JsonParser p, DeserializationContext ctxt) {
         JsonNode root = getRoot(p);
         return parseGeometry(root);
     }
@@ -64,7 +59,6 @@ public class GeometryDeserializer extends JsonDeserializer<Geometry<?>> {
     protected CoordinateReferenceSystem<?> getDefaultCrs() {
         return defaultCRS;
     }
-
 
     private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {
         CrsId id = getCrsId(root);
@@ -103,9 +97,7 @@ abstract class GeometryBuilder {
             throw new GeoJsonProcessingException(String.format("Can't parse GeoJson of type %s", type));
         }
     }
-
 }
-
 
 class GeometryCollectionBuilder extends GeometryBuilder {
 
@@ -146,7 +138,6 @@ class GeometryCollectionBuilder extends GeometryBuilder {
         }
     }
 }
-
 
 class SimpleGeometryBuilder extends GeometryBuilder {
     final private GeometryType type;
@@ -243,6 +234,4 @@ class SimpleGeometryBuilder extends GeometryBuilder {
         }
         return holder;
     }
-
 }
-

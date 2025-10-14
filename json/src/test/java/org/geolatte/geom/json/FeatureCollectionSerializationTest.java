@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.FeatureCollection;
 
 import static org.geolatte.geom.builder.DSL.*;
@@ -9,6 +8,7 @@ import static org.geolatte.geom.json.GeoJsonStrings.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.ArrayList;

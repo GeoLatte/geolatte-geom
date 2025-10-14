@@ -1,14 +1,12 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
-
-public class CrsSerializer<P extends Position> extends JsonSerializer<CoordinateReferenceSystem<P>> {
+public class CrsSerializer<P extends Position> extends ValueSerializer<CoordinateReferenceSystem<P>> {
 
     final private CoordinateReferenceSystem<P> defaultCRS;
     final private Settings settings;
@@ -19,18 +17,18 @@ public class CrsSerializer<P extends Position> extends JsonSerializer<Coordinate
     }
 
     @Override
-    public void serialize(CoordinateReferenceSystem<P> crs, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(CoordinateReferenceSystem<P> crs, JsonGenerator gen, SerializationContext serializers) {
         writeCrs(gen, crs);
     }
 
-    private void writeCrs(JsonGenerator gen, CoordinateReferenceSystem<P> crs) throws IOException {
+    private void writeCrs(JsonGenerator gen, CoordinateReferenceSystem<P> crs) {
         writeNamedCrs(gen, crs);
     }
 
-    private void writeNamedCrs(JsonGenerator gen, CoordinateReferenceSystem<P> crs) throws IOException {
+    private void writeNamedCrs(JsonGenerator gen, CoordinateReferenceSystem<P> crs) {
         gen.writeStartObject();
-        gen.writeStringField("type", "name");
-        gen.writeFieldName("properties");
+        gen.writeStringProperty("type", "name");
+        gen.writeName("properties");
         if (settings.isSet(Setting.SERIALIZE_CRS_AS_URN)) {
             writeCrsName(gen, crs.getCrsId().toUrn());
         } else {
@@ -39,9 +37,9 @@ public class CrsSerializer<P extends Position> extends JsonSerializer<Coordinate
         gen.writeEndObject();
     }
 
-    private void writeCrsName(JsonGenerator gen, String epsgString) throws IOException {
+    private void writeCrsName(JsonGenerator gen, String epsgString) {
         gen.writeStartObject();
-        gen.writeStringField("name", epsgString);
+        gen.writeStringProperty("name", epsgString);
         gen.writeEndObject();
     }
 }

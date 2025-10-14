@@ -16,7 +16,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
  */
 public class GeoJsonFeature<P extends Position, ID> implements Feature<P, ID> {
 
-
     final private Geometry<P> geometry;
 
     final private ID id;
@@ -73,4 +72,3 @@ public class GeoJsonFeature<P extends Position, ID> implements Feature<P, ID> {
                 '}';
     }
 }
-
