@@ -16,11 +16,9 @@ class Settings {
         return  override == null ? setting.isSetByDefault() : override;
     }
 
-
     public void override(Setting setting, boolean value) {
         if(setting.isSetByDefault() != value) {
             overrides.put(setting, value);
         }
     }
-
 }

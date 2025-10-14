@@ -1,9 +1,9 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.MultiPolygon;
 import org.junit.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.builder.DSL.polygon;
@@ -19,8 +19,7 @@ import static org.junit.Assert.assertEquals;
 public class MultiPolygonSerializationTest extends GeoJsonTest {
 
     @Test
-    public void testSerializeEmpty() throws JsonProcessingException {
-
+    public void testSerializeEmpty() throws JacksonException {
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiPolygon<?> mp = multipolygon(WGS84);
         String rec = mapper.writeValueAsString(mp);
@@ -28,8 +27,7 @@ public class MultiPolygonSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeSimple() throws JsonProcessingException {
-
+    public void testSerializeSimple() throws JacksonException {
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiPolygon<?> mp = multipolygon(
                 polygon(WGS84, ring(g(1, 1), g(1, 2), g(2, 2), g(2, 1), g(1, 1))),
@@ -40,7 +38,7 @@ public class MultiPolygonSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeWithCRS() throws JsonProcessingException {
+    public void testSerializeWithCRS() throws JacksonException {
         MultiPolygon<?> mp =multipolygon(
                 polygon(lambert72, ring(c(1, 1), c(1, 2), c(2, 2), c(2, 1), c(1, 1))),
                 polygon(lambert72, ring(c(3, 3), c(3, 5), c(5, 5), c(5, 3), c(3, 3)))
