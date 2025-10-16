@@ -1,8 +1,8 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Point;
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -19,7 +19,6 @@ public class UrnCrsSupportTest extends GeoJsonTest {
 
     @Test
     public void testSrializePointWithCrsInUrnFormat() throws IOException {
-
         ObjectMapper mapper = createMapper(Setting.SERIALIZE_CRS_AS_URN, true);
         Point<?> pnt = point(lambert72, c(1, 2));
         assertEquals(pointTextWithUrnCrs, mapper.writeValueAsString(pnt));
