@@ -12,6 +12,10 @@
     </description>
     <url>https://github.com/geolatte/geolatte-geom</url>
 
+    <properties>
+        <project.automatic.module.name>org.geolatte.geom.json</project.automatic.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.geolatte</groupId>
