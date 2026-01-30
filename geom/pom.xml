@@ -30,6 +30,9 @@
     </description>
 	<url>https://github.com/geolatte/geolatte-geom</url>
 
+    <properties>
+        <project.automatic.module.name>org.geolatte.geom</project.automatic.module.name>
+    </properties>
 
 	<dependencies>
 		<!-- Runtime dependencies -->
