@@ -41,6 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jts-core.version>1.19.0</jts-core.version>
+        <project.automatic.module.name></project.automatic.module.name>
     </properties>
 
     <licenses>
@@ -148,6 +149,18 @@
     </profiles>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.5.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${project.automatic.module.name}</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
             <!-- generate compiled (binary) artefacts -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
