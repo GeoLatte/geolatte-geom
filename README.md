@@ -22,7 +22,7 @@ GeoLatte-geom is fully interoperable with [the Java Topology Suite (JTS)](https:
 
 # Using Geolatte-geom
 
-Currently we require Java 1.8 or later.
+Currently we require Java 17 or later.
 
 The library is published on Maven Central. For Maven, you can include the following dependency.
 

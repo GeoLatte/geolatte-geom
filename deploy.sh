@@ -1,6 +1,6 @@
 #! /bin/bash
 
-#ensure we use java 8
+#ensure we use java 17
 . ~/.sdkman/bin/sdkman-init.sh
 sdk env
 
