@@ -1,10 +1,10 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import tools.jackson.core.Version;
+import tools.jackson.databind.module.SimpleModule;
+import tools.jackson.databind.ValueDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +20,9 @@ import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 @SuppressWarnings("rawtypes")
 public class GeolatteGeomModule extends SimpleModule {
 
-
     private final Settings settings = new Settings();
 
-    private final Map<Class, JsonDeserializer> dezers = new HashMap<>();
+    private final Map<Class, ValueDeserializer> dezers = new HashMap<>();
 
     private final GeometrySerializer geometrySerializer;
     private final CrsSerializer crsSerializer;
@@ -35,7 +34,7 @@ public class GeolatteGeomModule extends SimpleModule {
     @SuppressWarnings("unchecked")
     public <P extends Position> GeolatteGeomModule(CoordinateReferenceSystem<P> defaultCrs) {
 
-        super("GeolatteGeomModule", new Version(1, 9, 0, "", "org.geolatte", "geolatte-json"));
+        super("GeolatteGeomModule", new Version(2, 0, 0, "", "org.geolatte", "geolatte-json"));
 
         geometrySerializer = new GeometrySerializer(settings);
         FeatureSerializer featureSerializer = new FeatureSerializer(settings);
@@ -67,7 +66,6 @@ public class GeolatteGeomModule extends SimpleModule {
         settings.override(setting, value);
     }
 
-
     public GeometrySerializer getGeometrySerializer() {
         return this.geometrySerializer;
     }
@@ -77,15 +75,13 @@ public class GeolatteGeomModule extends SimpleModule {
      * <p>
      * This method is provided for interoperability reasons
      */
-    public Map<Class, JsonDeserializer> getGeometryDeserializers() {
+    public Map<Class, ValueDeserializer> getGeometryDeserializers() {
         return unmodifiableMap(dezers);
     }
-
 
     public void copyToModule(SimpleModule other) {
         other.addSerializer(getGeometrySerializer());
         other.addSerializer(this.crsSerializer);
         getGeometryDeserializers().forEach(other::addDeserializer);
     }
-
 }

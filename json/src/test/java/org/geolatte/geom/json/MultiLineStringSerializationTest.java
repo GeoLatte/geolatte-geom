@@ -1,9 +1,9 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.MultiLineString;
 import org.junit.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
@@ -18,8 +18,7 @@ public class MultiLineStringSerializationTest extends GeoJsonTest {
 
 
     @Test
-    public void testSerializeEmpty() throws JsonProcessingException {
-
+    public void testSerializeEmpty() throws JacksonException {
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiLineString<?> mls = new MultiLineString(WGS84);
         String rec = mapper.writeValueAsString(mls);
@@ -27,7 +26,7 @@ public class MultiLineStringSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeSimple() throws JsonProcessingException {
+    public void testSerializeSimple() throws JacksonException {
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         MultiLineString<?> mls = multilinestring(
                 linestring(WGS84, g(1, 1), g(1, 2)),
@@ -38,7 +37,7 @@ public class MultiLineStringSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeWithCRS() throws JsonProcessingException {
+    public void testSerializeWithCRS() throws JacksonException {
         MultiLineString<?> mls = multilinestring(
                 linestring(Crss.lambert72, c(1, 1), c(1, 2)),
                 linestring(Crss.lambert72, c(3, 4), c(5, 6))

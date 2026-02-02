@@ -1,11 +1,11 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 08/09/17.
  */
-public class GeoJsonProcessingException extends JsonProcessingException {
+public class GeoJsonProcessingException extends JacksonException {
 
     GeoJsonProcessingException(String msg) {
         super(msg);

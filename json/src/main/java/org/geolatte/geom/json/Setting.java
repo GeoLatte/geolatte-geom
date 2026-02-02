@@ -47,6 +47,4 @@ public enum Setting {
     public boolean isSetByDefault() {
         return this.setByDefault;
     }
-
-
 }

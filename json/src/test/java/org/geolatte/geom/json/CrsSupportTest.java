@@ -1,8 +1,8 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -26,7 +26,6 @@ public class CrsSupportTest extends GeoJsonTest {
         assertEquals(crswgs84, mapper.writeValueAsString(WGS84));
         assertEquals(crslambert72, mapper.writeValueAsString(lambert72));
     }
-
 
     @Test
     public void testDeserializeCrs() throws IOException {

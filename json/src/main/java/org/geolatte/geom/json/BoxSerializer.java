@@ -1,24 +1,23 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import org.geolatte.geom.Box;
 import org.geolatte.geom.Position;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
 import java.util.Arrays;
 
-public class BoxSerializer<P extends Position> extends JsonSerializer<Box<P>> {
+public class BoxSerializer<P extends Position> extends ValueSerializer<Box<P>> {
 
     @Override
-    public void serialize(Box<P> box, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(Box<P> box, JsonGenerator gen, SerializationContext serializers) {
         final double[] bbox = concat(box.lowerLeft().toArray(null), box.upperRight().toArray(null));
         gen.writeArray(bbox, 0, bbox.length);
     }
 
     @Override
-    public boolean isEmpty(SerializerProvider provider, Box<P> box) {
+    public boolean isEmpty(SerializationContext provider, Box<P> box) {
         return box == null || box.isEmpty();
     }
 

@@ -1,18 +1,15 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
-
-public class CrsDeserializer extends JsonDeserializer<CoordinateReferenceSystem> {
+public class CrsDeserializer extends ValueDeserializer<CoordinateReferenceSystem> {
 
     final private CoordinateReferenceSystem<?> defaultCrs;
     final private Settings settings;
@@ -22,13 +19,12 @@ public class CrsDeserializer extends JsonDeserializer<CoordinateReferenceSystem>
         this.settings = settings;
     }
 
-    private JsonNode getRoot(JsonParser p) throws IOException, GeoJsonProcessingException {
-        ObjectCodec oc = p.getCodec();
-        return oc.readTree(p);
+    private JsonNode getRoot(JsonParser p) throws JacksonException {
+        return p.readValueAsTree();
     }
 
     @Override
-    public CoordinateReferenceSystem<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+    public CoordinateReferenceSystem<?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         JsonNode root = getRoot(p);
         return resolveBaseCrs(root);
     }
