@@ -30,8 +30,20 @@ jobs:
           server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Import GPG key
+        run: |
+          # Debug: Check if secret is present (shows length, not content)
+          echo "GPG_PRIVATE_KEY length: ${#GPG_PRIVATE_KEY}"
+
+          # Decode and import
+          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+
+          # List imported keys
+          echo "Imported keys:"
+          gpg --list-secret-keys --keyid-format LONG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
       - name: Publish SNAPSHOT to Maven Central
         env:
