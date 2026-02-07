@@ -1,0 +1,59 @@
+name: Publish to Maven Central
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.11.0
+  workflow_dispatch:  # Allow manual trigger for emergency republishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Import GPG key
+        run: |
+          # Debug: Check if secret is present (shows length, not content)
+          echo "GPG_PRIVATE_KEY length: ${#GPG_PRIVATE_KEY}"
+
+          # Decode and import
+          echo "$GPG_PRIVATE_KEY" | base64 --decode | gpg --batch --import
+
+          # List imported keys
+          echo "Imported keys:"
+          gpg --list-secret-keys --keyid-format LONG
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Publish to Maven Central
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          mvn -P release \
+            --batch-mode \
+            --no-transfer-progress \
+            -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
+            clean deploy
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            **/target/*.jar
+            **/target/*.pom

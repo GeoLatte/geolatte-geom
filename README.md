@@ -228,6 +228,26 @@ The `JTS` class supports conversion from/to JTS `Geometry` instances.
         org.geolatte.geom.Point<G2D> glPnt2=JTS.from(jtsPoint,WGS84);
 ```
 
+# Releasing
+
+Releases are published automatically to Maven Central via GitHub Actions when a version tag is pushed:
+
+```bash
+# Create and push a version tag
+git tag -a v1.11.0 -m "Release version 1.11.0"
+git push origin v1.11.0
+```
+
+The GitHub Actions workflow will:
+1. Build the project with Java 17
+2. Run all tests
+3. Generate source and JavaDoc JARs
+4. Sign all artifacts with GPG
+5. Publish to Maven Central
+6. Create a GitHub Release
+
+Artifacts typically appear on Maven Central within 15-30 minutes.
+
 
 
 
