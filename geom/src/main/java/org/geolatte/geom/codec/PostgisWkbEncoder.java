@@ -28,7 +28,7 @@ import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
 
 /**
- * A WKBEncoder for the PostGIS EWKB dialect (for Postgis  versions < 2.2.2).
+ * A WKBEncoder for the PostGIS EWKB dialect (for Postgis  versions &lt; 2.2.2).
  *
  *<p>This {@code WKBEncoder} encodes empty points as empty GeometryCollections. This convention
  * was changed in Postgis version 2.2.2 to an encoding with NaN coordinates. For the later convention

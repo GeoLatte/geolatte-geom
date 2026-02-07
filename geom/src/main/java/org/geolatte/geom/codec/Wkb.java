@@ -53,7 +53,7 @@ public class Wkb {
         SFA_1_2_1,
 
         /**
-         * the PostGIS EWKB dialect (version < 2.2.1).
+         * the PostGIS EWKB dialect (version &lt; 2.2.1).
          * This encodes an empty {@code Point} as an empty {@code GeometryCollection}
          */
         POSTGIS_EWKB_1,
