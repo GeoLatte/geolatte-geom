@@ -6,6 +6,8 @@
         <version>${revision}</version>
     </parent>
     <artifactId>geolatte-geojson</artifactId>
+    <name>geolatte-geojson</name>
+    <packaging>jar</packaging>
     <description>
         This geoLatte-geojson library provides a Jackson module for serializing Geometry objects to GeoJson
         specification.
