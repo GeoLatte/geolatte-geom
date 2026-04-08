@@ -1,9 +1,9 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.Geometries;
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,8 +41,6 @@ public class FeatureSerializationTest extends GeoJsonTest {
         assertEquals(featureWithBBox, rec);
     }
 
-
-
     @Test
     public void testSerializeLineStringFeature() throws IOException {
         Map<Setting, Boolean> settingsMap = new HashMap<>();
@@ -74,4 +72,5 @@ public class FeatureSerializationTest extends GeoJsonTest {
         String rec = mapper.writeValueAsString(f);
         assertEquals(featureEmptyPolygon, rec);
     }
+
 }

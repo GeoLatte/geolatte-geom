@@ -1,22 +1,18 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.ObjectCodec;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.FeatureCollection;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-
 @SuppressWarnings("rawtypes")
-public class FeatureCollectionDeserializer extends JsonDeserializer<FeatureCollection> {
+public class FeatureCollectionDeserializer extends ValueDeserializer<FeatureCollection> {
     final private FeatureDeserializer fDeserializer;
     public FeatureCollectionDeserializer(CoordinateReferenceSystem<?> defaultCrs, Settings settings) {
         this.fDeserializer = new FeatureDeserializer(defaultCrs, settings);
@@ -24,14 +20,12 @@ public class FeatureCollectionDeserializer extends JsonDeserializer<FeatureColle
 
     @Override
     @SuppressWarnings("unchecked")
-    public FeatureCollection<?, ?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        ObjectCodec oc = jsonParser.getCodec();
-        JsonNode root = oc.readTree(jsonParser);
+    public FeatureCollection<?, ?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
+        JsonNode root = jsonParser.readValueAsTree();
         JsonNode featureNds = root.get("features");
         List<Feature<?, ?>> features = new ArrayList<>();
-        for (Iterator<JsonNode> it = featureNds.elements(); it.hasNext(); ) {
-            JsonNode fNode = it.next();
-            features.add(fDeserializer.readFeature(oc, fNode));
+        for (JsonNode feature : featureNds) {
+            features.add(fDeserializer.readFeature(jsonParser, feature));
         }
         return (GeoJsonFeatureCollection<?,?>)new GeoJsonFeatureCollection(features);
     }

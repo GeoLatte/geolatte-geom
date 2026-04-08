@@ -1,9 +1,9 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Point;
 import org.junit.Test;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 

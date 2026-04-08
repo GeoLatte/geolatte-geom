@@ -1,9 +1,9 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geolatte.geom.Point;
 import org.junit.Test;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import static org.geolatte.geom.builder.DSL.*;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
@@ -18,9 +18,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class PointSerializationTest extends GeoJsonTest {
 
-
     @Test
-    public void testSerializeEmptyPoint() throws JsonProcessingException {
+    public void testSerializeEmptyPoint() throws JacksonException {
         Point<?> pnt = new Point(WGS84);
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
@@ -28,7 +27,7 @@ public class PointSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeSimplePoint() throws JsonProcessingException {
+    public void testSerializeSimplePoint() throws JacksonException {
         Point<?> pnt = point(WGS84, g(1, 2));
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
@@ -36,7 +35,7 @@ public class PointSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializeSimplePoint3D() throws JsonProcessingException {
+    public void testSerializeSimplePoint3D() throws JacksonException {
         Point<?> pnt = point(wgs3D, g(1, 2, 3));
         ObjectMapper mapper = createMapper(SUPPRESS_CRS_SERIALIZATION, true);
         String rec = mapper.writeValueAsString(pnt);
@@ -44,14 +43,10 @@ public class PointSerializationTest extends GeoJsonTest {
     }
 
     @Test
-    public void testSerializePointWithCrs() throws JsonProcessingException {
+    public void testSerializePointWithCrs() throws JacksonException {
         Point<?> pnt = point(lambert72Z, c(1, 2, 3));
         String rec = mapper.writeValueAsString(pnt);
         assertEquals(GeoJsonStrings.pointTextWithCrs3D, rec);
     }
-
-
-
-
 
 }
