@@ -74,11 +74,11 @@ class BaseWktParser<P extends Position> {
             return overrideCrs;
         } else {
             CoordinateReferenceSystem<?> baseCrs = this.matchedSrid != null ? matchedSrid : DEFAULT_CRS;
-            return (CoordinateReferenceSystem<P>) widenCrsToCoordinateDimension(baseCrs);
+            return (CoordinateReferenceSystem<P>) adjustCrsToCoordinateDimension(baseCrs);
         }
     }
 
-    protected CoordinateReferenceSystem<?> widenCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
+    protected CoordinateReferenceSystem<?> adjustCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
         if (builder.isEmpty()) {
             return CoordinateReferenceSystems.adjustTo(crs, hasZMark, hasMMark);
         }

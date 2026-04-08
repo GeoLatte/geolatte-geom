@@ -215,37 +215,145 @@ public class CoordinateReferenceSystems {
         return combine(base, mkVertical(unit));
     }
 
+    /**
+     * Returns a {@code CoordinateReferenceSystem} that shares the horizontal base of {@code crs}
+     * but whose vertical (Z) and measure (M) axes are exactly as requested by {@code hasZ} and {@code hasM}.
+     *
+     * <p>This is the canonical form of {@code adjustTo}. It is bidirectional: it adds axes that are
+     * missing from {@code crs} and strips axes that should not be present in the result.
+     *
+     * <h4>Definitions</h4>
+     * <ul>
+     *   <li>The <em>shape</em> of a CRS is the pair {@code (hasZ, hasM)} where {@code hasZ} indicates
+     *       the presence of a vertical (Z) axis and {@code hasM} indicates the presence of a measure (M) axis.</li>
+     *   <li>The <em>horizontal base</em> of a CRS is its 2D anchor: the CRS itself when it is a
+     *       {@link SingleCoordinateReferenceSystem}, or {@link CompoundCoordinateReferenceSystem#getBase()}
+     *       when it is compound. Two CRSes share a horizontal base iff their base {@code CrsId}s are equal.</li>
+     * </ul>
+     *
+     * <h4>Postconditions</h4>
+     * The returned CRS {@code result} satisfies:
+     * <ol>
+     *   <li>{@code result} has the same horizontal base as {@code crs} (same datum, axes and EPSG code).</li>
+     *   <li>{@code result.hasZ() == hasZ} and {@code result.hasM() == hasM}.</li>
+     *   <li>Z and/or M axes that have to be added use {@link Unit#METER}.</li>
+     *   <li>The result is canonicalised through {@link CrsRegistry}, so repeated calls with the same
+     *       {@code (base, hasZ, hasM)} triple return the same instance.</li>
+     * </ol>
+     *
+     * <h4>Special cases</h4>
+     * <ul>
+     *   <li>If {@code crs} already has the requested shape, it is returned unchanged.</li>
+     *   <li>If {@code hasZ == false && hasM == false}, the result is the horizontal base of {@code crs},
+     *       regardless of how many axes {@code crs} had.</li>
+     * </ul>
+     *
+     * @param crs   the input coordinate reference system
+     * @param hasZ  whether the result must have a vertical (Z) axis
+     * @param hasM  whether the result must have a measure (M) axis
+     * @return a {@code CoordinateReferenceSystem} sharing the horizontal base of {@code crs} with the requested shape
+     */
     public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, boolean hasZ, boolean hasM) {
-        if (!hasZ && !hasM) return crs;
-        CrsId extId = crs.getCrsId().extend(hasZ ? METER : null, hasM ? METER : null);
-        return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, hasZ ? METER : null, hasM ? METER : null));
+        if (crs.hasZ() == hasZ && crs.hasM() == hasM) {
+            return crs;
+        }
+        CoordinateReferenceSystem<?> base = horizontalBase(crs);
+        CrsId extId = base.getCrsId().extend(hasZ ? METER : null, hasM ? METER : null);
+        return CrsRegistry.computeIfAbsent(extId,
+                key -> mkCoordinateReferenceSystem(base, hasZ ? METER : null, hasM ? METER : null));
     }
 
+    private static CoordinateReferenceSystem<?> horizontalBase(CoordinateReferenceSystem<?> crs) {
+        if (crs instanceof CompoundCoordinateReferenceSystem) {
+            return ((CompoundCoordinateReferenceSystem<?>) crs).getBase();
+        }
+        return crs;
+    }
+
+    /**
+     * Convenience overload of {@link #adjustTo(CoordinateReferenceSystem, int, boolean)} with {@code hasM = false}.
+     *
+     * <p>A 3rd coordinate is interpreted as Z (the GeoJSON/WKB convention), never as M.
+     *
+     * @param crs                 the input coordinate reference system
+     * @param coordinateDimension the desired total number of coordinates per position (2, 3 or 4)
+     * @return a {@code CoordinateReferenceSystem} sharing the horizontal base of {@code crs} with the requested dimension
+     */
     public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension) {
         return adjustTo(crs, coordinateDimension, false);
     }
 
+    /**
+     * Convenience overload of {@link #adjustTo(CoordinateReferenceSystem, boolean, boolean)} that derives
+     * the {@code (hasZ, hasM)} shape from a coordinate-count and an explicit {@code hasM} flag.
+     *
+     * <p>This form is intended for parsers that only know the <em>number</em> of coordinates per position
+     * (e.g. GeoJSON coordinate arrays, WKT positions without Z/M markers) and need an external hint to
+     * disambiguate a 3-coordinate position between XYZ and XYM.
+     *
+     * <h4>Mapping</h4>
+     * <table>
+     *   <caption>Derivation of {@code (hasZ, hasM)} from {@code (coordinateDimension, hasM)}</caption>
+     *   <tr><th>{@code coordinateDimension}</th><th>{@code hasM}</th><th>derived shape</th><th>meaning</th></tr>
+     *   <tr><td>{@code < 2}</td><td>(any)</td><td>(no constraint)</td><td>empty / no coordinate data — {@code crs} is returned unchanged</td></tr>
+     *   <tr><td>2</td><td>false</td><td>{@code (false, false)}</td><td>XY</td></tr>
+     *   <tr><td>3</td><td>false</td><td>{@code (true,  false)}</td><td>XYZ</td></tr>
+     *   <tr><td>3</td><td>true</td> <td>{@code (false, true)} </td><td>XYM</td></tr>
+     *   <tr><td>4</td><td>(any)</td><td>{@code (true,  true)} </td><td>XYZM</td></tr>
+     * </table>
+     *
+     * <p>The empty case ({@code coordinateDimension < 2}) exists because parsers of formats like GeoJSON
+     * and WKT call this overload with the coordinate dimension extracted from their position arrays;
+     * for an empty geometry that dimension is {@code 0} and there is no shape to constrain — in that
+     * case {@code crs} is the parser's default and is returned as-is.
+     *
+     * <p>For {@code coordinateDimension >= 2}, the derived shape is applied via
+     * {@link #adjustTo(CoordinateReferenceSystem, boolean, boolean)}, which is bidirectional —
+     * axes are added or stripped as needed so the result has exactly the requested shape while
+     * preserving the horizontal base of {@code crs}.
+     *
+     * @param crs                 the input coordinate reference system
+     * @param coordinateDimension the desired total number of coordinates per position; values
+     *                            below 2 are treated as "empty / no constraint" and pass {@code crs}
+     *                            through unchanged
+     * @param hasM                when {@code coordinateDimension == 3}, selects XYM ({@code true})
+     *                            over XYZ ({@code false}); otherwise this flag is redundant (must be
+     *                            {@code false} when {@code coordinateDimension == 2} and is implied by
+     *                            {@code coordinateDimension == 4})
+     * @return a {@code CoordinateReferenceSystem} sharing the horizontal base of {@code crs} with the requested shape
+     * @throws IllegalArgumentException if {@code coordinateDimension > 4},
+     *                                  or if {@code coordinateDimension == 2 && hasM == true}
+     */
     public static CoordinateReferenceSystem<?> adjustTo(CoordinateReferenceSystem<?> crs, int coordinateDimension, boolean hasM) {
-        if (coordinateDimension <= 2) {
+        // Empty / underspecified inputs (no coordinate data — typical for empty GeoJSON/WKT
+        // geometries) carry no constraint on the CRS shape; leave crs as-is.
+        if (coordinateDimension < 2) {
             return crs;
         }
-
-        if (coordinateDimension == 3 && hasM) {
-            CrsId extId = crs.getCrsId().extend(null, METER);
-            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, null, METER));
+        boolean targetHasZ;
+        boolean targetHasM;
+        switch (coordinateDimension) {
+            case 2:
+                if (hasM) {
+                    throw new IllegalArgumentException(
+                            "coordinateDimension=2 is incompatible with hasM=true");
+                }
+                targetHasZ = false;
+                targetHasM = false;
+                break;
+            case 3:
+                targetHasZ = !hasM;
+                targetHasM = hasM;
+                break;
+            case 4:
+                targetHasZ = true;
+                targetHasM = true;
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "coordinateDimension must be at most 4 but was " + coordinateDimension);
         }
-
-        if (coordinateDimension == 3) {
-            CrsId extId = crs.getCrsId().extend(METER, null);
-            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, null));
-        }
-
-        if (coordinateDimension == 4) {
-            CrsId extId = crs.getCrsId().extend(METER, METER);
-            return CrsRegistry.computeIfAbsent(extId, key -> mkCoordinateReferenceSystem(crs, METER, METER));
-        }
-
-        throw new IllegalStateException("CoordinateDimension " + coordinateDimension + " less than 2 or larger than 4");
+        return adjustTo(crs, targetHasZ, targetHasM);
     }
 
 

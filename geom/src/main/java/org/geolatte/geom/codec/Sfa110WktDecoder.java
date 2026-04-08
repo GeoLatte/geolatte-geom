@@ -23,7 +23,7 @@ class Sfa110WktParser<P extends Position> extends BaseWktParser<P> {
     }
 
     @Override
-    protected CoordinateReferenceSystem<?> widenCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
+    protected CoordinateReferenceSystem<?> adjustCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
         //don't do this for this dialect
         return crs;
     }
