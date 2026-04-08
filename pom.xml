@@ -40,11 +40,15 @@
 
     <properties>
         <!-- Two version axes:
-             - ${revision}        - parent aggregator + geolatte-geom (lockstep)
-             - ${geojson.version} - the three GeoJSON modules (lockstep among themselves)
-             Bump them with scripts/bump-version.sh; see docs/release-process.md. -->
+             - ${revision} - parent aggregator + geolatte-geom (lockstep)
+             - the three GeoJSON modules (json-core, json-jackson3, json-jackson2)
+               carry literal versions in their own poms; they are bumped in lockstep
+               with each other but independently of geom. Maven only allows the
+               three CI-friendly placeholders (${revision}/${sha1}/${changelist})
+               inside <version> elements without warning, so a custom property
+               is not viable for the GeoJSON axis.
+             Bump either axis with scripts/bump-version.sh; see docs/release-process.md. -->
         <revision>1.12-SNAPSHOT</revision>
-        <geojson.version>1.12-SNAPSHOT</geojson.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
