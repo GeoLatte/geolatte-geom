@@ -1,0 +1,31 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.geolatte</groupId>
+        <artifactId>geolatte</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <artifactId>geolatte-geojson-core</artifactId>
+    <name>geolatte-geojson-core</name>
+    <packaging>jar</packaging>
+
+    <description>
+        Jackson-free core for the geolatte-geojson library. Contains the GeoJSON data model and the
+        Jackson-version-independent encode/decode logic, consumed by geolatte-geojson-jackson2 and
+        geolatte-geojson-jackson3 adapter modules.
+    </description>
+    <url>https://github.com/geolatte/geolatte-geom</url>
+
+    <properties>
+        <project.automatic.module.name>org.geolatte.geom.json.core</project.automatic.module.name>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>

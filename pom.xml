@@ -27,6 +27,7 @@
 
     <modules>
         <module>geom</module>
+        <module>json-core</module>
         <module>json</module>
     </modules>
 
