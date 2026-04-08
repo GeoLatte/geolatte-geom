@@ -28,7 +28,7 @@
     <modules>
         <module>geom</module>
         <module>json-core</module>
-        <module>json</module>
+        <module>json-jackson3</module>
     </modules>
 
 

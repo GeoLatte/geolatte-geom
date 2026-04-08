@@ -5,17 +5,18 @@
         <artifactId>geolatte</artifactId>
         <version>${revision}</version>
     </parent>
-    <artifactId>geolatte-geojson</artifactId>
-    <name>geolatte-geojson</name>
+    <artifactId>geolatte-geojson-jackson3</artifactId>
+    <name>geolatte-geojson-jackson3</name>
     <packaging>jar</packaging>
     <description>
-        This geoLatte-geojson library provides a Jackson module for serializing Geometry objects to GeoJson
-        specification.
+        Jackson 3 adapter for the geolatte-geojson library. Registers the GeolatteGeomModule with a
+        Jackson 3 ObjectMapper. All GeoJSON encoding/decoding logic lives in geolatte-geojson-core;
+        this module is a thin adapter over the Jackson 3 streaming and tree-model APIs.
     </description>
     <url>https://github.com/geolatte/geolatte-geom</url>
 
     <properties>
-        <project.automatic.module.name>org.geolatte.geom.json</project.automatic.module.name>
+        <project.automatic.module.name>org.geolatte.geom.json.jackson3</project.automatic.module.name>
     </properties>
 
     <dependencies>
