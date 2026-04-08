@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.geolatte</groupId>
+        <artifactId>geolatte</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <artifactId>geolatte-geojson-jackson2</artifactId>
+    <name>geolatte-geojson-jackson2</name>
+    <packaging>jar</packaging>
+
+    <description>
+        Jackson 2 adapter for the geolatte-geojson library. Registers the GeolatteGeomModule with a
+        Jackson 2 ObjectMapper. All GeoJSON encoding/decoding logic lives in geolatte-geojson-core;
+        this module is a thin adapter over the Jackson 2 streaming and tree-model APIs.
+    </description>
+    <url>https://github.com/geolatte/geolatte-geom</url>
+
+    <properties>
+        <project.automatic.module.name>org.geolatte.geom.json.jackson2</project.automatic.module.name>
+        <jackson2.version>2.18.2</jackson2.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geojson-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson2.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
