@@ -1,7 +1,10 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.json.GeoJsonFeature;
+import org.geolatte.geom.json.GeoJsonFeatureReader;
+import org.geolatte.geom.json.Settings;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;

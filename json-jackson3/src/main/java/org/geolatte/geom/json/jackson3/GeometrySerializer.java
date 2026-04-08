@@ -1,7 +1,9 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.json.GeoJsonGeometryWriter;
+import org.geolatte.geom.json.Settings;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.core.JsonToken;
 import tools.jackson.core.type.WritableTypeId;

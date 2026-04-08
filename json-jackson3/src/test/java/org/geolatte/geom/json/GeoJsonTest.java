@@ -2,6 +2,7 @@ package org.geolatte.geom.json;
 
 import org.geolatte.geom.Position;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
 import org.junit.Before;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;

@@ -1,7 +1,9 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.FeatureCollection;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.json.GeoJsonFeatureCollectionWriter;
+import org.geolatte.geom.json.Settings;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;

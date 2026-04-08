@@ -3,6 +3,7 @@ package org.geolatte.geom.json;
 import org.geolatte.geom.*;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.Unit;
+import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
 import org.junit.Test;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;

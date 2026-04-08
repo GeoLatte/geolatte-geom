@@ -1,4 +1,4 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.json.spi.JsonTreeNode;
 import tools.jackson.databind.JsonNode;

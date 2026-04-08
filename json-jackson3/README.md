@@ -11,10 +11,15 @@ The actual GeoJSON encoding/decoding logic lives in the Jackson-free
 `geolatte-geojson-core` module; this module is a thin Jackson 3 adapter on top of it.
 A separate `geolatte-geojson-jackson2` module provides the equivalent for Jackson 2.x.
 
-> **Coordinate change:** prior to 1.12 this module was published as `org.geolatte:geolatte-geojson`.
-> From 1.12 onwards it is published as `org.geolatte:geolatte-geojson-jackson3`. The Java package
-> remains `org.geolatte.geom.json`, so existing source code only needs to update its `<dependency>`
-> coordinate (no import changes).
+> **Upgrading from 1.x:**
+> - The Maven coordinate changed from `org.geolatte:geolatte-geojson` to
+>   `org.geolatte:geolatte-geojson-jackson3`.
+> - The adapter classes (`GelatteGeomModule`, the per-type
+>   serializers/deserializers, etc.) moved from `org.geolatte.geom.json` to
+>   `org.geolatte.geom.json.jackson3`. Update your imports accordingly.
+> - The data types (`Setting`, `GeoJsonFeature`, `GeoJsonFeatureCollection`)
+>   stay in `org.geolatte.geom.json` and now live in the
+>   `geolatte-geojson-core` artifact.
 
 # How to use
 Add the following dependency to the POM.
@@ -32,11 +37,15 @@ This will pull in the Jackson 3 `jackson-databind` dependency. Note that the Jac
 is declared as `<optional>true</optional>`: consumers must declare the desired Jackson 3 version
 explicitly in their own POM.
 
-The library provides a custom module `GeolatteGeomModule` that can be added to Jackson `ObjectMapper`.
+The library provides a custom module `GeolatteGeomModule` (in package
+`org.geolatte.geom.json.jackson3`) that can be added to a Jackson 3 `ObjectMapper`.
 
 ```java
-    ObjectMapper mapper=new ObjectMapper();
-    mapper.registerModule(new GeolatteGeomModule());
+    import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
+
+    ObjectMapper mapper = JsonMapper.builder()
+        .addModule(new GeolatteGeomModule())
+        .build();
 ```
 
 # Configuration

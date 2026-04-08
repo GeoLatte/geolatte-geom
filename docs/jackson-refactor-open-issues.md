@@ -28,55 +28,7 @@ calls `adjustTo` expecting it to handle both directions.
 This is a `geom/` change and was not in the scope of the json refactor.
 Once decided, remove the `@Ignore` from `PointDeserializationTest.java`.
 
-## 2. Javadoc generation disabled on adapter modules
-
-**Where:** `json-jackson3/pom.xml` and `json-jackson2/pom.xml` —
-`<maven.javadoc.skip>true</maven.javadoc.skip>`
-
-**Symptom:** `mvn install` would fail in javadoc generation with errors like
-`module org.geolatte.geom.json.jackson3 reads package org.geolatte.geom.json
-from both org.geolatte.geom.json.core and org.geolatte.geom.json.jackson3`.
-
-**Root cause:** the `org.geolatte.geom.json` Java package is split between
-`json-core` (the data types `Setting`, `Settings`, `GeoJsonFeature`, etc.)
-and `json-jackson3` (the adapter classes). This is fine on the classpath,
-but when javadoc walks the dependency graph it auto-derives JPMS modules
-from each JAR's `Automatic-Module-Name` and rejects the split package.
-
-The compiler and Surefire are unaffected — only javadoc complains.
-
-**Fix options:**
-- (a) Move `json-jackson3` adapter classes into a sub-package
-  `org.geolatte.geom.json.jackson3` (mirrors `json-jackson2`'s layout) and
-  leave a deprecated shim class in `org.geolatte.geom.json.GelatteGeomModule`
-  for source compat. Cleanest but most code churn.
-- (b) Configure `maven-javadoc-plugin` to use classpath mode (`<source>17</source>`
-  instead of `--release 17`) so it stops trying to derive modules. Less
-  invasive but more obscure.
-- (c) Drop the `Automatic-Module-Name` from `json-jackson3` so javadoc
-  treats the JAR as classpath-only. Loses JPMS friendliness for that module.
-
-Recommendation: option (a) for the long-term health of the API surface.
-Schedule for the next minor release alongside the deprecation cycle.
-
-## 3. `GelatteGeomModule` and other adapter classes still in `org.geolatte.geom.json`
-
-**Where:** `json-jackson3/src/main/java/org/geolatte/geom/json/`
-
-**Status:** the adapter classes for Jackson 3 (`GelatteGeomModule`,
-`GeometrySerializer`, `GeometryDeserializer`, etc.) live in the
-`org.geolatte.geom.json` package — same as the data types in `json-core`.
-This was deliberate: it preserves existing user imports.
-
-**Trade-off:** this creates the split package issue from item 2 above.
-Resolving it requires moving the adapters to
-`org.geolatte.geom.json.jackson3`, which is a breaking change for source
-compatibility unless mitigated by deprecated shims.
-
-The Jackson 2 adapter (`json-jackson2`) is already in
-`org.geolatte.geom.json.jackson2`, so it doesn't have this problem.
-
-## 4. Independent versioning for the two adapter modules
+## 2. Independent versioning for the two adapter modules
 
 **Where:** root `pom.xml` — currently all four modules share `${revision}`.
 
@@ -91,9 +43,9 @@ Jackson 3 line evolves. Not implemented — release-process decision.
 - (b) Keep lockstep versioning and accept that the Jackson 2 adapter
   releases on the same cadence as everything else.
 
-## 5. `GeoJsonProcessingException` is orphaned
+## 3. `GeoJsonProcessingException` is orphaned
 
-**Where:** `json-jackson3/src/main/java/org/geolatte/geom/json/GeoJsonProcessingException.java`
+**Where:** `json-jackson3/src/main/java/org/geolatte/geom/json/jackson3/GeoJsonProcessingException.java`
 
 **Status:** the class still extends `tools.jackson.core.JacksonException`
 and is part of the public API of `json-jackson3`. After the refactor it is
@@ -103,10 +55,10 @@ adapters do not wrap it.
 
 **To do:** decide whether downstream users may catch
 `GeoJsonProcessingException` directly. If yes, keep it. If no, delete it
-in a follow-up. Either way, it should not exist in `json-jackson2` (which
+in a follow-up. Either way, it does not exist in `json-jackson2` (which
 correctly threw nothing of the kind from the start).
 
-## 6. `Settings` is now public
+## 4. `Settings` is now public
 
 **Where:** `json-core/src/main/java/org/geolatte/geom/json/Settings.java`
 
@@ -120,7 +72,7 @@ suggests this), or whether to push for an alternative that keeps it
 package-private (e.g. a factory method on `Setting` that returns an
 opaque `SettingsConfig` interface).
 
-## 7. `@JsonInclude(NON_EMPTY)` was dropped from `GeoJsonFeature.getBbox()`
+## 5. `@JsonInclude(NON_EMPTY)` was dropped from `GeoJsonFeature.getBbox()`
 
 **Where:** `json-core/src/main/java/org/geolatte/geom/json/GeoJsonFeature.java`
 
@@ -133,7 +85,7 @@ handles bbox suppression explicitly via the `SERIALIZE_FEATURE_BBOX` setting.
 something does (unlikely given how it was used), document the workaround
 (use `SERIALIZE_FEATURE_BBOX=true` plus a non-empty bbox).
 
-## 8. Existing tests in `json-jackson3` not migrated to the contract
+## 6. Existing tests in `json-jackson3` not migrated to the contract
 
 **Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/*Test.java`
 
@@ -148,8 +100,7 @@ concrete suite.
 shared `AbstractGeoJsonContract` so both adapters get equal coverage.
 Mechanical work; can be done test-by-test over multiple PRs.
 
-## 9. `GoeJsonProcessingException` namespace and the `Crss`/`GeoJsonStrings`
-test fixtures
+## 7. Test fixtures `Crss` / `GeoJsonStrings` not shared
 
 **Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/Crss.java`,
 `json-jackson3/src/test/java/org/geolatte/geom/json/GeoJsonStrings.java`
@@ -158,6 +109,6 @@ test fixtures
 the existing concrete tests in `json-jackson3`. They are tied to the
 existing Jackson 3 tests and were not migrated to a shared location.
 
-**To do:** when migrating tests to the contract (item 8), also lift these
+**To do:** when migrating tests to the contract (item 6), also lift these
 fixtures into the `json-core` test-jar so that the Jackson 2 adapter can
 use them as well.

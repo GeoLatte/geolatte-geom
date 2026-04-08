@@ -1,5 +1,6 @@
 package org.geolatte.geom.json;
 
+import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
 import org.geolatte.geom.json.test.AbstractGeoJsonContract;
 import org.geolatte.geom.json.test.MapperLike;
 import tools.jackson.databind.ObjectMapper;

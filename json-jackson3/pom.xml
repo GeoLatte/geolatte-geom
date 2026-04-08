@@ -17,10 +17,6 @@
 
     <properties>
         <project.automatic.module.name>org.geolatte.geom.json.jackson3</project.automatic.module.name>
-        <!-- TODO: re-enable once the org.geolatte.geom.json package split between
-             json-core and json-jackson3 is resolved (likely by moving adapter classes into
-             org.geolatte.geom.json.jackson3 with a deprecated shim for source compat). -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>

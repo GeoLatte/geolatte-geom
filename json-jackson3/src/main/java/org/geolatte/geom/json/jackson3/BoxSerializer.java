@@ -1,7 +1,8 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.Box;
 import org.geolatte.geom.Position;
+import org.geolatte.geom.json.GeoJsonBoxWriter;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;

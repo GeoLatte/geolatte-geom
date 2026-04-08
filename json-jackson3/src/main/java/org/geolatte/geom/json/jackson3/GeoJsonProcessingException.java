@@ -1,4 +1,4 @@
-package org.geolatte.geom.json;
+package org.geolatte.geom.json.jackson3;
 
 import tools.jackson.core.JacksonException;
 
