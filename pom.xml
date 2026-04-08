@@ -39,7 +39,18 @@
     </organization>
 
     <properties>
+        <!-- ${revision} is the version of the geolatte (parent aggregator) artifact and the
+             default for any child that does not override it. Each child module additionally
+             declares its own version property below so that the four published artifacts
+             (geolatte-geom, geolatte-geojson-core, geolatte-geojson-jackson2,
+             geolatte-geojson-jackson3) can be released independently. Bump them with
+             scripts/bump-version.sh — see docs/release-process.md for details. -->
         <revision>1.12-SNAPSHOT</revision>
+        <geom.version>1.12-SNAPSHOT</geom.version>
+        <geojson-core.version>1.12-SNAPSHOT</geojson-core.version>
+        <geojson-jackson3.version>1.12-SNAPSHOT</geojson-jackson3.version>
+        <geojson-jackson2.version>1.12-SNAPSHOT</geojson-jackson2.version>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jts-core.version>1.19.0</jts-core.version>
@@ -207,14 +218,18 @@
                 </executions>
             </plugin>
 
-            <!-- see  https://maven.apache.org/maven-ci-friendly.html -->
+            <!-- see  https://maven.apache.org/maven-ci-friendly.html
+                 The 'defaults' mode resolves *all* property placeholders (not just
+                 ${revision}/${sha1}/${changelist}). We rely on this so that the
+                 per-module version properties (${geom.version}, ${geojson-core.version},
+                 etc.) get resolved to concrete versions in the deployed poms. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.6.0</version>
                 <configuration>
                     <updatePomFile>true</updatePomFile>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    <flattenMode>defaults</flattenMode>
                 </configuration>
                 <executions>
                     <execution>

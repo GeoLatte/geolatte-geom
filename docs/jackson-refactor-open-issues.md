@@ -28,22 +28,7 @@ calls `adjustTo` expecting it to handle both directions.
 This is a `geom/` change and was not in the scope of the json refactor.
 Once decided, remove the `@Ignore` from `PointDeserializationTest.java`.
 
-## 2. Independent versioning for the two adapter modules
-
-**Where:** root `pom.xml` — currently all four modules share `${revision}`.
-
-**Status:** the plan recommended introducing separate `${revision}`-style
-properties so the Jackson 2 line could become maintenance-only while the
-Jackson 3 line evolves. Not implemented — release-process decision.
-
-**To do:** either
-- (a) Introduce per-module version properties (e.g. `geom.revision`,
-  `geojson-jackson2.revision`, `geojson-jackson3.revision`) and a small
-  release script that bumps each independently.
-- (b) Keep lockstep versioning and accept that the Jackson 2 adapter
-  releases on the same cadence as everything else.
-
-## 3. `GeoJsonProcessingException` is orphaned
+## 2. `GeoJsonProcessingException` is orphaned
 
 **Where:** `json-jackson3/src/main/java/org/geolatte/geom/json/jackson3/GeoJsonProcessingException.java`
 
@@ -58,7 +43,7 @@ adapters do not wrap it.
 in a follow-up. Either way, it does not exist in `json-jackson2` (which
 correctly threw nothing of the kind from the start).
 
-## 4. `Settings` is now public
+## 3. `Settings` is now public
 
 **Where:** `json-core/src/main/java/org/geolatte/geom/json/Settings.java`
 
@@ -72,7 +57,7 @@ suggests this), or whether to push for an alternative that keeps it
 package-private (e.g. a factory method on `Setting` that returns an
 opaque `SettingsConfig` interface).
 
-## 5. `@JsonInclude(NON_EMPTY)` was dropped from `GeoJsonFeature.getBbox()`
+## 4. `@JsonInclude(NON_EMPTY)` was dropped from `GeoJsonFeature.getBbox()`
 
 **Where:** `json-core/src/main/java/org/geolatte/geom/json/GeoJsonFeature.java`
 
@@ -85,7 +70,7 @@ handles bbox suppression explicitly via the `SERIALIZE_FEATURE_BBOX` setting.
 something does (unlikely given how it was used), document the workaround
 (use `SERIALIZE_FEATURE_BBOX=true` plus a non-empty bbox).
 
-## 6. Existing tests in `json-jackson3` not migrated to the contract
+## 5. Existing tests in `json-jackson3` not migrated to the contract
 
 **Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/*Test.java`
 
@@ -100,7 +85,7 @@ concrete suite.
 shared `AbstractGeoJsonContract` so both adapters get equal coverage.
 Mechanical work; can be done test-by-test over multiple PRs.
 
-## 7. Test fixtures `Crss` / `GeoJsonStrings` not shared
+## 6. Test fixtures `Crss` / `GeoJsonStrings` not shared
 
 **Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/Crss.java`,
 `json-jackson3/src/test/java/org/geolatte/geom/json/GeoJsonStrings.java`
@@ -109,6 +94,6 @@ Mechanical work; can be done test-by-test over multiple PRs.
 the existing concrete tests in `json-jackson3`. They are tied to the
 existing Jackson 3 tests and were not migrated to a shared location.
 
-**To do:** when migrating tests to the contract (item 6), also lift these
+**To do:** when migrating tests to the contract (item 5), also lift these
 fixtures into the `json-core` test-jar so that the Jackson 2 adapter can
 use them as well.

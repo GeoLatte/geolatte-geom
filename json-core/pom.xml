@@ -7,6 +7,7 @@
         <version>${revision}</version>
     </parent>
     <artifactId>geolatte-geojson-core</artifactId>
+    <version>${geojson-core.version}</version>
     <name>geolatte-geojson-core</name>
     <packaging>jar</packaging>
 
@@ -25,7 +26,7 @@
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-geom</artifactId>
-            <version>${project.version}</version>
+            <version>${geom.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
