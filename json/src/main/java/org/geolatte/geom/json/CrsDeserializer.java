@@ -2,7 +2,6 @@ package org.geolatte.geom.json;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CrsId;
-import org.geolatte.geom.crs.CrsRegistry;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;
@@ -11,53 +10,29 @@ import tools.jackson.databind.ValueDeserializer;
 
 public class CrsDeserializer extends ValueDeserializer<CoordinateReferenceSystem> {
 
-    final private CoordinateReferenceSystem<?> defaultCrs;
-    final private Settings settings;
+    final private GeoJsonCrsReader reader;
 
     public CrsDeserializer(CoordinateReferenceSystem<?> defaultCrs, Settings settings) {
-        this.defaultCrs = defaultCrs;
-        this.settings = settings;
-    }
-
-    private JsonNode getRoot(JsonParser p) throws JacksonException {
-        return p.readValueAsTree();
+        this.reader = new GeoJsonCrsReader(defaultCrs, settings);
     }
 
     @Override
     public CoordinateReferenceSystem<?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
-        JsonNode root = getRoot(p);
-        return resolveBaseCrs(root);
+        JsonNode root = p.readValueAsTree();
+        return reader.resolve(new Jackson3JsonTreeNode(root));
+    }
+
+    /**
+     * Used by other deserializers (notably {@link GeometryDeserializer}) to extract the CRS id
+     * from a sibling {@code crs} node that has already been read into a tree.
+     */
+    CrsId getCrsId(JsonNode root) {
+        JsonNode crs = root;
+        if (crs == null) return CrsId.UNDEFINED;
+        return reader.readCrsId(new Jackson3JsonTreeNode(crs));
     }
 
     protected CoordinateReferenceSystem<?> getDefaultCrs() {
-        return defaultCrs;
-    }
-
-    private CoordinateReferenceSystem<?> resolveBaseCrs(JsonNode root) throws GeoJsonProcessingException {
-        CrsId id = getCrsId(root);
-        return id.equals(CrsId.UNDEFINED) || settings.isSet(Setting.IGNORE_CRS) ?
-                this.defaultCrs :
-                CrsRegistry.getCoordinateReferenceSystemForEPSG(id.getCode(), getDefaultCrs());
-    }
-
-    protected CrsId getCrsId(JsonNode root) throws GeoJsonProcessingException {
-        JsonNode crs = root;//root.get("crs");
-        if (crs == null) return CrsId.UNDEFINED;
-
-        String type = crs.get("type").asText();
-
-        if (type.equalsIgnoreCase("name")) {
-            String text = crs.get("properties").get("name").asText();
-            return CrsId.parse(text);
-        }
-
-        if (type.equalsIgnoreCase("link")) {
-            String text = crs.get("properties").get("href").asText();
-            String[] components = text.split("/");
-            int last = components.length - 1;
-            return CrsId.valueOf(components[last-1], Integer.decode(components[last]));
-        }
-
-        throw new GeoJsonProcessingException("Can parse only named crs elements");
+        return reader.getDefaultCrs();
     }
 }
