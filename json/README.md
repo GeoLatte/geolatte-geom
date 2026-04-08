@@ -6,7 +6,7 @@
 
 Updated to Jackson 3.x.
 
-This modules provides a Jackson module to (de)serialize `Geometry`, `Feature` and `FeatureCollection` instances to 
+This module provides a Jackson module to (de)serialize `Geometry`, `Feature` and `FeatureCollection` instances to 
 (from) GeoJson.
 
 # How to use
