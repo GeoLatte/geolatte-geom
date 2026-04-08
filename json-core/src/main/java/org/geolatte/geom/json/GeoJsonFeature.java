@@ -1,6 +1,5 @@
 package org.geolatte.geom.json;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.geolatte.geom.Box;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.Geometry;
@@ -8,8 +7,6 @@ import org.geolatte.geom.Position;
 
 import java.util.Map;
 import java.util.Objects;
-
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 13/07/2018.
@@ -44,7 +41,6 @@ public class GeoJsonFeature<P extends Position, ID> implements Feature<P, ID> {
     }
 
     @Override
-    @JsonInclude(NON_EMPTY)
     public Box<P> getBbox() {
         return geometry != null ? geometry.getBoundingBox() : null;
     }
