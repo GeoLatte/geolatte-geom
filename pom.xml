@@ -39,17 +39,12 @@
     </organization>
 
     <properties>
-        <!-- ${revision} is the version of the geolatte (parent aggregator) artifact and the
-             default for any child that does not override it. Each child module additionally
-             declares its own version property below so that the four published artifacts
-             (geolatte-geom, geolatte-geojson-core, geolatte-geojson-jackson2,
-             geolatte-geojson-jackson3) can be released independently. Bump them with
-             scripts/bump-version.sh — see docs/release-process.md for details. -->
+        <!-- Two version axes:
+             - ${revision}        - parent aggregator + geolatte-geom (lockstep)
+             - ${geojson.version} - the three GeoJSON modules (lockstep among themselves)
+             Bump them with scripts/bump-version.sh; see docs/release-process.md. -->
         <revision>1.12-SNAPSHOT</revision>
-        <geom.version>1.12-SNAPSHOT</geom.version>
-        <geojson-core.version>1.12-SNAPSHOT</geojson-core.version>
-        <geojson-jackson3.version>1.12-SNAPSHOT</geojson-jackson3.version>
-        <geojson-jackson2.version>1.12-SNAPSHOT</geojson-jackson2.version>
+        <geojson.version>1.12-SNAPSHOT</geojson.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

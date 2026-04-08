@@ -1,50 +1,45 @@
 #!/usr/bin/env bash
 #
-# Bump the version property of one of the geolatte modules in the root pom.xml.
+# Bump one of the two version axes in the root pom.xml.
 #
-# The four publishable modules each have their own version property so that
-# they can be released independently. This script wraps `mvn versions:set-property`
-# with the right argument names.
-#
-# Modules:
-#   geom            -> geom.version
-#   json-core       -> geojson-core.version
-#   json-jackson3   -> geojson-jackson3.version
-#   json-jackson2   -> geojson-jackson2.version
+# The repository tracks two versions:
+#   geom    -> ${revision}        used by the parent aggregator and geolatte-geom
+#   geojson -> ${geojson.version} used by all three GeoJSON modules
+#                                 (geolatte-geojson-core, -jackson2, -jackson3)
 #
 # Usage:
-#   scripts/bump-version.sh <module> <new-version>
+#   scripts/bump-version.sh <axis> <new-version>
 #
-# Example:
-#   scripts/bump-version.sh json-jackson2 1.5.0
-#   mvn -pl json-jackson2 -am clean install      # rebuild and verify
-#   mvn -pl json-jackson2 deploy -P release      # publish to Maven Central
+# Example: cut a new GeoJSON release without touching geom:
+#   scripts/bump-version.sh geojson 1.13.0
+#   mvn -pl json-core,json-jackson3,json-jackson2 -am clean install
+#   mvn -pl json-core,json-jackson3,json-jackson2 deploy -P release
 
 set -euo pipefail
 
 if [[ $# -ne 2 ]]; then
     cat >&2 <<USAGE
-Usage: $0 <module> <new-version>
+Usage: $0 <axis> <new-version>
 
-Modules: geom, json-core, json-jackson3, json-jackson2
+Axes:
+  geom     -> revision        (parent aggregator + geolatte-geom)
+  geojson  -> geojson.version (the three GeoJSON modules)
 
 Example:
-  $0 json-jackson2 1.5.0
+  $0 geojson 1.13.0
 USAGE
     exit 1
 fi
 
-MODULE="$1"
+AXIS="$1"
 VERSION="$2"
 
-case "$MODULE" in
-    geom)           PROPERTY="geom.version" ;;
-    json-core)      PROPERTY="geojson-core.version" ;;
-    json-jackson3)  PROPERTY="geojson-jackson3.version" ;;
-    json-jackson2)  PROPERTY="geojson-jackson2.version" ;;
+case "$AXIS" in
+    geom)     PROPERTY="revision" ;;
+    geojson)  PROPERTY="geojson.version" ;;
     *)
-        echo "Unknown module: $MODULE" >&2
-        echo "Modules: geom, json-core, json-jackson3, json-jackson2" >&2
+        echo "Unknown axis: $AXIS" >&2
+        echo "Axes: geom, geojson" >&2
         exit 1
         ;;
 esac
@@ -61,6 +56,15 @@ mvn -q org.codehaus.mojo:versions-maven-plugin:2.18.0:set-property \
 
 echo "Updated $PROPERTY to $VERSION in $REPO_ROOT/pom.xml"
 echo
-echo "Next steps:"
-echo "  mvn -pl $MODULE -am clean install      # rebuild and verify"
-echo "  mvn -pl $MODULE deploy -P release      # publish to Maven Central"
+case "$AXIS" in
+    geom)
+        echo "Next steps (everything depends on geom, so the whole reactor rebuilds):"
+        echo "  mvn clean install                            # rebuild and verify"
+        echo "  mvn -pl geom deploy -P release               # publish geolatte-geom"
+        ;;
+    geojson)
+        echo "Next steps:"
+        echo "  mvn -pl json-core,json-jackson3,json-jackson2 -am clean install"
+        echo "  mvn -pl json-core,json-jackson3,json-jackson2 deploy -P release"
+        ;;
+esac

@@ -7,7 +7,7 @@
         <version>${revision}</version>
     </parent>
     <artifactId>geolatte-geojson-jackson2</artifactId>
-    <version>${geojson-jackson2.version}</version>
+    <version>${geojson.version}</version>
     <name>geolatte-geojson-jackson2</name>
     <packaging>jar</packaging>
 
@@ -27,12 +27,12 @@
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-geom</artifactId>
-            <version>${geom.version}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-geojson-core</artifactId>
-            <version>${geojson-core.version}</version>
+            <version>${geojson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.geolatte</groupId>
             <artifactId>geolatte-geojson-core</artifactId>
-            <version>${geojson-core.version}</version>
+            <version>${geojson.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

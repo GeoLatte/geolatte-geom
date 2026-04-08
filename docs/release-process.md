@@ -1,77 +1,88 @@
 # Release process
 
-The four publishable modules each have their own version property in the
-root `pom.xml` so that they can be released independently:
+The repository tracks two version axes in the root `pom.xml`:
 
-| Module           | Property                  | Artifact id                  |
-|------------------|---------------------------|------------------------------|
-| `geom/`          | `geom.version`            | `geolatte-geom`              |
-| `json-core/`     | `geojson-core.version`    | `geolatte-geojson-core`      |
-| `json-jackson3/` | `geojson-jackson3.version`| `geolatte-geojson-jackson3`  |
-| `json-jackson2/` | `geojson-jackson2.version`| `geolatte-geojson-jackson2`  |
+| Axis      | Property            | Used by                                            |
+|-----------|---------------------|----------------------------------------------------|
+| `geom`    | `${revision}`       | parent aggregator + `geolatte-geom`                |
+| `geojson` | `${geojson.version}`| `geolatte-geojson-core`, `-jackson3`, `-jackson2`  |
 
-The aggregator pom (`geolatte`) keeps its own version as `${revision}` — that
-property is the default for any module that does not override it. The
-`flatten-maven-plugin` is configured in `defaults` mode so that the deployed
-poms have all `${...}` placeholders resolved to concrete versions, regardless
-of which CI-friendly placeholder names you use.
+The `geom` axis groups the parent and `geolatte-geom` because the parent is
+pom-only and exists primarily to host shared build configuration for the
+geom module. The `geojson` axis groups the three GeoJSON modules because
+they share the SPI in `geolatte-geojson-core`; bumping any of them in
+isolation would create a configuration where the adapters depend on a
+core they were not built against.
 
-Cross-module dependencies in each child pom reference the *producer's*
-version property explicitly (e.g. `geolatte-geojson-jackson3` declares its
-dependency on `geolatte-geojson-core` as `${geojson-core.version}`, not
-`${project.version}`). This is what makes independent bumps work — bumping
-`geojson-core.version` to a new value rebuilds both adapter modules against
-the new core, but does not force them onto a new version of their own.
+The `flatten-maven-plugin` is configured in `defaults` mode so that all
+`${...}` placeholders are resolved to concrete versions in the deployed
+poms (not just the standard CI-friendly `${revision}`/`${sha1}`/`${changelist}`).
 
-## Bumping a single module
+Cross-module dependencies in each child pom reference the producer's
+property explicitly:
+
+- `json-core` depends on `geolatte-geom` via `${revision}`
+- `json-jackson3` and `json-jackson2` depend on `geolatte-geom` via `${revision}`
+  and on `geolatte-geojson-core` via `${geojson.version}`
+
+This is what makes the two axes truly independent — bumping
+`${geojson.version}` rebuilds and republishes the three GeoJSON modules
+without forcing a new geom release.
+
+## Bumping a version
 
 Use `scripts/bump-version.sh`:
 
 ```
-scripts/bump-version.sh <module> <new-version>
+scripts/bump-version.sh <axis> <new-version>
 ```
 
-Example: cut a 1.5.0 release of the Jackson 2 adapter without touching the
-other three modules.
+### Bump only the GeoJSON line
 
 ```
-scripts/bump-version.sh json-jackson2 1.5.0
-mvn -pl json-jackson2 -am clean install         # rebuild and verify
-mvn -pl json-jackson2 deploy -P release         # publish to Maven Central
+scripts/bump-version.sh geojson 1.13.0
+mvn -pl json-core,json-jackson3,json-jackson2 -am clean install
+mvn -pl json-core,json-jackson3,json-jackson2 deploy -P release
 ```
 
-The script wraps `mvn versions:set-property` (pinned to a known version of
-`versions-maven-plugin`) and updates the property in the root `pom.xml`. No
-backup pom files are written; the change is immediately ready to commit.
+The geom axis is unchanged. The three GeoJSON modules are republished
+together at the new version.
 
-## Bumping multiple modules together
-
-For lockstep releases (e.g. bumping everything to 1.13), run the script
-multiple times:
+### Bump the geom (and parent) line
 
 ```
-scripts/bump-version.sh geom            1.13
-scripts/bump-version.sh json-core       1.13
-scripts/bump-version.sh json-jackson3   1.13
-scripts/bump-version.sh json-jackson2   1.13
-mvn clean install                                # rebuild everything
-mvn deploy -P release                            # publish all four
+scripts/bump-version.sh geom 1.13.0
+mvn clean install
+mvn -pl geom deploy -P release
 ```
 
-If you also want to bump the parent aggregator's own version (currently
-`${revision}`), update `pom.xml` directly — the script does not manage it.
+Bumping geom forces a rebuild of the entire reactor (every other module
+depends on geom), but does *not* automatically republish the GeoJSON
+modules — they keep their own `${geojson.version}`. If you also want to
+publish a new GeoJSON release pinned to the new geom, follow up with a
+`geojson` bump.
+
+### Bumping both at once
+
+For a lockstep release (e.g. raising everything to 1.13.0):
+
+```
+scripts/bump-version.sh geom    1.13.0
+scripts/bump-version.sh geojson 1.13.0
+mvn clean install
+mvn deploy -P release
+```
 
 ## Constraints
 
-- A module's `<parent>` reference is fixed to `${revision}` so that the
-  parent pom can still be located. If you decouple a module's version from
-  the parent's version (which is the whole point of these properties), the
-  parent pom at the referenced version must still exist in the local repo
-  or in Maven Central, otherwise dependent modules cannot find it. In the
-  reactor build the parent is always at the current `${revision}`, so this
-  is only a concern when releasing modules out-of-band.
-- All four modules still build in a single reactor. Independent versioning
-  controls *what gets published with which version*, not what gets compiled
-  together. If you bump `geom.version` to 1.13, the next reactor build
-  produces a new `geolatte-geom-1.13.jar` and recompiles every consumer
-  against it.
+- A child module's `<parent>` reference is fixed to `${revision}`. If you
+  decouple the GeoJSON line from the parent's version (which is the whole
+  point of these axes), the parent pom at `${revision}` must still exist
+  in the local repo or in Maven Central, otherwise the child build cannot
+  resolve its parent. In a normal reactor build the parent is always at
+  the current `${revision}`, so this is only a concern when releasing the
+  GeoJSON line out-of-band against an unreleased parent.
+- All four modules still build in a single reactor. The two axes control
+  *what gets published with which version*, not what gets compiled together.
+  Bumping `${revision}` rebuilds the entire reactor against the new geom;
+  bumping `${geojson.version}` rebuilds only the three GeoJSON modules.

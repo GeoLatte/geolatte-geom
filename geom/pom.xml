@@ -20,7 +20,6 @@
 		<version>${revision}</version>
 	</parent>
     <artifactId>geolatte-geom</artifactId>
-    <version>${geom.version}</version>
     <name>geolatte-geom</name>
     <packaging>jar</packaging>
 
