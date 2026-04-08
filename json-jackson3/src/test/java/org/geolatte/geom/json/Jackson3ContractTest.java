@@ -1,5 +1,6 @@
 package org.geolatte.geom.json;
 
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
 import org.geolatte.geom.json.test.AbstractGeoJsonContract;
 import org.geolatte.geom.json.test.MapperLike;
@@ -14,8 +15,8 @@ import java.util.Map;
 public class Jackson3ContractTest extends AbstractGeoJsonContract {
 
     @Override
-    protected MapperLike newMapper(Map<Setting, Boolean> settings) {
-        GeolatteGeomModule module = new GeolatteGeomModule();
+    protected MapperLike newMapper(CoordinateReferenceSystem<?> defaultCrs, Map<Setting, Boolean> settings) {
+        GeolatteGeomModule module = new GeolatteGeomModule(defaultCrs);
         settings.forEach(module::set);
 
         ObjectMapper mapper = JsonMapper.builder().addModule(module).build();
