@@ -17,6 +17,10 @@
 
     <properties>
         <project.automatic.module.name>org.geolatte.geom.json.jackson3</project.automatic.module.name>
+        <!-- TODO: re-enable once the org.geolatte.geom.json package split between
+             json-core and json-jackson3 is resolved (likely by moving adapter classes into
+             org.geolatte.geom.json.jackson3 with a deprecated shim for source compat). -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>
@@ -40,6 +44,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geojson-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

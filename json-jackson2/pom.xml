@@ -20,6 +20,11 @@
     <properties>
         <project.automatic.module.name>org.geolatte.geom.json.jackson2</project.automatic.module.name>
         <jackson2.version>2.18.2</jackson2.version>
+        <!-- TODO: re-enable javadoc once the org.geolatte.geom.json package layout
+             is finalized. Adapter classes live in org.geolatte.geom.json.jackson2 already
+             so this module is split-free, but the dependency on json-core (which contains
+             org.geolatte.geom.json) trips JPMS module path detection in javadoc. -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>
@@ -43,6 +48,13 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geolatte</groupId>
+            <artifactId>geolatte-geojson-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
