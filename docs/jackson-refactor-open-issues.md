@@ -46,30 +46,3 @@ handles bbox suppression explicitly via the `SERIALIZE_FEATURE_BBOX` setting.
 something does (unlikely given how it was used), document the workaround
 (use `SERIALIZE_FEATURE_BBOX=true` plus a non-empty bbox).
 
-## 4. Existing tests in `json-jackson3` not migrated to the contract
-
-**Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/*Test.java`
-
-**Status:** the 81 existing concrete `*Test` classes in `json-jackson3`
-(point/linestring/polygon/feature serialization, deserialization, CRS
-handling, etc.) still live as adapter-specific tests. The new shared
-contract in `json-core` has only 6 tests — enough to prove the wiring
-works for both adapters but nowhere near the coverage of the existing
-concrete suite.
-
-**To do:** incrementally migrate the existing concrete tests into the
-shared `AbstractGeoJsonContract` so both adapters get equal coverage.
-Mechanical work; can be done test-by-test over multiple PRs.
-
-## 5. Test fixtures `Crss` / `GeoJsonStrings` not shared
-
-**Where:** `json-jackson3/src/test/java/org/geolatte/geom/json/Crss.java`,
-`json-jackson3/src/test/java/org/geolatte/geom/json/GeoJsonStrings.java`
-
-**Status:** both are package-private test fixture utility classes used by
-the existing concrete tests in `json-jackson3`. They are tied to the
-existing Jackson 3 tests and were not migrated to a shared location.
-
-**To do:** when migrating tests to the contract (item 4), also lift these
-fixtures into the `json-core` test-jar so that the Jackson 2 adapter can
-use them as well.
