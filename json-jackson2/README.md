@@ -1,20 +1,18 @@
 
-[![javadoc](https://javadoc.io/badge2/org.geolatte/geolatte-geojson-jackson3/javadoc.svg)](https://javadoc.io/doc/org.geolatte/geolatte-geojson-jackson3)
+[![javadoc](https://javadoc.io/badge2/org.geolatte/geolatte-geojson-jackson2/javadoc.svg)](https://javadoc.io/doc/org.geolatte/geolatte-geojson-jackson2)
 
 
-# GeoJson module — Jackson 3 adapter
+# GeoJson module — Jackson 2 adapter
 
-This module provides a Jackson 3 adapter that registers a `GeolatteGeomModule` for
+This module provides a Jackson 2 adapter that registers a `GeolatteGeomModule` for
 (de)serializing `Geometry`, `Feature` and `FeatureCollection` instances to/from GeoJSON.
 
 The actual GeoJSON encoding/decoding logic lives in the Jackson-free
-`geolatte-geojson-core` module; this module is a thin Jackson 3 adapter on top of it.
-A separate `geolatte-geojson-jackson2` module provides the equivalent for Jackson 2.x.
+`geolatte-geojson-core` module; this module is a thin Jackson 2 adapter on top of it.
+A separate `geolatte-geojson-jackson3` module provides the equivalent for Jackson 3.x.
 
-> **Coordinate change:** prior to 1.12 this module was published as `org.geolatte:geolatte-geojson`.
-> From 1.12 onwards it is published as `org.geolatte:geolatte-geojson-jackson3`. The Java package
-> remains `org.geolatte.geom.json`, so existing source code only needs to update its `<dependency>`
-> coordinate (no import changes).
+> **Use this module** if your project is on Jackson 2.x (e.g. Spring Boot 2.x or 3.x lines that
+> still ship Jackson 2). If you are on Jackson 3.x, use `geolatte-geojson-jackson3` instead.
 
 # How to use
 Add the following dependency to the POM.
@@ -23,19 +21,22 @@ Add the following dependency to the POM.
 
 <dependency>
     <groupId>org.geolatte</groupId>
-    <artifactId>geolatte-geojson-jackson3</artifactId>
+    <artifactId>geolatte-geojson-jackson2</artifactId>
     <version>${geolatte-geom-version}</version>
 </dependency>
 ```
 
-This will pull in the Jackson 3 `jackson-databind` dependency. Note that the Jackson dependency
-is declared as `<optional>true</optional>`: consumers must declare the desired Jackson 3 version
-explicitly in their own POM.
+This module is built and tested against Jackson 2.18.x. The Jackson dependency is declared as
+`<optional>true</optional>`: consumers must declare the desired Jackson 2 version explicitly in
+their own POM.
 
-The library provides a custom module `GeolatteGeomModule` that can be added to Jackson `ObjectMapper`.
+The library provides a custom module `GeolatteGeomModule` (in package
+`org.geolatte.geom.json.jackson2`) that can be added to a Jackson 2 `ObjectMapper`.
 
 ```java
-    ObjectMapper mapper=new ObjectMapper();
+    import org.geolatte.geom.json.jackson2.GeolatteGeomModule;
+
+    ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new GeolatteGeomModule());
 ```
 
@@ -51,8 +52,8 @@ Optionally you can customize the `GeolatteGeomModule` behavior by:
 You can configure a default Coordinate Reference System by passing it in the constructor of the `GeolatteGeomModule`
 
 ```java
-    CoordinateReferenceSystem<G2D> crs=...;
-    ObjectMapper mapper=new ObjectMapper();
+    CoordinateReferenceSystem<G2D> crs = ...;
+    ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(new GeolatteGeomModule(crs));
 ```
 
@@ -71,13 +72,11 @@ You can set a feature flag after creation of the `GeolatteGeomModule`:
 ```java
     GeolatteGeomModule module = new GeolatteGeomModule();
     module.set(Setting.IGNORE_CRS, true);
-    mapper = new ObjectMapper();
+    ObjectMapper mapper = new ObjectMapper();
     mapper.registerModule(module);
 ```
 
 The following settings are currently supported:
-- `IGNORE_CRS`: ignore the`crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`) 
+- `IGNORE_CRS`: ignore the `crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`)
 - `SUPPRESS_CRS_SERIALIZATION`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
 - `SERIALIZE_CRS_AS_URN`: serialize `crs` as a URN (default: `false`)
-
-
