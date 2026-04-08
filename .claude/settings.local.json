@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn -pl json-core -q test-compile)",
+      "Bash(mvn -pl json-jackson3 -am -q test)",
+      "Bash(mvn -q clean install)"
+    ]
+  }
+}

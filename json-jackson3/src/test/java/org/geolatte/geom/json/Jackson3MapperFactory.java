@@ -2,7 +2,6 @@ package org.geolatte.geom.json;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.json.jackson3.GeolatteGeomModule;
-import org.geolatte.geom.json.test.AbstractGeoJsonContract;
 import org.geolatte.geom.json.test.MapperLike;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -10,12 +9,14 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.Map;
 
 /**
- * Runs the shared {@link AbstractGeoJsonContract} against the Jackson 3 adapter.
+ * Builds a {@link MapperLike} backed by a Jackson 3 {@code JsonMapper} with the
+ * Geolatte module installed. Used by every {@code Jackson3*Test} concrete spec
+ * subclass so that the actual mapper construction code lives in exactly one
+ * place per adapter.
  */
-public class Jackson3ContractTest extends AbstractGeoJsonContract {
+final class Jackson3MapperFactory {
 
-    @Override
-    protected MapperLike newMapper(CoordinateReferenceSystem<?> defaultCrs, Map<Setting, Boolean> settings) {
+    static MapperLike create(CoordinateReferenceSystem<?> defaultCrs, Map<Setting, Boolean> settings) {
         GeolatteGeomModule module = new GeolatteGeomModule(defaultCrs);
         settings.forEach(module::set);
 
@@ -31,5 +32,8 @@ public class Jackson3ContractTest extends AbstractGeoJsonContract {
                 return mapper.readValue(json, type);
             }
         };
+    }
+
+    private Jackson3MapperFactory() {
     }
 }

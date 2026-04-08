@@ -1,0 +1,15 @@
+package org.geolatte.geom.json.jackson2;
+
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
+import org.geolatte.geom.json.Setting;
+import org.geolatte.geom.json.test.CrsSpec;
+import org.geolatte.geom.json.test.MapperLike;
+
+import java.util.Map;
+
+public class Jackson2CrsTest extends CrsSpec {
+    @Override
+    protected MapperLike newMapper(CoordinateReferenceSystem<?> defaultCrs, Map<Setting, Boolean> settings) {
+        return Jackson2MapperFactory.create(defaultCrs, settings);
+    }
+}
