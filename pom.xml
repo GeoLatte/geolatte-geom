@@ -48,7 +48,7 @@
                inside <version> elements without warning, so a custom property
                is not viable for the GeoJSON axis.
              Bump either axis with scripts/bump-version.sh; see docs/release-process.md. -->
-        <revision>1.12-SNAPSHOT</revision>
+        <revision>1.12</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
