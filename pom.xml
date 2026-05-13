@@ -218,17 +218,19 @@
             </plugin>
 
             <!-- see  https://maven.apache.org/maven-ci-friendly.html
-                 The 'defaults' mode resolves *all* property placeholders (not just
-                 ${revision}/${sha1}/${changelist}). We rely on this so that the
-                 per-module version properties (${geom.version}, ${geojson-core.version},
-                 etc.) get resolved to concrete versions in the deployed poms. -->
+                 The 'ossrh' mode resolves all property placeholders (so ${revision} and
+                 any per-module version properties become literal versions in the deployed
+                 pom) while preserving the metadata Maven Central requires for validation:
+                 name, description, url, scm, developers, licenses, organization. The
+                 'defaults' mode strips that metadata and fails Central's component
+                 validation. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
                     <updatePomFile>true</updatePomFile>
-                    <flattenMode>defaults</flattenMode>
+                    <flattenMode>ossrh</flattenMode>
                 </configuration>
                 <executions>
                     <execution>
