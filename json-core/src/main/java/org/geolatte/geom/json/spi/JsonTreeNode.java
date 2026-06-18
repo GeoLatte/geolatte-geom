@@ -45,4 +45,10 @@ public interface JsonTreeNode {
      * Returns the property names of an object node, in iteration order.
      */
     Iterable<String> propertyNames();
+
+    /**
+     * Materialises this node into its natural Java representation by delegating to the host
+     * ObjectMapper: objects &rarr; Map, arrays &rarr; List, scalars &rarr; Number/Boolean/String/null.
+     */
+    Object toJavaObject();
 }

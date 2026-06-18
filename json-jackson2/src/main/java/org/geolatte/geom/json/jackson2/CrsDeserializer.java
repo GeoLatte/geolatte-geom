@@ -21,6 +21,6 @@ public class CrsDeserializer extends JsonDeserializer<CoordinateReferenceSystem>
     @Override
     public CoordinateReferenceSystem<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode root = p.readValueAsTree();
-        return reader.resolve(new Jackson2JsonTreeNode(root));
+        return reader.resolve(new Jackson2JsonTreeNode(root, ctxt));
     }
 }

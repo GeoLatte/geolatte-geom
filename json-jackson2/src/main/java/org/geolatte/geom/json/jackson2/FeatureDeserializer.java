@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.json.GeoJsonFeature;
 import org.geolatte.geom.json.GeoJsonFeatureReader;
 import org.geolatte.geom.json.Settings;
 
@@ -27,10 +26,6 @@ public class FeatureDeserializer extends JsonDeserializer<Feature> {
     @Override
     public Feature<?, ?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         JsonNode root = p.readValueAsTree();
-        return reader.read(new Jackson2JsonTreeNode(root));
-    }
-
-    GeoJsonFeature<?, Object> readFeature(JsonParser p, JsonNode root) {
-        return reader.read(new Jackson2JsonTreeNode(root));
+        return reader.read(new Jackson2JsonTreeNode(root, ctxt));
     }
 }

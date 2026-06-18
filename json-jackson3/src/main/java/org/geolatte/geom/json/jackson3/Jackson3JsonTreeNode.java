@@ -1,6 +1,7 @@
 package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.json.spi.JsonTreeNode;
+import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
@@ -13,9 +14,11 @@ import java.util.List;
 final class Jackson3JsonTreeNode implements JsonTreeNode {
 
     private final JsonNode node;
+    private final DeserializationContext ctxt;
 
-    Jackson3JsonTreeNode(JsonNode node) {
+    Jackson3JsonTreeNode(JsonNode node, DeserializationContext ctxt) {
         this.node = node;
+        this.ctxt = ctxt;
     }
 
     @Override
@@ -36,13 +39,13 @@ final class Jackson3JsonTreeNode implements JsonTreeNode {
     @Override
     public JsonTreeNode get(String fieldName) {
         JsonNode child = node.get(fieldName);
-        return child == null ? null : new Jackson3JsonTreeNode(child);
+        return child == null ? null : new Jackson3JsonTreeNode(child, ctxt);
     }
 
     @Override
     public JsonTreeNode get(int index) {
         JsonNode child = node.get(index);
-        return child == null ? null : new Jackson3JsonTreeNode(child);
+        return child == null ? null : new Jackson3JsonTreeNode(child, ctxt);
     }
 
     @Override
@@ -83,5 +86,10 @@ final class Jackson3JsonTreeNode implements JsonTreeNode {
             names.add(name);
         }
         return names;
+    }
+
+    @Override
+    public Object toJavaObject() {
+        return ctxt.readTreeAsValue(node, Object.class);
     }
 }

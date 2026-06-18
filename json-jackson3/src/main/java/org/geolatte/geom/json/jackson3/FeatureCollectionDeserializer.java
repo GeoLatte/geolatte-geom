@@ -21,6 +21,6 @@ public class FeatureCollectionDeserializer extends ValueDeserializer<FeatureColl
     @Override
     public FeatureCollection<?, ?> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) {
         JsonNode root = jsonParser.readValueAsTree();
-        return reader.read(new Jackson3JsonTreeNode(root));
+        return reader.read(new Jackson3JsonTreeNode(root, deserializationContext));
     }
 }

@@ -1,7 +1,6 @@
 package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.json.GeoJsonCrsReader;
 import org.geolatte.geom.json.Settings;
 import tools.jackson.core.JacksonException;
@@ -21,20 +20,6 @@ public class CrsDeserializer extends ValueDeserializer<CoordinateReferenceSystem
     @Override
     public CoordinateReferenceSystem<?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         JsonNode root = p.readValueAsTree();
-        return reader.resolve(new Jackson3JsonTreeNode(root));
-    }
-
-    /**
-     * Used by other deserializers (notably {@link GeometryDeserializer}) to extract the CRS id
-     * from a sibling {@code crs} node that has already been read into a tree.
-     */
-    CrsId getCrsId(JsonNode root) {
-        JsonNode crs = root;
-        if (crs == null) return CrsId.UNDEFINED;
-        return reader.readCrsId(new Jackson3JsonTreeNode(crs));
-    }
-
-    protected CoordinateReferenceSystem<?> getDefaultCrs() {
-        return reader.getDefaultCrs();
+        return reader.resolve(new Jackson3JsonTreeNode(root, ctxt));
     }
 }

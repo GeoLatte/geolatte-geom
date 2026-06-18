@@ -11,8 +11,10 @@ import java.util.Map;
  * Jackson-free reader for GeoJSON {@code Feature} objects.
  *
  * <p>Resulting features carry geometries decoded by {@link GeoJsonGeometryReader} and
- * properties materialised into a plain {@link HashMap}. The minimal value coercion
- * (int / long / text) mirrors the original {@code FeatureDeserializer} behavior.</p>
+ * properties materialised into a plain {@link HashMap}. Property values are deserialized by
+ * delegating the whole {@code properties} node back to the host ObjectMapper (via
+ * {@link JsonTreeNode#toJavaObject()}), so nested objects, arrays, numbers and booleans are
+ * reconstructed faithfully rather than coerced to int/text.</p>
  */
 public final class GeoJsonFeatureReader {
 
@@ -38,18 +40,12 @@ public final class GeoJsonFeatureReader {
 
         HashMap<String, Object> properties = new HashMap<>();
         JsonTreeNode propNode = root.get("properties");
-        if (propNode != null) {
-            for (String property : propNode.propertyNames()) {
-                JsonTreeNode valueNode = propNode.get(property);
-                if (valueNode == null) continue;
-
-                Object value;
-                if (valueNode.canConvertToInt()) {
-                    value = valueNode.asInt();
-                } else {
-                    value = valueNode.asText();
-                }
-                properties.put(property, value);
+        if (propNode != null && !propNode.isNull()) {
+            Object obj = propNode.toJavaObject();
+            if (obj instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> m = (Map<String, Object>) obj;
+                properties.putAll(m);
             }
         }
 

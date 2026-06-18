@@ -2,7 +2,6 @@ package org.geolatte.geom.json.jackson3;
 
 import org.geolatte.geom.Feature;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
-import org.geolatte.geom.json.GeoJsonFeature;
 import org.geolatte.geom.json.GeoJsonFeatureReader;
 import org.geolatte.geom.json.Settings;
 import tools.jackson.core.JacksonException;
@@ -26,14 +25,6 @@ public class FeatureDeserializer extends ValueDeserializer<Feature> {
     @Override
     public Feature<?, ?> deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
         JsonNode root = p.readValueAsTree();
-        return reader.read(new Jackson3JsonTreeNode(root));
-    }
-
-    /**
-     * Used by {@link FeatureCollectionDeserializer} to read a feature from an
-     * already-materialized sub-tree.
-     */
-    GeoJsonFeature<?, Object> readFeature(JsonParser p, JsonNode root) {
-        return reader.read(new Jackson3JsonTreeNode(root));
+        return reader.read(new Jackson3JsonTreeNode(root, ctxt));
     }
 }

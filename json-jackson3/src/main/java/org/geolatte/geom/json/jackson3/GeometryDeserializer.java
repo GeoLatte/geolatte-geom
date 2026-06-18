@@ -24,13 +24,6 @@ public class GeometryDeserializer extends ValueDeserializer<Geometry<?>> {
     @Override
     public Geometry<?> deserialize(JsonParser p, DeserializationContext ctxt) {
         JsonNode root = p.readValueAsTree();
-        return reader.read(new Jackson3JsonTreeNode(root));
-    }
-
-    /**
-     * Used by {@link FeatureDeserializer} to parse a geometry from an already-read sub-tree.
-     */
-    Geometry<?> parseGeometry(JsonNode root) {
-        return reader.read(new Jackson3JsonTreeNode(root));
+        return reader.read(new Jackson3JsonTreeNode(root, ctxt));
     }
 }

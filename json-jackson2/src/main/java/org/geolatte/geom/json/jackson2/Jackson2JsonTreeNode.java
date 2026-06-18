@@ -1,8 +1,11 @@
 package org.geolatte.geom.json.jackson2;
 
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.geolatte.geom.json.GeoJsonException;
 import org.geolatte.geom.json.spi.JsonTreeNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -14,9 +17,11 @@ import java.util.List;
 final class Jackson2JsonTreeNode implements JsonTreeNode {
 
     private final JsonNode node;
+    private final DeserializationContext ctxt;
 
-    Jackson2JsonTreeNode(JsonNode node) {
+    Jackson2JsonTreeNode(JsonNode node, DeserializationContext ctxt) {
         this.node = node;
+        this.ctxt = ctxt;
     }
 
     @Override
@@ -37,13 +42,13 @@ final class Jackson2JsonTreeNode implements JsonTreeNode {
     @Override
     public JsonTreeNode get(String fieldName) {
         JsonNode child = node.get(fieldName);
-        return child == null ? null : new Jackson2JsonTreeNode(child);
+        return child == null ? null : new Jackson2JsonTreeNode(child, ctxt);
     }
 
     @Override
     public JsonTreeNode get(int index) {
         JsonNode child = node.get(index);
-        return child == null ? null : new Jackson2JsonTreeNode(child);
+        return child == null ? null : new Jackson2JsonTreeNode(child, ctxt);
     }
 
     @Override
@@ -86,5 +91,14 @@ final class Jackson2JsonTreeNode implements JsonTreeNode {
             names.add(it.next());
         }
         return names;
+    }
+
+    @Override
+    public Object toJavaObject() {
+        try {
+            return ctxt.readTreeAsValue(node, Object.class);
+        } catch (IOException e) {
+            throw new GeoJsonException(e);
+        }
     }
 }
