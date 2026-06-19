@@ -3,8 +3,19 @@ name: Publish to Maven Central
 on:
   push:
     tags:
-      - 'v*'  # Triggers on version tags like v1.11.0
+      - 'v*'          # full release (both axes), e.g. v1.13.0
+      - 'geom-v*'     # geom axis only,    e.g. geom-v1.13.0
+      - 'geojson-v*'  # geojson axis only, e.g. geojson-v2.0.1
   workflow_dispatch:  # Allow manual trigger for emergency republishing
+    inputs:
+      axis:
+        description: 'Which version axis to publish'
+        type: choice
+        options:
+          - geojson
+          - geom
+          - both
+        default: geojson
 
 jobs:
   publish:
@@ -13,6 +24,54 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Resolve the version axis (and the matching Maven module selectors) either
+      # from the workflow_dispatch input or from the pushed tag's prefix.
+      # The build/deploy commands mirror docs/release-process.md:
+      #   geojson -> build the 3 GeoJSON modules + their deps, deploy only those 3
+      #   geom    -> build the full reactor, deploy only geolatte-geom
+      #   both    -> build and deploy the full reactor
+      - name: Determine axis
+        id: axis
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            AXIS="${{ inputs.axis }}"
+          else
+            case "${{ github.ref_name }}" in
+              geojson-v*) AXIS=geojson ;;
+              geom-v*)    AXIS=geom ;;
+              v*)         AXIS=both ;;
+              *) echo "Unrecognized tag '${{ github.ref_name }}'"; exit 1 ;;
+            esac
+          fi
+          echo "Selected axis: $AXIS"
+
+          case "$AXIS" in
+            geojson)
+              BUILD_ARGS="-pl json-core,json-jackson3,json-jackson2 -am"
+              DEPLOY_ARGS="-pl json-core,json-jackson3,json-jackson2"
+              RELEASE_FILES=$'json-core/target/*.jar\njson-jackson3/target/*.jar\njson-jackson2/target/*.jar\njson-core/target/*.pom\njson-jackson3/target/*.pom\njson-jackson2/target/*.pom'
+              ;;
+            geom)
+              BUILD_ARGS=""
+              DEPLOY_ARGS="-pl geom"
+              RELEASE_FILES=$'geom/target/*.jar\ngeom/target/*.pom'
+              ;;
+            both)
+              BUILD_ARGS=""
+              DEPLOY_ARGS=""
+              RELEASE_FILES=$'**/target/*.jar\n**/target/*.pom'
+              ;;
+          esac
+
+          {
+            echo "axis=$AXIS"
+            echo "build_args=$BUILD_ARGS"
+            echo "deploy_args=$DEPLOY_ARGS"
+            echo "release_files<<EOF"
+            echo "$RELEASE_FILES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -38,22 +97,33 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-      - name: Publish to Maven Central
+      # Build (and test) everything the selected axis needs, populating the local
+      # repo so the scoped deploy can resolve cross-module dependencies (parent,
+      # geom, geojson-core) without pulling unrelated modules into the deploy.
+      - name: Build and verify
+        run: |
+          mvn ${{ steps.axis.outputs.build_args }} \
+            --batch-mode \
+            --no-transfer-progress \
+            clean install
+
+      - name: Deploy to Maven Central
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          mvn -P release \
+          mvn ${{ steps.axis.outputs.deploy_args }} \
+            -P release \
+            -DskipTests \
             --batch-mode \
             --no-transfer-progress \
             -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
-            clean deploy
+            deploy
 
       - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
-          files: |
-            **/target/*.jar
-            **/target/*.pom
+          files: ${{ steps.axis.outputs.release_files }}

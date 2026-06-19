@@ -2,6 +2,15 @@ name: Publish SNAPSHOT to Maven Central
 
 on:
   workflow_dispatch:  # Manual trigger only
+    inputs:
+      axis:
+        description: 'Which version axis to publish'
+        type: choice
+        options:
+          - geojson
+          - geom
+          - both
+        default: geojson
 
 jobs:
   publish-snapshot:
@@ -11,15 +20,60 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Resolve the version axis and the matching Maven module selectors.
+      # Mirrors docs/release-process.md (see publish-release.yml for details).
+      - name: Determine axis
+        id: axis
+        run: |
+          AXIS="${{ inputs.axis }}"
+          echo "Selected axis: $AXIS"
+          case "$AXIS" in
+            geojson)
+              BUILD_ARGS="-pl json-core,json-jackson3,json-jackson2 -am"
+              DEPLOY_ARGS="-pl json-core,json-jackson3,json-jackson2"
+              ;;
+            geom)
+              BUILD_ARGS=""
+              DEPLOY_ARGS="-pl geom"
+              ;;
+            both)
+              BUILD_ARGS=""
+              DEPLOY_ARGS=""
+              ;;
+          esac
+          {
+            echo "axis=$AXIS"
+            echo "build_args=$BUILD_ARGS"
+            echo "deploy_args=$DEPLOY_ARGS"
+          } >> "$GITHUB_OUTPUT"
+
+      # Make sure the version(s) for the selected axis are SNAPSHOTs. The geom
+      # axis lives in the ${revision} property; the geojson axis carries literal
+      # versions in the three GeoJSON module poms (read from json-core).
       - name: Verify SNAPSHOT version
         run: |
-          VERSION=$(grep -m1 '<revision>' pom.xml | sed 's/.*<revision>\(.*\)<\/revision>.*/\1/')
-          if [[ ! "$VERSION" =~ -SNAPSHOT$ ]]; then
-            echo "Error: Version '$VERSION' is not a SNAPSHOT version"
-            echo "This workflow is only for publishing SNAPSHOT versions"
-            exit 1
-          fi
-          echo "Publishing SNAPSHOT version: $VERSION"
+          AXIS="${{ steps.axis.outputs.axis }}"
+          GEOM=$(grep -m1 '<revision>' pom.xml | sed -E 's/.*<revision>(.*)<\/revision>.*/\1/')
+          GEOJSON=$(awk '
+            /<artifactId>geolatte-geojson-core<\/artifactId>/ { found=1; next }
+            found && /<version>/ {
+              sub(/^[[:space:]]*<version>/, ""); sub(/<\/version>.*$/, ""); print; exit
+            }' json-core/pom.xml)
+
+          check() {
+            if [[ ! "$2" =~ -SNAPSHOT$ ]]; then
+              echo "Error: $1 version '$2' is not a SNAPSHOT version"
+              echo "This workflow is only for publishing SNAPSHOT versions"
+              exit 1
+            fi
+            echo "Publishing $1 SNAPSHOT version: $2"
+          }
+
+          case "$AXIS" in
+            geojson) check geojson "$GEOJSON" ;;
+            geom)    check geom "$GEOM" ;;
+            both)    check geom "$GEOM"; check geojson "$GEOJSON" ;;
+          esac
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -45,14 +99,23 @@ jobs:
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-      - name: Publish SNAPSHOT to Maven Central
+      - name: Build and verify
+        run: |
+          mvn ${{ steps.axis.outputs.build_args }} \
+            --batch-mode \
+            --no-transfer-progress \
+            clean install
+
+      - name: Deploy SNAPSHOT to Maven Central
         env:
           MAVEN_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          mvn -P release \
+          mvn ${{ steps.axis.outputs.deploy_args }} \
+            -P release \
+            -DskipTests \
             --batch-mode \
             --no-transfer-progress \
             -Dgpg.passphrase="${MAVEN_GPG_PASSPHRASE}" \
-            clean deploy
+            deploy
