@@ -20,7 +20,7 @@
 
     <properties>
         <project.automatic.module.name>org.geolatte.geom.json.jackson2</project.automatic.module.name>
-        <jackson2.version>2.18.2</jackson2.version>
+        <jackson2.version>2.22.0</jackson2.version>
     </properties>
 
     <dependencies>
