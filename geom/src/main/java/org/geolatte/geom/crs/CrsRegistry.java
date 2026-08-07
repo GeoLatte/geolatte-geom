@@ -60,25 +60,21 @@ public class CrsRegistry {
     }
 
     private static void loadCRS() throws IOException {
-        BufferedReader reader = createReader();
-        try {
-            String line = reader.readLine();
-            CrsWktDecoder decoder = new CrsWktDecoder();
-            while (line != null) {
-                addDefinition(line, decoder);
-                line = reader.readLine();
+        try (InputStream in = CrsRegistry.class.getClassLoader().getResourceAsStream("spatial_ref_sys.txt")) {
+            if (in == null) {
+                throw new IllegalStateException("Can't find spatial_ref_sys definitions.");
             }
-        } finally {
-            reader.close();
-        }
-    }
+            try (InputStreamReader isr = new InputStreamReader(in, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)) {
 
-    private static BufferedReader createReader() {
-        InputStream in = CrsRegistry.class.getClassLoader().getResourceAsStream("spatial_ref_sys.txt");
-        if (in == null) {
-            throw new IllegalStateException("Can't find spatial_ref_sys definitions.");
+                String line = reader.readLine();
+                CrsWktDecoder decoder = new CrsWktDecoder();
+                while (line != null) {
+                    addDefinition(line, decoder);
+                    line = reader.readLine();
+                }
+            }
         }
-        return new BufferedReader(new InputStreamReader(in));
     }
 
     private static void addDefinition(String line, CrsWktDecoder decoder) {
