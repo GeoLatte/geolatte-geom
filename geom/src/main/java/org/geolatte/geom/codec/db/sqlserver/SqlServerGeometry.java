@@ -140,7 +140,8 @@ public class SqlServerGeometry {
 
     void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
         this.crs = crs;
-        this.srid = crs.getCrsId().getCode();
+        //SRID -1 denotes a null value in the serialization format, so undefined SRIDs are written as 0
+        this.srid = Math.max(crs.getCrsId().getCode(), 0);
     }
 
     boolean isParentShapeOf(int parent, int child) {
@@ -156,12 +157,14 @@ public class SqlServerGeometry {
         if (startIdx == -1) {
             return new IndexRange(-1, -1); //empty figures
         }
-        int endIdx = -1;
-        int nextShapeIdx = shapeIndex + 1;
-        if (nextShapeIdx == getNumShapes()) {
-            endIdx = getNumFigures();
-        } else {
-            endIdx = getShape(nextShapeIdx).figureOffset;
+        //the figures end where those of the next shape with figures begin; empty shapes have figure offset -1
+        int endIdx = getNumFigures();
+        for (int nextShapeIdx = shapeIndex + 1; nextShapeIdx < getNumShapes(); nextShapeIdx++) {
+            int nextFigureOffset = getShape(nextShapeIdx).figureOffset;
+            if (nextFigureOffset != -1) {
+                endIdx = nextFigureOffset;
+                break;
+            }
         }
         return new IndexRange(startIdx, endIdx);
     }
@@ -198,7 +201,6 @@ public class SqlServerGeometry {
     }
 
     PositionSequence<?> coordinateRange(IndexRange range) {
-        crs = getCRS(getSrid(), hasZValues(), hasMValues());
         PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(range.end - range.start, crs.getPositionClass());
         double[] coordinates = new double[crs.getCoordinateDimension()];
         for (int idx = range.start, i = 0; idx < range.end; idx++, i++) {
@@ -269,6 +271,10 @@ public class SqlServerGeometry {
         serializationPropertiesByte |= isValidMask;
     }
 
+    void clearIsValid() {
+        serializationPropertiesByte &= ~isValidMask;
+    }
+
     void setIsSinglePoint() {
         setNumberOfPoints(1);
         serializationPropertiesByte |= isSinglePointMask;
@@ -294,6 +300,7 @@ public class SqlServerGeometry {
             throw new IllegalStateException("Version mismatch. Expected version " + SUPPORTED_VERSION + ", but received version " + version);
         }
         serializationPropertiesByte = buffer.get();
+        crs = getCRS(srid, hasZValues(), hasMValues());
         determineNumberOfPoints();
         readPoints();
         if (hasZValues()) {

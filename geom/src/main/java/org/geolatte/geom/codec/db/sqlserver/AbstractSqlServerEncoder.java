@@ -37,9 +37,7 @@ abstract class AbstractSqlServerEncoder implements Encoder<SqlServerGeometry> {
     public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
         SqlServerGeometry nativeGeom = new SqlServerGeometry();
 
-        if (geom.getSRID() > 0) {
-            nativeGeom.setCoordinateReferenceSystem(geom.getCoordinateReferenceSystem());
-        }
+        nativeGeom.setCoordinateReferenceSystem(geom.getCoordinateReferenceSystem());
 
         nativeGeom.setIsValid();
 
