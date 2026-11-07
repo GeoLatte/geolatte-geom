@@ -23,10 +23,13 @@ package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.AbstractGeometryCollection;
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.GeometryCollection;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkGeometryCollection;
+import static org.geolatte.geom.Geometries.mkEmptyGeometryCollection;
 
 /**
  * <code>Decoder</code> for GeometryCollections.
@@ -39,6 +42,11 @@ class GeometryCollectionSqlServerDecoder extends AbstractGeometryCollectionSqlSe
     @Override
     protected OpenGisType getOpenGisType() {
         return OpenGisType.GEOMETRYCOLLECTION;
+    }
+
+    @Override
+    protected GeometryCollection<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return mkEmptyGeometryCollection(crs);
     }
 
     @Override

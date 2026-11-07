@@ -47,9 +47,7 @@ class PointSqlServerEncoder extends AbstractSqlServerEncoder {
     public <P extends Position, G extends Geometry<P>> SqlServerGeometry encode(G geom) {
 
         SqlServerGeometry sqlServerGeom = new SqlServerGeometry();
-        if (geom.getSRID() > 0) {
-            sqlServerGeom.setCoordinateReferenceSystem(geom.getCoordinateReferenceSystem());
-        }
+        sqlServerGeom.setCoordinateReferenceSystem(geom.getCoordinateReferenceSystem());
         sqlServerGeom.setIsValid();
 
         if (geom.isEmpty()) {

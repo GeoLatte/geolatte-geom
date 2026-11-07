@@ -54,6 +54,8 @@ public class SqlServerGeometry {
     private static final byte isSingleLineSegment = 16;
 
     private ByteBuffer buffer;
+    //points always hold (x, y) pairs; a GEOGRAPHY structure stores them as (latitude, longitude)
+    private boolean geography;
     private Integer srid = 0;
     private CoordinateReferenceSystem<?> crs = DEFAULT_CRS;
     private byte version;
@@ -77,6 +79,14 @@ public class SqlServerGeometry {
 
 
     public static byte[] serialize(SqlServerGeometry sqlServerGeom) {
+        return serialize(sqlServerGeom, false);
+    }
+
+    /**
+     * Serializes as a GEOMETRY structure, or as a GEOGRAPHY structure, which stores the points as
+     * (latitude, longitude) pairs.
+     */
+    static byte[] serialize(SqlServerGeometry sqlServerGeom, boolean geography) {
         int capacity = sqlServerGeom.calculateCapacity();
         ByteBuffer buffer = ByteBuffer.allocate(capacity);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -87,8 +97,13 @@ public class SqlServerGeometry {
             buffer.putInt(sqlServerGeom.numberOfPoints);
         }
         for (int i = 0; i < sqlServerGeom.getNumPoints(); i++) {
-            buffer.putDouble(sqlServerGeom.points[2 * i]);
-            buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+            if (geography) {
+                buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+                buffer.putDouble(sqlServerGeom.points[2 * i]);
+            } else {
+                buffer.putDouble(sqlServerGeom.points[2 * i]);
+                buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+            }
         }
         if (sqlServerGeom.hasZValues()) {
             for (int i = 0; i < sqlServerGeom.zValues.length; i++) {
@@ -119,7 +134,16 @@ public class SqlServerGeometry {
     }
 
     public static SqlServerGeometry deserialize(byte[] bytes) {
+        return deserialize(bytes, false);
+    }
+
+    /**
+     * Deserializes a GEOMETRY structure, or a GEOGRAPHY structure, which stores the points as
+     * (latitude, longitude) pairs.
+     */
+    static SqlServerGeometry deserialize(byte[] bytes, boolean geography) {
         SqlServerGeometry result = new SqlServerGeometry(bytes);
+        result.geography = geography;
         result.parse();
         return result;
     }
@@ -140,7 +164,8 @@ public class SqlServerGeometry {
 
     void setCoordinateReferenceSystem(CoordinateReferenceSystem<?> crs) {
         this.crs = crs;
-        this.srid = crs.getCrsId().getCode();
+        //SRID -1 denotes a null value in the serialization format, so undefined SRIDs are written as 0
+        this.srid = Math.max(crs.getCrsId().getCode(), 0);
     }
 
     boolean isParentShapeOf(int parent, int child) {
@@ -156,12 +181,14 @@ public class SqlServerGeometry {
         if (startIdx == -1) {
             return new IndexRange(-1, -1); //empty figures
         }
-        int endIdx = -1;
-        int nextShapeIdx = shapeIndex + 1;
-        if (nextShapeIdx == getNumShapes()) {
-            endIdx = getNumFigures();
-        } else {
-            endIdx = getShape(nextShapeIdx).figureOffset;
+        //the figures end where those of the next shape with figures begin; empty shapes have figure offset -1
+        int endIdx = getNumFigures();
+        for (int nextShapeIdx = shapeIndex + 1; nextShapeIdx < getNumShapes(); nextShapeIdx++) {
+            int nextFigureOffset = getShape(nextShapeIdx).figureOffset;
+            if (nextFigureOffset != -1) {
+                endIdx = nextFigureOffset;
+                break;
+            }
         }
         return new IndexRange(startIdx, endIdx);
     }
@@ -198,7 +225,6 @@ public class SqlServerGeometry {
     }
 
     PositionSequence<?> coordinateRange(IndexRange range) {
-        crs = getCRS(getSrid(), hasZValues(), hasMValues());
         PositionSequenceBuilder<?> psBuilder = PositionSequenceBuilders.fixedSized(range.end - range.start, crs.getPositionClass());
         double[] coordinates = new double[crs.getCoordinateDimension()];
         for (int idx = range.start, i = 0; idx < range.end; idx++, i++) {
@@ -269,6 +295,10 @@ public class SqlServerGeometry {
         serializationPropertiesByte |= isValidMask;
     }
 
+    void clearIsValid() {
+        serializationPropertiesByte &= ~isValidMask;
+    }
+
     void setIsSinglePoint() {
         setNumberOfPoints(1);
         serializationPropertiesByte |= isSinglePointMask;
@@ -294,6 +324,7 @@ public class SqlServerGeometry {
             throw new IllegalStateException("Version mismatch. Expected version " + SUPPORTED_VERSION + ", but received version " + version);
         }
         serializationPropertiesByte = buffer.get();
+        crs = getCRS(srid, hasZValues(), hasMValues());
         determineNumberOfPoints();
         readPoints();
         if (hasZValues()) {
@@ -394,8 +425,13 @@ public class SqlServerGeometry {
     private void readPoints() {
         points = new double[2 * numberOfPoints];
         for (int i = 0; i < numberOfPoints; i++) {
-            points[2 * i] = buffer.getDouble();
-            points[2 * i + 1] = buffer.getDouble();
+            if (geography) {
+                points[2 * i + 1] = buffer.getDouble();
+                points[2 * i] = buffer.getDouble();
+            } else {
+                points[2 * i] = buffer.getDouble();
+                points[2 * i + 1] = buffer.getDouble();
+            }
         }
     }
 

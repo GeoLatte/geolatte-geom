@@ -22,10 +22,12 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.MultiLineString;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkMultiLineString;
+import static org.geolatte.geom.Geometries.mkEmptyMultiLineString;
 
 
 class MultiLineStringSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
@@ -33,6 +35,11 @@ class MultiLineStringSqlServerDecoder extends AbstractGeometryCollectionSqlServe
     @Override
     protected OpenGisType getOpenGisType() {
         return OpenGisType.MULTILINESTRING;
+    }
+
+    @Override
+    protected MultiLineString<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return mkEmptyMultiLineString(crs);
     }
 
     @Override

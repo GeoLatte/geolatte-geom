@@ -22,7 +22,6 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.Geometry;
-import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +34,15 @@ abstract class AbstractGeometryCollectionSqlServerDecoder extends AbstractSqlSer
     }
 
     @Override
-    protected Geometry<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
-        return createGeometry(new ArrayList<Geometry<?>>(), null);
-    }
-
-    @Override
     protected Geometry<?> createGeometry(SqlServerGeometry nativeGeom) {
         return createGeometry(nativeGeom, 0);
     }
 
     @Override
     protected Geometry<?> createGeometry(SqlServerGeometry nativeGeom, int shapeIndex) {
+        if (nativeGeom.isEmptyShape(shapeIndex)) {
+            return createNullGeometry(nativeGeom.getCoordinateReferenceSystem());
+        }
         int startChildIdx = shapeIndex + 1;
         List<Geometry<?>> geometries = new ArrayList<Geometry<?>>(nativeGeom.getNumShapes());
         for (int childIdx = startChildIdx; childIdx < nativeGeom.getNumShapes(); childIdx++) {

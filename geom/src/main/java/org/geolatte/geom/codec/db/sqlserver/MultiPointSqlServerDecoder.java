@@ -22,10 +22,12 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.MultiPoint;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkMultiPoint;
+import static org.geolatte.geom.Geometries.mkEmptyMultiPoint;
 
 /**
  * <code>Decoder</code> for GeometryCollections.
@@ -38,6 +40,11 @@ class MultiPointSqlServerDecoder extends AbstractGeometryCollectionSqlServerDeco
     @Override
     protected OpenGisType getOpenGisType() {
         return OpenGisType.MULTIPOINT;
+    }
+
+    @Override
+    protected MultiPoint<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return mkEmptyMultiPoint(crs);
     }
 
     @Override

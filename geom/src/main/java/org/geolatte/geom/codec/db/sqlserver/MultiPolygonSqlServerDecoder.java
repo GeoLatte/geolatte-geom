@@ -22,16 +22,23 @@
 package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.MultiPolygon;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.List;
 
 import static org.geolatte.geom.Geometries.mkMultiPolygon;
+import static org.geolatte.geom.Geometries.mkEmptyMultiPolygon;
 
 class MultiPolygonSqlServerDecoder extends AbstractGeometryCollectionSqlServerDecoder {
 
     @Override
     protected OpenGisType getOpenGisType() {
         return OpenGisType.MULTIPOLYGON;
+    }
+
+    @Override
+    protected MultiPolygon<?> createNullGeometry(CoordinateReferenceSystem<?> crs) {
+        return mkEmptyMultiPolygon(crs);
     }
 
     @Override
