@@ -148,11 +148,57 @@ public class TestSqlServerCodecEdgeCases {
         assertThrows(IllegalArgumentException.class, () -> Decoders.decode(bytes));
     }
 
+    // --- GEOGRAPHY: points are stored as (latitude, longitude) (section 2.1.5) ---
+
+    /**
+     * [MS-SSCLRT] 3.1.4, which is a GEOGRAPHY example.
+     */
+    @Test
+    public void geographySpecExampleGeometryCollection() {
+        byte[] bytes = hex("E6100000 01 04 0D000000 "
+                + "0000000000000000 0000000000001040 0000000000000040 0000000000001040 "
+                + "0000000000000840 0000000000001440 0000000000000000 0000000000000000 "
+                + "0000000000000000 0000000000000840 0000000000000840 0000000000000840 "
+                + "0000000000000840 0000000000000000 0000000000000000 0000000000000000 "
+                + "000000000000F03F 000000000000F03F 0000000000000040 000000000000F03F "
+                + "0000000000000040 0000000000000040 000000000000F03F 0000000000000040 "
+                + "000000000000F03F 000000000000F03F "
+                + "04000000 01 00000000 01 01000000 02 03000000 00 08000000 "
+                + "04000000 FFFFFFFF 00000000 07 00000000 00000000 01 00000000 01000000 02 "
+                + "00000000 02000000 03");
+        String ewkt = "SRID=4326;GEOMETRYCOLLECTION(POINT(4 0), LINESTRING(4 2, 5 3), "
+                + "POLYGON((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1)))";
+        assertDecoded(ewkt, bytes, GeographyDecoders.decode(bytes));
+        assertEquals(hex(bytes), hex(GeographyEncoders.encode(Wkt.fromWkt(ewkt))));
+    }
+
+    @Test
+    public void geometryAndGeographyDecodeWithSwappedAxes() {
+        byte[] bytes = new Bytes().header(4326, V | P).doubles(10, 5).toArray();
+        assertDecoded("SRID=4326;POINT(10 5)", bytes, Decoders.decode(bytes));
+        assertDecoded("SRID=4326;POINT(5 10)", bytes, GeographyDecoders.decode(bytes));
+    }
+
+    @Test
+    public void geographyWithoutSridIsEncodedWithDefaultSrid() {
+        byte[] bytes = new Bytes().header(4326, V | P).doubles(2, 1).toArray();
+        assertEquals(hex(bytes), hex(GeographyEncoders.encode(Wkt.fromWkt("POINT(1 2)"))));
+    }
+
+    @Test
+    public void geographyWithSridOutsideRangeIsRejected() {
+        Geometry<?> geom = Wkt.fromWkt("SRID=31370;POINT(150000 200000)");
+        assertThrows(IllegalArgumentException.class, () -> GeographyEncoders.encode(geom));
+    }
+
     // --- helpers ---
 
     private void assertDecodes(String ewkt, byte[] bytes) {
+        assertDecoded(ewkt, bytes, Decoders.decode(bytes));
+    }
+
+    private void assertDecoded(String ewkt, byte[] bytes, Geometry<?> decoded) {
         Geometry<?> expected = Wkt.fromWkt(ewkt);
-        Geometry<?> decoded = Decoders.decode(bytes);
         String msg = String.format("decoding %s: expected %s but was %s", hex(bytes), ewkt, Wkt.toWkt(decoded));
         assertEquals(msg, expected.getSRID(), decoded.getSRID());
         assertEquals(msg, expected.getGeometryType(), decoded.getGeometryType());

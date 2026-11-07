@@ -54,6 +54,8 @@ public class SqlServerGeometry {
     private static final byte isSingleLineSegment = 16;
 
     private ByteBuffer buffer;
+    //points always hold (x, y) pairs; a GEOGRAPHY structure stores them as (latitude, longitude)
+    private boolean geography;
     private Integer srid = 0;
     private CoordinateReferenceSystem<?> crs = DEFAULT_CRS;
     private byte version;
@@ -77,6 +79,14 @@ public class SqlServerGeometry {
 
 
     public static byte[] serialize(SqlServerGeometry sqlServerGeom) {
+        return serialize(sqlServerGeom, false);
+    }
+
+    /**
+     * Serializes as a GEOMETRY structure, or as a GEOGRAPHY structure, which stores the points as
+     * (latitude, longitude) pairs.
+     */
+    static byte[] serialize(SqlServerGeometry sqlServerGeom, boolean geography) {
         int capacity = sqlServerGeom.calculateCapacity();
         ByteBuffer buffer = ByteBuffer.allocate(capacity);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -87,8 +97,13 @@ public class SqlServerGeometry {
             buffer.putInt(sqlServerGeom.numberOfPoints);
         }
         for (int i = 0; i < sqlServerGeom.getNumPoints(); i++) {
-            buffer.putDouble(sqlServerGeom.points[2 * i]);
-            buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+            if (geography) {
+                buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+                buffer.putDouble(sqlServerGeom.points[2 * i]);
+            } else {
+                buffer.putDouble(sqlServerGeom.points[2 * i]);
+                buffer.putDouble(sqlServerGeom.points[2 * i + 1]);
+            }
         }
         if (sqlServerGeom.hasZValues()) {
             for (int i = 0; i < sqlServerGeom.zValues.length; i++) {
@@ -119,7 +134,16 @@ public class SqlServerGeometry {
     }
 
     public static SqlServerGeometry deserialize(byte[] bytes) {
+        return deserialize(bytes, false);
+    }
+
+    /**
+     * Deserializes a GEOMETRY structure, or a GEOGRAPHY structure, which stores the points as
+     * (latitude, longitude) pairs.
+     */
+    static SqlServerGeometry deserialize(byte[] bytes, boolean geography) {
         SqlServerGeometry result = new SqlServerGeometry(bytes);
+        result.geography = geography;
         result.parse();
         return result;
     }
@@ -401,8 +425,13 @@ public class SqlServerGeometry {
     private void readPoints() {
         points = new double[2 * numberOfPoints];
         for (int i = 0; i < numberOfPoints; i++) {
-            points[2 * i] = buffer.getDouble();
-            points[2 * i + 1] = buffer.getDouble();
+            if (geography) {
+                points[2 * i + 1] = buffer.getDouble();
+                points[2 * i] = buffer.getDouble();
+            } else {
+                points[2 * i] = buffer.getDouble();
+                points[2 * i + 1] = buffer.getDouble();
+            }
         }
     }
 

@@ -64,7 +64,10 @@ public class Decoders {
      * @return
      */
     public static Geometry decode(byte[] raw) {
-        SqlServerGeometry sqlServerGeom = SqlServerGeometry.deserialize(raw);
+        return decode(SqlServerGeometry.deserialize(raw));
+    }
+
+    static Geometry decode(SqlServerGeometry sqlServerGeom) {
         Decoder decoder = decoderFor(sqlServerGeom);
         return decoder.decode(sqlServerGeom);
     }
