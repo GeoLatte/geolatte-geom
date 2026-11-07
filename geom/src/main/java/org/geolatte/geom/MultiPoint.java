@@ -47,7 +47,7 @@ public class MultiPoint<P extends Position> extends AbstractGeometryCollection<P
 
     @Override
     public int getDimension() {
-        return 0;
+        return isEmpty() ? -1 : 0;
     }
 
     @Override

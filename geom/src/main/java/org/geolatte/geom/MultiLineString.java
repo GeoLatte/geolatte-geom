@@ -60,7 +60,7 @@ public class MultiLineString<P extends Position> extends AbstractGeometryCollect
 
     @Override
     public int getDimension() {
-        return 1;
+        return isEmpty() ? -1 : 1;
     }
 
     @Override

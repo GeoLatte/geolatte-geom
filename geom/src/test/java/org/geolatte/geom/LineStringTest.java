@@ -131,8 +131,52 @@ public class LineStringTest {
     }
 
     @Test
+    public void testIsClosedIgnoresM() {
+        LineString<C2DM> closed2dm = linestring(crsM, cM(0, 0, 0), cM(0, 1, 1), cM(1, 1, 2), cM(0, 0, 3));
+        LineString<C3DM> closed3dm = linestring(crsZM, c(0, 0, 5, 0), c(0, 1, 5, 1), c(1, 1, 5, 2), c(0, 0, 5, 3));
+        assertTrue(closed2dm.isClosed());
+        assertTrue(closed3dm.isClosed());
+        assertTrue(closed3dm.is3DClosed());
+    }
+
+    @Test
+    public void testIsClosedIgnoresZButIs3DClosedDoesNot() {
+        LineString<C3D> closedInXY = linestring(crsZ, c(0, 0, 0), c(0, 1, 1), c(1, 1, 2), c(0, 0, 3));
+        assertTrue(closedInXY.isClosed());
+        assertFalse(closedInXY.is3DClosed());
+
+        LineString<C3D> closedIn3D = linestring(crsZ, c(0, 0, 0), c(0, 1, 1), c(1, 1, 2), c(0, 0, 0));
+        assertTrue(closedIn3D.is3DClosed());
+    }
+
+    @Test
+    public void testIs3DClosedOn2D() {
+        assertFalse(emptyLine.is3DClosed());
+        assertFalse(linestr2d.is3DClosed());
+        assertTrue(simpleClosed.is3DClosed());
+    }
+
+    @Test
+    public void testIsRingRequiresSimplicity() {
+        LineString<C2D> bowTie = linestring(crs, c(0, 0), c(1, 1), c(1, 0), c(0, 1), c(0, 0));
+        assertTrue(bowTie.isClosed());
+        assertFalse(bowTie.isRing());
+    }
+
+    @Test
+    public void testIsRingIgnoresM() {
+        LineString<C2DM> ringM = linestring(crsM, cM(0, 0, 0), cM(0, 1, 1), cM(1, 1, 2), cM(1, 0, 3), cM(0, 0, 4));
+        assertTrue(ringM.isRing());
+    }
+
+    @Test
     public void testGetDimension() {
         assertEquals(1, linestr2d.getDimension());
+    }
+
+    @Test
+    public void testGetDimensionOfEmptyIsMinusOne() {
+        assertEquals(-1, emptyLine.getDimension());
     }
 
     @Test

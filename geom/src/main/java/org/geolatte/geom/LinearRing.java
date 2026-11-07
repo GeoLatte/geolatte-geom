@@ -24,7 +24,12 @@ package org.geolatte.geom;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
- * A <code>LineString</code> that is both closed and simple.
+ * A closed <code>LineString</code> that is used as the boundary of a {@code Polygon}.
+ *
+ * <p>A non-empty <code>LinearRing</code> must be closed (start and end position coincide in X and Y) and contain at
+ * least 4 positions. ISO/IEC 13249-3 (SQL/MM Spatial) additionally defines a linear ring to be simple, but that is
+ * not enforced on construction, so that invalid geometries can still be represented (e.g. when decoding them from
+ * a database). Use {@link #isRing()} to test whether an instance is simple and closed.</p>
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 4/14/11
@@ -51,7 +56,7 @@ public class LinearRing<P extends Position> extends LineString<P> {
     }
 
     private void checkIsClosed(){
-        if (isEmpty() || (isClosed() && getNumPositions() >= 3)) return;
+        if (isEmpty() || (isClosed() && getNumPositions() >= 4)) return;
         throw new IllegalArgumentException("Cannot create a LinearRing. PointSequence is not closed or contains < 4 points.");
     }
 

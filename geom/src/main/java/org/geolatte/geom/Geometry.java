@@ -318,7 +318,9 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * Returns the topological dimension of this instance. In non-homogenous collections, this will return the largest
      * topological dimension of the contained <code>Geometries</code>.
      *
-     * @return the topological dimension of this instance
+     * <p>As specified in ISO/IEC 13249-3 (SQL/MM Spatial), the dimension of the empty set is -1.</p>
+     *
+     * @return the topological dimension of this instance, or -1 if this instance is empty
      */
     public abstract int getDimension();
 

@@ -136,7 +136,7 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
 
     @Override
     public int getDimension() {
-        return 2;
+        return isEmpty() ? -1 : 2;
     }
 
     @Override

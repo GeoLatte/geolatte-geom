@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.LineStringSimplicity;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -80,28 +81,52 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     }
 
     /**
-     * Checks whether this <code>LineString</code> is closed, i.e. the first <code>Point</code> equals the last.
+     * Checks whether this <code>LineString</code> is closed, i.e. its start position equals its end position.
      *
-     * @return true if this <code>LineString</code> is closed.
+     * <p>As specified for <code>ST_IsClosed</code> in ISO/IEC 13249-3 (SQL/MM Spatial), Z and M coordinate
+     * values are ignored: only the X and Y coordinates of the start and end positions are compared. Use
+     * {@link #is3DClosed()} to also take Z coordinates into account.</p>
+     *
+     * @return true if this <code>LineString</code> is non-empty and closed.
      */
     public boolean isClosed() {
-        return !isEmpty() && getStartPosition().equals(getEndPosition());
+        return !isEmpty() && Positions.equals2D(getStartPosition(), getEndPosition());
     }
 
     /**
-     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and non-empty.
+     * Checks whether this <code>LineString</code> is closed, taking Z coordinate values into account.
      *
-     * <p>Note that this implementation allows rings thate are non-simple.</p>
+     * <p>As specified for <code>ST_3DIsClosed</code> in ISO/IEC 13249-3 (SQL/MM Spatial), the X, Y and (if present) Z
+     * coordinates of the start and end positions are compared. M coordinate values are ignored. For
+     * <code>LineString</code>s without Z coordinates this is equivalent to {@link #isClosed()}.</p>
+     *
+     * @return true if this <code>LineString</code> is non-empty and closed in 3D.
+     */
+    public boolean is3DClosed() {
+        if (!isClosed()) return false;
+        return !hasZ() || getStartPosition().getCoordinate(2) == getEndPosition().getCoordinate(2);
+    }
+
+    /**
+     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple.
+     *
+     * <p>As specified for <code>ST_IsRing</code> in ISO/IEC 13249-3 (SQL/MM Spatial), Z and M coordinate values are
+     * ignored in both the closedness and the simplicity test.</p>
      *
      * @return true if this <code>LineString</code> is a ring.
      */
     public boolean isRing() {
-        return !isEmpty() && isClosed();
+        return isClosed() && LineStringSimplicity.isSimple(getPositions());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return 1, or -1 if this <code>LineString</code> is empty.
+     */
     @Override
     public int getDimension() {
-        return 1;
+        return isEmpty() ? -1 : 1;
     }
 
     @Override

@@ -100,7 +100,7 @@ abstract public class AbstractGeometryCollection<P extends Position, G extends G
 
     @Override
     public int getDimension() {
-        int maxDim = 0;
+        int maxDim = -1; // dimension of the empty set
         for (Geometry part : this) {
             maxDim = Math.max(maxDim, part.getDimension());
         }

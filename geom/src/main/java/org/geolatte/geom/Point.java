@@ -68,7 +68,7 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
 
     @Override
     public int getDimension() {
-        return 0;
+        return isEmpty() ? -1 : 0;
     }
 
     @Override

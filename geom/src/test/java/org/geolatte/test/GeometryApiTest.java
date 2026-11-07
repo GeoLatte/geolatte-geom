@@ -29,7 +29,7 @@ public class GeometryApiTest {
     public void readme_test() {
         Point<G2D> pnt = point(WGS84, g(4.33, 53.21));
         LineString<G2D> lstr = linestring(WGS84, g(4.43, 53.21), g(4.44, 53.20), g(4.45, 53.19));
-        Polygon<G2D> pgn = polygon(WGS84, ring(g(4.43, 53.21), g(4.44, 53.22), g(4.43, 53.21)));
+        Polygon<G2D> pgn = polygon(WGS84, ring(g(4.43, 53.21), g(4.44, 53.22), g(4.45, 53.21), g(4.43, 53.21)));
 
         CoordinateReferenceSystem<G3D> wgs84E = WGS84.addVerticalSystem(LinearUnit.METER, G3D.class);
         Point<G3D> pntWithElevation = point(wgs84E, g(4.33, 53.21, 350));
@@ -48,7 +48,7 @@ public class GeometryApiTest {
 
         ProjectedGeometryOperations pgo = GeometryOperations.projectedGeometryOperations();
         Point<C2D> point = point(WEB_MERCATOR, c(4.33, 53.21));
-        Polygon<C2D> polygon = polygon(WEB_MERCATOR, ring(c(4.43, 53.21), c(4.44, 53.22), c(4.43, 53.21)));
+        Polygon<C2D> polygon = polygon(WEB_MERCATOR, ring(c(4.43, 53.21), c(4.44, 53.22), c(4.45, 53.21), c(4.43, 53.21)));
         boolean isPntInPoly = pgo.contains(polygon, point);
 
         // example  op an operation on measured geometries

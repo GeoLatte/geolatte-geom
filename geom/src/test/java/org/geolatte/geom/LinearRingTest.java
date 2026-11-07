@@ -21,6 +21,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.builder.DSL;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
 import org.junit.Test;
@@ -72,6 +73,27 @@ public class LinearRingTest {
             fail("Non-empty linearRing should have at least 4 points.");
         } catch (IllegalArgumentException e) {
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testClosedLinearRingWithThreePointsIsRejected() {
+        PositionSequence<C2D> threePoints = PositionSequenceBuilders.variableSized(crs.getPositionClass())
+                .add(0, 0).add(10, 0).add(0, 0).toPositionSequence();
+        new LinearRing<C2D>(threePoints, crs);
+    }
+
+    @Test
+    public void testLinearRingClosedInXYWithDifferentMeasuresIsAccepted() {
+        CoordinateReferenceSystem<C2DM> crsM = CrsMock.crsM;
+        LinearRing<C2DM> ring = DSL.ring(crsM, DSL.cM(0, 0, 0), DSL.cM(10, 0, 1), DSL.cM(10, 10, 2), DSL.cM(0, 0, 3));
+        assertTrue(ring.isClosed());
+        assertTrue(ring.isRing());
+    }
+
+    @Test
+    public void testNonSimpleLinearRingIsAcceptedButIsNotARing() {
+        LinearRing<C2D> bowTie = DSL.ring(crs, DSL.c(0, 0), DSL.c(10, 10), DSL.c(10, 0), DSL.c(0, 10), DSL.c(0, 0));
+        assertFalse(bowTie.isRing());
     }
 
     @Test
