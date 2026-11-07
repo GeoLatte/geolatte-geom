@@ -20,9 +20,12 @@ they share the SPI in `geolatte-geojson-core`; bumping any of them in
 isolation would create a configuration where the adapters depend on a
 core they were not built against.
 
-The `flatten-maven-plugin` is configured in `defaults` mode so that all
+The `flatten-maven-plugin` is configured in `ossrh` mode so that all
 `${...}` placeholders are resolved to concrete versions in the deployed
-poms (not just the standard CI-friendly `${revision}`/`${sha1}`/`${changelist}`).
+poms (not just the standard CI-friendly `${revision}`/`${sha1}`/`${changelist}`),
+while keeping the metadata Maven Central requires (name, description, url, scm,
+developers, licenses, organization). The `defaults` mode strips that metadata,
+and Central's validation then rejects the deployment.
 
 Cross-module dependencies in each child pom reference the producer explicitly:
 

@@ -31,7 +31,7 @@ The library is published on Maven Central. For Maven, you can include the follow
 <dependency>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geom</artifactId>
-    <version>1.9.0</version>
+    <version>1.13</version>
 </dependency>
 ```
 
@@ -230,13 +230,29 @@ The `JTS` class supports conversion from/to JTS `Geometry` instances.
 
 # Releasing
 
-Releases are published automatically to Maven Central via GitHub Actions when a version tag is pushed:
+Releases are published automatically to Maven Central via GitHub Actions when a version tag is pushed.
+
+The repository has two independently versioned release lines: `geom` (`geolatte-geom`, versioned by `${revision}` in
+the root `pom.xml`) and `geojson` (the three GeoJSON modules). The tag prefix selects what is published:
+
+| Tag           | Publishes                                   |
+|---------------|---------------------------------------------|
+| `geom-v*`     | `geolatte-geom` only                        |
+| `geojson-v*`  | the three GeoJSON modules only              |
+| `v*`          | all modules                                 |
+
+Publishing a version that is already on Maven Central fails, so only use `v*` when both lines have a new version.
+For example, to release `geolatte-geom` on its own:
 
 ```bash
-# Create and push a version tag
-git tag -a v1.11.0 -m "Release version 1.11.0"
-git push origin v1.11.0
+scripts/bump-version.sh geom 1.13
+git commit -am "Set revision to 1.13"
+git tag -a geom-v1.13 -m "Release geolatte-geom 1.13"
+git push origin master geom-v1.13
 ```
+
+See [docs/release-process.md](docs/release-process.md) for the details of both release lines, SNAPSHOT releases and
+manual deploys.
 
 The GitHub Actions workflow will:
 1. Build the project with Java 17
