@@ -2,6 +2,7 @@ package org.geolatte.geom.cga.exact;
 
 import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.SegmentIntersection;
 
 import java.math.BigDecimal;
 
@@ -387,6 +388,94 @@ public final class Predicates {
             sum = sum.add(big(xs[i]).multiply(big(ys[j]))).subtract(big(xs[j]).multiply(big(ys[i])));
         }
         return sum.signum();
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // Segment intersection
+    // ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * Determines how the line segments (a, b) and (c, d) intersect.
+     *
+     * <p>This is the line segment intersection test of Ratschek &amp; Rokne (Sec. 5.2, Algorithm 10). The book
+     * solves {@code a + t (b - a) = c + s (d - c)} with Cramer's rule, and determines the signs of the
+     * determinant {@code U} and of the numerators {@code D_i} and {@code D_i - U} exactly. Each of these
+     * determinants is the orientation determinant of three of the endpoints, so the test is formulated here
+     * directly in terms of the exact {@link #orientation(double, double, double, double, double, double)}
+     * predicate. Compared to the book, the test additionally handles all configurations of collinear segments
+     * (where the book only checks whether c lies strictly between a and b), and degenerate segments (a = b or
+     * c = d), which are treated as points.</p>
+     *
+     * <p>The intersection point itself is never computed: the result is exact, even though the intersection
+     * point is in general not representable in double precision.</p>
+     *
+     * @return the kind of intersection
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    public static SegmentIntersection segmentIntersection(double ax, double ay, double bx, double by,
+                                                          double cx, double cy, double dx, double dy) {
+        boolean abIsPoint = ax == bx && ay == by;
+        boolean cdIsPoint = cx == dx && cy == dy;
+        if (abIsPoint || cdIsPoint) {
+            checkFinite(ax, ay, bx, by);
+            checkFinite(cx, cy, dx, dy);
+            if (abIsPoint && cdIsPoint) {
+                return ax == cx && ay == cy ? SegmentIntersection.TOUCHING : SegmentIntersection.DISJOINT;
+            }
+            return abIsPoint ? pointOnSegment(cx, cy, dx, dy, ax, ay) : pointOnSegment(ax, ay, bx, by, cx, cy);
+        }
+
+        int o1 = orientation(ax, ay, bx, by, cx, cy);
+        int o2 = orientation(ax, ay, bx, by, dx, dy);
+        if (o1 * o2 > 0) return SegmentIntersection.DISJOINT; // c and d strictly on the same side of line ab
+        int o3 = orientation(cx, cy, dx, dy, ax, ay);
+        int o4 = orientation(cx, cy, dx, dy, bx, by);
+        if (o3 * o4 > 0) return SegmentIntersection.DISJOINT; // a and b strictly on the same side of line cd
+
+        if (o1 == 0 && o2 == 0) {
+            return collinearIntersection(ax, ay, bx, by, cx, cy, dx, dy);
+        }
+        // The lines are not parallel, and each segment meets the line of the other: the segments have exactly
+        // one point in common. If an endpoint lies on the line of the other segment, it is that point.
+        if (o1 == 0 || o2 == 0 || o3 == 0 || o4 == 0) return SegmentIntersection.TOUCHING;
+        return SegmentIntersection.CROSSING;
+    }
+
+    /**
+     * Determines how the line segments (a, b) and (c, d) intersect.
+     *
+     * @see #segmentIntersection(double, double, double, double, double, double, double, double)
+     */
+    public static SegmentIntersection segmentIntersection(Position a, Position b, Position c, Position d) {
+        return segmentIntersection(x(a), y(a), x(b), y(b), x(c), y(c), x(d), y(d));
+    }
+
+    // p lies on the (non-degenerate) segment (a, b)?
+    private static SegmentIntersection pointOnSegment(double ax, double ay, double bx, double by, double px, double py) {
+        if (orientation(ax, ay, bx, by, px, py) != 0) return SegmentIntersection.DISJOINT;
+        boolean between = ax != bx ? isBetween(px, ax, bx) : isBetween(py, ay, by);
+        return between ? SegmentIntersection.TOUCHING : SegmentIntersection.DISJOINT;
+    }
+
+    private static boolean isBetween(double v, double a, double b) {
+        return a < b ? a <= v && v <= b : b <= v && v <= a;
+    }
+
+    // a, b, c, d lie on one line, a != b and c != d. On a non-vertical line, the order of points along the line is
+    // the order of their x-coordinates (and on a vertical line, that of their y-coordinates), so the comparison
+    // reduces to comparing intervals of exact double values.
+    private static SegmentIntersection collinearIntersection(double ax, double ay, double bx, double by,
+                                                             double cx, double cy, double dx, double dy) {
+        double a, b, c, d;
+        if (ax != bx) {
+            a = ax; b = bx; c = cx; d = dx;
+        } else {
+            a = ay; b = by; c = cy; d = dy;
+        }
+        double lo = Math.max(Math.min(a, b), Math.min(c, d));
+        double hi = Math.min(Math.max(a, b), Math.max(c, d));
+        if (lo > hi) return SegmentIntersection.DISJOINT;
+        return lo == hi ? SegmentIntersection.TOUCHING : SegmentIntersection.OVERLAPPING;
     }
 
     // ---------------------------------------------------------------------------------------------------------

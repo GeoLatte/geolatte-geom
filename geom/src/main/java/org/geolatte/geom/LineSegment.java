@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.exact.Predicates;
+
 /**
  * A portion of a line delimited (inclusively) by two <code>Position</code>s.
  * @author Karel Maesen, Geovise BVBA
@@ -57,6 +59,34 @@ public class LineSegment<P extends Position> {
      */
     public P getEndPosition() {
         return p1;
+    }
+
+    /**
+     * Determines how this segment and the specified segment intersect in the plane of the first two coordinates.
+     *
+     * <p>The test is exact for the coordinates as given: it is never falsified by rounding errors (see
+     * {@link Predicates#segmentIntersection(Position, Position, Position, Position)}). Note that for geographic
+     * coordinates, the segments are treated as straight lines in the longitude/latitude plane, not as geodesics.</p>
+     *
+     * @param other the other segment
+     * @return the kind of intersection
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite (e.g. for an empty {@code Position})
+     */
+    public SegmentIntersection classifyIntersection(LineSegment<?> other) {
+        return Predicates.segmentIntersection(p0, p1, other.p0, other.p1);
+    }
+
+    /**
+     * Determines whether this segment and the specified segment have at least one point in common, in the plane of
+     * the first two coordinates. The result is exact.
+     *
+     * @param other the other segment
+     * @return true iff the segments intersect
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite (e.g. for an empty {@code Position})
+     * @see #classifyIntersection(LineSegment)
+     */
+    public boolean intersects(LineSegment<?> other) {
+        return classifyIntersection(other).intersects();
     }
 
 }
