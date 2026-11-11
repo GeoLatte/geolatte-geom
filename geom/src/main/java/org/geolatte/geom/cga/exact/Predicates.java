@@ -578,6 +578,218 @@ public final class Predicates {
     }
 
     /**
+     * Compares the (Euclidean) distance of p to the line segment (a, b) with the specified distance.
+     *
+     * <p>This is the tolerance test of exact line simplification (Ramer-Douglas-Peucker, Sec. 8.4.3 of the book).
+     * The comparison is exact for the given coordinates and distance; neither distance is rounded (in particular,
+     * {@code distance * distance} is not rounded).</p>
+     *
+     * @param distance a finite, non-negative distance
+     * @return -1, 0 or 1 if the distance of p to segment (a, b) is less than, equal to, or greater than
+     * {@code distance}
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite, or the distance is negative, NaN or
+     *                                  infinite
+     */
+    public static int compareDistanceToSegment(double ax, double ay, double bx, double by,
+                                               double px, double py, double distance) {
+        checkFinite(ax, ay, bx, by);
+        checkFinite(px, py);
+        if (!(distance >= 0) || distance == Double.POSITIVE_INFINITY) {
+            throw new IllegalArgumentException("Distance must be finite and non-negative: " + distance);
+        }
+        Region r = region(ax, ay, bx, by, px, py);
+        Interval d2 = Interval.product(distance, distance);
+        int s;
+        if (r == Region.INTERIOR) {
+            // compare O(A,B,P)² / |B - A|² with distance²
+            Interval segLen2 = Interval.difference(bx, ax).sqr().add(Interval.difference(by, ay).sqr());
+            s = orientationInterval(ax, ay, bx, by, px, py).sqr().sub(d2.mul(segLen2)).signum();
+        } else {
+            double ex = r == Region.A ? ax : bx, ey = r == Region.A ? ay : by;
+            s = Interval.difference(px, ex).sqr().add(Interval.difference(py, ey).sqr()).sub(d2).signum();
+        }
+        if (s != UNDECIDED) return s;
+
+        ExactSum sum;
+        ExactSum dist2 = new ExactSum(2).addProduct(distance, distance);
+        if (r == Region.INTERIOR) {
+            ExactSum o = orientationTerms(ax, ay, bx, by, px, py);
+            ExactSum segLen2 = new ExactSum(12);
+            addDiffSquare(segLen2, bx, ax);
+            addDiffSquare(segLen2, by, ay);
+            sum = new ExactSum(340).addProduct(1, o, o).addProduct(-1, dist2, segLen2);
+        } else {
+            double ex = r == Region.A ? ax : bx, ey = r == Region.A ? ay : by;
+            sum = new ExactSum(16);
+            addDiffSquare(sum, px, ex);
+            addDiffSquare(sum, py, ey);
+            sum.add(-1, dist2);
+        }
+        if (sum.isExact()) return sum.signum();
+
+        BigDecimal bigD2 = sqr(big(distance));
+        if (r == Region.INTERIOR) {
+            BigDecimal segLen2 = sqr(big(bx).subtract(big(ax))).add(sqr(big(by).subtract(big(ay))));
+            return sqr(orientationBigValue(ax, ay, bx, by, px, py)).subtract(bigD2.multiply(segLen2)).signum();
+        }
+        double ex = r == Region.A ? ax : bx, ey = r == Region.A ? ay : by;
+        return sqr(big(px).subtract(big(ex))).add(sqr(big(py).subtract(big(ey)))).subtract(bigD2).signum();
+    }
+
+    /**
+     * Compares the (Euclidean) distance of p to the line segment (a, b) with the specified distance.
+     *
+     * @see #compareDistanceToSegment(double, double, double, double, double, double, double)
+     */
+    public static int compareDistanceToSegment(Position a, Position b, Position p, double distance) {
+        return compareDistanceToSegment(x(a), y(a), x(b), y(b), x(p), y(p), distance);
+    }
+
+    /**
+     * Returns a machine interval that contains the squared (Euclidean) distance of p to the line segment (a, b).
+     *
+     * <p>The interval is computed with machine interval arithmetic, and is usually narrow. It serves to decide
+     * comparisons of distances cheaply; when two intervals overlap, the comparison must be decided with
+     * {@link #compareDistanceToSegment(double, double, double, double, double, double, double, double)}.</p>
+     *
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    public static Interval squaredDistanceToSegment(double ax, double ay, double bx, double by, double px, double py) {
+        checkFinite(ax, ay, bx, by);
+        checkFinite(px, py);
+        Interval abx = Interval.difference(bx, ax), aby = Interval.difference(by, ay);
+        Interval apx = Interval.difference(px, ax), apy = Interval.difference(py, ay);
+        // the region of p: on the boundary of a region both distance formulae agree, so if the region can not
+        // be decided, the hull of the candidate formulae contains the distance.
+        Interval dotA = apx.mul(abx).add(apy.mul(aby));             // (p - a) . (b - a)
+        if (dotA.hi() <= 0) return apx.sqr().add(apy.sqr());
+        Interval bpx = Interval.difference(px, bx), bpy = Interval.difference(py, by);
+        Interval dotB = bpx.mul(abx).add(bpy.mul(aby)).negate();    // (p - b) . (a - b)
+        if (dotB.hi() <= 0) return bpx.sqr().add(bpy.sqr());
+        Interval segLen2 = abx.sqr().add(aby.sqr());
+        if (!(segLen2.lo() > 0)) return Interval.of(0, Double.POSITIVE_INFINITY); // underflow
+        Interval interior = abx.mul(apy).sub(apx.mul(aby)).sqr().div(segLen2);
+        if (dotA.lo() > 0 && dotB.lo() > 0) return interior;
+        if (dotA.lo() <= 0) interior = interior.hull(apx.sqr().add(apy.sqr()));
+        if (dotB.lo() <= 0) interior = interior.hull(bpx.sqr().add(bpy.sqr()));
+        return interior;
+    }
+
+    /**
+     * Encloses the squared (Euclidean) distances of the points {@code (xs[i], ys[i])}, {@code from <= i < to}, to
+     * the line segment (a, b): the squared distance of point i lies in {@code [lo[i], hi[i]]}.
+     *
+     * <p>This is a fast variant of {@link #squaredDistanceToSegment(double, double, double, double, double, double)}
+     * for many points: the distances are evaluated in plain floating point arithmetic, together with rigorous
+     * bounds on the rounding errors (Shewchuk's bound for expressions of the form {@code (p - q)(r - s) +- (t -
+     * u)(v - w)}, cf. {@link #orientation(double, double, double, double, double, double)}). Points for which this
+     * is not possible (e.g. due to underflow or overflow) are enclosed with machine interval arithmetic.</p>
+     *
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    public static void squaredDistancesToSegment(double ax, double ay, double bx, double by,
+                                                 double[] xs, double[] ys, int from, int to,
+                                                 double[] lo, double[] hi) {
+        double ux = bx - ax, uy = by - ay;
+        if (ux == 0 && uy == 0) {
+            // degenerate segment (exactly): distances to a
+            for (int i = from; i < to; i++) {
+                double wx = xs[i] - ax, wy = ys[i] - ay;
+                double l = wx * wx, r = wy * wy;
+                if (!encloseSum(l, r, lo, hi, i)) fallback(ax, ay, bx, by, xs[i], ys[i], lo, hi, i);
+            }
+            return;
+        }
+        double ul = ux * ux, ur = uy * uy;
+        double len2 = ul + ur;
+        double len2Err = CCW_ERRBOUND * (ul + ur) + UNDERFLOW_MARGIN;
+        double len2Lo = len2 - len2Err, len2Hi = len2 + len2Err;
+        boolean usable = len2Lo >= 0x1p-1000 && len2Hi < Double.POSITIVE_INFINITY;
+        for (int i = from; i < to; i++) {
+            double px = xs[i], py = ys[i];
+            if (!usable || !encloseOne(ax, ay, bx, by, ux, uy, len2Lo, len2Hi, px, py, lo, hi, i)) {
+                fallback(ax, ay, bx, by, px, py, lo, hi, i);
+            }
+        }
+    }
+
+    // relative widening that covers the rounding errors of the few operations that compute a bound
+    private static final double WIDEN_DOWN = 1 - 0x1p-48, WIDEN_UP = 1 + 0x1p-48;
+
+    private static boolean encloseOne(double ax, double ay, double bx, double by, double ux, double uy,
+                                      double len2Lo, double len2Hi, double px, double py,
+                                      double[] lo, double[] hi, int i) {
+        double wx = px - ax, wy = py - ay;
+        // region tests: (p - a).(b - a) <= 0 (closest to a), (b - p).(b - a) <= 0 (closest to b)
+        double dal = wx * ux, dar = wy * uy;
+        double dotA = dal + dar;
+        double dotAErr = CCW_ERRBOUND * (Math.abs(dal) + Math.abs(dar)) + UNDERFLOW_MARGIN;
+        if (dotA <= -dotAErr) {
+            return encloseSum(wx * wx, wy * wy, lo, hi, i);
+        }
+        double vx = bx - px, vy = by - py;
+        double dbl = vx * ux, dbr = vy * uy;
+        double dotB = dbl + dbr;
+        double dotBErr = CCW_ERRBOUND * (Math.abs(dbl) + Math.abs(dbr)) + UNDERFLOW_MARGIN;
+        if (dotB <= -dotBErr) {
+            return encloseSum(vx * vx, vy * vy, lo, hi, i);
+        }
+        // interior formula: (u x w)² / |u|²
+        double cl = ux * wy, cr = uy * wx;
+        double c = Math.abs(cl - cr);
+        double cErr = CCW_ERRBOUND * (Math.abs(cl) + Math.abs(cr)) + UNDERFLOW_MARGIN;
+        double cLo = Math.max(c - cErr, 0), cHi = c + cErr;
+        // c * (c / |u|²) rather than c² / |u|²: c² may underflow although the quotient is representable. If the
+        // quotient c / |u|² underflows, c < 4 (as |u|² is finite), so the absolute error is below the margin.
+        double l = cLo * (cLo / len2Hi) * WIDEN_DOWN;
+        double h = cHi * (cHi / len2Lo) * WIDEN_UP + UNDERFLOW_MARGIN;
+        if (!(h < Double.POSITIVE_INFINITY)) return false;   // also false for NaN
+        // On the boundary of a region, the formulae agree. If the region is not decided, the distance lies in
+        // the hull of the enclosures of the candidate formulae.
+        if (!(dotA > dotAErr)) {
+            if (!encloseSum(wx * wx, wy * wy, lo, hi, i)) return false;
+            l = Math.min(l, lo[i]);
+            h = Math.max(h, hi[i]);
+        }
+        if (!(dotB > dotBErr)) {
+            if (!encloseSum(vx * vx, vy * vy, lo, hi, i)) return false;
+            l = Math.min(l, lo[i]);
+            h = Math.max(h, hi[i]);
+        }
+        lo[i] = l < 0x1p-1000 ? 0 : l;
+        hi[i] = h;
+        return true;
+    }
+
+    // encloses the sum of two squares of differences, given the computed squares l and r
+    private static boolean encloseSum(double l, double r, double[] lo, double[] hi, int i) {
+        double d = l + r;
+        double err = CCW_ERRBOUND * d + UNDERFLOW_MARGIN;
+        double h = (d + err) * WIDEN_UP;
+        if (!(h < Double.POSITIVE_INFINITY)) return false;
+        double low = (d - err) * WIDEN_DOWN;
+        lo[i] = low < 0x1p-1000 ? 0 : low;
+        hi[i] = h;
+        return true;
+    }
+
+    private static void fallback(double ax, double ay, double bx, double by, double px, double py,
+                                 double[] lo, double[] hi, int i) {
+        Interval d = squaredDistanceToSegment(ax, ay, bx, by, px, py);
+        lo[i] = d.lo();
+        hi[i] = d.hi();
+    }
+
+    /**
+     * Returns a machine interval that contains the squared distance of p to the line segment (a, b).
+     *
+     * @see #squaredDistanceToSegment(double, double, double, double, double, double)
+     */
+    public static Interval squaredDistanceToSegment(Position a, Position b, Position p) {
+        return squaredDistanceToSegment(x(a), y(a), x(b), y(b), x(p), y(p));
+    }
+
+    /**
      * Returns the exact sign of the dot product {@code (p - a) . (r - q)}
      */
     public static int dotSign(double ax, double ay, double px, double py, double qx, double qy, double rx, double ry) {

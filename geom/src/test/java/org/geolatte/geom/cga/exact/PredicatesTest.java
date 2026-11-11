@@ -464,6 +464,110 @@ public class PredicatesTest {
         }
     }
 
+    @Test
+    public void compareDistanceToToleranceSimpleCases() {
+        // segment (0,0)-(10,0)
+        assertEquals(0, Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, 5, 5));
+        assertEquals(-1, Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, 5, 5.000001));
+        assertEquals(1, Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, 5, 4.999999));
+        assertEquals(0, Predicates.compareDistanceToSegment(0, 0, 10, 0, -3, 4, 5));     // region A
+        assertEquals(0, Predicates.compareDistanceToSegment(0, 0, 10, 0, 13, -4, 5));    // region B
+        assertEquals(0, Predicates.compareDistanceToSegment(0, 0, 10, 0, 5, 0, 0));      // on the segment
+        assertEquals(1, Predicates.compareDistanceToSegment(0, 0, 10, 0, 11, 0, 0));
+        assertEquals(0, Predicates.compareDistanceToSegment(1, 1, 1, 1, 4, 5, 5));       // degenerate segment
+        // 0.1 * 0.1 is not representable: the distance 0.1 is compared exactly
+        assertEquals(0, Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, 0.1, 0.1));
+        assertEquals(1, Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, Math.nextUp(0.1), 0.1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void negativeToleranceIsRejected() {
+        Predicates.compareDistanceToSegment(0, 0, 10, 0, 3, 5, -1);
+    }
+
+    @Test
+    public void compareDistanceToToleranceNearTies() {
+        for (int k = 0; k < 30_000; k++) {
+            double scale = k % 3 == 0 ? 1000 : Math.scalb(1.0, random.nextInt(200) - 100);
+            double offset = k % 3 == 0 ? 150000 : 0;
+            double ax = offset + rnd(scale), ay = offset + rnd(scale);
+            double bx = k % 7 == 0 ? ax : ax + rnd(scale), by = ay + rnd(scale);
+            double dx = bx - ax, dy = by - ay;
+            double len = Math.hypot(dx, dy);
+            double nx = len == 0 ? 0 : -dy / len, ny = len == 0 ? 1 : dx / len;
+            double dist = Math.abs(rnd(scale));
+            double[] p = pointAtDistance(ax, ay, bx, by, nx, ny, dist, len == 0 ? 2 : random.nextInt(3));
+            for (double tolerance : new double[]{dist, Math.nextUp(dist), Math.nextDown(Math.abs(dist)), Math.abs(rnd(scale))}) {
+                checkTolerance(ax, ay, bx, by, p[0], p[1], Math.abs(tolerance));
+            }
+        }
+        // exact ties at large offsets
+        for (int k = 0; k < 5_000; k++) {
+            double ox = random.nextInt(1 << 22) + 0.25, oy = random.nextInt(1 << 22) + 0.5;
+            checkTolerance(ox, oy, ox + 8, oy + 6, ox + 4 - 0.75, oy + 3 + 1, 1.25);
+            checkTolerance(ox, oy, ox + 8, oy + 6, ox - 0.75, oy + 1, 1.25);
+            checkTolerance(ox, oy, ox + 8, oy + 6, ox + 8 + 0.75, oy + 6 - 1, 1.25);
+            checkTolerance(ox, oy, ox + 8, oy + 6, ox + 4 - 0.75, Math.nextUp(oy + 3 + 1), 1.25);
+        }
+        // extreme magnitudes
+        for (int k = 0; k < 2_000; k++) {
+            double scale = k % 2 == 0 ? 1e-150 : 1e150;
+            double ax = rnd(scale), ay = rnd(scale), bx = ax + rnd(scale), by = ay + rnd(scale);
+            double dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+            double[] p = pointAtDistance(ax, ay, bx, by, -dy / len, dx / len, scale, random.nextInt(3));
+            checkTolerance(ax, ay, bx, by, p[0], p[1], scale);
+        }
+    }
+
+    /**
+     * The floating point enclosure of squared distances must contain the exact value, at all scales, also for
+     * points near the boundaries of the regions (where the closest point of the segment changes).
+     */
+    @Test
+    public void fastDistanceEnclosureAllScales() {
+        int n = 200_000;
+        double[] xs = new double[n], ys = new double[n], lo = new double[n], hi = new double[n];
+        for (int round = 0; round < 20; round++) {
+            double scale = Math.scalb(1.0, random.nextInt(1040) - 540);
+            double offset = random.nextBoolean() ? 0 : rnd(Math.scalb(scale, random.nextInt(40)));
+            double ax = offset + rnd(scale), ay = offset + rnd(scale);
+            double bx = round % 5 == 0 ? ax : offset + rnd(scale), by = round % 5 == 0 ? ay : offset + rnd(scale);
+            double ux = bx - ax, uy = by - ay;
+            for (int i = 0; i < n; i++) {
+                double t = random.nextInt(4) == 0 ? random.nextInt(2) : random.nextDouble() * 1.4 - 0.2;
+                double off = random.nextInt(4) == 0 ? Math.scalb(rnd(1), -random.nextInt(60)) : rnd(1);
+                // along the segment (or beyond its ends), and perpendicular to it
+                xs[i] = ax + t * ux - off * uy + (ux == 0 && uy == 0 ? rnd(scale) : 0);
+                ys[i] = ay + t * uy + off * ux;
+            }
+            Predicates.squaredDistancesToSegment(ax, ay, bx, by, xs, ys, 0, n, lo, hi);
+            for (int i = 0; i < n; i += 7) {
+                BigDecimal[] d = squaredDistance(ax, ay, bx, by, xs[i], ys[i]);
+                assertEnclosed(String.format("(%s, %s)-(%s, %s), p = (%s, %s): [%s, %s]",
+                        ax, ay, bx, by, xs[i], ys[i], lo[i], hi[i]), lo[i], hi[i], d);
+            }
+        }
+    }
+
+    private void checkTolerance(double ax, double ay, double bx, double by, double px, double py, double tolerance) {
+        BigDecimal[] d = squaredDistance(ax, ay, bx, by, px, py);
+        int expected = d[0].subtract(big(tolerance).multiply(big(tolerance)).multiply(d[1])).signum();
+        String msg = String.format("compareDistance(%s, %s, %s, %s, %s, %s, tolerance %s)", ax, ay, bx, by, px, py, tolerance);
+        assertEquals(msg, expected, Predicates.compareDistanceToSegment(ax, ay, bx, by, px, py, tolerance));
+        // the enclosure of the squared distance
+        Interval enclosure = Predicates.squaredDistanceToSegment(ax, ay, bx, by, px, py);
+        assertEnclosed(msg + ": enclosure " + enclosure, enclosure.lo(), enclosure.hi(), d);
+        // the floating point enclosure (point at index 1)
+        double[] lo = new double[3], hi = new double[3];
+        Predicates.squaredDistancesToSegment(ax, ay, bx, by, new double[]{0, px, 0}, new double[]{0, py, 0}, 1, 2, lo, hi);
+        assertEnclosed(msg + ": fast enclosure [" + lo[1] + ", " + hi[1] + "]", lo[1], hi[1], d);
+    }
+
+    private static void assertEnclosed(String msg, double lo, double hi, BigDecimal[] fraction) {
+        assertTrue(msg, big(lo).multiply(fraction[1]).compareTo(fraction[0]) <= 0
+                && (hi == Double.POSITIVE_INFINITY || big(hi).multiply(fraction[1]).compareTo(fraction[0]) >= 0));
+    }
+
     // returns a point at (approximately) distance dist from the segment, in region A (0), B (1) or interior (2)
     private double[] pointAtDistance(double ax, double ay, double bx, double by, double nx, double ny, double dist, int region) {
         double side = random.nextBoolean() ? 1 : -1;

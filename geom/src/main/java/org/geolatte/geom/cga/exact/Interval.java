@@ -114,6 +114,13 @@ public final class Interval {
         return new Interval(addDown(lo, -o.hi), addUp(hi, -o.lo));
     }
 
+    /**
+     * @return the smallest interval containing this interval and {@code o}
+     */
+    public Interval hull(Interval o) {
+        return new Interval(Math.min(lo, o.lo), Math.max(hi, o.hi));
+    }
+
     public Interval negate() {
         return new Interval(-hi, -lo);
     }
@@ -123,6 +130,20 @@ public final class Interval {
         // this keeps the implementation obviously correct.
         double l = Math.min(Math.min(mulDown(lo, o.lo), mulDown(lo, o.hi)), Math.min(mulDown(hi, o.lo), mulDown(hi, o.hi)));
         double h = Math.max(Math.max(mulUp(lo, o.lo), mulUp(lo, o.hi)), Math.max(mulUp(hi, o.lo), mulUp(hi, o.hi)));
+        return new Interval(l, h);
+    }
+
+    /**
+     * Returns an inclusion of the range of {@code x / y}, for x in this interval and y in {@code o}.
+     *
+     * @throws ArithmeticException if {@code o} contains zero
+     */
+    public Interval div(Interval o) {
+        if (!(o.lo > 0 || o.hi < 0)) {
+            throw new ArithmeticException("Division by an interval containing zero: " + o);
+        }
+        double l = Math.min(Math.min(divDown(lo, o.lo), divDown(lo, o.hi)), Math.min(divDown(hi, o.lo), divDown(hi, o.hi)));
+        double h = Math.max(Math.max(divUp(lo, o.lo), divUp(lo, o.hi)), Math.max(divUp(hi, o.lo), divUp(hi, o.hi)));
         return new Interval(l, h);
     }
 
@@ -188,6 +209,34 @@ public final class Interval {
             return Math.nextUp(p);
         }
         return Math.fma(a, b, -p) > 0 ? Math.nextUp(p) : p;
+    }
+
+    // With q = RN(a / b), the remainder r = a - q * b is exactly representable, and computed exactly by fma, if
+    // no underflow occurs; then a / b = q + r / b. Otherwise q is off by at most one ulp, and is rounded outward.
+    private static final double DIV_GUARD = 0x1p-960;
+
+    /**
+     * @return the largest double that is &lt;= a / b (b non-zero)
+     */
+    static double divDown(double a, double b) {
+        double q = a / b;
+        if (a == 0) return 0;
+        if (Double.isInfinite(q)) return q > 0 ? Double.MAX_VALUE : q;  // overflow
+        if (Math.abs(a) < DIV_GUARD || Math.abs(q) < DIV_GUARD) return Math.nextDown(q);
+        double r = Math.fma(-q, b, a);
+        return r != 0 && (r > 0) != (b > 0) ? Math.nextDown(q) : q;
+    }
+
+    /**
+     * @return the smallest double that is &gt;= a / b (b non-zero)
+     */
+    static double divUp(double a, double b) {
+        double q = a / b;
+        if (a == 0) return 0;
+        if (Double.isInfinite(q)) return q < 0 ? -Double.MAX_VALUE : q;
+        if (Math.abs(a) < DIV_GUARD || Math.abs(q) < DIV_GUARD) return Math.nextUp(q);
+        double r = Math.fma(-q, b, a);
+        return r != 0 && (r > 0) == (b > 0) ? Math.nextUp(q) : q;
     }
 
     // Knuth's TwoSum: (a + b) - s computed without rounding error (barring overflow)

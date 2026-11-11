@@ -81,6 +81,50 @@ public class IntervalTest {
         assertEquals(Interval.UNDECIDED, Interval.of(-1, 1).signum());
     }
 
+    @Test
+    public void divisionGivesNarrowestEnclosure() {
+        for (int i = 0; i < 100_000; i++) {
+            double a = randomDouble(), b = randomDouble();
+            if (b == 0) continue;
+            Interval q = Interval.of(a).div(Interval.of(b));
+            if (Double.isInfinite(q.lo()) || Double.isInfinite(q.hi())) {
+                assertTrue(Double.isInfinite(a / b));  // overflow
+                continue;
+            }
+            // lo <= a / b <= hi, checked without division
+            BigDecimal ba = big(a), bb = big(b);
+            int sign = b > 0 ? 1 : -1;
+            assertTrue(q + " does not contain " + a + " / " + b,
+                    big(q.lo()).multiply(bb).compareTo(ba) * sign <= 0 && big(q.hi()).multiply(bb).compareTo(ba) * sign >= 0);
+            if (Math.abs(a / b) >= 0x1p-900 && Math.abs(a) >= 0x1p-900) {
+                assertTrue("Not narrowest: " + q, q.lo() == q.hi() || Math.nextUp(q.lo()) == q.hi());
+            }
+        }
+        assertEquals(Interval.of(2), Interval.of(6).div(Interval.of(3)));
+        assertEquals(Interval.of(-0.5), Interval.of(1).div(Interval.of(-2)));
+        Interval third = Interval.of(1).div(Interval.of(3));
+        assertEquals(Math.nextUp(third.lo()), third.hi(), 0);
+    }
+
+    @Test
+    public void intervalDivisionContainsAllResults() {
+        for (int i = 0; i < 20_000; i++) {
+            Interval x = randomInterval(), y = randomInterval();
+            if (y.contains(0)) continue;
+            Interval q = x.div(y);
+            for (int k = 0; k < 4; k++) {
+                double a = k < 2 ? x.lo() : x.hi(), b = k % 2 == 0 ? y.lo() : y.hi();
+                Interval point = Interval.of(a).div(Interval.of(b));
+                assertTrue(q.lo() <= point.lo() && point.hi() <= q.hi());
+            }
+        }
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void divisionByIntervalContainingZero() {
+        Interval.of(1).div(Interval.of(-1, 1));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void invalidBounds() {
         Interval.of(1, 0);
