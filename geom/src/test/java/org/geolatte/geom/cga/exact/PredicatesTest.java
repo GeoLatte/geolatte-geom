@@ -201,6 +201,29 @@ public class PredicatesTest {
     }
 
     @Test
+    public void inCircleExpansionWithInexactDifferences() {
+        // circles around the origin: coordinates of opposite signs, so the differences are often not exact
+        Counts counts = new Counts();
+        int inexactDifferences = 0;
+        for (int k = 0; k < 20_000; k++) {
+            double scale = Math.scalb(1.0, random.nextInt(200) - 100);
+            double[] p = new double[8];
+            for (int i = 0; i < 4; i++) {
+                double theta = random.nextDouble() * 2 * Math.PI;
+                p[2 * i] = scale * Math.cos(theta);
+                p[2 * i + 1] = scale * Math.sin(theta);
+            }
+            p[random.nextInt(8)] = random.nextBoolean() ? Math.nextUp(p[0]) : Math.nextDown(p[0]);
+            for (int i = 0; i < 6; i++) {
+                if (Expansion.difference(p[i], p[6 + i % 2]).length == 2) inexactDifferences++;
+            }
+            assertNotEquals(Predicates.UNDECIDED, Predicates.inCircleExpansion(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]));
+            checkInCircle(counts, p);
+        }
+        assertTrue(inexactDifferences > 1000);
+    }
+
+    @Test
     public void inCircleExactlyCocircular() {
         double[][] pts = {{5, 0}, {0, 5}, {-5, 0}, {0, -5}, {3, 4}, {4, 3}, {-3, 4}, {4, -3}, {-4, -3}};
         Counts counts = new Counts();
@@ -256,6 +279,10 @@ public class PredicatesTest {
         int errorBound = Predicates.inCircleErrorBound(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
         if (errorBound != Predicates.UNDECIDED) {
             assertEquals(msg + " [error bound]", expected, errorBound);
+        }
+        int expansion = Predicates.inCircleExpansion(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+        if (expansion != Predicates.UNDECIDED) {
+            assertEquals(msg + " [expansion]", expected, expansion);
         }
         ExactSum terms = Predicates.inCircleTerms(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
         if (terms.isExact()) {

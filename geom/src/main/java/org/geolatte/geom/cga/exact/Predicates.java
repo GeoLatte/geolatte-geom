@@ -184,6 +184,8 @@ public final class Predicates {
     public static int inCircle(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy) {
         int fast = inCircleErrorBound(ax, ay, bx, by, cx, cy, dx, dy);
         if (fast != UNDECIDED) return fast;
+        int adaptive = inCircleExpansion(ax, ay, bx, by, cx, cy, dx, dy);
+        if (adaptive != UNDECIDED) return adaptive;
         checkFinite(ax, ay, bx, by);
         checkFinite(cx, cy, dx, dy);
         int s = inCircleFilter(ax, ay, bx, by, cx, cy, dx, dy);
@@ -227,6 +229,44 @@ public final class Predicates {
         if (det > errBound) return 1;
         if (det < -errBound) return -1;
         return UNDECIDED;
+    }
+
+    /**
+     * Exact evaluation with floating point expansions (Shewchuk). The coordinate differences are computed exactly
+     * as expansions of one or two components (for nearby points they are usually exact doubles, by Sterbenz's
+     * lemma), and the determinant is evaluated from them with exact expansion arithmetic. Returns UNDECIDED for
+     * non-finite input, or when a non-zero component of a difference lies outside [2^-200, 2^200].
+     *
+     * <p>In that range the result is exact: every non-zero component is at least 2^-252 in magnitude and has an
+     * ulp of at least 2^-252, so all exact intermediate values (sums of products of at most four components)
+     * are multiples of 2^-1008, and no rounding error underflows; magnitudes stay far below the overflow
+     * threshold.</p>
+     */
+    static int inCircleExpansion(double ax, double ay, double bx, double by, double cx, double cy,
+                                 double dx, double dy) {
+        double[] adx = Expansion.difference(ax, dx), ady = Expansion.difference(ay, dy);
+        double[] bdx = Expansion.difference(bx, dx), bdy = Expansion.difference(by, dy);
+        double[] cdx = Expansion.difference(cx, dx), cdy = Expansion.difference(cy, dy);
+        if (!(inIccRange(adx) && inIccRange(ady) && inIccRange(bdx) && inIccRange(bdy)
+                && inIccRange(cdx) && inIccRange(cdy))) {
+            return UNDECIDED;
+        }
+        double[] alift = Expansion.sum(Expansion.product(adx, adx), Expansion.product(ady, ady));
+        double[] blift = Expansion.sum(Expansion.product(bdx, bdx), Expansion.product(bdy, bdy));
+        double[] clift = Expansion.sum(Expansion.product(cdx, cdx), Expansion.product(cdy, cdy));
+        double[] bc = Expansion.productDifference(bdx, cdy, cdx, bdy);
+        double[] ca = Expansion.productDifference(cdx, ady, adx, cdy);
+        double[] ab = Expansion.productDifference(adx, bdy, bdx, ady);
+        double[] det = Expansion.sum(Expansion.sum(Expansion.product(alift, bc), Expansion.product(blift, ca)),
+                Expansion.product(clift, ab));
+        return Expansion.signum(det);
+    }
+
+    private static boolean inIccRange(double[] e) {
+        for (double c : e) {
+            if (!inIccRange(c)) return false;
+        }
+        return true;
     }
 
     // NaN and infinite differences fail the test
