@@ -76,7 +76,8 @@ public class CoordinateOperations {
      * @param sourceId the source CRS
      * @param targetId the target CRS
      * @return a CoordinateOperation whose forward operation transforms source to target
-     * @throws UnsupportedTransformException when no transform could be determined
+     * @throws UnsupportedTransformException when no transform could be determined, e.g. because the source or
+     * target system uses a projection that is not supported
      */
     static public CoordinateOperation transform(CrsId sourceId, CrsId targetId) {
         CoordinateReferenceSystem<?> source = CrsRegistry.getCoordinateReferenceSystem(sourceId, null);
@@ -86,9 +87,23 @@ public class CoordinateOperations {
         return transform(source, target);
     }
 
+    /**
+     * Creates a transformation from source to target CRS's
+     *
+     * @param source the source CRS
+     * @param target the target CRS
+     * @return a CoordinateOperation whose forward operation transforms source to target
+     * @throws UnsupportedTransformException when no transform could be determined, e.g. because the source or
+     * target system uses a projection that is not supported
+     */
     static public <P extends Position, Q extends Position> CoordinateOperation transform(CoordinateReferenceSystem<P> source, CoordinateReferenceSystem<Q> target) {
         if (source == null || target == null) {
             throw new IllegalArgumentException("No null parameters accepted");
+        }
+
+        // Nothing to (un)project between identical projected systems, whatever their projection
+        if (source instanceof ProjectedCoordinateReferenceSystem && source.equals(target)) {
+            return identity(2);
         }
         ConcatenatedOperation.Builder builder = new ConcatenatedOperation.Builder();
         GeographicCoordinateReferenceSystem sourceGeodetic;

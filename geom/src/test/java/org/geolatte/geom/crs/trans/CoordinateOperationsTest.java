@@ -1,13 +1,19 @@
 package org.geolatte.geom.crs.trans;
 
+import org.geolatte.geom.C2D;
+import org.geolatte.geom.G2D;
 import org.geolatte.geom.crs.CrsId;
 import org.geolatte.geom.crs.CrsRegistry;
 import org.geolatte.geom.crs.Geographic2DCoordinateReferenceSystem;
+import org.geolatte.geom.crs.ProjectedCoordinateReferenceSystem;
 import org.junit.Test;
 
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 import static org.geolatte.geom.crs.trans.CoordinateOperations.positionVectorTransformation2D;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Karel Maesen, Geovise BVBA on 02/04/2018.
@@ -121,6 +127,29 @@ public class CoordinateOperationsTest {
         //accurate to wihtin 50 cm.
         assertEquals(643004.665110905, out[0], .5);
         assertEquals(6520614.15359373, out[1], .5);
+    }
+
+    @Test
+    public void unsupportedProjectionInTargetIsRejected() {
+        ProjectedCoordinateReferenceSystem utm31n = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(32631);
+        UnsupportedTransformException ex = assertThrows(UnsupportedTransformException.class,
+                () -> TransformOperations.<G2D, C2D>from(WGS84, utm31n));
+        assertTrue(ex.getMessage(), ex.getMessage().contains("Transverse_Mercator"));
+    }
+
+    @Test
+    public void unsupportedProjectionInSourceIsRejected() {
+        assertThrows(UnsupportedTransformException.class,
+                () -> CoordinateOperations.transform(CrsId.valueOf(32631), CrsId.valueOf(4326)));
+    }
+
+    @Test
+    public void transformBetweenIdenticalProjectedSystemsIsIdentity() {
+        CoordinateOperation operation = CoordinateOperations.transform(CrsId.valueOf(32631), CrsId.valueOf(32631));
+        double[] in = new double[]{596_000, 5_633_000};
+        double[] out = new double[2];
+        operation.forward(in, out);
+        assertArrayEquals(in, out, 0.0);
     }
 
 }

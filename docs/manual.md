@@ -472,10 +472,12 @@ Supported transformations:
   system definitions. Both systems must have `TOWGS84` parameters, or be WGS 84.
 - Vertical and measure axes are carried over unchanged.
 
-> **Warning.** Other projections are not supported, but the library does not reject them yet. A transformation to or
-> from a system with any other projection (for example the UTM zones, which use Transverse Mercator) currently
-> returns the coordinates **unchanged**. Systems declaring the `Mercator_1SP` projection, such as World Mercator
-> (EPSG:3395), are computed with the spherical Pseudo-Mercator formulas, which is only correct for EPSG:3857.
+Other projections are not supported. Creating a transformation to or from a system with any other projection (for
+example the UTM zones, which use Transverse Mercator) with `TransformOperations.from` or
+`CoordinateOperations.transform` throws an `UnsupportedTransformException`.
+
+> **Warning.** Systems declaring the `Mercator_1SP` projection, such as World Mercator (EPSG:3395), are computed with
+> the spherical Pseudo-Mercator formulas, which is only correct for EPSG:3857.
 
 ## Encoding and decoding
 
