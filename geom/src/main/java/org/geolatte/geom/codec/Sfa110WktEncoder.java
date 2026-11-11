@@ -19,9 +19,4 @@ class Sfa110WktWriter extends BaseWktWriter {
     public Sfa110WktWriter() {
         super(Sfa110WktDialect.INSTANCE, new StringBuilder());
     }
-
-    @Override
-    protected <P extends Position> void addMultiPointText(Geometry<P> geometry) {
-        addPointList(geometry.getPositions());
-    }
 }

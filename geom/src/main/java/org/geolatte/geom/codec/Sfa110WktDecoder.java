@@ -2,7 +2,6 @@ package org.geolatte.geom.codec;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.Position;
-import org.geolatte.geom.codec.support.Holder;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 public class Sfa110WktDecoder implements WktDecoder {
@@ -26,10 +25,6 @@ class Sfa110WktParser<P extends Position> extends BaseWktParser<P> {
     protected CoordinateReferenceSystem<?> adjustCrsToCoordinateDimension(CoordinateReferenceSystem<?> crs) {
         //don't do this for this dialect
         return crs;
-    }
-
-    protected Holder matchesMultiPointList() {
-        return matchesPositionList();
     }
 
 }

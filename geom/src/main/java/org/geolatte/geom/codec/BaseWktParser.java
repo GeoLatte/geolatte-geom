@@ -123,14 +123,16 @@ class BaseWktParser<P extends Position> {
                 builder.setPositions(matchesPositionList());
                 break;
             case POLYGON:
-            case MULTILINESTRING:
                 builder.setPositions(matchesListOfPositionList());
                 break;
-            case MULTIPOLYGON:
-                builder.setPositions(matchesPolygonList());
-                break;
             case MULTIPOINT:
-                builder.setPositions(matchesMultiPointList());
+                matchesMembers((CollectionGeometryBuilder) builder, GeometryType.POINT);
+                break;
+            case MULTILINESTRING:
+                matchesMembers((CollectionGeometryBuilder) builder, GeometryType.LINESTRING);
+                break;
+            case MULTIPOLYGON:
+                matchesMembers((CollectionGeometryBuilder) builder, GeometryType.POLYGON);
                 break;
             case GEOMETRYCOLLECTION:
                 matchGeometries((CollectionGeometryBuilder) builder);
@@ -142,22 +144,50 @@ class BaseWktParser<P extends Position> {
     }
 
 
-    protected Holder matchesMultiPointList() {
+    /**
+     * Matches the members of a MultiPoint, MultiLineString or MultiPolygon. Each member is either
+     * {@code EMPTY} or the text of a Point, LineString or Polygon (without its tag), as in
+     * {@code <multipoint text> ::= <empty set> | <left paren> <point text> { <comma> <point text> }... <right paren>}.
+     */
+    protected void matchesMembers(CollectionGeometryBuilder builder, GeometryType memberType) {
         if (!tokenizer.matchesOpenList()) {
             throw new WktDecodeException("Expected '(' near position " + tokenizer.currentPos());
         }
-        LinearPositionsHolder lplh = new LinearPositionsHolder();
         Delimiter d;
         do {
-            boolean expectClose = matchesOptionalOpenList();
-            lplh.push(matchesPosition());
-            expectCloseList(expectClose);
+            SimpleGeometryBuilder member = new SimpleGeometryBuilder(memberType);
+            if (!tokenizer.matchPattern(EMPTY_PATTERN)) {
+                member.setPositions(matchesMemberText(memberType));
+            }
+            builder.push(member);
             d = matchesDelimiter();
             if (d == Delimiter.NO_DELIM) {
                 throw new WktDecodeException(String.format("Expected ')' or ',' near %d", tokenizer.currentPos()));
             }
         } while (d != Delimiter.CLOSE);
-        return lplh;
+    }
+
+    private Holder matchesMemberText(GeometryType memberType) {
+        switch (memberType) {
+            case POINT:
+                return matchesMultiPointMember();
+            case LINESTRING:
+                return matchesPositionList();
+            case POLYGON:
+                return matchesListOfPositionList();
+            default:
+                throw new WktDecodeException("Unexpected member type " + memberType);
+        }
+    }
+
+    /**
+     * Matches a MultiPoint member: a position, optionally enclosed in parentheses.
+     */
+    protected PointHolder matchesMultiPointMember() {
+        boolean expectClose = matchesOptionalOpenList();
+        PointHolder pnt = matchesPosition();
+        expectCloseList(expectClose);
+        return pnt;
     }
 
     protected boolean matchesOptionalOpenList() {

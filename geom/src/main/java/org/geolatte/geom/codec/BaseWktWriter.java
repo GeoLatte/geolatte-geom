@@ -76,12 +76,31 @@ class BaseWktWriter {
     }
 
     protected <P extends Position> void addMultiPointText(Geometry<P> geometry) {
-        if(dialect.writeMultiPointAsListOfPositions()) {
-            addPointList(geometry.getPositions());
+        AbstractGeometryCollection<P, ?> multiPoint = (AbstractGeometryCollection<P, ?>) geometry;
+        addStartList();
+        if (dialect.writeMultiPointAsListOfPositions()) {
+            addMultiPointPositions(multiPoint);
         } else {
-            addStartList();
-            addGeometries((AbstractGeometryCollection<P, ?>) geometry, false);
-            addEndList();
+            addGeometries(multiPoint, false);
+        }
+        addEndList();
+    }
+
+    /**
+     * Writes the points of a MultiPoint as a list of positions without parentheses, e.g. {@code MULTIPOINT(1 2,3 4)}.
+     * An empty point is written as EMPTY so that it is not dropped from the representation.
+     */
+    private <P extends Position> void addMultiPointPositions(AbstractGeometryCollection<P, ?> multiPoint) {
+        for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+            if (i > 0) {
+                addDelimiter();
+            }
+            Geometry<P> point = multiPoint.getGeometryN(i);
+            if (point.isEmpty()) {
+                addEmptyKeyword();
+            } else {
+                addPositions(point.getPositions());
+            }
         }
     }
 

@@ -7,10 +7,14 @@ import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 abstract public class GeometryBuilder {
     public static GeometryBuilder create(GeometryType type) {
-        if (type == GeometryType.GEOMETRYCOLLECTION) {
-            return new CollectionGeometryBuilder();
-        } else {
-            return new SimpleGeometryBuilder(type);
+        switch (type) {
+            case GEOMETRYCOLLECTION:
+            case MULTIPOINT:
+            case MULTILINESTRING:
+            case MULTIPOLYGON:
+                return new CollectionGeometryBuilder(type);
+            default:
+                return new SimpleGeometryBuilder(type);
         }
     }
 

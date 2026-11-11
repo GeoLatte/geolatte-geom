@@ -61,14 +61,8 @@ class BaseWkbParser<P extends Position> {
                 matchPolygon(builder);
                 break;
             case MULTIPOINT:
-                matchMultiPoint(builder);
-                break;
             case MULTILINESTRING:
-                matchMultiLineString(builder);
-                break;
             case MULTIPOLYGON:
-                matchMultiPolygon(builder);
-                break;
             case GEOMETRYCOLLECTION:
                 matchGeometryCollection((CollectionGeometryBuilder) builder);
                 break;
@@ -135,39 +129,6 @@ class BaseWkbParser<P extends Position> {
         return llh;
     }
 
-    protected void matchMultiPoint(GeometryBuilder builder) {
-        LinearPositionsHolder lh = new LinearPositionsHolder();
-        long numPnts = buffer.getUInt();
-        for (long i = 0; i < numPnts; i++) {
-            parseByteOrder();
-            buffer.getUInt(); //not necessary
-            lh.push(readPosition());
-        }
-        builder.setPositions(lh);
-    }
-
-    protected void matchMultiLineString(GeometryBuilder builder) {
-        LinearPositionsListHolder llh = new LinearPositionsListHolder();
-        long numl = buffer.getUInt();
-        for (long i = 0; i < numl; i++) {
-            parseByteOrder();
-            buffer.getUInt(); //skip type
-            llh.push(readLinestring());
-        }
-        builder.setPositions(llh);
-    }
-
-    protected void matchMultiPolygon(GeometryBuilder builder) {
-        PolygonListHolder plh = new PolygonListHolder();
-        long nump = buffer.getUInt();
-        for (long i = 0; i < nump; i++) {
-            parseByteOrder();
-            buffer.getUInt();
-            plh.push(readPolygon());
-        }
-        builder.setPositions(plh);
-    }
-
     //Is the CRS coordinate dimension compatible with the WKB
     protected void isCrsCompatible(CoordinateReferenceSystem<?> crs) {
         if ((hasM && !(crs.hasM())) ||
@@ -176,6 +137,10 @@ class BaseWkbParser<P extends Position> {
         }
     }
 
+    /**
+     * Reads the members of a (homogeneous) collection as full geometries, each with its own
+     * byte order and type header, so that empty members are preserved.
+     */
     private void matchGeometryCollection(CollectionGeometryBuilder builder) {
         long numg = buffer.getUInt();
         for (long i = 0; i < numg; i++) {
