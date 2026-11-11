@@ -21,12 +21,11 @@
 
 package org.geolatte.geom.jts;
 
-import org.geotools.api.referencing.FactoryException;
-import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
-import org.geotools.api.referencing.operation.MathTransform;
-import org.geotools.api.referencing.operation.TransformException;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.CoordinateXYM;
 import org.locationtech.jts.geom.CoordinateXYZM;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.geolatte.geom.Geometry;
@@ -180,33 +179,53 @@ public class TestJTS {
         assertEquals(4326, JTS.to(point(WGS84, g(1.0, 2.0))).getSRID());
     }
 
+    /**
+     * Transforming a JTS geometry creates new coordinate sequences with
+     * {@code CoordinateSequenceFactory.create(size, dimension, measures)}, and then copies every ordinate into them.
+     * The factory of the geometries created by {@link JTS#to(Geometry)} must then keep the Z and M ordinates.
+     * <p>
+     * This mimics what GeoTools' {@code JTS.transform()} does, with a translation of (500000, 500000) in place of a
+     * reprojection (roughly the difference between Belgian Lambert 72 and Belgian Lambert 2008).</p>
+     */
     @Test
-    public void test_transform() throws FactoryException, TransformException {
+    public void test_transform() {
         String wktStringC3dmLambert72 = "SRID=31370;MULTILINESTRING((161020.812 191200.732 0 22.931,161020.135 191200.408 0 23.682,160997.118 191190.48 0 48.748,160966.688 191179.292 0 81.17,160936.497 191168.623 0 113.191,160932.78 191167.31 0 117.133,160929.266 191166.126 0 120.841),(160890.884 191144.82 0 0,160883.296 191148.378 0 8.381,160879 191150.391 0 13.125,160868.328 191155.579 0 24.991,160837.437 191170.688 0 59.379,160818.608 191179.772 0 80.285,160804.953 191186.36 0 95.446),(160804.953 191186.36 0 0,160790.964 191193.112 0 15.533,160785.625 191195.688 0 21.461))";
         int lambert2008Srid = 3812;
-        String lambert2008Crs = "EPSG:" + lambert2008Srid;
+        double shift = 500000;
         @SuppressWarnings("unchecked")
         MultiLineString<C3DM> geometryC3dmLambert = (MultiLineString<C3DM>) Wkt.fromWkt(wktStringC3dmLambert72);
-        org.locationtech.jts.geom.Geometry jtsGeometry = org.geolatte.geom.jts.JTS.to(geometryC3dmLambert);
-        CoordinateReferenceSystem sourceCrs =
-                org.geotools.referencing.CRS.decode(
-                        geometryC3dmLambert.getCoordinateReferenceSystem().getCrsId().toString()
-                );
-        CoordinateReferenceSystem targetCrs = org.geotools.referencing.CRS.decode(lambert2008Crs);
-        MathTransform mathTransform = org.geotools.referencing.CRS.findMathTransform(sourceCrs, targetCrs);
-        org.locationtech.jts.geom.Geometry transformedGeometryJts =
-                org.geotools.geometry.jts.JTS.transform(jtsGeometry, mathTransform);
+        org.locationtech.jts.geom.MultiLineString jtsGeometry = JTS.to(geometryC3dmLambert);
+
+        GeometryFactory factory = jtsGeometry.getFactory();
+        CoordinateSequenceFactory csFactory = factory.getCoordinateSequenceFactory();
+        org.locationtech.jts.geom.LineString[] transformedLines =
+                new org.locationtech.jts.geom.LineString[jtsGeometry.getNumGeometries()];
+        for (int i = 0; i < transformedLines.length; i++) {
+            CoordinateSequence source =
+                    ((org.locationtech.jts.geom.LineString) jtsGeometry.getGeometryN(i)).getCoordinateSequence();
+            CoordinateSequence target = csFactory.create(source.size(), source.getDimension(), source.getMeasures());
+            for (int j = 0; j < source.size(); j++) {
+                for (int d = 0; d < source.getDimension(); d++) {
+                    target.setOrdinate(j, d, source.getOrdinate(j, d));
+                }
+                target.setOrdinate(j, CoordinateSequence.X, source.getX(j) + shift);
+                target.setOrdinate(j, CoordinateSequence.Y, source.getY(j) + shift);
+            }
+            transformedLines[i] = factory.createLineString(target);
+        }
+        org.locationtech.jts.geom.Geometry transformedGeometryJts = factory.createMultiLineString(transformedLines);
         transformedGeometryJts.setSRID(lambert2008Srid);
         assertEquals("SRID must match Lambert2008", lambert2008Srid, transformedGeometryJts.getSRID());
+
         @SuppressWarnings("unchecked")
         MultiLineString<C3DM> transformedGeometryGeolatte =
-                (MultiLineString<C3DM>) org.geolatte.geom.jts.JTS.from(transformedGeometryJts);
+                (MultiLineString<C3DM>) JTS.from(transformedGeometryJts);
         assertEquals("SRID must match Lambert2008", lambert2008Srid, transformedGeometryGeolatte.getSRID());
+        assertEquals(geometryC3dmLambert.getNumGeometries(), transformedGeometryGeolatte.getNumGeometries());
         for (int i = 0; i < geometryC3dmLambert.getNumGeometries(); i++) {
             org.geolatte.geom.LineString<C3DM> originalLineString = geometryC3dmLambert.getGeometryN(i);
             org.geolatte.geom.LineString<C3DM> transformedLineString = transformedGeometryGeolatte.getGeometryN(i);
             assertEquals("SRID must match Lambert2008", lambert2008Srid, transformedLineString.getSRID());
-            // Check the number of points.
             assertEquals("the number of points in LineString " + i + " must match",
                     originalLineString.getPositions().size(),
                     transformedLineString.getPositions().size());
@@ -214,21 +233,13 @@ public class TestJTS {
             for (int j = 0; j < originalLineString.getPositions().size(); j++) {
                 C3DM originalPosition = originalLineString.getPositions().getPositionN(j);
                 C3DM transformedPosition = transformedLineString.getPositions().getPositionN(j);
-                // X en Y coördinates must be larger than 500000 in the Lambert2008 CRS
-                assertTrue("X coördinate at point " + j + " in LineString " + i + " must be > 500000",
-                        transformedPosition.getX() > 500000);
-                assertTrue("Y coördinate at point " + j + " in LineString " + i + " must be > 500000",
-                        transformedPosition.getY() > 500000);
-                // the Z-coördinate must remain the same
-                assertEquals("Z coördinate at point " + j + " in LineString " + i + " must be the same",
-                        originalPosition.getZ(),
-                        transformedPosition.getZ(),
-                        0.0001);
-                // the M-coördinate must remain the same
-                assertEquals("M coördinate at point " + j + " in LineString " + i + " must be the same",
-                        originalPosition.getM(),
-                        transformedPosition.getM(),
-                        0.0001);
+                String at = " at point " + j + " in LineString " + i;
+                assertEquals("X coordinate" + at, originalPosition.getX() + shift, transformedPosition.getX(), 0.0001);
+                assertEquals("Y coordinate" + at, originalPosition.getY() + shift, transformedPosition.getY(), 0.0001);
+                assertEquals("Z coordinate" + at + " must be the same",
+                        originalPosition.getZ(), transformedPosition.getZ(), 0.0001);
+                assertEquals("M coordinate" + at + " must be the same",
+                        originalPosition.getM(), transformedPosition.getM(), 0.0001);
             }
         }
     }
