@@ -61,6 +61,22 @@ public class ExactSumTest {
         assertFalse(new ExactSum().addProduct(1, inexact, new ExactSum().add(1)).isExact());
     }
 
+    @Test
+    public void tripleProductsAndScaledSumsAreExact() {
+        for (int i = 0; i < 10_000; i++) {
+            double a = rnd(), b = rnd(), c = rnd(), f = rnd();
+            ExactSum triple = new ExactSum().addProduct(a, b, c);
+            assertTrue(triple.size() <= 4);
+            assertEquals(0, big(a).multiply(big(b)).multiply(big(c)).compareTo(value(triple)));
+            ExactSum scaled = new ExactSum().addProduct(f, triple);
+            assertTrue(scaled.size() <= 8);
+            assertEquals(0, big(f).multiply(value(triple)).compareTo(value(scaled)));
+        }
+        assertFalse(new ExactSum().addProduct(1e-100, 1e-100, 1e-100).isExact());
+        assertFalse(new ExactSum().addProduct(1e300, 1e300, 1).isExact());
+        assertFalse(new ExactSum().addProduct(1, new ExactSum().addProduct(1e200, 1e200)).isExact());
+    }
+
     @Test(expected = ArithmeticException.class)
     public void signumOfInexactSumThrows() {
         new ExactSum().addProduct(1e-200, 1e-200).signum();

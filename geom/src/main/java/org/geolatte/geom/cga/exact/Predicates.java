@@ -406,39 +406,16 @@ public final class Predicates {
      * (where the book only checks whether c lies strictly between a and b), and degenerate segments (a = b or
      * c = d), which are treated as points.</p>
      *
-     * <p>The intersection point itself is never computed: the result is exact, even though the intersection
-     * point is in general not representable in double precision.</p>
+     * <p>The intersection point itself is not computed: the result is exact, even though the intersection
+     * point is in general not representable in double precision. See {@link Constructions} for computing the
+     * intersection.</p>
      *
      * @return the kind of intersection
      * @throws IllegalArgumentException if a coordinate is NaN or infinite
      */
     public static SegmentIntersection segmentIntersection(double ax, double ay, double bx, double by,
                                                           double cx, double cy, double dx, double dy) {
-        boolean abIsPoint = ax == bx && ay == by;
-        boolean cdIsPoint = cx == dx && cy == dy;
-        if (abIsPoint || cdIsPoint) {
-            checkFinite(ax, ay, bx, by);
-            checkFinite(cx, cy, dx, dy);
-            if (abIsPoint && cdIsPoint) {
-                return ax == cx && ay == cy ? SegmentIntersection.TOUCHING : SegmentIntersection.DISJOINT;
-            }
-            return abIsPoint ? pointOnSegment(cx, cy, dx, dy, ax, ay) : pointOnSegment(ax, ay, bx, by, cx, cy);
-        }
-
-        int o1 = orientation(ax, ay, bx, by, cx, cy);
-        int o2 = orientation(ax, ay, bx, by, dx, dy);
-        if (o1 * o2 > 0) return SegmentIntersection.DISJOINT; // c and d strictly on the same side of line ab
-        int o3 = orientation(cx, cy, dx, dy, ax, ay);
-        int o4 = orientation(cx, cy, dx, dy, bx, by);
-        if (o3 * o4 > 0) return SegmentIntersection.DISJOINT; // a and b strictly on the same side of line cd
-
-        if (o1 == 0 && o2 == 0) {
-            return collinearIntersection(ax, ay, bx, by, cx, cy, dx, dy);
-        }
-        // The lines are not parallel, and each segment meets the line of the other: the segments have exactly
-        // one point in common. If an endpoint lies on the line of the other segment, it is that point.
-        if (o1 == 0 || o2 == 0 || o3 == 0 || o4 == 0) return SegmentIntersection.TOUCHING;
-        return SegmentIntersection.CROSSING;
+        return KINDS[classifySegments(ax, ay, bx, by, cx, cy, dx, dy) & KIND_MASK];
     }
 
     /**
@@ -450,11 +427,82 @@ public final class Predicates {
         return segmentIntersection(x(a), y(a), x(b), y(b), x(c), y(c), x(d), y(d));
     }
 
+    // Encoding of the result of classifySegments(). Bits 0-1 hold the ordinal of the SegmentIntersection. For
+    // TOUCHING, bits 2-3 hold the index of an endpoint that is the common point (0 = a, 1 = b, 2 = c, 3 = d;
+    // endpoints of (a, b) take precedence). For OVERLAPPING, bits 2-3 and 4-5 hold the indices of the endpoints
+    // of the overlap, ordered in the direction from a to b. For CROSSING, bit 6 is set iff orientation(c, d, a)
+    // is positive (which is the sign of the cross product (b - a) x (d - c)).
+    static final int KIND_MASK = 3;
+    static final int CROSSING_POSITIVE = 1 << 6;
+    static final int DISJOINT_CODE = SegmentIntersection.DISJOINT.ordinal();
+    static final int CROSSING_CODE = SegmentIntersection.CROSSING.ordinal();
+    static final int TOUCHING_CODE = SegmentIntersection.TOUCHING.ordinal();
+    static final int OVERLAPPING_CODE = SegmentIntersection.OVERLAPPING.ordinal();
+    private static final SegmentIntersection[] KINDS = SegmentIntersection.values();
+    private static final int A = 0, B = 1, C = 2, D = 3;
+
+    static SegmentIntersection kind(int code) {
+        return KINDS[code & KIND_MASK];
+    }
+
+    // the index of the touching endpoint, or of the first endpoint of the overlap
+    static int firstEndpoint(int code) {
+        return (code >> 2) & 3;
+    }
+
+    // the index of the last endpoint of the overlap
+    static int lastEndpoint(int code) {
+        return (code >> 4) & 3;
+    }
+
+    private static int touching(int endpoint) {
+        return TOUCHING_CODE | endpoint << 2;
+    }
+
+    /**
+     * Classifies the intersection of the segments (a, b) and (c, d), see
+     * {@link #segmentIntersection(double, double, double, double, double, double, double, double)}, and also
+     * identifies the endpoints that make up the intersection (see the encoding above).
+     */
+    static int classifySegments(double ax, double ay, double bx, double by,
+                                double cx, double cy, double dx, double dy) {
+        boolean abIsPoint = ax == bx && ay == by;
+        boolean cdIsPoint = cx == dx && cy == dy;
+        if (abIsPoint || cdIsPoint) {
+            checkFinite(ax, ay, bx, by);
+            checkFinite(cx, cy, dx, dy);
+            if (abIsPoint && cdIsPoint) {
+                return ax == cx && ay == cy ? touching(A) : DISJOINT_CODE;
+            }
+            if (abIsPoint) {
+                return isOnSegment(cx, cy, dx, dy, ax, ay) ? touching(A) : DISJOINT_CODE;
+            }
+            return isOnSegment(ax, ay, bx, by, cx, cy) ? touching(C) : DISJOINT_CODE;
+        }
+
+        int o1 = orientation(ax, ay, bx, by, cx, cy);
+        int o2 = orientation(ax, ay, bx, by, dx, dy);
+        if (o1 * o2 > 0) return DISJOINT_CODE; // c and d strictly on the same side of line ab
+        int o3 = orientation(cx, cy, dx, dy, ax, ay);
+        int o4 = orientation(cx, cy, dx, dy, bx, by);
+        if (o3 * o4 > 0) return DISJOINT_CODE; // a and b strictly on the same side of line cd
+
+        if (o1 == 0 && o2 == 0) {
+            return collinearIntersection(ax, ay, bx, by, cx, cy, dx, dy);
+        }
+        // The lines are not parallel, and each segment meets the line of the other: the segments have exactly
+        // one point in common. If an endpoint lies on the line of the other segment, it is that point.
+        if (o3 == 0) return touching(A);
+        if (o4 == 0) return touching(B);
+        if (o1 == 0) return touching(C);
+        if (o2 == 0) return touching(D);
+        return o3 > 0 ? CROSSING_CODE | CROSSING_POSITIVE : CROSSING_CODE;
+    }
+
     // p lies on the (non-degenerate) segment (a, b)?
-    private static SegmentIntersection pointOnSegment(double ax, double ay, double bx, double by, double px, double py) {
-        if (orientation(ax, ay, bx, by, px, py) != 0) return SegmentIntersection.DISJOINT;
-        boolean between = ax != bx ? isBetween(px, ax, bx) : isBetween(py, ay, by);
-        return between ? SegmentIntersection.TOUCHING : SegmentIntersection.DISJOINT;
+    private static boolean isOnSegment(double ax, double ay, double bx, double by, double px, double py) {
+        if (orientation(ax, ay, bx, by, px, py) != 0) return false;
+        return ax != bx ? isBetween(px, ax, bx) : isBetween(py, ay, by);
     }
 
     private static boolean isBetween(double v, double a, double b) {
@@ -464,8 +512,8 @@ public final class Predicates {
     // a, b, c, d lie on one line, a != b and c != d. On a non-vertical line, the order of points along the line is
     // the order of their x-coordinates (and on a vertical line, that of their y-coordinates), so the comparison
     // reduces to comparing intervals of exact double values.
-    private static SegmentIntersection collinearIntersection(double ax, double ay, double bx, double by,
-                                                             double cx, double cy, double dx, double dy) {
+    private static int collinearIntersection(double ax, double ay, double bx, double by,
+                                             double cx, double cy, double dx, double dy) {
         double a, b, c, d;
         if (ax != bx) {
             a = ax; b = bx; c = cx; d = dx;
@@ -474,8 +522,20 @@ public final class Predicates {
         }
         double lo = Math.max(Math.min(a, b), Math.min(c, d));
         double hi = Math.min(Math.max(a, b), Math.max(c, d));
-        if (lo > hi) return SegmentIntersection.DISJOINT;
-        return lo == hi ? SegmentIntersection.TOUCHING : SegmentIntersection.OVERLAPPING;
+        if (lo > hi) return DISJOINT_CODE;
+        int loIndex = indexOf(lo, a, b, c);
+        if (lo == hi) return touching(loIndex);
+        int hiIndex = indexOf(hi, a, b, c);
+        return a < b
+                ? OVERLAPPING_CODE | loIndex << 2 | hiIndex << 4
+                : OVERLAPPING_CODE | hiIndex << 2 | loIndex << 4;
+    }
+
+    // the index of the first of the endpoints a, b, c, d with value v (which is one of them)
+    private static int indexOf(double v, double a, double b, double c) {
+        if (v == a) return A;
+        if (v == b) return B;
+        return v == c ? C : D;
     }
 
     // ---------------------------------------------------------------------------------------------------------

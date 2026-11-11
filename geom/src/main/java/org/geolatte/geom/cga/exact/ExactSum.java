@@ -67,6 +67,22 @@ public final class ExactSum {
     }
 
     /**
+     * Adds the exact product {@code a * b * c} (as at most 4 terms)
+     */
+    public ExactSum addProduct(double a, double b, double c) {
+        if (a == 0 || b == 0 || c == 0) return this;
+        double p = a * b;
+        if (!(Math.abs(p) >= UNDERFLOW_GUARD) || !(Math.abs(p) < Essa.MAX_SUMMAND)) {
+            exact = false;
+            return this;
+        }
+        double e = Math.fma(a, b, -p);
+        addProduct(p, c);
+        addProduct(e, c);
+        return this;
+    }
+
+    /**
      * Adds the exact product {@code a * b * c * d} (as at most 8 terms)
      */
     public ExactSum addProduct(double a, double b, double c, double d) {
@@ -101,6 +117,18 @@ public final class ExactSum {
         exact &= other.exact;
         for (int i = 0; i < other.size; i++) {
             push(sign < 0 ? -other.terms[i] : other.terms[i]);
+        }
+        return this;
+    }
+
+    /**
+     * Adds the exact product of {@code factor} and the value represented by {@code x}
+     * (as at most {@code 2 * x.size()} terms)
+     */
+    public ExactSum addProduct(double factor, ExactSum x) {
+        exact &= x.exact;
+        for (int i = 0; i < x.size; i++) {
+            addProduct(factor, x.terms[i]);
         }
         return this;
     }
