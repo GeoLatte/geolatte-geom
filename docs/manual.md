@@ -27,7 +27,8 @@ Contents:
 10. [JTS interop](#jts-interop)
 11. [Features](#features)
 12. [Space-filling curves](#space-filling-curves)
-13. [Geometry generators](#geometry-generators)
+13. [Spatial index](#spatial-index)
+14. [Geometry generators](#geometry-generators)
 
 ## Design principles
 
@@ -224,7 +225,7 @@ Every geometry offers:
 |-----------------------------------------------|-----------------------------------------------------------------|
 | `getCoordinateReferenceSystem()`, `getSRID()` | the coordinate reference system and its EPSG code               |
 | `getGeometryType()`                           | the `GeometryType` (`POINT`, `LINESTRING`, …)                   |
-| `getDimension()`                              | the topological dimension (0 for points, 1 for lines, 2 for areas) |
+| `getDimension()`                              | the topological dimension (0 for points, 1 for lines, 2 for areas, -1 for empty geometries) |
 | `getCoordinateDimension()`, `hasZ()`, `hasM()` | the number of coordinates per position, and which axes exist   |
 | `isEmpty()`                                   | whether the geometry has no positions                           |
 | `getNumPositions()`, `getPositionN(i)`, `getPositions()` | the vertices                                         |
@@ -234,7 +235,8 @@ Every geometry offers:
 The subclasses add type-specific accessors:
 
 - `Point`: `getPosition()`
-- `LineString`: `getStartPosition()`, `getEndPosition()`, `isClosed()`, `isRing()`
+- `LineString` and `MultiLineString`: `getStartPosition()`, `getEndPosition()`, `getStartPoint()`, `getEndPoint()`,
+  `isClosed()`, `is3DClosed()`; `LineString` also has `isRing()`
 - `Polygon`: `getExteriorRing()`, `getNumInteriorRing()`, `getInteriorRingN(i)`
 - `MultiPoint`, `MultiLineString`, `MultiPolygon`, `GeometryCollection`: `getNumGeometries()`, `getGeometryN(i)`,
   `components()`, and they are `Iterable` over their components
@@ -242,9 +244,25 @@ The subclasses add type-specific accessors:
 ### Empty geometries
 
 Every geometry type has an empty variant (`POINT EMPTY`, `LINESTRING EMPTY`, …), created with the `Geometries.mkEmpty*`
-methods. Accessors that read a specific vertex, such as `Point.getPosition()` or `LineString.getStartPosition()`,
-throw an `IndexOutOfBoundsException` on an empty geometry, so check `isEmpty()` first. `Polygon.getExteriorRing()`
-returns an empty ring for an empty polygon.
+methods. The semantics of empty geometries follow ISO/IEC 13249-3 (SQL/MM Spatial): an empty geometry is the empty
+set. Where SQL/MM returns the null value, the library returns an empty value of the corresponding kind, never `null`:
+
+- geometry-valued accessors return an empty geometry: `LineString.getStartPoint()` on an empty line is an empty
+  `Point`, and `Polygon.getExteriorRing()` on an empty polygon is an empty ring;
+- position-valued accessors return an [empty position](#empty-positions): `Point.getPosition()`,
+  `LineString.getStartPosition()` and `getEndPosition()` on an empty geometry return a position of the right class
+  with `isEmpty()` true and `NaN` coordinates;
+- `getDimension()` returns -1, and `isClosed()`, `isRing()` and `is3DClosed()` return `false`.
+
+Only indexed access with an index out of range throws: `getPositionN(i)`, `getGeometryN(i)` and
+`getInteriorRingN(i)` throw an `IndexOutOfBoundsException` naming the index and the size.
+
+A collection whose members are all empty, such as `MULTIPOINT(EMPTY,EMPTY)` or `GEOMETRYCOLLECTION(POINT EMPTY)`, is
+itself empty (`isEmpty()` is `true` and `getDimension()` is -1), but keeps its members: `getNumGeometries()` counts
+them, and they are written in WKT and WKB.
+
+`isClosed()` on a `MultiLineString` is `true` only when it is non-empty and all its members are closed. `isClosed()`
+ignores Z and M coordinates; `is3DClosed()` also compares the Z coordinate.
 
 ### Casting and changing the coordinate reference system
 
@@ -507,6 +525,13 @@ Text or bytes without an SRID decode to one of the generic `PROJECTED_*` systems
 reference system to `fromWkt`/`fromWkb`. For repeated conversions, you can create a reusable encoder or decoder with
 `Wkt.newEncoder(dialect)`, `Wkt.newDecoder(dialect)` and the `Wkb` equivalents.
 
+Empty geometries are written as `POINT EMPTY`, `MULTIPOINT EMPTY`, etc. Empty members of a collection are kept, as
+in `MULTIPOINT((1 2),EMPTY)` or `GEOMETRYCOLLECTION(POINT EMPTY)`, and the decoders accept these forms in every dialect.
+In WKB an empty point is encoded as a point with `NaN` coordinates, except in the Postgis EWKB v1 and SAP HANA
+dialects, which have no such representation: there a top-level `POINT EMPTY` decodes as an empty `GeometryCollection`
+(Postgis) or `MultiPoint` (HANA), while an empty point inside a `MultiPoint` is restored as an empty `Point`. MySQL has
+no representation for empty geometries at all; its encoder writes an empty `GeometryCollection` instead.
+
 ### Dialects
 
 | WKT dialect (`Wkt.Dialect`) | WKB dialect (`Wkb.Dialect`)       | Used by                                        |
@@ -603,6 +628,29 @@ morton.envelopeOf("3");                // the upper-right quadrant: (50, 50) - (
 
 The codes have at most `depth` characters. An empty code means the geometry doesn't fit in any single quadrant. The
 methods throw an `IllegalArgumentException` for geometries outside the extent of the context.
+
+## Spatial index
+
+`PackedRTree` in `org.geolatte.geom.index` is a static R-tree over items with 2D bounding boxes, for fast lookup of
+the items whose box intersects a query box. The tree is bulk-loaded with the Sort-Tile-Recursive algorithm, which
+gives a balanced tree with nearly full nodes. Once built it is immutable and can be queried from several threads.
+
+```java
+import org.geolatte.geom.index.PackedRTree;
+
+PackedRTree<Feature<C2D, String>> index = PackedRTree.<Feature<C2D, String>>builder()
+        .add(feature1, 0, 0, 10, 10)
+        .add(feature2, 5, 5, 20, 20)
+        .build();
+
+List<Feature<C2D, String>> hits = index.query(8, 8, 9, 9);     // both features
+index.query(8, 8, 9, 9, hit -> { visit(hit); return true; }); // visitor form; return false to stop early
+```
+
+The bounding box of a geometry comes from `getBoundingBox()` (see [Bounding boxes](#bounding-boxes)); the index itself
+only deals with coordinates and is independent of the geometry model. Boxes are closed: items that touch the query
+box along an edge or at a corner are hits. `builder(nodeCapacity)` sets the maximum number of children per node
+(default 16).
 
 ## Geometry generators
 
