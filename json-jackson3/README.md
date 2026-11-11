@@ -14,7 +14,7 @@ A separate `geolatte-geojson-jackson2` module provides the equivalent for Jackso
 > **Upgrading from 1.x:**
 > - The Maven coordinate changed from `org.geolatte:geolatte-geojson` to
 >   `org.geolatte:geolatte-geojson-jackson3`.
-> - The adapter classes (`GelatteGeomModule`, the per-type
+> - The adapter classes (`GeolatteGeomModule`, the per-type
 >   serializers/deserializers, etc.) moved from `org.geolatte.geom.json` to
 >   `org.geolatte.geom.json.jackson3`. Update your imports accordingly.
 > - The data types (`Setting`, `GeoJsonFeature`, `GeoJsonFeatureCollection`)
@@ -88,5 +88,15 @@ The following settings are currently supported:
 - `IGNORE_CRS`: ignore the`crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`) 
 - `SUPPRESS_CRS_SERIALIZATION`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
 - `SERIALIZE_CRS_AS_URN`: serialize `crs` as a URN (default: `false`)
+- `SERIALIZE_FEATURE_BBOX`: serialize a `bbox` member for each `Feature` whose bounding box is non-empty (default: `false`)
+- `SERIALIZE_FEATURE_COLLECTION_BBOX`: serialize a `bbox` member for a `FeatureCollection` whose bounding box is non-empty (default: `false`)
 
+## Serializing features without the module
 
+Always register `GeolatteGeomModule` when serializing `GeoJsonFeature` or `GeoJsonFeatureCollection` instances.
+Without it, Jackson falls back to generic bean serialization, which does not produce GeoJSON.
+
+In versions 1.9.0 to 1.11, `GeoJsonFeature.getBbox()` was annotated with `@JsonInclude(NON_EMPTY)`. The annotation
+only affected that generic bean serialization, and was removed when `GeoJsonFeature` moved to the Jackson-free
+`geolatte-geojson-core` artifact. If you relied on it to omit empty bounding boxes, register the module and set
+`SERIALIZE_FEATURE_BBOX` to `true`: the `bbox` member is then written only when the bounding box is non-empty.
