@@ -38,7 +38,8 @@ The library is published on Maven Central. For Maven, you can include the follow
 # Documentation
 
 - [Quick start](docs/quick-start.md): creating geometries and encoding them to WKT/WKB
-- [Manual](docs/manual.md): positions, geometries, coordinate reference systems and geometry operations
+- [Manual](docs/manual.md): the geometry model, coordinate reference systems, geometry operations, coordinate
+  transformations, encoding and decoding, and more
 - [Javadoc on javadoc.io](https://javadoc.io/doc/org.geolatte/geolatte-geom)
 
 # GeoJSON

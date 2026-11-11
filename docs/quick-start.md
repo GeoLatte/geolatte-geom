@@ -64,6 +64,7 @@ For historical and practical reasons, the default dialects for WKB/WKT are those
 
 ## Next steps
 
-- The [manual](manual.md) explains positions, geometries, coordinate reference systems and geometry operations.
+- The [manual](manual.md) explains the geometry model, coordinate reference systems, geometry operations,
+  coordinate transformations, encoding and decoding, and more.
 - For GeoJSON, see the [`geolatte-geojson-jackson2`](../json-jackson2/README.md) or
   [`geolatte-geojson-jackson3`](../json-jackson3/README.md) module.
