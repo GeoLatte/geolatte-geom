@@ -14,6 +14,17 @@ A separate `geolatte-geojson-jackson3` module provides the equivalent for Jackso
 > **Use this module** if your project is on Jackson 2.x (e.g. Spring Boot 2.x or 3.x lines that
 > still ship Jackson 2). If you are on Jackson 3.x, use `geolatte-geojson-jackson3` instead.
 
+> **Upgrading from `geolatte-geojson` 1.x:**
+> - `geolatte-geojson` 1.x (up to 1.11) was built on Jackson 2, so this module is its direct
+>   successor. Replace the `org.geolatte:geolatte-geojson` dependency with
+>   `org.geolatte:geolatte-geojson-jackson2`.
+> - The adapter classes (`GeolatteGeomModule`, the per-type
+>   serializers/deserializers, etc.) moved from `org.geolatte.geom.json` to
+>   `org.geolatte.geom.json.jackson2`. Update your imports accordingly.
+> - The data types (`Setting`, `GeoJsonFeature`, `GeoJsonFeatureCollection`)
+>   stay in `org.geolatte.geom.json` and now live in the
+>   `geolatte-geojson-core` artifact.
+
 # How to use
 Add the following dependency to the POM.
 
@@ -22,9 +33,12 @@ Add the following dependency to the POM.
 <dependency>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geojson-jackson2</artifactId>
-    <version>${geolatte-geom-version}</version>
+    <version>2.0.1</version>
 </dependency>
 ```
+
+The GeoJSON modules are versioned independently of `geolatte-geom`; this dependency brings in
+`geolatte-geojson-core` and a matching `geolatte-geom` transitively.
 
 This module is built and tested against Jackson 2.18.x. The Jackson dependency is declared as
 `<optional>true</optional>`: consumers must declare the desired Jackson 2 version explicitly in
@@ -77,7 +91,7 @@ You can set a feature flag after creation of the `GeolatteGeomModule`:
 ```
 
 The following settings are currently supported:
-- `IGNORE_CRS`: ignore the `crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`)
+- `IGNORE_CRS`: ignore the `crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate reference system (default: `false`)
 - `SUPPRESS_CRS_SERIALIZATION`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
 - `SERIALIZE_CRS_AS_URN`: serialize `crs` as a URN (default: `false`)
 - `SERIALIZE_FEATURE_BBOX`: serialize a `bbox` member for each `Feature` whose bounding box is non-empty (default: `false`)

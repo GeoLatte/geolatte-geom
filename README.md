@@ -1,5 +1,4 @@
-![Build Status](https://github.com/GeoLatte/geolatte-geom/workflows/Java%20CI/badge.svg)
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/GeoLatte/geolatte-geom.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/GeoLatte/geolatte-geom/context:java)
+[![Build Status](https://github.com/GeoLatte/geolatte-geom/actions/workflows/java-ci.yml/badge.svg)](https://github.com/GeoLatte/geolatte-geom/actions/workflows/java-ci.yml)
 [![javadoc](https://javadoc.io/badge2/org.geolatte/geolatte-geom/javadoc.svg)](https://javadoc.io/doc/org.geolatte/geolatte-geom)
 
 # Geolatte-geom
@@ -9,8 +8,9 @@ A geometry model for Java with:
 * immutable data structures
 * support for 2D, 3D, 2DM and 3DM geometries
 * A DSL for creating Geometries
-* support for several dialects of WKT/WKB (Postgis, Sql Server, SFA 1.1.0 and 1.2.1)
-* Codecs for translating from/to native database formats for Postgis, Mysql, Oracle, and Microsoft SQL Server.
+* support for several dialects of WKT/WKB (SFA 1.1.0 and 1.2.1, Postgis, MySQL, SAP HANA, and DB2 for WKT only)
+* Codecs for translating from/to native database formats for Postgis, MySQL, Oracle (`SDO_GEOMETRY`), Microsoft SQL
+  Server (`GEOMETRY` and `GEOGRAPHY`), and DB2 (as used by Hibernate Spatial).
 * Pluggable, extendable Geometry operations
 * Coordinate reference system aware
 * space filling curves
@@ -60,12 +60,12 @@ import static org.geolatte.geom.builder.DSL.*;
 
 Now we can create geometries like so.
 
-```java 
-  Point<G2D> pnt=point(WGS84,g(4.33,53.21));
-  
-  LineString<G2D> lstr=linestring(WGS84,g(4.43,53.21),g(4.44,53.20),g(4.45,53.19));
-  
-  Polygon<G2D> pgn=polygon(WGS84,ring(g(4.43,53.21),g(4.44,53.22),g(4.43,53.21)));
+```java
+Point<G2D> pnt = point(WGS84, g(4.33, 53.21));
+
+LineString<G2D> lstr = linestring(WGS84, g(4.43, 53.21), g(4.44, 53.20), g(4.45, 53.19));
+
+Polygon<G2D> pgn = polygon(WGS84, ring(g(4.43, 53.21), g(4.44, 53.22), g(4.45, 53.21), g(4.43, 53.21)));
 ```
 
 We can also create Geometries in a higher-dimensional space. Let's do it in 3D.
@@ -74,10 +74,9 @@ First we again need to specify the coordinate reference system we will be workin
 from WGS84 by adding a Vertical system for the elevation.
 
 ```java
-  CoordinateReferenceSystem<G3D>  wgs84E=WGS84.addVerticalSystem(LinearUnit.METER,G3D.class);
-        ...
+CoordinateReferenceSystem<G3D> wgs84E = WGS84.addVerticalSystem(LinearUnit.METER, G3D.class);
 
-        Point<G3D> pointWithElevation=point(wgs84E,g(4.33,53.21,350));
+Point<G3D> pointWithElevation = point(wgs84E, g(4.33, 53.21, 350));
 ```
 
 ## Encoding and Decoding Geometries to WKT/WKB
@@ -86,26 +85,28 @@ Now let's write these out as WKT string.
 
 ```java
 import org.geolatte.geom.codec.Wkt;
-  
-  String wkt=Wkt.toWkt(pnt);
-          // "SRID=4326;POINT(4.33 53.21)"
 
-          // or maybe using a specific dialect such as SFA 1.2.1
-          String wktZ=Wkt.toWkt(pntWithElevation,Wkt.Dialect.SFA_1_2_1);
+String wkt = Wkt.toWkt(pnt);
+// "SRID=4326;POINT(4.33 53.21)"
+
+// or maybe using a specific dialect such as SFA 1.2.1
+String wktZ = Wkt.toWkt(pointWithElevation, Wkt.Dialect.SFA_1_2_1);
 // "POINT Z (4.33 53.21 350)"
 ```
 
 There is a very similar API for WKB encoding/decoding (see the `Wkb` codec class).
 
-For historical and practical reasons. The default dialects for WKB/WKT are those used in [Postgis](http://postgis.org).
+For historical and practical reasons, the default dialects for WKB/WKT are those used by [Postgis](https://postgis.net).
 
 ## Encoding and Decoding to GeoJson
 
-See [the json module](json/README.md)
+GeoJSON support is provided by separate modules, depending on the Jackson version you use:
 
-## Using Scala?
+- [`geolatte-geojson-jackson2`](json-jackson2/README.md) for Jackson 2.x
+- [`geolatte-geojson-jackson3`](json-jackson3/README.md) for Jackson 3.x
 
-There is an experimental module for using this library in idiomatic Scala. See the [scala module](scala)
+Both are thin adapters on top of `geolatte-geojson-core`, which holds the Jackson-independent GeoJSON encoding and
+decoding logic. The GeoJSON modules are versioned independently of `geolatte-geom`.
 
 ## Javadoc
 
@@ -116,7 +117,7 @@ The JavaDoc is [published on javadoc.io](https://javadoc.io/doc/org.geolatte/geo
 ## Positions
 
 A `Position` is a tuple of coordinates that specify a position relative to a coordinate reference system. It corresponds
-with to the concept of **direct position** in the Simple Feature and ISO-19107 specifications.
+to the concept of **direct position** in the Simple Feature and ISO-19107 specifications.
 
 The coordinate space can be 2-, 3- or 4-dimensional. The first two dimensions are used to specify a point on the earth's
 surface. The third dimension usually represent altitude or elevation, and the fourth a measurement.
@@ -145,7 +146,7 @@ between consecutive elements in a list of `Position`s. These `Position`s are cal
 
 A distinctive feature of this library is that `Geometry` class is parameterized by `Position` type. This means that e.g.
 a `Point<C2D>` is a different type than `Point<G2D>`. This ensures that it is always explicit what the coordinates mean
-(projected or spherical), and what types of operation make sense. E.g. the euclydian distance on the plane works for
+(projected or spherical), and what types of operation make sense. E.g. the Euclidean distance on the plane works for
 projected coordinates, but makes no sense for spherical coordinates.
 
 The instantiable subclasses of `Geometry` are:
@@ -161,20 +162,20 @@ The instantiable subclasses of `Geometry` are:
 
 ## <a name="crs"></a>Coordinate Reference Systems
 
-For many operations a `CoordinateReferenceSystem` is required. The most important ways to create or get hold of an
-`CoordinateReferenceSystem` instance is:
+For many operations a `CoordinateReferenceSystem` is required. The most important ways to create or get hold of a
+`CoordinateReferenceSystem` instance are:
 
 - Using one of the statically declared systems in the `CoordinateReferenceSystems` class (e.g. `WGS84`, `WEB_MERCATOR`)
-- Find the system by its [EPSG](https://epsg.org/home.html) ID in the `CrsRepository`. The `CrsRegistry` has most of the
+- Find the system by its [EPSG](https://epsg.org/home.html) ID in the `CrsRegistry`. The `CrsRegistry` has most of the
   coordinate reference systems in use.
 
 As already mentioned, you can create higher-dimensional coordinate reference systems by adding a vertical or linear
 system.
 
 ```java
-  CoordinateReferenceSystem<C2D> crs=CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
-  CoordinateReferenceSystem<C3D> crsZ=crs.addVerticalSystem(LinearUnit.METER,C3D.class);
-  CoordinateReferenceSystem<C3DM> crsZM=crsZ.addLinearSystem(LinearUnit.METER,C3DM.class);
+CoordinateReferenceSystem<C2D> crs = CrsRegistry.getProjectedCoordinateReferenceSystemForEPSG(31370);
+CoordinateReferenceSystem<C3D> crsZ = crs.addVerticalSystem(LinearUnit.METER, C3D.class);
+CoordinateReferenceSystem<C3DM> crsZM = crsZ.addLinearSystem(LinearUnit.METER, C3DM.class);
 ```
 
 ## Geometry operations
@@ -190,27 +191,31 @@ methods has several drawbacks:
 For these reasons the spatial operations are separated into their own classes. Currently, two types are supported:
 
 - `ProjectedGeometryOperations` : operations on projected (planar) geometries (i.e. `C2D` and subtypes)
-- `MeasureGeometryOperations` : operations specific to projected (planar) geometries with a Measure (i.e. `C2DM`
-  , `C3DM`)
+- `MeasureGeometryOperations` : operations specific to projected (planar) geometries with a Measure (i.e. `C2DM`,
+  `C3DM`)
 
-At present there is no support for operations on geometries in a `GeographicCoordinateSystem`.
+At present there is no support for operations on geometries in a `GeographicCoordinateReferenceSystem`.
 
 You can get hold of an operations class using the `GeometryOperations` factory class. Currently there are only default
 implementations available. The `ProjectedGeometryOperations` implementation will delegate most operations to the
 corresponding JTS implementation.
 
 ```java
-    // example of a contains test with planar geometries
-    ProjectedGeometryOperations pgo=GeometryOperations.projectedGeometryOperations();
-            Point<C2D> point=point(WEB_MERCATOR,c(4.33,53.21));
-        Polygon<C2D> polygon=polygon(WEB_MERCATOR,ring(c(4.43,53.21),c(4.44,53.22),c(4.43,53.21)));
-        boolean isPntInPoly=pgo.contains(polygon,point);
+// example of a contains test with planar geometries (Web Mercator coordinates are in meters)
+ProjectedGeometryOperations pgo = GeometryOperations.projectedGeometryOperations();
+Point<C2D> point = point(WEB_MERCATOR, c(482000, 7020000));
+Polygon<C2D> polygon = polygon(WEB_MERCATOR, ring(c(481000, 7019000), c(483000, 7019000), c(483000, 7021000),
+        c(481000, 7021000), c(481000, 7019000)));
+boolean isPntInPoly = pgo.contains(polygon, point);
+// true
 
-        // example  op an operation on measured geometries
-        MeasureGeometryOperations mgo=GeometryOperations.measureGeometryOperations();
-        LineString<C2DM> linestring=linestring(crsM,cM(4.43,53.21,0),cM(4.44,53.20,1),cM(4.45,53.19,2));
-        //create a geometry along the linestring that is between 1.5 and 1.8
-        Geometry<C2DM> c2DMGeometry=mgo.locateBetween(linestring,1.5,1.8);
+// example of an operation on measured geometries
+CoordinateReferenceSystem<C2DM> crsM = CoordinateReferenceSystems.PROJECTED_2DM_METER;
+MeasureGeometryOperations mgo = GeometryOperations.measureGeometryOperations();
+LineString<C2DM> linestring = linestring(crsM, cM(0, 0, 0), cM(10, 0, 1), cM(20, 0, 2));
+// create a geometry along the linestring that is between measures 1.5 and 1.8
+Geometry<C2DM> c2DMGeometry = mgo.locateBetween(linestring, 1.5, 1.8);
+// MULTILINESTRINGM((15 0 1.5,18 0 1.8))
 ```
 
 # JTS interop
@@ -219,13 +224,14 @@ Because JTS has been the dominant geometry library in the Java ecosystem, JTS in
 The `JTS` class supports conversion from/to JTS `Geometry` instances.
 
 ```java
-  import org.geolatte.geom.jts.JTS;
-//Geolatte to JTS
-  org.locationtech.jts.geom.Point jtsPoint=JTS.to(point(WGS84,g(4.32,53.12)));
-          //.. and back
-          org.geolatte.geom.Point<?> glPnt=JTS.from(jtsPoint);
-        //or if you know the CRS in advance
-        org.geolatte.geom.Point<G2D> glPnt2=JTS.from(jtsPoint,WGS84);
+import org.geolatte.geom.jts.JTS;
+
+// Geolatte to JTS
+org.locationtech.jts.geom.Point jtsPoint = JTS.to(point(WGS84, g(4.32, 53.12)));
+// ... and back
+org.geolatte.geom.Point<?> glPnt = JTS.from(jtsPoint);
+// or if you know the CRS in advance
+org.geolatte.geom.Point<G2D> glPnt2 = JTS.from(jtsPoint, WGS84);
 ```
 
 # Releasing
@@ -263,12 +269,3 @@ The GitHub Actions workflow will:
 6. Create a GitHub Release
 
 Artifacts typically appear on Maven Central within 15-30 minutes.
-
-
-
-
-
-
-
-
-
