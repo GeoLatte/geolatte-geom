@@ -123,6 +123,16 @@ public class TestDefaultProjectedGeometryOperations {
                 g("MULTILINESTRING ((6 2, 2 2, 1 1), (1 4, 5 5))"), "101F00102"));
     }
 
+    @Test
+    public void convexHull() {
+        Geometry<C2D> hull = ops.convexHull(g("MULTIPOINT ((0 0), (4 0), (2 1), (4 4), (0 4), (1 3))"));
+        assertTrue(hull instanceof Polygon);
+        assertTrue(ops.equalsTopologically(hull, g(SQUARE)));
+        assertEquals(g("LINESTRING (0 0, 3 3)"), ops.convexHull(g("MULTIPOINT ((1 1), (0 0), (3 3), (2 2))")));
+        assertEquals(g("POINT (1 1)"), ops.convexHull(g("MULTIPOINT ((1 1), (1 1))")));
+        assertTrue(ops.convexHull(new Polygon<>(crs)).isEmpty());
+    }
+
     private static Geometry<C2D> g(String wkt) {
         return Wkt.fromWkt(wkt, crs);
     }

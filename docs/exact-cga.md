@@ -107,7 +107,7 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - `PointLocator.of(geometry).locate(x, y)` returns the `Location` (`INTERIOR`, `BOUNDARY` or `EXTERIOR`) of a
   point.
 - `DefaultProjectedGeometryOperations`, the default `ProjectedGeometryOperations`, computes its spatial
-  predicates with `Relate`.
+  predicates with `Relate` and its convex hull with `ConvexHull`.
 
 **Union semantics.** A geometry is the union of its elements: points, lines and polygons, also as members of a
 `GeometryCollection`, and also when members overlap or touch. The location of a point is decided by the elements

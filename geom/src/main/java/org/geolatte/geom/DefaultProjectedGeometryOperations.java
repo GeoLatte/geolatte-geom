@@ -20,6 +20,7 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.ConvexHull;
 import org.geolatte.geom.cga.Relate;
 
 /**
@@ -28,14 +29,18 @@ import org.geolatte.geom.cga.Relate;
  * <p>The spatial predicates ({@code intersects}, {@code disjoint}, {@code touches}, {@code crosses},
  * {@code within}, {@code contains}, {@code overlaps}, {@code covers}, {@code coveredBy}, {@code equalsTopologically}
  * and {@code relates}) are computed exactly with {@link Relate}: the result is exact for the given coordinates, and
- * geometry collections have union semantics. The other operations are delegated to JTS, as in
- * {@link JTSGeometryOperations}.</p>
+ * geometry collections have union semantics. The convex hull is computed exactly with {@link ConvexHull}. The
+ * other operations do not have an exact implementation yet; they
+ * are delegated to a {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
  * geometries. The operands must have the same coordinate reference system.</p>
  */
-public class DefaultProjectedGeometryOperations extends JTSGeometryOperations {
+public class DefaultProjectedGeometryOperations implements ProjectedGeometryOperations {
+
+    // the operations that are not (yet) computed exactly
+    private final ProjectedGeometryOperations jts = new JTSGeometryOperations();
 
     private static void checkCompatibleCRS(Geometry<?> geometry, Geometry<?> other) {
         if (!geometry.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem())) {
@@ -105,5 +110,74 @@ public class DefaultProjectedGeometryOperations extends JTSGeometryOperations {
     @Override
     public <P extends C2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix) {
         return nonEmpty(geometry, other) && Relate.relate(geometry, other, matrix);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> convexHull(final Geometry<P> geometry) {
+        return ConvexHull.of(geometry);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // delegated to JTS
+    // ---------------------------------------------------------------------------------------------------------
+
+    @Override
+    public <P extends C2D> boolean isSimple(final Geometry<P> geometry) {
+        return jts.isSimple(geometry);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> boundary(final Geometry<P> geometry) {
+        return jts.boundary(geometry);
+    }
+
+    @Override
+    public <P extends C2D, G extends Geometry<P>> G reverse(final G geometry) {
+        return jts.reverse(geometry);
+    }
+
+    @Override
+    public <P extends C2D> double distance(final Geometry<P> geometry, final Geometry<P> other) {
+        return jts.distance(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
+        return jts.buffer(geometry, distance);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other) {
+        return jts.intersection(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other) {
+        return jts.union(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
+        return jts.difference(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other) {
+        return jts.symmetricDifference(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry) {
+        return jts.length(geometry);
+    }
+
+    @Override
+    public <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry) {
+        return jts.area(geometry);
+    }
+
+    @Override
+    public <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {
+        return jts.centroid(geometry);
     }
 }
