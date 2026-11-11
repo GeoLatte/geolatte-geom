@@ -31,7 +31,7 @@ The library is published on Maven Central. For Maven, you can include the follow
 <dependency>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geom</artifactId>
-    <version>1.13</version>
+    <version>2.0</version>
 </dependency>
 ```
 
@@ -69,10 +69,10 @@ Publishing a version that is already on Maven Central fails, so only use `v*` wh
 For example, to release `geolatte-geom` on its own:
 
 ```bash
-scripts/bump-version.sh geom 1.13
-git commit -am "Set revision to 1.13"
-git tag -a geom-v1.13 -m "Release geolatte-geom 1.13"
-git push origin main geom-v1.13
+scripts/bump-version.sh geom 2.0
+git commit -am "Set revision to 2.0"
+git tag -a geom-v2.0 -m "Release geolatte-geom 2.0"
+git push origin main geom-v2.0
 ```
 
 See [docs/release-process.md](docs/release-process.md) for the details of both release lines, SNAPSHOT releases and

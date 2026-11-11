@@ -151,8 +151,7 @@ CoordinateReferenceSystem<C3DM> crsZM = crsZ.addLinearSystem(LinearUnit.METER, C
 ```
 
 When you only know the required dimensions at run time, `CoordinateReferenceSystems.adjustTo(crs, hasZ, hasM)` adds or
-removes the vertical and measure axes as needed. `hasVerticalAxis(crs)` and `hasMeasureAxis(crs)` tell you which axes a
-system has.
+removes the vertical and measure axes as needed. `crs.hasZ()` and `crs.hasM()` tell you which axes a system has.
 
 ### Building systems yourself
 
@@ -487,7 +486,8 @@ Supported transformations:
 - **Map projections:** Lambert Conformal Conic (2SP), as used by e.g. Belgian Lambert 72 (EPSG:31370) and
   Lambert-93 (EPSG:2154), and Pseudo-Mercator (EPSG:3857, `WEB_MERCATOR`).
 - **Datum shifts:** between geographic systems, using the 7-parameter `TOWGS84` (position vector) values from the
-  system definitions. Both systems must have `TOWGS84` parameters, or be WGS 84.
+  system definitions. Both systems must have `TOWGS84` parameters, or be WGS 84; otherwise `TransformOperations.from`
+  throws an `IllegalArgumentException`.
 - Vertical and measure axes are carried over unchanged.
 
 Other projections are not supported. Creating a transformation to or from a system with any other projection (for
