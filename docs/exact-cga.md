@@ -106,7 +106,66 @@ Indicative timings for 100,000 points:
 | Delaunay, points on a circle (all cocircular) | ≈ 100 ms |
 | Voronoi diagram | ≈ 115–130 ms |
 
-## Not yet available
+## Roadmap: the Simple Features operations
 
-`ST_Equals`, `ST_IsValid` and the other relate-based predicates have been postponed until the exact
-foundation is complete.
+The goal is to implement the 2D geometry operations and predicates of the Simple Features Access specification
+(and `ST_IsValid` from SQL/MM) on the exact foundation above.
+
+There are two kinds of operation, with different guarantees:
+
+- **Predicates** (the spatial relations, `IsSimple`, `IsValid`) depend only on the input coordinates. They can
+  be made fully exact: no intersection point ever needs to be constructed.
+- **Constructions** (overlay, buffer, area, distance, ...) return new coordinates or numbers that must be
+  rounded. For each one the guarantee has to be defined: correct rounding where the result is rational,
+  faithful rounding otherwise, and a valid result for geometry-valued operations.
+
+### Status per operation
+
+| Operation | Exact implementation | What is needed |
+|---|---|---|
+| `Dimension`, `Envelope`, `IsEmpty`, `StartPoint`, `EndPoint`, `IsClosed` | combinatorial or exact equality | — |
+| `Boundary` | to do | combinatorial (Mod-2 rule); no arithmetic |
+| `IsSimple`, `IsRing` | to do | all segment intersections within one geometry, using `segmentIntersection` |
+| `Equals`, `Disjoint`, `Intersects`, `Touches`, `Crosses`, `Within`, `Contains`, `Overlaps`, `Relate` | to do | the exact relate engine (primitives 1–4) |
+| `IsValid` (SQL/MM) | to do | the relate engine, plus a check that the polygon interior is connected |
+| `ConvexHull` | **done** | — |
+| `Area` | to do | correctly rounded value of an exact sum (primitive 5); the area is rational |
+| `Centroid` | to do | correctly rounded quotient of two exact sums (primitive 5); the centroid is rational |
+| `PointOnSurface` | to do | scan line, ordering of implicit x-coordinates, exact check that the result is inside |
+| `Distance` | to do | exact selection of the minimum over segment pairs, then a correctly rounded √(N/D) (primitive 6) |
+| `Length` | to do | a sum of square roots: faithful rounding (≤ 1 ulp) rather than correct rounding |
+| `Intersection`, `Union`, `Difference`, `SymDifference` | to do | noding, graph labelling, polygon assembly, and snap rounding of the output (primitive 7) |
+| `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
+| `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
+
+### Primitives still needed
+
+1. **Ordering of implicit intersection points.** Two crossings on the same segment are ordered by their
+   parameters, sign(α₁D₂ − α₂D₁): a degree-4 sum for ESSA, which requires four-factor products in `ExactSum`.
+   The same test decides whether two crossing points coincide, and compares a crossing point with a vertex.
+   This is the key primitive for relate: crossing points never need to be constructed.
+2. **A public point locator.** Interior, boundary or exterior of a point with respect to a polygon or a line,
+   applying the Mod-2 boundary rule. The exact winding-number test inside `TopologyPreservingSimplification`
+   can be lifted out for this.
+3. **Angular ordering of edges around a node.** Every edge of the arrangement lies on an original segment, so
+   this reduces to the exact sign of (b − a) × (d − c), already computed in segment classification, together
+   with the quadrant from exact coordinate comparisons.
+4. **Noding of two geometries.** All intersecting segment pairs (using `SegmentIndex` or a sweep), the
+   resulting topology graph, and the DE-9IM labelling built on primitives 1–3.
+5. **Correct rounding of exact sums and quotients**, for `Area` and `Centroid`: a generalization of the staged
+   rounding (enclosure → midpoint test with ESSA → BigInteger) behind `crossingPoint` and `circumcenter`.
+6. **Correctly rounded square root of a rational**, for `Distance`: the distance from a point to a segment
+   is √(cross² / |ab|²).
+7. **Snap rounding.** Overlay output vertices are rounded crossing points, which in general do not lie on
+   either segment. Without snap rounding the output can become invalid (slivers, new self-intersections).
+   Doubles do not form a uniform grid, which complicates the classic hot-pixel algorithm. This is the main
+   design question for the constructive operations.
+
+### Order of work
+
+1. **Relate engine** (primitives 1–4): makes all spatial relations, `Equals`, `IsSimple` and `IsValid` fully
+   exact, without any rounding questions.
+2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length`; small and independent, each needing one
+   rounding routine.
+3. **`PointOnSurface`**.
+4. **Overlay** with snap rounding, followed by **`Buffer`** on top of it.
