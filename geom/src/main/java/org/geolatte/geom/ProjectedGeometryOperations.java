@@ -35,7 +35,7 @@ public interface ProjectedGeometryOperations {
     /**
      * Default implementation of this interface
      */
-    public final ProjectedGeometryOperations Default = new JTSGeometryOperations();
+    public final ProjectedGeometryOperations Default = new DefaultProjectedGeometryOperations();
 
     /**
      * Tests the simplicity of the specified <code>Geometry</code>.
@@ -108,6 +108,55 @@ public interface ProjectedGeometryOperations {
      * @return true iff the specified <code>Geometry</code>s spatially overlap
      */
     <P extends C2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the first specified <code>Geometry</code> is spatially within the second.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the within test
+     * @param other    the second <code>Geometry</code> operand of the within test
+     * @return true iff the first specified <code>Geometry</code> is spatially within the second
+     */
+    <P extends C2D> boolean within(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the specified <code>Geometry</code>s are spatially disjoint: they have no point in common. This is
+     * the negation of {@link #intersects(Geometry, Geometry)}.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the disjoint test
+     * @param other    the second <code>Geometry</code> operand of the disjoint test
+     * @return true iff the specified <code>Geometry</code>s are spatially disjoint
+     */
+    <P extends C2D> boolean disjoint(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the specified <code>Geometry</code>s are topologically equal: they represent the same point set.
+     * Two empty <code>Geometry</code>s are equal.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the equality test
+     * @param other    the second <code>Geometry</code> operand of the equality test
+     * @return true iff the specified <code>Geometry</code>s are topologically equal
+     */
+    <P extends C2D> boolean equalsTopologically(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the first specified <code>Geometry</code> spatially covers the second: no point of the second
+     * lies in the exterior of the first.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the covers test
+     * @param other    the second <code>Geometry</code> operand of the covers test
+     * @return true iff the first specified <code>Geometry</code> spatially covers the second
+     */
+    <P extends C2D> boolean covers(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the first specified <code>Geometry</code> is spatially covered by the second: no point of the
+     * first lies in the exterior of the second.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the covered-by test
+     * @param other    the second <code>Geometry</code> operand of the covered-by test
+     * @return true iff the first specified <code>Geometry</code> is spatially covered by the second
+     */
+    <P extends C2D> boolean coveredBy(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
      * Checks if the specified <code>Geometry</code>s are spatially related by testing

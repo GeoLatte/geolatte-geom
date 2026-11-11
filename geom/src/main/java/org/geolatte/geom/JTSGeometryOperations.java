@@ -157,6 +157,43 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     @Override
+    public <P extends C2D> boolean within(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!other.getEnvelope().contains(geometry.getEnvelope())) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isWithin();
+    }
+
+    @Override
+    public <P extends C2D> boolean disjoint(final Geometry<P> geometry, final Geometry<P> other) {
+        return !intersects(geometry, other);
+    }
+
+    @Override
+    public <P extends C2D> boolean equalsTopologically(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return geometry.isEmpty() && other.isEmpty();
+        checkCompatibleCRS(geometry, other);
+        if (!geometry.getEnvelope().equals(other.getEnvelope())) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isEquals(geometry.getDimension(), other.getDimension());
+    }
+
+    @Override
+    public <P extends C2D> boolean covers(final Geometry<P> geometry, final Geometry<P> other) {
+        if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
+        checkCompatibleCRS(geometry, other);
+        if (!geometry.getEnvelope().contains(other.getEnvelope())) return Boolean.FALSE;
+        final RelateOp relateOp = new RelateOp(JTS.to(geometry), JTS.to(other));
+        return relateOp.getIntersectionMatrix().isCovers();
+    }
+
+    @Override
+    public <P extends C2D> boolean coveredBy(final Geometry<P> geometry, final Geometry<P> other) {
+        return covers(other, geometry);
+    }
+
+    @Override
     public <P extends C2D> boolean relates(final Geometry<P> geometry, final Geometry<P> other, final String matrix) {
         if (geometry.isEmpty() || other.isEmpty()) return Boolean.FALSE;
         checkCompatibleCRS(geometry, other);

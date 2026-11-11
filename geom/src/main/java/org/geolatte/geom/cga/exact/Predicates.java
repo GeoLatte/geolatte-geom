@@ -892,6 +892,151 @@ public final class Predicates {
                 .signum();
     }
 
+    // ---------------------------------------------------------------------------------------------------------
+    // Directions and crossing points
+    // ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the exact sign of the cross product {@code (b - a) x (d - c)}, i.e. the orientation of the direction
+     * of (c, d) relative to the direction of (a, b).
+     *
+     * <p>With {@code c = a}, this is {@link #orientation(double, double, double, double, double, double)}.</p>
+     *
+     * @return 1 if the direction d - c points to the left of the direction b - a (counterclockwise, less than half
+     * a turn), -1 if to the right, 0 if the directions are parallel (or one of them is zero)
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    public static int crossProductSign(double ax, double ay, double bx, double by,
+                                       double cx, double cy, double dx, double dy) {
+        int s = crossProductErrorBound(ax, ay, bx, by, cx, cy, dx, dy);
+        if (s != UNDECIDED) return s;
+        checkFinite(ax, ay, bx, by);
+        checkFinite(cx, cy, dx, dy);
+        s = crossProductFilter(ax, ay, bx, by, cx, cy, dx, dy);
+        if (s != UNDECIDED) return s;
+        ExactSum sum = crossProductTerms(ax, ay, bx, by, cx, cy, dx, dy);
+        if (sum.isExact()) return sum.signum();
+        return crossProductBig(ax, ay, bx, by, cx, cy, dx, dy);
+    }
+
+    /**
+     * Floating point evaluation with error bound. The expression has the same form as the orientation
+     * determinant (the difference of two products of two coordinate differences), so Shewchuk's bound applies.
+     */
+    static int crossProductErrorBound(double ax, double ay, double bx, double by,
+                                      double cx, double cy, double dx, double dy) {
+        double l1 = bx - ax, l2 = dy - cy;
+        double r1 = by - ay, r2 = dx - cx;
+        double detLeft = l1 * l2;
+        double detRight = r1 * r2;
+        double det = detLeft - detRight;
+        double errBound = CCW_ERRBOUND * (Math.abs(detLeft) + Math.abs(detRight)) + UNDERFLOW_MARGIN;
+        if (det > errBound) return 1;
+        if (det < -errBound) return -1;
+        if (Double.isFinite(det)) {
+            int signLeft = sign(l1) * sign(l2);
+            int signRight = sign(r1) * sign(r2);
+            if (signLeft != signRight) return Integer.signum(signLeft - signRight);
+            if (signLeft == 0) return 0;
+        }
+        return UNDECIDED;
+    }
+
+    static int crossProductFilter(double ax, double ay, double bx, double by,
+                                  double cx, double cy, double dx, double dy) {
+        return Interval.difference(bx, ax).mul(Interval.difference(dy, cy))
+                .sub(Interval.difference(by, ay).mul(Interval.difference(dx, cx)))
+                .signum();
+    }
+
+    static ExactSum crossProductTerms(double ax, double ay, double bx, double by,
+                                      double cx, double cy, double dx, double dy) {
+        ExactSum sum = new ExactSum(16);
+        addDiffProduct(sum, 1, bx, ax, dy, cy);
+        addDiffProduct(sum, -1, by, ay, dx, cx);
+        return sum;
+    }
+
+    static int crossProductBig(double ax, double ay, double bx, double by,
+                               double cx, double cy, double dx, double dy) {
+        return big(bx).subtract(big(ax)).multiply(big(dy).subtract(big(cy)))
+                .subtract(big(by).subtract(big(ay)).multiply(big(dx).subtract(big(cx))))
+                .signum();
+    }
+
+    /**
+     * Returns the orientation of the triangle (a, b, X), where X is the intersection point of the lines through
+     * (p, q) and (r, w).
+     *
+     * <p>The intersection point is not computed: the result is exact, although X is in general not representable
+     * in double precision. With {@code X = p + t (q - p)}, {@code t = alpha / (alpha - beta)},
+     * {@code alpha = orientation(r, w, p)} and {@code beta = orientation(r, w, q)}, and since orientation is affine
+     * in its last argument, the orientation of (a, b, X) is</p>
+     * <pre>
+     *     (alpha * orientation(a, b, q) - beta * orientation(a, b, p)) / (alpha - beta)
+     * </pre>
+     * <p>where {@code alpha - beta = (q - p) x (w - r)}. The numerator is a polynomial of degree 4 in the
+     * coordinates.</p>
+     *
+     * @return 1 if X lies to the left of the directed line a-&gt;b, -1 if to the right, 0 if on the line
+     * @throws IllegalArgumentException if the lines through (p, q) and (r, w) are parallel (or one of them is
+     *                                  degenerate), or if a coordinate is NaN or infinite
+     */
+    public static int orientationOfCrossing(double ax, double ay, double bx, double by,
+                                            double px, double py, double qx, double qy,
+                                            double rx, double ry, double wx, double wy) {
+        int denominator = crossProductSign(px, py, qx, qy, rx, ry, wx, wy);
+        if (denominator == 0) {
+            throw new IllegalArgumentException("The lines are parallel");
+        }
+        checkFinite(ax, ay, bx, by);
+        // the signs of the four orientations decide most cases
+        int alpha = orientation(rx, ry, wx, wy, px, py);
+        int beta = orientation(rx, ry, wx, wy, qx, qy);
+        int oq = orientation(ax, ay, bx, by, qx, qy);
+        int op = orientation(ax, ay, bx, by, px, py);
+        int left = alpha * oq, right = beta * op;
+        if (left != right) return Integer.signum(left - right) * denominator;
+        if (left == 0) return 0;
+        return crossingNumeratorSign(ax, ay, bx, by, px, py, qx, qy, rx, ry, wx, wy) * denominator;
+    }
+
+    // the exact sign of alpha * orientation(a, b, q) - beta * orientation(a, b, p)
+    static int crossingNumeratorSign(double ax, double ay, double bx, double by,
+                                     double px, double py, double qx, double qy,
+                                     double rx, double ry, double wx, double wy) {
+        int s = crossingNumeratorFilter(ax, ay, bx, by, px, py, qx, qy, rx, ry, wx, wy);
+        if (s != UNDECIDED) return s;
+        ExactSum sum = crossingNumeratorTerms(ax, ay, bx, by, px, py, qx, qy, rx, ry, wx, wy);
+        if (sum.isExact()) return sum.signum();
+        return crossingNumeratorBig(ax, ay, bx, by, px, py, qx, qy, rx, ry, wx, wy);
+    }
+
+    static int crossingNumeratorFilter(double ax, double ay, double bx, double by,
+                                       double px, double py, double qx, double qy,
+                                       double rx, double ry, double wx, double wy) {
+        return orientationInterval(rx, ry, wx, wy, px, py).mul(orientationInterval(ax, ay, bx, by, qx, qy))
+                .sub(orientationInterval(rx, ry, wx, wy, qx, qy).mul(orientationInterval(ax, ay, bx, by, px, py)))
+                .signum();
+    }
+
+    static ExactSum crossingNumeratorTerms(double ax, double ay, double bx, double by,
+                                           double px, double py, double qx, double qy,
+                                           double rx, double ry, double wx, double wy) {
+        ExactSum sum = new ExactSum(576);
+        sum.addProduct(1, orientationTerms(rx, ry, wx, wy, px, py), orientationTerms(ax, ay, bx, by, qx, qy));
+        sum.addProduct(-1, orientationTerms(rx, ry, wx, wy, qx, qy), orientationTerms(ax, ay, bx, by, px, py));
+        return sum;
+    }
+
+    static int crossingNumeratorBig(double ax, double ay, double bx, double by,
+                                    double px, double py, double qx, double qy,
+                                    double rx, double ry, double wx, double wy) {
+        return orientationBigValue(rx, ry, wx, wy, px, py).multiply(orientationBigValue(ax, ay, bx, by, qx, qy))
+                .subtract(orientationBigValue(rx, ry, wx, wy, qx, qy).multiply(orientationBigValue(ax, ay, bx, by, px, py)))
+                .signum();
+    }
+
     /**
      * The part of the plane, relative to segment AB, in which a point lies; this determines how its distance to
      * the segment is computed.

@@ -30,6 +30,8 @@ All predicates take either raw `double` coordinates or `Position`s.
 | `squaredDistanceToSegment(...)` | an `Interval` enclosing the squared distance | interval arithmetic |
 | `squaredDistancesToSegment(...)` | the same enclosure for many points at once | fast bulk filter |
 | `dotSign(...)` | exact sign of a dot product | exact |
+| `crossProductSign(a, b, c, d)` | sign of (b − a) × (d − c): compares two directions | error-bound filter → interval → ESSA → BigDecimal |
+| `orientationOfCrossing(a, b, p, q, r, w)` | the side of line ab on which the crossing point of lines pq and rw lies, without constructing it | sign shortcut → interval → ESSA (≤ 576 terms) → BigDecimal |
 
 ## `cga.exact.Constructions` — correctly rounded points
 
@@ -95,6 +97,53 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - The default clip envelope is the envelope of the sites, expanded by its diameter.
 - Cell vertices are correctly rounded circumcenters, and adjacent cells share bit-identical vertices.
 
+### `Relate`, `IntersectionMatrix` and `PointLocator`
+
+- `Relate.relate(a, b)` returns the DE-9IM `IntersectionMatrix`; `relate(a, b, pattern)` matches it against a
+  pattern (`T`, `F`, `*`, `0`, `1`, `2`).
+- The named predicates `equalsTopologically`, `disjoint`, `intersects`, `touches`, `crosses`, `within`,
+  `contains`, `overlaps`, `covers` and `coveredBy` are static methods of `Relate`, with envelope prefilters, and
+  are also available on an `IntersectionMatrix` (`isTouches`, `isCrosses`, ...).
+- `PointLocator.of(geometry).locate(x, y)` returns the `Location` (`INTERIOR`, `BOUNDARY` or `EXTERIOR`) of a
+  point.
+- `DefaultProjectedGeometryOperations`, the default `ProjectedGeometryOperations`, computes its spatial
+  predicates with `Relate`.
+
+**Union semantics.** A geometry is the union of its elements: points, lines and polygons, also as members of a
+`GeometryCollection`, and also when members overlap or touch. The location of a point is decided by the elements
+of the highest dimension that contain it:
+
+1. polygons: a point is in the interior if it lies in the interior of the union of the polygons, also when it
+   lies on the boundaries of polygons that together cover a neighbourhood of it (an edge shared by adjacent
+   polygons, a hole filled by another polygon); otherwise it is on the boundary if it lies on a polygon;
+2. lines: a point on a line is on the boundary if it is an endpoint of an odd number of lines (the Mod-2 rule,
+   applied literally: an endpoint of one line that lies in the interior of another line is still on the
+   boundary), and in the interior otherwise;
+3. points: a point of the geometry is in the interior.
+
+For valid Simple Features geometries this is the usual definition. Only the individual polygons need to be valid.
+
+**Algorithm.** The result is exact for the input doubles: no coordinate is ever rounded to decide the topology.
+
+- All segments of both geometries are put into one arrangement. Candidate pairs come from a sweep over the
+  segment envelopes, and are classified with `segmentIntersection`.
+- The nodes are the vertices, the points, and the crossing points. A crossing point is represented implicitly by
+  its two segments; its correctly rounded value is only used as a hash key to find nodes that may coincide, and
+  coincidence is confirmed exactly with `orientation` and `orientationOfCrossing`.
+- The nodes on a segment are ordered exactly: vertices by coordinate, a vertex and a crossing with
+  `orientation`, two crossings with `orientationOfCrossing`. The pieces between consecutive nodes are the
+  edges; overlapping pieces are merged.
+- The edges around each node are sorted by angle with `crossProductSign`.
+- Each face gets a depth per geometry: the number of polygons that cover it. Per connected component, the depth
+  of the face to the left of its lexicographically smallest vertex comes from an exact point-in-polygon test;
+  the other depths follow by walking around the nodes and along the edges, adding +1 or −1 when crossing a ring.
+- The locations of the nodes (dimension 0), the edges (dimension 1) and the faces beside each edge (dimension 2)
+  in both geometries give the matrix.
+
+`PointLocator` uses exact crossing parity per polygon, on an interval index over the ring segments, and for a
+point on polygon boundaries the same angular ordering to decide whether the polygons cover all of its
+neighbourhood.
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -105,6 +154,14 @@ Indicative timings for 100,000 points:
 | Delaunay, grid with or without noise | ≈ 60–70 ms |
 | Delaunay, points on a circle (all cocircular) | ≈ 100 ms |
 | Voronoi diagram | ≈ 115–130 ms |
+
+Indicative timings for `Relate.relate`:
+
+| Operation | Time |
+|---|---|
+| two overlapping polygons, 10,000 vertices each | ≈ 15 ms |
+| two overlapping polygons, 100,000 vertices each | ≈ 0.6 s |
+| 10,000 line segments against a polygon of 2,000 vertices | ≈ 20 ms |
 
 ## Roadmap: the Simple Features operations
 
@@ -125,9 +182,9 @@ There are two kinds of operation, with different guarantees:
 |---|---|---|
 | `Dimension`, `Envelope`, `IsEmpty`, `StartPoint`, `EndPoint`, `IsClosed` | combinatorial or exact equality | — |
 | `Boundary` | to do | combinatorial (Mod-2 rule); no arithmetic |
-| `IsSimple`, `IsRing` | to do | all segment intersections within one geometry, using `segmentIntersection` |
-| `Equals`, `Disjoint`, `Intersects`, `Touches`, `Crosses`, `Within`, `Contains`, `Overlaps`, `Relate` | to do | the exact relate engine (primitives 1–4) |
-| `IsValid` (SQL/MM) | to do | the relate engine, plus a check that the polygon interior is connected |
+| `IsSimple`, `IsRing` | to do | all segment intersections within one geometry; the arrangement of the relate engine provides them |
+| `Equals`, `Disjoint`, `Intersects`, `Touches`, `Crosses`, `Within`, `Contains`, `Overlaps`, `Relate` (and `Covers`, `CoveredBy`) | **done** | `Relate`, with union semantics |
+| `IsValid` (SQL/MM) | to do | the arrangement of the relate engine, plus a check that the polygon interior is connected |
 | `ConvexHull` | **done** | — |
 | `Area` | to do | correctly rounded value of an exact sum (primitive 5); the area is rational |
 | `Centroid` | to do | correctly rounded quotient of two exact sums (primitive 5); the centroid is rational |
@@ -138,20 +195,17 @@ There are two kinds of operation, with different guarantees:
 | `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
 | `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
 
-### Primitives still needed
+### Primitives
 
-1. **Ordering of implicit intersection points.** Two crossings on the same segment are ordered by their
-   parameters, sign(α₁D₂ − α₂D₁): a degree-4 sum for ESSA, which requires four-factor products in `ExactSum`.
-   The same test decides whether two crossing points coincide, and compares a crossing point with a vertex.
-   This is the key primitive for relate: crossing points never need to be constructed.
-2. **A public point locator.** Interior, boundary or exterior of a point with respect to a polygon or a line,
-   applying the Mod-2 boundary rule. The exact winding-number test inside `TopologyPreservingSimplification`
-   can be lifted out for this.
-3. **Angular ordering of edges around a node.** Every edge of the arrangement lies on an original segment, so
-   this reduces to the exact sign of (b − a) × (d − c), already computed in segment classification, together
-   with the quadrant from exact coordinate comparisons.
-4. **Noding of two geometries.** All intersecting segment pairs (using `SegmentIndex` or a sweep), the
-   resulting topology graph, and the DE-9IM labelling built on primitives 1–3.
+Primitives 1–4 are done: they make up the relate engine.
+
+1. **Ordering of implicit intersection points** (done): `orientationOfCrossing` compares a crossing point with
+   a line, which orders crossings along a segment and decides whether two crossings coincide. Crossing points
+   are never constructed to decide topology.
+2. **A public point locator** (done): `PointLocator`, with union semantics and the Mod-2 rule.
+3. **Angular ordering of edges around a node** (done): every edge lies on an original segment, so this reduces
+   to the half plane, from exact coordinate comparisons, and `crossProductSign`.
+4. **Noding of two geometries** (done): the arrangement and depth labelling of `Relate`.
 5. **Correct rounding of exact sums and quotients**, for `Area` and `Centroid`: a generalization of the staged
    rounding (enclosure → midpoint test with ESSA → BigInteger) behind `crossingPoint` and `circumcenter`.
 6. **Correctly rounded square root of a rational**, for `Distance`: the distance from a point to a segment
@@ -163,8 +217,8 @@ There are two kinds of operation, with different guarantees:
 
 ### Order of work
 
-1. **Relate engine** (primitives 1–4): makes all spatial relations, `Equals`, `IsSimple` and `IsValid` fully
-   exact, without any rounding questions.
+1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple` and
+   `IsValid` can be built on its arrangement.
 2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length`; small and independent, each needing one
    rounding routine.
 3. **`PointOnSurface`**.
