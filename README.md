@@ -72,7 +72,7 @@ For example, to release `geolatte-geom` on its own:
 scripts/bump-version.sh geom 1.13
 git commit -am "Set revision to 1.13"
 git tag -a geom-v1.13 -m "Release geolatte-geom 1.13"
-git push origin master geom-v1.13
+git push origin main geom-v1.13
 ```
 
 See [docs/release-process.md](docs/release-process.md) for the details of both release lines, SNAPSHOT releases and
