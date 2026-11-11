@@ -102,8 +102,9 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - `Relate.relate(a, b)` returns the DE-9IM `IntersectionMatrix`; `relate(a, b, pattern)` matches it against a
   pattern (`T`, `F`, `*`, `0`, `1`, `2`).
 - The named predicates `equalsTopologically`, `disjoint`, `intersects`, `touches`, `crosses`, `within`,
-  `contains`, `overlaps`, `covers` and `coveredBy` are static methods of `Relate`, with envelope prefilters, and
-  are also available on an `IntersectionMatrix` (`isTouches`, `isCrosses`, ...).
+  `contains`, `overlaps`, `covers` and `coveredBy` are static methods of `Relate`, and are also available on an
+  `IntersectionMatrix` (`isTouches`, `isCrosses`, ...). The static methods stop as soon as the answer is known
+  (see below), so they are usually faster than computing the matrix.
 - `PointLocator.of(geometry).locate(x, y)` returns the `Location` (`INTERIOR`, `BOUNDARY` or `EXTERIOR`) of a
   point.
 - `DefaultProjectedGeometryOperations`, the default `ProjectedGeometryOperations`, computes its spatial
@@ -126,11 +127,15 @@ For valid Simple Features geometries this is the usual definition. Only the indi
 **Algorithm.** The result is exact for the input doubles: no coordinate is ever rounded to decide the topology.
 
 - All segments of both geometries are put into one arrangement. The lines and rings are split into monotone
-  chains (runs of segments whose directions lie in the same quadrant), which are packed in a static R-tree in
-  their order along the lines and rings. A self-join of the tree gives the pairs of chains with intersecting
-  envelopes, and a recursive bisection of each pair gives the candidate pairs of segments, which are classified
-  with `segmentIntersection`. Segments of the same monotone chain only meet in a common vertex and are never
-  tested; consecutive segments of a line or ring are only tested if the line turns back.
+  chains (runs of segments whose directions lie in the same quadrant), which are packed in a static R-tree per
+  geometry, in their order along the lines and rings. A join of the two trees gives the pairs of chains with
+  intersecting envelopes, and a recursive bisection of each pair gives the candidate pairs of segments, which
+  are classified with `segmentIntersection`. Segments of the same monotone chain only meet in a common vertex and
+  are never tested; consecutive segments of a line or ring are only tested if the line turns back.
+- A geometry is only intersected with itself (a self-join of its tree) if it has lines, more than one polygon,
+  or points and a polygon. The rings of one polygon are never tested against each other, because the polygon is
+  valid: they can only touch in vertices. Such a vertex is found afterwards: every node is looked up in the ring
+  chains, and a ring that passes through it is split there.
 - The nodes are the points where elements meet (vertices, points and crossing points), the endpoints of lines,
   and the lexicographically smallest vertex of each line and ring. Other vertices touch nothing and are not
   nodes. A crossing point is represented implicitly by its two segments; its correctly rounded value is only
@@ -147,6 +152,21 @@ For valid Simple Features geometries this is the usual definition. Only the indi
   the other depths follow by walking around the nodes and along the edges, adding +1 or −1 when crossing a ring.
 - The locations of the nodes (dimension 0), the edges (dimension 1) and the faces beside each edge (dimension 2)
   in both geometries give the matrix.
+
+**Predicates.** A named predicate is decided early where possible:
+
+- an envelope test, and the dimensions (two points never touch, areas never cross, geometries of different
+  dimensions never overlap);
+- the exact location of one position of each geometry in the other, by a linear scan: a position in the
+  interior of a polygon of the other geometry proves that the interiors intersect (so `intersects` is true and
+  `touches` false), and a position outside the other geometry rules out `within`, `covers` and the like;
+- during the join: `intersects` is true at the first contact. A proper crossing of a segment of A and one of B
+  that no other segment comes near proves that the interiors intersect and that each geometry has points outside
+  the other, if both geometries are locally simple (no polygons, or a single polygon and no lines). So
+  `touches`, `within`, `contains`, `covers`, `coveredBy` and `equalsTopologically` are false; `crosses` is true
+  for a line against an area, and `overlaps` is true for two areas.
+
+Otherwise the predicate is evaluated on the full matrix.
 
 `PointLocator` uses exact crossing parity per polygon, on an interval index over the ring segments, and for a
 point on polygon boundaries the same angular ordering to decide whether the polygons cover all of its
@@ -167,10 +187,16 @@ Indicative timings for `Relate.relate`:
 
 | Operation | Time |
 |---|---|
-| two overlapping polygons, 100,000 vertices each | ≈ 6 ms |
-| two overlapping polygons, 1,000,000 vertices each | ≈ 55 ms |
+| two overlapping polygons, 100,000 vertices each | ≈ 3 ms |
+| two overlapping polygons, 1,000,000 vertices each | ≈ 28 ms |
+| two overlapping polygons, 100,000 vertices each, with spikes | ≈ 28 ms |
 | 10,000 line segments against a polygon of 2,000 vertices | ≈ 8 ms |
-| 10,000 line segments against 10,000 line segments (random walks) | ≈ 18 ms |
+| 10,000 line segments against 10,000 line segments (random walks) | ≈ 20 ms |
+
+This is comparable to JTS 1.20 `RelateNG` (and 4 to 15 times faster than JTS `RelateOp` on large inputs). The
+named predicates take ≈ 1 ms for two polygons of 100,000 vertices when they are decided early, most of which is
+spent copying the coordinates; RelateNG is faster there (≈ 0.1–0.3 ms), because JTS geometries cache their
+envelope and RelateNG reads the coordinates in place.
 
 ## Roadmap: the Simple Features operations
 

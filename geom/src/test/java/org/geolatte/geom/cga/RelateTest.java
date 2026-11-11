@@ -280,6 +280,175 @@ public class RelateTest {
         assertEquals(report.toString(), 0, failures);
     }
 
+    /**
+     * Polygons whose holes touch the shell and each other in points (which the engine does not compute: rings of
+     * the same polygon are not tested against each other), compared with the oracle.
+     */
+    @Test
+    public void sameAsOracleForTouchingRings() {
+        // a hole touching the shell in a reflex vertex of the shell, which is the smallest vertex of the hole
+        String notched = "POLYGON ((0 0, 6 0, 6 1.5, 2 2, 6 2.5, 6 4, 0 4, 0 0), (2 2, 3 3, 2.5 3.5, 2 2))";
+        assertTrue(jts(notched).isValid());
+        assertMatrix("FF2FF10F2", notched, "POINT (2.5 2.9)");    // in the hole
+        assertMatrix("FF20F1FF2", notched, "POINT (2 2)");        // the touching point
+        assertMatrix("212FF1FF2", notched, "POLYGON ((0.5 1, 1.5 1, 1.5 3, 0.5 3, 0.5 1))");
+        for (String other : new String[]{"POINT (1.9 2)", "LINESTRING (1 1, 1 3)", "LINESTRING (1 2, 3 2)",
+                "POLYGON ((1 1, 2 2, 1 3, 1 1))", "POLYGON ((2 2, 3 3, 2.5 3.5, 2 2))"}) {
+            assertEquals(other, RelateOracle.relate(jts(notched), jts(other)),
+                    Relate.relate(geometry(notched), geometry(other)).toString());
+        }
+        int failures = 0, touching = 0;
+        StringBuilder report = new StringBuilder();
+        for (int trial = 0; trial < 500; trial++) {
+            org.locationtech.jts.geom.Polygon p = polygonWithTouchingHoles();
+            if (p.getNumInteriorRing() > 0 && p.getExteriorRing().intersects(p.getInteriorRingN(0))) touching++;
+            org.locationtech.jts.geom.Geometry a = random.nextInt(4) == 0
+                    ? factory.createGeometryCollection(new org.locationtech.jts.geom.Geometry[]{p, randomMember()}) : p;
+            org.locationtech.jts.geom.Geometry b = random.nextBoolean() ? randomCollection() : polygonWithTouchingHoles();
+            for (org.locationtech.jts.geom.Geometry[] pair : new org.locationtech.jts.geom.Geometry[][]{{a, b}, {b, a}}) {
+                String expected = RelateOracle.relate(pair[0], pair[1]);
+                String actual = Relate.relate(JTS.from(pair[0]), JTS.from(pair[1])).toString();
+                if (!expected.equals(actual) && failures++ < 10) {
+                    report.append(pair[0]).append('\n').append(pair[1]).append("\n oracle ").append(expected)
+                            .append(" exact ").append(actual).append('\n');
+                }
+            }
+        }
+        assertEquals(report.toString(), 0, failures);
+        assertTrue(touching > 100);
+    }
+
+    // a valid polygon with holes whose vertices are often vertices or edge midpoints of the shell, or vertices of
+    // other holes
+    private org.locationtech.jts.geom.Polygon polygonWithTouchingHoles() {
+        while (true) {
+            Coordinate[] shell = star(3, 3, 4 + random.nextInt(4), 3);
+            List<Coordinate> anchors = new ArrayList<>();
+            for (int i = 0; i + 1 < shell.length; i++) {
+                anchors.add(shell[i]);
+                anchors.add(new Coordinate((shell[i].x + shell[i + 1].x) / 2, (shell[i].y + shell[i + 1].y) / 2));
+            }
+            List<org.locationtech.jts.geom.LinearRing> holes = new ArrayList<>();
+            int count = 1 + random.nextInt(3);
+            for (int attempt = 0; attempt < 20 && holes.size() < count; attempt++) {
+                Coordinate[] hole = new Coordinate[4];
+                for (int i = 0; i < 3; i++) {
+                    hole[i] = random.nextInt(3) == 0 ? new Coordinate(anchors.get(random.nextInt(anchors.size())))
+                            : new Coordinate(random.nextInt(13) / 2.0, random.nextInt(13) / 2.0);
+                }
+                hole[3] = new Coordinate(hole[0]);
+                org.locationtech.jts.geom.LinearRing ring = factory.createLinearRing(hole);
+                if (!ring.isValid() || ring.isEmpty() || factory.createPolygon(hole).getArea() == 0) continue;
+                List<org.locationtech.jts.geom.LinearRing> candidate = new ArrayList<>(holes);
+                candidate.add(ring);
+                org.locationtech.jts.geom.Polygon p = factory.createPolygon(factory.createLinearRing(shell),
+                        candidate.toArray(new org.locationtech.jts.geom.LinearRing[0]));
+                if (p.isValid()) {
+                    holes.add(ring);
+                    for (Coordinate c : hole) anchors.add(c);
+                }
+            }
+            if (holes.isEmpty()) continue;
+            return factory.createPolygon(factory.createLinearRing(shell),
+                    holes.toArray(new org.locationtech.jts.geom.LinearRing[0]));
+        }
+    }
+
+    private static org.locationtech.jts.geom.Geometry jts(String wkt) {
+        try {
+            return new WKTReader().read(wkt);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /**
+     * The named predicates, which may be decided before the matrix is complete, agree with the matrix
+     */
+    @Test
+    public void predicatesAgreeWithMatrix() {
+        int early = 0;
+        for (int trial = 0; trial < 4000; trial++) {
+            org.locationtech.jts.geom.Geometry a = anyGeometry(), b = anyGeometry();
+            Geometry<?> ga = JTS.from(a), gb = JTS.from(b);
+            IntersectionMatrix m = Relate.relate(ga, gb);
+            String msg = a + " / " + b + " " + m;
+            assertEquals(msg, m.isIntersects(), Relate.intersects(ga, gb));
+            assertEquals(msg, m.isDisjoint(), Relate.disjoint(ga, gb));
+            assertEquals(msg, m.isTouches(), Relate.touches(ga, gb));
+            assertEquals(msg, m.isCrosses(), Relate.crosses(ga, gb));
+            assertEquals(msg, m.isWithin(), Relate.within(ga, gb));
+            assertEquals(msg, m.isContains(), Relate.contains(ga, gb));
+            assertEquals(msg, m.isOverlaps(), Relate.overlaps(ga, gb));
+            assertEquals(msg, m.isCovers(), Relate.covers(ga, gb));
+            assertEquals(msg, m.isCoveredBy(), Relate.coveredBy(ga, gb));
+            assertEquals(msg, m.isEquals(), Relate.equalsTopologically(ga, gb));
+            for (RelateComputer.Predicate p : RelateComputer.Predicate.values()) {
+                RelateComputer computer = new RelateComputer(GeometryElements.of(ga), GeometryElements.of(gb), p);
+                if (computer.compute() != null) continue;
+                early++;
+                boolean decided = computer.decided;
+                switch (p) {
+                    case INTERSECTS:
+                        assertEquals(msg, m.isIntersects(), decided);
+                        break;
+                    case TOUCHES:
+                        assertEquals(msg, m.isTouches(), decided);
+                        break;
+                    case CONTAINMENT:
+                        assertFalse(msg, decided || m.isCovers() || m.isCoveredBy());
+                        break;
+                    case CROSSES:
+                        assertEquals(msg, m.isCrosses(), decided);
+                        break;
+                    case OVERLAPS:
+                        assertEquals(msg, m.isOverlaps(), decided);
+                        break;
+                    default:
+                        fail(msg + " decided early without a predicate");
+                }
+            }
+        }
+        assertTrue(early > 2000);
+    }
+
+    /**
+     * The quick location used by the predicates is consistent with the point locator.
+     */
+    @Test
+    public void roughLocationAgreesWithPointLocator() {
+        int[] counts = new int[3];
+        for (int trial = 0; trial < 1000; trial++) {
+            Geometry<?> g = JTS.from(anyGeometry());
+            GeometryElements elements = GeometryElements.of(g);
+            PointLocator locator = PointLocator.of(g);
+            for (int i = 0; i < 40; i++) {
+                double x = random.nextInt(20) * 0.5 - 1, y = random.nextInt(20) * 0.5 - 1;
+                int rough = elements.roughLocation(x, y);
+                Location location = locator.locate(x, y);
+                String msg = g + " at " + x + " " + y;
+                if (rough == GeometryElements.EXTERIOR) assertEquals(msg, Location.EXTERIOR, location);
+                if (rough == GeometryElements.ON) assertNotEquals(msg, Location.EXTERIOR, location);
+                if (rough == GeometryElements.INSIDE) assertEquals(msg, Location.INTERIOR, location);
+                counts[rough]++;
+            }
+        }
+        for (int count : counts) assertTrue(java.util.Arrays.toString(counts), count > 1000);
+    }
+
+    private org.locationtech.jts.geom.Geometry anyGeometry() {
+        switch (random.nextInt(5)) {
+            case 0:
+                return randomCollection();
+            case 1:
+                return polygonWithTouchingHoles();
+            case 2:
+                return randomPolygon(6);
+            default:
+                return randomGeometry();
+        }
+    }
+
     @Test
     public void sameAsOracleForCollections() {
         int failures = 0;

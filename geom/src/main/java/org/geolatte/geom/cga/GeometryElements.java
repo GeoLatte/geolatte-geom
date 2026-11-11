@@ -140,6 +140,63 @@ final class GeometryElements {
         maxY = Math.max(maxY, y);
     }
 
+    static final int EXTERIOR = 0, ON = 1, INSIDE = 2;
+
+    /**
+     * A quick, exact location of the point by a linear scan: {@code INSIDE} if it lies in the interior of a polygon
+     * (and not on one of its rings), so in the interior of the geometry; {@code EXTERIOR} if it is not a point of
+     * the geometry; {@code ON} otherwise (it lies on an element, in the interior or on the boundary).
+     */
+    int roughLocation(double x, double y) {
+        x += 0.0;
+        y += 0.0;
+        boolean on = false;
+        boolean[] odd = new boolean[polygonCount], touched = new boolean[polygonCount];
+        for (Ring r : rings) {
+            double[] xs = r.xs, ys = r.ys;
+            for (int i = 0; i + 1 < xs.length; i++) {
+                double y0 = ys[i], y1 = ys[i + 1];
+                if ((y0 > y && y1 > y) || (y0 < y && y1 < y)) continue;
+                double x0 = xs[i], x1 = xs[i + 1];
+                if (x0 < x && x1 < x) continue;
+                int o = Predicates.orientation(x0, y0, x1, y1, x, y);
+                if (o == 0 && Math.min(x0, x1) <= x) {
+                    touched[r.polygon] = true;
+                    on = true;
+                } else if (y0 <= y ? y1 > y && o > 0 : y1 <= y && o < 0) {
+                    odd[r.polygon] = !odd[r.polygon];
+                }
+            }
+        }
+        for (int p = 0; p < polygonCount; p++) {
+            if (odd[p] && !touched[p]) return INSIDE;
+            if (odd[p]) on = true;
+        }
+        if (on) return ON;
+        for (double[][] line : lines) {
+            double[] xs = line[0], ys = line[1];
+            for (int i = 0; i + 1 < xs.length; i++) {
+                if (x < Math.min(xs[i], xs[i + 1]) || x > Math.max(xs[i], xs[i + 1])) continue;
+                if (y < Math.min(ys[i], ys[i + 1]) || y > Math.max(ys[i], ys[i + 1])) continue;
+                if (Predicates.orientation(xs[i], ys[i], xs[i + 1], ys[i + 1], x, y) == 0) return ON;
+            }
+        }
+        for (double[] p : points) {
+            if (p[0] == x && p[1] == y) return ON;
+        }
+        return EXTERIOR;
+    }
+
+    /**
+     * @return a position of the geometry (the first one of its first element), or null if it is empty
+     */
+    double[] anyPosition() {
+        if (!points.isEmpty()) return points.get(0);
+        if (!lines.isEmpty()) return new double[]{lines.get(0)[0][0], lines.get(0)[1][0]};
+        if (!rings.isEmpty()) return new double[]{rings.get(0).xs[0], rings.get(0).ys[0]};
+        return null;
+    }
+
     /**
      * @return true if the bounding boxes of this and the other geometry have a point in common
      */

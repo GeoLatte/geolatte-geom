@@ -30,7 +30,11 @@ import java.util.*;
  *     polygons (of other components) that contain v.</li>
  * </ol>
  * <p>The segments that meet are found with monotone chains (runs of segments with directions in the same
- * quadrant) in an {@link EnvelopeTree}: segments of the same monotone chain only meet in a common vertex.</p>
+ * quadrant) in an {@link EnvelopeTree} per geometry: segments of the same monotone chain only meet in a common
+ * vertex. The trees of A and B are joined first. A geometry is only intersected with itself if it has lines, more
+ * than one polygon, or points and a polygon: the rings of a valid polygon only touch in vertices, and these are
+ * found by looking up every node in the ring chains afterwards (the closing step).</p>
+ * <p>With a {@link Predicate}, the computation stops as soon as the predicate is decided, see {@link #compute()}.</p>
  * <p>Nodes, edges, and the faces next to the edges partition the plane into cells, in each of which the location
  * relative to each geometry is constant. The matrix entry of the locations of a cell is at least the dimension of
  * the cell.</p>
@@ -51,14 +55,46 @@ final class RelateComputer {
     private int[][] sectors = new int[2][8];
     int inconsistencies = 0;   // edges that received different depths from their two ends (invalid input)
 
-    RelateComputer(GeometryElements a, GeometryElements b) {
-        this.elements = new GeometryElements[]{a, b};
+    /**
+     * The predicates that can be decided before the matrix is complete
+     */
+    enum Predicate {
+        NONE,
+        INTERSECTS,     // true if the geometries meet
+        TOUCHES,        // false if the interiors meet
+        CONTAINMENT,    // contains, within, covers, covered by, equals: false if both have points outside the other
+        CROSSES,        // true for a line crossing the boundary of an area
+        OVERLAPS        // true for crossing boundaries of areas
     }
 
+    private final Predicate predicate;
+    private final boolean[] simple = new boolean[2];
+    private EnvelopeTree[] trees;
+    private List<List<MonotoneChain>> monotone;
+    Boolean decided;   // the value of the predicate, if decided before the matrix is complete
+
+    RelateComputer(GeometryElements a, GeometryElements b) {
+        this(a, b, Predicate.NONE);
+    }
+
+    RelateComputer(GeometryElements a, GeometryElements b, Predicate predicate) {
+        this.elements = new GeometryElements[]{a, b};
+        this.predicate = predicate;
+        // a geometry is locally simple if no element covers the neighbourhood of a point on the boundary of another
+        // element: then a proper crossing that no other segment passes through tells the locations around it
+        for (int g = 0; g < 2; g++) {
+            simple[g] = elements[g].polygonCount == 0 || (elements[g].polygonCount == 1 && elements[g].lines.isEmpty());
+        }
+    }
+
+    /**
+     * @return the matrix, or null if the predicate was decided before the matrix was complete (see decided)
+     */
     IntersectionMatrix compute() {
         addElements(elements[A], A);
         addElements(elements[B], B);
         findContacts();
+        if (decided != null) return null;
         buildEdges();
         for (Node n : allNodes) n.sortStar();
         label();
@@ -100,7 +136,9 @@ final class RelateComputer {
                 maxX = Math.max(maxX, xs[i]);
                 minY = Math.min(minY, ys[i]);
                 maxY = Math.max(maxY, ys[i]);
-                if (!closed && (i == 0 || i == vertexCount - 1)) continue;
+                // only consecutive segments of a line can be tested against each other: rings of a polygon are
+                // not tested against the rings of the same polygon
+                if (closed || i == 0 || i == vertexCount - 1) continue;
                 int previous = i > 0 ? i - 1 : vertexCount - 1;
                 turnsBack[i] = turnsBack(xs[previous], ys[previous], xs[i], ys[i], xs[i + 1], ys[i + 1]);
             }
@@ -430,19 +468,80 @@ final class RelateComputer {
         return dx >= 0 ? (dy >= 0 ? 0 : 3) : (dy >= 0 ? 1 : 2);
     }
 
-    // all pairs of segments with intersecting bounding boxes: monotone chains in an R-tree
+    /**
+     * All pairs of segments with intersecting bounding boxes, except pairs of segments of rings of the same polygon:
+     * the polygon is valid, so its rings meet only in isolated points, which do not change the topology of the
+     * polygon. Where such a point is a node for another reason, the rings are split there afterwards.
+     *
+     * <p>The monotone chains of each geometry are in an R-tree; pairs within a geometry come from a self-join (if
+     * it can have such pairs), pairs between the geometries from a join of the two trees.</p>
+     */
     private void findContacts() {
-        List<MonotoneChain> monotone = new ArrayList<>();
-        // the points along a Hilbert curve, the monotone chains in their order along the lines and rings
-        if (!points.isEmpty()) {
-            double[] px = new double[points.size()], py = new double[points.size()];
-            for (int i = 0; i < px.length; i++) {
-                px[i] = points.get(i).x0;
-                py[i] = points.get(i).y0;
+        monotone = new ArrayList<>();
+        trees = new EnvelopeTree[2];
+        for (int g = 0; g < 2; g++) {
+            monotone.add(monotoneChains(g));
+            trees[g] = tree(monotone.get(g));
+        }
+        // first the pairs between the geometries, which may decide the predicate
+        List<MonotoneChain> ma = monotone.get(A), mb = monotone.get(B);
+        EnvelopeTree.join(trees[A], trees[B], (i, j) -> {
+            MonotoneChain a = ma.get(i), b = mb.get(j);
+            if (a.point != null && b.point != null) {
+                if (predicate == Predicate.INTERSECTS && a.point.point == b.point.point) decided = true;
+            } else {
+                overlap(a, a.start, a.end, b, b.start, b.end);
             }
-            for (int i : Hilbert.order(px, py)) monotone.add(new MonotoneChain(points.get(i)));
+            return decided != null;
+        });
+        if (decided != null) return;
+        for (int g = 0; g < 2; g++) {
+            GeometryElements e = elements[g];
+            boolean selfContacts = !e.lines.isEmpty() || e.polygonCount > 1 || (!e.points.isEmpty() && e.polygonCount > 0);
+            if (!selfContacts) continue;
+            List<MonotoneChain> mcs = monotone.get(g);
+            trees[g].selfJoin((i, j) -> {
+                MonotoneChain a = mcs.get(i), b = mcs.get(j);
+                if (a.point != null && b.point != null) return false;
+                if (a.chain != null && b.chain != null && a.chain.kind == RING && b.chain.kind == RING
+                        && a.chain.polygon == b.chain.polygon) {
+                    return false;
+                }
+                overlap(a, a.start, a.end, b, b.start, b.end);
+                return false;
+            });
+        }
+        // split the rings that pass through exact nodes
+        List<Node> exact = new ArrayList<>();
+        for (Node n : allNodes) if (n.exact) exact.add(n);
+        for (int g = 0; g < 2; g++) {
+            if (elements[g].polygonCount == 0) continue;
+            List<MonotoneChain> mcs = monotone.get(g);
+            for (Node n : exact) {
+                trees[g].query(n.x, n.y, n.x, n.y, i -> {
+                    MonotoneChain mc = mcs.get(i);
+                    if (mc.chain != null && mc.chain.kind == RING) splitAt(mc, mc.start, mc.end, n);
+                });
+            }
+        }
+    }
+
+    // the monotone chains of geometry g: the points along a Hilbert curve, the chains in their order along the
+    // lines and rings
+    private List<MonotoneChain> monotoneChains(int g) {
+        List<MonotoneChain> monotone = new ArrayList<>();
+        List<Seg> own = new ArrayList<>();
+        for (Seg p : points) if (p.geom == g) own.add(p);
+        if (!own.isEmpty()) {
+            double[] px = new double[own.size()], py = new double[own.size()];
+            for (int i = 0; i < px.length; i++) {
+                px[i] = own.get(i).x0;
+                py[i] = own.get(i).y0;
+            }
+            for (int i : Hilbert.order(px, py)) monotone.add(new MonotoneChain(own.get(i)));
         }
         for (Chain c : chains) {
+            if (c.geom != g) continue;
             int n = c.xs.length - 1, start = 0;
             int q = quadrant(c.xs[1] - c.xs[0], c.ys[1] - c.ys[0]);
             for (int i = 1; i < n; i++) {
@@ -455,6 +554,10 @@ final class RelateComputer {
             }
             monotone.add(new MonotoneChain(c, start, n));
         }
+        return monotone;
+    }
+
+    private static EnvelopeTree tree(List<MonotoneChain> monotone) {
         int m = monotone.size();
         double[] minX = new double[m], minY = new double[m], maxX = new double[m], maxY = new double[m];
         for (int i = 0; i < m; i++) {
@@ -464,14 +567,34 @@ final class RelateComputer {
             minY[i] = Math.min(mc.y(mc.start), mc.y(mc.end));
             maxY[i] = Math.max(mc.y(mc.start), mc.y(mc.end));
         }
-        new EnvelopeTree(minX, minY, maxX, maxY).selfJoin((i, j) -> {
-            MonotoneChain a = monotone.get(i), b = monotone.get(j);
-            if (a.point == null || b.point == null) overlap(a, a.start, a.end, b, b.start, b.end);
-        });
+        return new EnvelopeTree(minX, minY, maxX, maxY);
+    }
+
+    // if the exact node lies on segments v0 to v1 - 1 of the monotone chain, it is a node of the chain there
+    private void splitAt(MonotoneChain mc, int v0, int v1, Node n) {
+        double x0 = mc.x(v0), x1 = mc.x(v1), y0 = mc.y(v0), y1 = mc.y(v1);
+        if (n.x < Math.min(x0, x1) || n.x > Math.max(x0, x1) || n.y < Math.min(y0, y1) || n.y > Math.max(y0, y1)) {
+            return;
+        }
+        if (v1 - v0 > 1) {
+            int mid = (v0 + v1) >>> 1;
+            splitAt(mc, v0, mid, n);
+            splitAt(mc, mid, v1, n);
+            return;
+        }
+        Chain c = mc.chain;
+        if (n.x == x0 && n.y == y0) {
+            vertexNode(c, v0);
+        } else if (n.x == x1 && n.y == y1) {
+            vertexNode(c, c.closed && v1 == c.vertexCount ? 0 : v1);
+        } else if (Predicates.orientation(x0, y0, x1, y1, n.x, n.y) == 0) {
+            seg(c, v0).addIncidence(n, null);
+        }
     }
 
     // the pairs of segments a0 to a1 - 1 of a and b0 to b1 - 1 of b with intersecting bounding boxes
     private void overlap(MonotoneChain a, int a0, int a1, MonotoneChain b, int b0, int b1) {
+        if (decided != null) return;
         // the bounding box of a monotone run is that of its end vertices
         double ax0 = a.x(a0), ax1 = a.x(a1), bx0 = b.x(b0), bx1 = b.x(b1);
         if (Math.max(ax0, ax1) < Math.min(bx0, bx1) || Math.min(ax0, ax1) > Math.max(bx0, bx1)) return;
@@ -515,18 +638,30 @@ final class RelateComputer {
                 return;
             case CROSSING: {
                 double[] xy = Constructions.crossingPoint(s.x0, s.y0, s.x1, s.y1, t.x0, t.y0, t.x1, t.y1);
+                if (predicate != Predicate.NONE && s.geom != t.geom) {
+                    decideAtCrossing(s.geom == A ? s : t, s.geom == A ? t : s, xy[0], xy[1]);
+                    if (decided != null) return;
+                }
                 Node n = crossingNode(s, t, xy[0], xy[1]);
                 s.addIncidence(n, n.exact ? null : t);
                 t.addIncidence(n, n.exact ? null : s);
                 return;
             }
             case TOUCHING:
+                if (predicate == Predicate.INTERSECTS && s.geom != t.geom) {
+                    decided = true;
+                    return;
+                }
                 endpointOn(s, 0, t);
                 if (s.kind != POINT) endpointOn(s, 1, t);
                 endpointOn(t, 0, s);
                 if (t.kind != POINT) endpointOn(t, 1, s);
                 return;
             default: {
+                if (predicate == Predicate.INTERSECTS && s.geom != t.geom) {
+                    decided = true;
+                    return;
+                }
                 // OVERLAPPING: the endpoints of both segments are nodes, so that the overlapping parts are
                 // edges between nodes; the endpoints of each segment that lie inside the other are nodes on it
                 s.overlapping = true;
@@ -538,6 +673,59 @@ final class RelateComputer {
                 if (t.strictlyInside(s.x1, s.y1)) t.addIncidence(s1, null);
             }
         }
+    }
+
+    /**
+     * Decides the predicate, if possible, from a proper crossing of segment s of A and segment t of B, near the
+     * rounded crossing point (x, y). If both geometries are locally simple and no other segment passes (near) the
+     * crossing point, the neighbourhood of the crossing point consists of s and t and the parts of the plane they
+     * separate: both geometries have points outside the other, and their interiors meet.
+     */
+    private void decideAtCrossing(Seg s, Seg t, double x, double y) {
+        if (predicate == Predicate.INTERSECTS) {
+            decided = true;
+            return;
+        }
+        if (!simple[A] || !simple[B] || !alone(A, s, x, y) || !alone(B, t, x, y)) return;
+        switch (predicate) {
+            case TOUCHES:
+            case CONTAINMENT:
+                decided = false;
+                return;
+            case CROSSES:
+                if (s.kind != t.kind) decided = true;    // a line crossing the boundary of an area
+                return;
+            case OVERLAPS:
+                if (s.kind == RING && t.kind == RING) decided = true;
+                return;
+            default:
+        }
+    }
+
+    // is s the only segment of geometry g whose bounding box meets the box of an ulp around (x, y)?
+    private boolean alone(int g, Seg s, double x, double y) {
+        double ex = Math.ulp(x), ey = Math.ulp(y);
+        double x0 = x - ex, x1 = x + ex, y0 = y - ey, y1 = y + ey;
+        List<MonotoneChain> mcs = monotone.get(g);
+        boolean[] other = {false};
+        trees[g].query(x0, y0, x1, y1, i -> {
+            if (!other[0]) other[0] = touchesBox(mcs.get(i), mcs.get(i).start, mcs.get(i).end, s, x0, y0, x1, y1);
+        });
+        return !other[0];
+    }
+
+    // does a segment v0 to v1 - 1 of the monotone chain, other than s, meet the box?
+    private static boolean touchesBox(MonotoneChain mc, int v0, int v1, Seg s, double x0, double y0, double x1,
+                                      double y1) {
+        double ax = mc.x(v0), bx = mc.x(v1), ay = mc.y(v0), by = mc.y(v1);
+        if (Math.max(ax, bx) < x0 || Math.min(ax, bx) > x1 || Math.max(ay, by) < y0 || Math.min(ay, by) > y1) {
+            return false;
+        }
+        if (v1 - v0 > 1) {
+            int mid = (v0 + v1) >>> 1;
+            return touchesBox(mc, v0, mid, s, x0, y0, x1, y1) || touchesBox(mc, mid, v1, s, x0, y0, x1, y1);
+        }
+        return mc.chain == null ? mc.point != s : !(mc.chain == s.chain && v0 == s.index);
     }
 
     // if endpoint `end` of s lies on t, it is a node, of s and of t

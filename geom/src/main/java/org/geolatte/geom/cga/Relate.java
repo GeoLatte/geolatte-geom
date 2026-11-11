@@ -44,6 +44,22 @@ public final class Relate {
         return new RelateComputer(a, b).compute();
     }
 
+    // the predicate, decided early if possible, otherwise from the matrix
+    private static boolean evaluate(GeometryElements a, GeometryElements b, RelateComputer.Predicate predicate,
+                                    java.util.function.Predicate<IntersectionMatrix> test) {
+        RelateComputer computer = new RelateComputer(a, b, predicate);
+        IntersectionMatrix matrix = computer.compute();
+        return matrix == null ? computer.decided : test.test(matrix);
+    }
+
+    // the location (EXTERIOR, ON or INSIDE, see GeometryElements.roughLocation) in g of a position of the other
+    // geometry. Every point of a geometry is a limit of points of its interior, so INSIDE means that the
+    // interiors intersect.
+    private static int roughLocation(GeometryElements other, GeometryElements g) {
+        double[] p = other.anyPosition();
+        return g.roughLocation(p[0], p[1]);
+    }
+
     /**
      * @return true if the geometries are topologically equal (they are the same point set); two empty geometries
      * are equal
@@ -52,7 +68,9 @@ public final class Relate {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
         if (ea.isEmpty() || eb.isEmpty()) return ea.isEmpty() && eb.isEmpty();
         if (ea.minX != eb.minX || ea.minY != eb.minY || ea.maxX != eb.maxX || ea.maxY != eb.maxY) return false;
-        return relate(ea, eb).isEquals();
+        if (roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
+        if (roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isEquals);
     }
 
     /**
@@ -67,7 +85,10 @@ public final class Relate {
      */
     public static boolean intersects(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeIntersects(eb) && relate(ea, eb).isIntersects();
+        if (!ea.envelopeIntersects(eb)) return false;
+        if (roughLocation(ea, eb) != GeometryElements.EXTERIOR) return true;
+        if (roughLocation(eb, ea) != GeometryElements.EXTERIOR) return true;
+        return evaluate(ea, eb, RelateComputer.Predicate.INTERSECTS, IntersectionMatrix::isIntersects);
     }
 
     /**
@@ -76,7 +97,11 @@ public final class Relate {
      */
     public static boolean touches(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeIntersects(eb) && relate(ea, eb).isTouches();
+        if (ea.dimension == 0 && eb.dimension == 0) return false;
+        if (!ea.envelopeIntersects(eb)) return false;
+        if (roughLocation(ea, eb) == GeometryElements.INSIDE) return false;
+        if (roughLocation(eb, ea) == GeometryElements.INSIDE) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.TOUCHES, IntersectionMatrix::isTouches);
     }
 
     /**
@@ -84,7 +109,9 @@ public final class Relate {
      */
     public static boolean crosses(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeIntersects(eb) && relate(ea, eb).isCrosses();
+        if (ea.dimension == eb.dimension && ea.dimension != 1) return false;
+        return ea.envelopeIntersects(eb)
+                && evaluate(ea, eb, RelateComputer.Predicate.CROSSES, IntersectionMatrix::isCrosses);
     }
 
     /**
@@ -92,7 +119,8 @@ public final class Relate {
      */
     public static boolean within(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return eb.envelopeContains(ea) && relate(ea, eb).isWithin();
+        if (!eb.envelopeContains(ea) || roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isWithin);
     }
 
     /**
@@ -100,7 +128,8 @@ public final class Relate {
      */
     public static boolean contains(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeContains(eb) && relate(ea, eb).isContains();
+        if (!ea.envelopeContains(eb) || roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isContains);
     }
 
     /**
@@ -108,7 +137,9 @@ public final class Relate {
      */
     public static boolean overlaps(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeIntersects(eb) && relate(ea, eb).isOverlaps();
+        if (ea.dimension != eb.dimension) return false;
+        return ea.envelopeIntersects(eb)
+                && evaluate(ea, eb, RelateComputer.Predicate.OVERLAPS, IntersectionMatrix::isOverlaps);
     }
 
     /**
@@ -116,7 +147,8 @@ public final class Relate {
      */
     public static boolean covers(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return ea.envelopeContains(eb) && relate(ea, eb).isCovers();
+        if (!ea.envelopeContains(eb) || roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCovers);
     }
 
     /**
@@ -124,6 +156,7 @@ public final class Relate {
      */
     public static boolean coveredBy(Geometry<?> a, Geometry<?> b) {
         GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        return eb.envelopeContains(ea) && relate(ea, eb).isCoveredBy();
+        if (!eb.envelopeContains(ea) || roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
+        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCoveredBy);
     }
 }

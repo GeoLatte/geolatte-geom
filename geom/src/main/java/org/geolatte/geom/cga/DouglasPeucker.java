@@ -125,10 +125,11 @@ public final class DouglasPeucker {
 
     // copies the X and Y coordinates, which must be finite
     static void coordinates(PositionSequence<?> positions, double[] xs, double[] ys) {
-        for (int i = 0; i < positions.size(); i++) {
-            Position p = positions.getPositionN(i);
-            xs[i] = p.getCoordinate(0);
-            ys[i] = p.getCoordinate(1);
+        double[] buffer = new double[Math.max(2, positions.getCoordinateDimension())];
+        for (int i = 0, n = positions.size(); i < n; i++) {
+            positions.getCoordinates(i, buffer);
+            xs[i] = buffer[0];
+            ys[i] = buffer[1];
             if (!Double.isFinite(xs[i]) || !Double.isFinite(ys[i])) {
                 throw new IllegalArgumentException("Coordinates must be finite");
             }
