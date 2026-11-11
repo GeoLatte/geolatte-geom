@@ -52,6 +52,9 @@ abstract class AbstractPositionSequenceBuilder<P extends Position> implements Po
 
     @Override
     public PositionSequenceBuilder<P> add(P pos) {
+        if (pos.isEmpty()) {
+            throw new IllegalArgumentException("Cannot add an empty position to a position sequence");
+        }
         pos.toArray(coords);
         for (double coord : coords) {
             addCoordinate(coord);

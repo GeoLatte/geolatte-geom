@@ -43,4 +43,24 @@ public interface Linear<P extends Position> {
      */
     public P getEndPosition();
 
+    /**
+     * Returns the start point of the linear {@code Geometry} as a {@code Point}.
+     *
+     * <p>Corresponds to {@code ST_StartPoint} in ISO/IEC 13249-3 (SQL/MM Spatial): the returned {@code Point} includes
+     * any Z and M coordinate values, and is empty if this linear {@code Geometry} is empty.</p>
+     *
+     * @return the start point of the linear {@code Geometry}
+     */
+    public Point<P> getStartPoint();
+
+    /**
+     * Returns the end point of the linear {@code Geometry} as a {@code Point}.
+     *
+     * <p>Corresponds to {@code ST_EndPoint} in ISO/IEC 13249-3 (SQL/MM Spatial): the returned {@code Point} includes
+     * any Z and M coordinate values, and is empty if this linear {@code Geometry} is empty.</p>
+     *
+     * @return the end point of the linear {@code Geometry}
+     */
+    public Point<P> getEndPoint();
+
 }

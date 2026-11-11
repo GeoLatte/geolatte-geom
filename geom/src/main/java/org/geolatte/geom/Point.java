@@ -53,10 +53,13 @@ public class Point<P extends Position> extends Geometry<P> implements Simple {
     /**
      * Returns the <code>Position</code> of this <code>Point</code>.
      *
+     * <p>If this <code>Point</code> is empty, an empty <code>Position</code> is returned (see
+     * {@link Position#isEmpty()}).</p>
+     *
      * @return the <code>Position</code> of this <code>Point</code>.
      */
     public P getPosition() {
-        return getPositions().getPositionN(0) ;
+        return isEmpty() ? Positions.mkPosition(getCoordinateReferenceSystem()) : getPositions().getPositionN(0);
     }
 
     @Override

@@ -208,8 +208,9 @@ public abstract class Geometry<P extends Position> implements Serializable {
      * @return the position at the specified index in the <code>PositionSequence</code> of this <code>Geometry</code>.
      */
     public P getPositionN(int index) {
-        if (index >= getPositions().size()) {
-            throw new IndexOutOfBoundsException();
+        if (index < 0 || index >= getPositions().size()) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index %d out of bounds for a geometry with %d positions", index, getPositions().size()));
         }
         return getPositions().getPositionN(index);
     }

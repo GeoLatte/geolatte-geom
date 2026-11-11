@@ -130,6 +130,10 @@ public class Polygon<P extends Position> extends Geometry<P> implements Polygona
      * @return the <code>LinearRing</code> at the position specified by the parameter index.
      */
     public LinearRing<P> getInteriorRingN(int index) {
+        if (index < 0 || index >= getNumInteriorRing()) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index %d out of bounds for a polygon with %d interior rings", index, getNumInteriorRing()));
+        }
         return this.rings[index + 1];
     }
 

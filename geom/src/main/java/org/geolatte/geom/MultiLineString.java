@@ -48,14 +48,40 @@ public class MultiLineString<P extends Position> extends AbstractGeometryCollect
 
 
 
+    /**
+     * Returns the first <code>Position</code> of the first element of this <code>MultiLineString</code>.
+     *
+     * <p>If this <code>MultiLineString</code> is empty, an empty <code>Position</code> is returned (see
+     * {@link Position#isEmpty()}).</p>
+     *
+     * @return the first <code>Position</code> of this <code>MultiLineString</code>.
+     */
     @Override
     public P getStartPosition() {
-        return getPositionN(0);
+        return isEmpty() ? Positions.mkPosition(getCoordinateReferenceSystem()) : getPositionN(0);
+    }
+
+    /**
+     * Returns the last <code>Position</code> of the last element of this <code>MultiLineString</code>.
+     *
+     * <p>If this <code>MultiLineString</code> is empty, an empty <code>Position</code> is returned (see
+     * {@link Position#isEmpty()}).</p>
+     *
+     * @return the last <code>Position</code> of this <code>MultiLineString</code>.
+     */
+    @Override
+    public P getEndPosition() {
+        return isEmpty() ? Positions.mkPosition(getCoordinateReferenceSystem()) : getPositionN(getNumPositions() - 1);
     }
 
     @Override
-    public P getEndPosition() {
-        return getPositionN(getNumPositions() - 1);
+    public Point<P> getStartPoint() {
+        return new Point<P>(getStartPosition(), getCoordinateReferenceSystem());
+    }
+
+    @Override
+    public Point<P> getEndPoint() {
+        return new Point<P>(getEndPosition(), getCoordinateReferenceSystem());
     }
 
     /**

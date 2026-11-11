@@ -64,20 +64,35 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     /**
      * Returns the first <code>Position</code> of this <code>LineString</code>.
      *
+     * <p>If this <code>LineString</code> is empty, an empty <code>Position</code> is returned (see
+     * {@link Position#isEmpty()}).</p>
+     *
      * @return the first <code>Position</code> of this <code>LineString</code>.
      */
     public P getStartPosition() {
-        return getPositionN(0);
+        return isEmpty() ? Positions.mkPosition(getCoordinateReferenceSystem()) : getPositionN(0);
     }
-
 
     /**
      * Returns the last <code>Position</code> of this <code>LineString</code>.
      *
+     * <p>If this <code>LineString</code> is empty, an empty <code>Position</code> is returned (see
+     * {@link Position#isEmpty()}).</p>
+     *
      * @return the last <code>Position</code> of this <code>LineString</code>.
      */
     public P getEndPosition() {
-        return getPositionN(getNumPositions() - 1);
+        return isEmpty() ? Positions.mkPosition(getCoordinateReferenceSystem()) : getPositionN(getNumPositions() - 1);
+    }
+
+    @Override
+    public Point<P> getStartPoint() {
+        return new Point<P>(getStartPosition(), getCoordinateReferenceSystem());
+    }
+
+    @Override
+    public Point<P> getEndPoint() {
+        return new Point<P>(getEndPosition(), getCoordinateReferenceSystem());
     }
 
     /**

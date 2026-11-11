@@ -96,9 +96,10 @@ public class LineStringTest {
         assertEquals(new C3DM(0, 0, 0, 0), linestr3dm.getStartPosition());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testStartPositionOnEmptyThrowsException() {
-        emptyLine.getStartPosition();
+    @Test
+    public void testStartPositionOnEmptyIsEmptyPosition() {
+        assertTrue(emptyLine.getStartPosition().isEmpty());
+        assertTrue(emptyLine.getStartPoint().isEmpty());
     }
 
     @Test
@@ -108,9 +109,10 @@ public class LineStringTest {
         assertEquals(new C3DM(2, -2, 3, 4), linestr3dm.getEndPosition());
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testEndPositionOnEmptyThrowsException() {
-        emptyLine.getEndPosition();
+    @Test
+    public void testEndPositionOnEmptyIsEmptyPosition() {
+        assertTrue(emptyLine.getEndPosition().isEmpty());
+        assertTrue(emptyLine.getEndPoint().isEmpty());
     }
 
 

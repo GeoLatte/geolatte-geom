@@ -95,6 +95,10 @@ abstract public class AbstractGeometryCollection<P extends Position, G extends G
      */
     @SuppressWarnings("unchecked")
     public G getGeometryN(int num) {
+        if (num < 0 || num >= geometries.length) {
+            throw new IndexOutOfBoundsException(String.format(
+                    "Index %d out of bounds for a collection with %d elements", num, geometries.length));
+        }
         return (G) geometries[num];
     }
 

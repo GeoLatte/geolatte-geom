@@ -120,8 +120,11 @@ abstract public class Position{
 
         Position position = (Position) o;
 
-        if (!Arrays.equals(coords, position.toArray(null))) return false;
-        return true;
+        if (isEmpty() || position.isEmpty()) {
+            // an empty position equals only an empty position of the same class
+            return isEmpty() && position.isEmpty() && getClass() == position.getClass();
+        }
+        return Arrays.equals(coords, position.toArray(null));
     }
 
     @Override

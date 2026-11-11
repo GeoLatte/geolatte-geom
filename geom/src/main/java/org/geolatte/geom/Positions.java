@@ -75,13 +75,18 @@ public class Positions {
 	 * Tests whether two positions coincide in the horizontal plane, i.e. have equal first (X or longitude) and
 	 * second (Y or latitude) coordinates. Any Z or M coordinate values are ignored.
 	 *
-	 * <p>Coordinates are compared numerically, so that 0.0 and -0.0 are considered equal.</p>
+	 * <p>Coordinates are compared numerically, so that 0.0 and -0.0 are considered equal. Two empty positions are
+	 * considered equal.</p>
 	 *
 	 * @param p0 a {@code Position}
 	 * @param p1 another {@code Position}
 	 * @return true if both positions have the same X and Y coordinate values
 	 */
 	public static boolean equals2D(Position p0, Position p1) {
+		if (p0.isEmpty() || p1.isEmpty()) {
+			// two empty positions are equal; an empty position never equals a non-empty one
+			return p0.isEmpty() && p1.isEmpty();
+		}
 		return p0.getCoordinate(0) == p1.getCoordinate(0) && p0.getCoordinate(1) == p1.getCoordinate(1);
 	}
 
