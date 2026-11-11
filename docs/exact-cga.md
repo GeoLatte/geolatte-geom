@@ -125,15 +125,23 @@ For valid Simple Features geometries this is the usual definition. Only the indi
 
 **Algorithm.** The result is exact for the input doubles: no coordinate is ever rounded to decide the topology.
 
-- All segments of both geometries are put into one arrangement. Candidate pairs come from a sweep over the
-  segment envelopes, and are classified with `segmentIntersection`.
-- The nodes are the vertices, the points, and the crossing points. A crossing point is represented implicitly by
-  its two segments; its correctly rounded value is only used as a hash key to find nodes that may coincide, and
-  coincidence is confirmed exactly with `orientation` and `orientationOfCrossing`.
-- The nodes on a segment are ordered exactly: vertices by coordinate, a vertex and a crossing with
-  `orientation`, two crossings with `orientationOfCrossing`. The pieces between consecutive nodes are the
-  edges; overlapping pieces are merged.
-- The edges around each node are sorted by angle with `crossProductSign`.
+- All segments of both geometries are put into one arrangement. The lines and rings are split into monotone
+  chains (runs of segments whose directions lie in the same quadrant), which are packed in a static R-tree in
+  their order along the lines and rings. A self-join of the tree gives the pairs of chains with intersecting
+  envelopes, and a recursive bisection of each pair gives the candidate pairs of segments, which are classified
+  with `segmentIntersection`. Segments of the same monotone chain only meet in a common vertex and are never
+  tested; consecutive segments of a line or ring are only tested if the line turns back.
+- The nodes are the points where elements meet (vertices, points and crossing points), the endpoints of lines,
+  and the lexicographically smallest vertex of each line and ring. Other vertices touch nothing and are not
+  nodes. A crossing point is represented implicitly by its two segments; its correctly rounded value is only
+  used as a hash key to find nodes that may coincide, and coincidence is confirmed exactly with `orientation` and
+  `orientationOfCrossing`.
+- The nodes on a segment are ordered exactly. A crossing point is correctly rounded, so if the coordinates of
+  two nodes (along the major axis of the segment) differ by more than their rounding errors, they decide the
+  order. Otherwise: a vertex and a crossing are ordered with `orientation`, two crossings with
+  `orientationOfCrossing`. The parts of the lines and rings between consecutive nodes are the edges: polylines.
+  The endpoints of overlapping segments are nodes, and overlapping parts are merged into one edge.
+- The edges around each node are sorted by the direction of their first segment, with `crossProductSign`.
 - Each face gets a depth per geometry: the number of polygons that cover it. Per connected component, the depth
   of the face to the left of its lexicographically smallest vertex comes from an exact point-in-polygon test;
   the other depths follow by walking around the nodes and along the edges, adding +1 or −1 when crossing a ring.
@@ -159,9 +167,10 @@ Indicative timings for `Relate.relate`:
 
 | Operation | Time |
 |---|---|
-| two overlapping polygons, 10,000 vertices each | ≈ 15 ms |
-| two overlapping polygons, 100,000 vertices each | ≈ 0.6 s |
-| 10,000 line segments against a polygon of 2,000 vertices | ≈ 20 ms |
+| two overlapping polygons, 100,000 vertices each | ≈ 6 ms |
+| two overlapping polygons, 1,000,000 vertices each | ≈ 55 ms |
+| 10,000 line segments against a polygon of 2,000 vertices | ≈ 8 ms |
+| 10,000 line segments against 10,000 line segments (random walks) | ≈ 18 ms |
 
 ## Roadmap: the Simple Features operations
 

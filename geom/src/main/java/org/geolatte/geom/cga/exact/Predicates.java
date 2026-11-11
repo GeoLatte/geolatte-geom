@@ -102,6 +102,9 @@ public final class Predicates {
             int signRight = sign(r1) * sign(r2);
             if (signLeft != signRight) return Integer.signum(signLeft - signRight);
             if (signLeft == 0) return 0;
+            // Coinciding positions (e.g. the shared endpoint of adjacent segments): the determinant is exactly
+            // zero, which no error bound can decide.
+            if ((cx == ax && cy == ay) || (cx == bx && cy == by) || (ax == bx && ay == by)) return 0;
         }
         return UNDECIDED;
     }

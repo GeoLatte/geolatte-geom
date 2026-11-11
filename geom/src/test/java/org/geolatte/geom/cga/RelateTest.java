@@ -250,6 +250,36 @@ public class RelateTest {
     // comparison with a brute force oracle, for collections with union semantics and non-simple geometries
     // ---------------------------------------------------------------------------------------------------------
 
+    /**
+     * Geometries with many connected components (more than RelateComputer scans before it builds an index to
+     * locate their start vertices).
+     */
+    @Test
+    public void sameAsOracleForManyComponents() {
+        int failures = 0;
+        StringBuilder report = new StringBuilder();
+        for (int trial = 0; trial < 200; trial++) {
+            int n = 10 + random.nextInt(10);
+            org.locationtech.jts.geom.Geometry[] members = new org.locationtech.jts.geom.Geometry[n + 1];
+            for (int i = 0; i < n; i++) members[i] = randomMember();
+            Coordinate[] points = new Coordinate[20];
+            for (int i = 0; i < points.length; i++) {
+                points[i] = new Coordinate(random.nextInt(7) + 0.5, random.nextInt(7) + 0.25);
+            }
+            members[n] = factory.createMultiPointFromCoords(points);
+            org.locationtech.jts.geom.Geometry a = factory.createGeometryCollection(members), b = randomCollection();
+            for (org.locationtech.jts.geom.Geometry[] pair : new org.locationtech.jts.geom.Geometry[][]{{a, b}, {b, a}}) {
+                String expected = RelateOracle.relate(pair[0], pair[1]);
+                String actual = Relate.relate(JTS.from(pair[0]), JTS.from(pair[1])).toString();
+                if (!expected.equals(actual) && failures++ < 10) {
+                    report.append(pair[0]).append('\n').append(pair[1]).append("\n oracle ").append(expected)
+                            .append(" exact ").append(actual).append('\n');
+                }
+            }
+        }
+        assertEquals(report.toString(), 0, failures);
+    }
+
     @Test
     public void sameAsOracleForCollections() {
         int failures = 0;
