@@ -180,8 +180,8 @@ public class MeasureInterpolatingVisitor<P extends C2D & Measured> implements Ge
         }
 
         if (number0Dimensional == 0 && number1Dimensional == 0) {
-            Position p = Positions.mkPosition(getCrs(), Double.NaN, Double.NaN);
-            return new Point(p, getCrs());
+            // no matching measures: an empty set of type Point (ISO/IEC 13249-3, 4.2.1.7)
+            return new Point<P>(getCrs());
         }
 
         if (number0Dimensional > 1 && number1Dimensional == 0) {

@@ -64,7 +64,8 @@ class WkbDialect {
             size += extraHeaderSize(geom);
         }
         //empty geometries have same representation as an empty GeometryCollection
-        if (geom.isEmpty()) return size + sizeEmptyGeometry(geom);
+        //(a collection whose elements are all empty is sized as a collection, since its elements are written)
+        if (geom.isEmpty() && !(geom instanceof AbstractGeometryCollection)) return size + sizeEmptyGeometry(geom);
 
         return size + geometrySize(geom);
     }

@@ -140,6 +140,32 @@ public class TestDefaultMeasureGeometryOperations {
     }
 
     @Test
+    public void testLocateBetweenReturnsEmptyPointWhenNoMeasureMatches() {
+        LineString<C2DM> line = linestring(crsM, DSL.cM(0, 0, 0), DSL.cM(1, 0, 1), DSL.cM(2, 0, 2));
+        Geometry<C2DM> result = measureOps.locateBetween(line, 5, 6);
+        assertTrue(result instanceof Point);
+        assertTrue(result.isEmpty());
+        assertEquals(crsM, result.getCoordinateReferenceSystem());
+
+        result = measureOps.locateAlong(line, 7);
+        assertTrue(result instanceof Point);
+        assertTrue(result.isEmpty());
+
+        Geometry<C2DM> fromPoints = measureOps.locateBetween(DSL.multipoint(crsM, DSL.cM(0, 0, 0), DSL.cM(1, 1, 1)), 5, 6);
+        assertTrue(fromPoints instanceof Point);
+        assertTrue(fromPoints.isEmpty());
+    }
+
+    @Test
+    public void testLocateBetweenReturnsEmptyPointWhenNoMeasureMatches3D() {
+        LineString<C3DM> line = linestring(crsZM, DSL.c(0, 0, 0, 0), DSL.c(1, 0, 0, 1));
+        Geometry<C3DM> result = measureOps.locateBetween(line, 5, 6);
+        assertTrue(result instanceof Point);
+        assertTrue(result.isEmpty());
+        assertEquals(crsZM, result.getCoordinateReferenceSystem());
+    }
+
+    @Test
     public void testGetMeasureOpReturnsNaNOnEmptyGeometry() {
         double m = measureOps.measureAt(new LineString<C2DM>(crsM), new C2DM(1, 2, 0), 0.1);
         assertTrue(Double.isNaN(m));

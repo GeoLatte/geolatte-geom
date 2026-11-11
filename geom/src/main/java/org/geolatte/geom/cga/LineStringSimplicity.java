@@ -82,7 +82,8 @@ public final class LineStringSimplicity {
             int n = 0;
             for (int i = 0; i < size; i++) {
                 positions.getCoordinates(i, buffer);
-                // skip positions that repeat the previous one in X and Y
+                // skip positions that repeat the previous one in X and Y (as does JTS's IsSimpleOp in
+                // org.locationtech.jts.operation; the newer org.locationtech.jts.operation.valid.IsSimpleOp does not)
                 if (n > 0 && x[n - 1] == buffer[0] && y[n - 1] == buffer[1]) continue;
                 x[n] = buffer[0];
                 y[n] = buffer[1];

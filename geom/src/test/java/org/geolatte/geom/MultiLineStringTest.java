@@ -24,8 +24,9 @@ package org.geolatte.geom;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.geolatte.geom.builder.DSL.c;
+import static org.geolatte.geom.builder.DSL.linestring;
+import static org.junit.Assert.*;
 
 import static org.geolatte.geom.CrsMock.*;
 /**
@@ -94,7 +95,24 @@ public class MultiLineStringTest {
 
     @Test
     public void testIsClosed() throws Exception {
+        assertFalse("empty MultiLineString is not closed", empty.isClosed());
+        assertFalse(ml1.isClosed());
+        assertFalse(ml2.isClosed());
+        assertTrue(closedSimple.isClosed());
+        assertTrue("non-simple elements may still be closed", new MultiLineString<C2DM>(lcs, lcns).isClosed());
+        assertFalse("all elements must be closed", new MultiLineString<C2DM>(lcs, ls1).isClosed());
+    }
 
+    @Test
+    public void testIs3DClosed() throws Exception {
+        assertFalse(empty.is3DClosed());
+        assertFalse(ml1.is3DClosed());
+        assertTrue("M values are ignored", closedSimple.is3DClosed());
+        LineString<C3DM> closedInXY = linestring(crsZM, c(0, 0, 0, 1), c(1, 0, 0, 2), c(1, 1, 0, 3), c(0, 0, 5, 4));
+        LineString<C3DM> closedInXYZ = linestring(crsZM, c(0, 0, 0, 1), c(1, 0, 0, 2), c(1, 1, 0, 3), c(0, 0, 0, 4));
+        assertTrue(new MultiLineString<C3DM>(closedInXY, closedInXYZ).isClosed());
+        assertFalse(new MultiLineString<C3DM>(closedInXY, closedInXYZ).is3DClosed());
+        assertTrue(new MultiLineString<C3DM>(closedInXYZ).is3DClosed());
     }
 
     @Test

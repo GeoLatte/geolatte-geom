@@ -24,7 +24,7 @@ class HANAWkbDialect extends WkbDialect {
         if (includeSrid) {
             size += 4;
         }
-        if (geom.isEmpty()) return size + ByteBuffer.UINT_SIZE;
+        if (geom.isEmpty() && !(geom instanceof AbstractGeometryCollection)) return size + ByteBuffer.UINT_SIZE;
         return size + geometrySize(geom);
     }
 

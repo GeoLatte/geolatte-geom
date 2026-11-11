@@ -13,9 +13,7 @@ class Sfa121WktDialect extends WktDialect{
         if (geometry.hasZ() && geometry.hasM())  buffer.append(" ZM");
         else if (geometry.hasZ()) buffer.append(" Z");
         else if (geometry.hasM()) buffer.append(" M");
-
-        if(!geometry.isEmpty())
-            buffer.append(' ');
+        buffer.append(' ');
     }
 
 }

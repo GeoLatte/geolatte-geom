@@ -58,6 +58,39 @@ public class MultiLineString<P extends Position> extends AbstractGeometryCollect
         return getPositionN(getNumPositions() - 1);
     }
 
+    /**
+     * Checks whether this <code>MultiLineString</code> is closed, i.e. whether all of its elements are closed.
+     *
+     * <p>As specified for <code>ST_IsClosed</code> on <code>ST_MultiCurve</code> in ISO/IEC 13249-3 (SQL/MM Spatial),
+     * Z and M coordinate values are ignored, and an empty <code>MultiLineString</code> is not closed.</p>
+     *
+     * @return true if this <code>MultiLineString</code> is non-empty and all of its elements are closed.
+     */
+    public boolean isClosed() {
+        if (isEmpty()) return false;
+        for (LineString<P> element : this) {
+            if (!element.isClosed()) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks whether this <code>MultiLineString</code> is closed, taking Z coordinate values into account.
+     *
+     * <p>As specified for <code>ST_3DIsClosed</code> on <code>ST_MultiCurve</code> in ISO/IEC 13249-3 (SQL/MM
+     * Spatial), all elements must be closed in 3D (see {@link LineString#is3DClosed()}). M coordinate values are
+     * ignored, and an empty <code>MultiLineString</code> is not closed.</p>
+     *
+     * @return true if this <code>MultiLineString</code> is non-empty and all of its elements are closed in 3D.
+     */
+    public boolean is3DClosed() {
+        if (isEmpty()) return false;
+        for (LineString<P> element : this) {
+            if (!element.is3DClosed()) return false;
+        }
+        return true;
+    }
+
     @Override
     public int getDimension() {
         return isEmpty() ? -1 : 1;

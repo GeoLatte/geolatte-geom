@@ -40,7 +40,7 @@ class BaseWktWriter {
     }
 
     protected <P extends Position> void addGeometryText(Geometry<P> geometry) {
-        if (geometry.isEmpty()) {
+        if (isWrittenAsEmpty(geometry)) {
             addEmptyKeyword();
             return;
         }
@@ -171,8 +171,26 @@ class BaseWktWriter {
         builder.append("(");
     }
 
+    /**
+     * A geometry collection is written as EMPTY only if it has no elements. A collection whose elements are all
+     * empty is itself empty (as a point set), but its elements are still written, e.g.
+     * <code>GEOMETRYCOLLECTION (POINT EMPTY)</code>.
+     */
+    private boolean isWrittenAsEmpty(Geometry<?> geometry) {
+        if (geometry instanceof AbstractGeometryCollection) {
+            return ((AbstractGeometryCollection<?, ?>) geometry).getNumGeometries() == 0;
+        }
+        return geometry.isEmpty();
+    }
+
     private void addEmptyKeyword() {
-        builder.append(" EMPTY");
+        if (builder.length() > 0) {
+            char last = builder.charAt(builder.length() - 1);
+            if (last != ' ' && last != '(' && last != ',') {
+                builder.append(' ');
+            }
+        }
+        builder.append("EMPTY");
     }
 
 

@@ -55,7 +55,11 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
                     throw new IllegalArgumentException("All child sequences must have the same Coordinate Reference System");
                 }
                 factory = seq.getPositionFactory();
-
+            }
+            if (factory == null && children.length > 0) {
+                // all children are empty: take the factory of the first child, so that the coordinate dimension
+                // and position class remain known
+                factory = children[0].getPositionFactory();
             }
             return factory;
         }
@@ -74,9 +78,17 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         return Arrays.copyOf(this.children, this.children.length);
     }
 
+    /**
+     * Tests whether this sequence contains no positions.
+     *
+     * <p>A nested sequence whose children are all empty is itself empty, so that a geometry collection
+     * whose elements are all empty corresponds to the empty set (ISO/IEC 13249-3, ST_IsEmpty).</p>
+     *
+     * @return true if this sequence contains no positions
+     */
     @Override
     public boolean isEmpty() {
-        return this.children.length == 0;
+        return this.size == 0;
     }
 
     @Override
