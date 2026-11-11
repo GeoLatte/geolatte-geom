@@ -16,3 +16,6 @@ javadoc/*
 **/.flattened-pom.xml
 deploy-release.sh
 .sdkmanrc
+.claude/
+.serena/
+*.pdf
