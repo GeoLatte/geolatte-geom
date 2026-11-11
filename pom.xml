@@ -157,6 +157,12 @@
                             <waitUntil>uploaded</waitUntil>
                             <centralBaseUrl>https://central.sonatype.com</centralBaseUrl>
                             <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
+                            <!-- The parent pom is build-only (aggregator + shared config). The
+                                 flattened module poms carry no <parent> reference, so nothing
+                                 on Central needs it; keep it out of every deployment bundle. -->
+                            <excludeArtifacts>
+                                <artifact>geolatte</artifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>

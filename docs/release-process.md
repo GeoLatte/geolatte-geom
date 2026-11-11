@@ -27,6 +27,12 @@ while keeping the metadata Maven Central requires (name, description, url, scm,
 developers, licenses, organization). The `defaults` mode strips that metadata,
 and Central's validation then rejects the deployment.
 
+Because the flattened poms carry no `<parent>` reference, nothing on Maven
+Central depends on the parent pom (`org.geolatte:geolatte`). It is therefore
+never published: the `central-publishing-maven-plugin` in the `release` profile
+lists it under `excludeArtifacts`, so even a full-reactor deploy only bundles
+the four library modules. The last parent published to Central is 1.12.
+
 Cross-module dependencies in each child pom reference the producer explicitly:
 
 - `json-core` depends on `geolatte-geom` via `${revision}`
@@ -129,10 +135,11 @@ that case).
 - A child module's `<parent>` reference is fixed to `${revision}`. If you
   decouple the GeoJSON line from the parent's version (which is the whole
   point of these axes), the parent pom at `${revision}` must still exist
-  in the local repo or in Maven Central, otherwise the child build cannot
-  resolve its parent. In a normal reactor build the parent is always at
-  the current `${revision}`, so this is only a concern when releasing the
-  GeoJSON line out-of-band against an unreleased parent.
+  in the reactor or the local repo, otherwise the child build cannot
+  resolve its parent. It is not on Maven Central (see above). In a normal
+  reactor build the parent is always at the current `${revision}`, so this
+  is only a concern when building a child module outside the reactor
+  without first installing the parent.
 - All four modules still build in a single reactor. The two axes control
   *what gets published with which version*, not what gets compiled together.
   Bumping `${revision}` rebuilds the entire reactor against the new geom;
