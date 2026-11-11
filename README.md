@@ -87,3 +87,19 @@ The GitHub Actions workflow will:
 6. Create a GitHub Release
 
 Artifacts typically appear on Maven Central within 15-30 minutes.
+
+# License
+
+Copyright (C) 2010-2026 Geovise BV - Indiestraat 35/401 - 2000 Antwerpen
+
+SPDX-License-Identifier: LGPL-3.0-or-later
+
+GeoLatte is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+GeoLatte is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+
+The full license text is in [LICENSE](LICENSE). The GPL version 3 text it incorporates is in
+[licenses/gnu-gpl-v3.txt](licenses/gnu-gpl-v3.txt).
