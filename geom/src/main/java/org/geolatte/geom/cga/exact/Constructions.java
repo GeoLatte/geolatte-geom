@@ -47,11 +47,10 @@ import java.math.BigInteger;
  * <pre>
  *   ox = (c'y |b'|² - b'y |c'|²) / D,   oy = (b'x |c'|² - c'x |b'|²) / D,   D = 2 (b'x c'y - b'y c'x)
  * </pre>
- * <p>The offset o is enclosed with {@link Interval} arithmetic. Since rounding to nearest is monotone and the
- * floating point sum {@code ax + v} is the correctly rounded value of the exact sum, the correctly rounded X
- * coordinate is decided when {@code ax + ox.lo() == ax + ox.hi()} (in floating point). Otherwise (for nearly
- * collinear points, or when the coordinate is very close to a rounding boundary) the coordinate is rounded
- * exactly with {@link BigInteger} arithmetic.</p>
+ * <p>The coordinates {@code a + o} are enclosed in double-word arithmetic with a rigorous error bound, in the
+ * same way as the crossing point (stage 1 above). When the enclosure does not contain a rounding boundary, the
+ * rounding is decided; otherwise (for nearly collinear points, extreme magnitudes, or a coordinate extremely close
+ * to a rounding boundary) the coordinate is rounded exactly with {@link BigInteger} arithmetic.</p>
  */
 public final class Constructions {
 
@@ -250,7 +249,18 @@ public final class Constructions {
         double nh = ch + cl3;
         double nl = cl3 - (nh - ch);
         if (!(Math.abs(nh) >= MIN_FILTER_RESULT)) return false;
+        return encloseSumOfQuotient(pa, nh, nl, denH, denL, rel, out, offset);
+    }
 
+    /**
+     * Encloses {@code pa + n / den} for normalized double-words n and den, in the form {@code [out[offset] +
+     * out[offset + 1] -/+ out[offset + 2]]}. The relative error bound rel must cover the errors of n and den, and
+     * the double-word division (13.1 u^2).
+     *
+     * @return false if an intermediate result is too small for the error bounds to hold
+     */
+    private static boolean encloseSumOfQuotient(double pa, double nh, double nl, double denH, double denL,
+                                                double rel, double[] out, int offset) {
         // t = n / den in double-word arithmetic. With q1 = RN(nh / denh), the remainder nh - q1 * denh is
         // representable and computed exactly by fma. Relative error <= 13.1 u^2.
         double q1 = nh / denH;
@@ -324,6 +334,13 @@ public final class Constructions {
             double p = a * b;
             add(p);
             addError(Math.fma(a, b, -p));
+        }
+
+        // adds (h + l)^2
+        void addSquare(double h, double l) {
+            addProduct(h, h);
+            addProduct(2 * h, l);
+            addProduct(l, l);
         }
 
         // adds (sx, sy) x (ex, ey) for double-word operands
@@ -443,7 +460,7 @@ public final class Constructions {
         if (Predicates.orientation(ax, ay, bx, by, cx, cy) == 0) {
             throw new IllegalArgumentException("Points are collinear");
         }
-        double[] result = circumcenterFromEnclosure(ax, ay, bx, by, cx, cy);
+        double[] result = circumcenterDoubleWord(ax, ay, bx, by, cx, cy);
         if (Double.isNaN(result[0])) result[0] = circumcenterExactly(false, ax, ay, bx, by, cx, cy);
         if (Double.isNaN(result[1])) result[1] = circumcenterExactly(true, ax, ay, bx, by, cx, cy);
         return result;
@@ -451,23 +468,77 @@ public final class Constructions {
 
     /**
      * The correctly rounded coordinates of the circumcenter of (non-collinear) a, b, c, as far as they can be
-     * decided from an interval enclosure; NaN for an undecided coordinate.
+     * decided from a double-word enclosure; NaN for an undecided coordinate.
+     *
+     * <p>The differences b' = b - a and c' = c - a are computed exactly as double-words. D, |b'|² and |c'|² are
+     * sums of products of their parts, accumulated with a rigorous error bound; the numerators are then
+     * accumulated from the parts of the differences and of the (inexact) squared lengths, adding the propagated
+     * error of the latter. The quotient and the final sum use double-word arithmetic (as for the crossing point),
+     * which gives an enclosure of width about u² times the offset.</p>
+     *
+     * <p>The stage is only applied when every non-zero part of a difference lies in [2^-200, 2^200]: then every
+     * product of up to four such parts is a multiple of 2^-1008 and far from overflow, so all error-free
+     * transformations are exact.</p>
      */
-    static double[] circumcenterFromEnclosure(double ax, double ay, double bx, double by, double cx, double cy) {
+    static double[] circumcenterDoubleWord(double ax, double ay, double bx, double by, double cx, double cy) {
         double[] result = {Double.NaN, Double.NaN};
-        Interval bpx = Interval.difference(bx, ax), bpy = Interval.difference(by, ay);
-        Interval cpx = Interval.difference(cx, ax), cpy = Interval.difference(cy, ay);
-        Interval d = bpx.mul(cpy).sub(bpy.mul(cpx));
-        d = d.add(d);
-        if (!(d.lo() > 0 || d.hi() < 0)) return result;
-        Interval b2 = bpx.sqr().add(bpy.sqr()), c2 = cpx.sqr().add(cpy.sqr());
-        Interval ox = cpy.mul(b2).sub(bpy.mul(c2)).div(d);
-        Interval oy = bpx.mul(c2).sub(cpx.mul(b2)).div(d);
-        double xlo = ax + ox.lo(), xhi = ax + ox.hi();
-        double ylo = ay + oy.lo(), yhi = ay + oy.hi();
-        if (xlo == xhi) result[0] = xlo;    // false for NaN
-        if (ylo == yhi) result[1] = ylo;
+        double bxh = bx - ax, bxl = twoSumError(bx, -ax, bxh), byh = by - ay, byl = twoSumError(by, -ay, byh);
+        double cxh = cx - ax, cxl = twoSumError(cx, -ax, cxh), cyh = cy - ay, cyl = twoSumError(cy, -ay, cyh);
+        if (!(inProductRange(bxh) && inProductRange(bxl) && inProductRange(byh) && inProductRange(byl)
+                && inProductRange(cxh) && inProductRange(cxl) && inProductRange(cyh) && inProductRange(cyl))) {
+            return result;
+        }
+        Accumulator acc = new Accumulator();
+        // D = b' x c', doubled below
+        acc.addCross(bxh, bxl, byh, byl, cxh, cxl, cyh, cyl);
+        double dh = acc.high(), dl = acc.low(), dErr = acc.errorBound();
+        if (!(dErr <= MAX_REL_ERROR * Math.abs(dh))) return result;
+        // |b'|² and |c'|²
+        acc.reset();
+        acc.addSquare(bxh, bxl);
+        acc.addSquare(byh, byl);
+        double b2h = acc.high(), b2l = acc.low(), b2Err = acc.errorBound();
+        acc.reset();
+        acc.addSquare(cxh, cxl);
+        acc.addSquare(cyh, cyl);
+        double c2h = acc.high(), c2l = acc.low(), c2Err = acc.errorBound();
+
+        // ox = (c'y |b'|² - b'y |c'|²) / 2D,   oy = (b'x |c'|² - c'x |b'|²) / 2D
+        result[0] = circumcenterCoordinate(acc, ax, cyh, cyl, b2h, b2l, b2Err, byh, byl, c2h, c2l, c2Err, dh, dl, dErr);
+        result[1] = circumcenterCoordinate(acc, ay, bxh, bxl, c2h, c2l, c2Err, cxh, cxl, b2h, b2l, b2Err, dh, dl, dErr);
         return result;
+    }
+
+    // the correctly rounded value of pa + (p q - r s) / 2D, for exact double-words p and r, and double-words q and s
+    // with error bounds; NaN if undecided
+    private static double circumcenterCoordinate(Accumulator acc, double pa,
+                                                 double ph, double pl, double qh, double ql, double qErr,
+                                                 double rh, double rl, double sh, double sl, double sErr,
+                                                 double dh, double dl, double dErr) {
+        acc.reset();
+        acc.addProduct(ph, qh);
+        acc.addProduct(ph, ql);
+        acc.addProduct(pl, qh);
+        acc.addProduct(pl, ql);
+        acc.addProduct(-rh, sh);
+        acc.addProduct(-rh, sl);
+        acc.addProduct(-rl, sh);
+        acc.addProduct(-rl, sl);
+        double nh = acc.high(), nl = acc.low();
+        // the errors of q and s, multiplied by |p| <= |ph| (1 + u) and |r|; the factor covers the rounding of this
+        // bound
+        double nErr = (acc.errorBound() + (Math.abs(ph) * qErr + Math.abs(rh) * sErr)) * (1 + 0x1p-40);
+        if (nh == 0 && nErr == 0) return pa;   // the offset is exactly zero
+        if (!(Math.abs(nh) >= MIN_FILTER_RESULT) || !(nErr <= MAX_REL_ERROR * Math.abs(nh))) return Double.NaN;
+        double rel = nErr / Math.abs(nh) + dErr / Math.abs(dh) + DW_REL_ERROR;
+        double[] enclosure = new double[3];
+        if (!encloseSumOfQuotient(pa, nh, nl, 2 * dh, 2 * dl, rel, enclosure, 0)) return Double.NaN;
+        return roundFromEnclosure(enclosure[0], enclosure[1], enclosure[2]);
+    }
+
+    private static boolean inProductRange(double v) {
+        double a = Math.abs(v);
+        return a == 0 || (a >= 0x1p-200 && a <= 0x1p200);
     }
 
     /**

@@ -69,7 +69,7 @@ public class CircumcenterTest {
             assertArrayEquals(c, Constructions.circumcenter(cx, cy, ax, ay, bx, by), 0);
             assertArrayEquals(c, Constructions.circumcenter(bx, by, ax, ay, cx, cy), 0);
             // the stages agree
-            double[] filtered = Constructions.circumcenterFromEnclosure(ax, ay, bx, by, cx, cy);
+            double[] filtered = Constructions.circumcenterDoubleWord(ax, ay, bx, by, cx, cy);
             for (int axis = 0; axis < 2; axis++) {
                 double e = Constructions.circumcenterExactly(axis == 1, ax, ay, bx, by, cx, cy);
                 assertEquals(0, Double.compare(e, c[axis]));
@@ -79,14 +79,34 @@ public class CircumcenterTest {
     }
 
     @Test
-    public void gisCoordinates() {
-        for (int i = 0; i < 20000; i++) {
-            double x0 = 150000 + 1000 * random.nextDouble(), y0 = 200000 + 1000 * random.nextDouble();
-            double ax = x0 + rnd(10), ay = y0 + rnd(10), bx = x0 + rnd(10), by = y0 + rnd(10);
-            double cx = x0 + rnd(10), cy = y0 + rnd(10);
-            if (Predicates.orientation(ax, ay, bx, by, cx, cy) == 0) continue;
-            check(Constructions.circumcenter(ax, ay, bx, by, cx, cy), ax, ay, bx, by, cx, cy);
+    public void doubleWordStageDecidesPracticalInputs() {
+        // GIS coordinates (large offset, small triangles) and the unit square (offsets as large as the coordinates)
+        for (boolean gis : new boolean[]{true, false}) {
+            int undecided = 0;
+            for (int i = 0; i < 20000; i++) {
+                double x0 = gis ? 150000 + 1000 * random.nextDouble() : 0.5, y0 = gis ? 200000 + 1000 * random.nextDouble() : 0.5;
+                double s = gis ? 10 : 0.5;
+                double ax = x0 + rnd(s), ay = y0 + rnd(s), bx = x0 + rnd(s), by = y0 + rnd(s);
+                double cx = x0 + rnd(s), cy = y0 + rnd(s);
+                if (Predicates.orientation(ax, ay, bx, by, cx, cy) == 0) continue;
+                double[] c = Constructions.circumcenter(ax, ay, bx, by, cx, cy);
+                check(c, ax, ay, bx, by, cx, cy);
+                double[] dw = Constructions.circumcenterDoubleWord(ax, ay, bx, by, cx, cy);
+                for (int axis = 0; axis < 2; axis++) {
+                    if (Double.isNaN(dw[axis])) undecided++;
+                    else assertEquals(0, Double.compare(c[axis], dw[axis]));
+                }
+            }
+            assertTrue("undecided: " + undecided, undecided < 10);
         }
+    }
+
+    @Test
+    public void exactOffsets() {
+        // the circumcenter of (1, 0), (0, 1), (2, 1) is (1, 1): the X offset from a is exactly zero; the double-word
+        // stage decides both coordinates
+        assertArrayEquals(new double[]{1, 1}, Constructions.circumcenterDoubleWord(1, 0, 0, 1, 2, 1), 0);
+        assertArrayEquals(new double[]{1, 1}, Constructions.circumcenterDoubleWord(0, 1, 2, 1, 1, 0), 0);
     }
 
     // ---------------------------------------------------------------------------------------------------------
