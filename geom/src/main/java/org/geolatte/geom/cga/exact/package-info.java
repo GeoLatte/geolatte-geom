@@ -13,7 +13,7 @@
  *     orientation, distance comparison, segment intersection), each implemented as an interval filter followed by
  *     ESSA (Sec. 4.6, 5.2, 8.3, 8.4);</li>
  *     <li>{@link org.geolatte.geom.cga.exact.Constructions}: constructions with correctly rounded results (the
- *     intersection of line segments).</li>
+ *     intersection of line segments, the circumcenter of a triangle).</li>
  * </ul>
  *
  * <p>Predicates are exact: their result is the result for the given double coordinates as exact real numbers.

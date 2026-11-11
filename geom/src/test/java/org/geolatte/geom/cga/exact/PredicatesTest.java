@@ -253,6 +253,10 @@ public class PredicatesTest {
         } else {
             assertEquals(msg + " [filter]", expected, filter);
         }
+        int errorBound = Predicates.inCircleErrorBound(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
+        if (errorBound != Predicates.UNDECIDED) {
+            assertEquals(msg + " [error bound]", expected, errorBound);
+        }
         ExactSum terms = Predicates.inCircleTerms(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]);
         if (terms.isExact()) {
             assertEquals(msg + " [essa]", expected, terms.signum());

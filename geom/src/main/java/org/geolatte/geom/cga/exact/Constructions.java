@@ -40,6 +40,18 @@ import java.math.BigInteger;
  * <p>The double-word algorithms and error bounds follow M. Joldes, J.-M. Muller and V. Popescu, "Tight and
  * rigorous error bounds for basic building blocks of double-word arithmetic", ACM TOMS 44(2), 2017. The bounds
  * used here are derived for the specific algorithms below, and are applied with a safety margin.</p>
+ *
+ * <h2>Circumcenter</h2>
+ *
+ * <p>The center of the circle through a, b and c is {@code a + o}, with (writing b' = b - a, c' = c - a)</p>
+ * <pre>
+ *   ox = (c'y |b'|² - b'y |c'|²) / D,   oy = (b'x |c'|² - c'x |b'|²) / D,   D = 2 (b'x c'y - b'y c'x)
+ * </pre>
+ * <p>The offset o is enclosed with {@link Interval} arithmetic. Since rounding to nearest is monotone and the
+ * floating point sum {@code ax + v} is the correctly rounded value of the exact sum, the correctly rounded X
+ * coordinate is decided when {@code ax + ox.lo() == ax + ox.hi()} (in floating point). Otherwise (for nearly
+ * collinear points, or when the coordinate is very close to a rounding boundary) the coordinate is rounded
+ * exactly with {@link BigInteger} arithmetic.</p>
  */
 public final class Constructions {
 
@@ -413,6 +425,71 @@ public final class Constructions {
     // ---------------------------------------------------------------------------------------------------------
     // Stage 3: exact rational arithmetic
     // ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns the center of the circle through a, b and c, with each coordinate correctly rounded (round to
+     * nearest, ties to even).
+     *
+     * <p>Since the result is the unique correctly rounded value of the exact circumcenter, it does not depend on
+     * the order of a, b and c: all triangles with the same circumcircle get exactly the same center.</p>
+     *
+     * @return {@code {x, y}}; a coordinate whose magnitude exceeds the largest double is infinite
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite, or if a, b and c are collinear
+     */
+    public static double[] circumcenter(double ax, double ay, double bx, double by, double cx, double cy) {
+        for (double v : new double[]{ax, ay, bx, by, cx, cy}) {
+            if (!Double.isFinite(v)) throw new IllegalArgumentException("Coordinates must be finite");
+        }
+        if (Predicates.orientation(ax, ay, bx, by, cx, cy) == 0) {
+            throw new IllegalArgumentException("Points are collinear");
+        }
+        double[] result = circumcenterFromEnclosure(ax, ay, bx, by, cx, cy);
+        if (Double.isNaN(result[0])) result[0] = circumcenterExactly(false, ax, ay, bx, by, cx, cy);
+        if (Double.isNaN(result[1])) result[1] = circumcenterExactly(true, ax, ay, bx, by, cx, cy);
+        return result;
+    }
+
+    /**
+     * The correctly rounded coordinates of the circumcenter of (non-collinear) a, b, c, as far as they can be
+     * decided from an interval enclosure; NaN for an undecided coordinate.
+     */
+    static double[] circumcenterFromEnclosure(double ax, double ay, double bx, double by, double cx, double cy) {
+        double[] result = {Double.NaN, Double.NaN};
+        Interval bpx = Interval.difference(bx, ax), bpy = Interval.difference(by, ay);
+        Interval cpx = Interval.difference(cx, ax), cpy = Interval.difference(cy, ay);
+        Interval d = bpx.mul(cpy).sub(bpy.mul(cpx));
+        d = d.add(d);
+        if (!(d.lo() > 0 || d.hi() < 0)) return result;
+        Interval b2 = bpx.sqr().add(bpy.sqr()), c2 = cpx.sqr().add(cpy.sqr());
+        Interval ox = cpy.mul(b2).sub(bpy.mul(c2)).div(d);
+        Interval oy = bpx.mul(c2).sub(cpx.mul(b2)).div(d);
+        double xlo = ax + ox.lo(), xhi = ax + ox.hi();
+        double ylo = ay + oy.lo(), yhi = ay + oy.hi();
+        if (xlo == xhi) result[0] = xlo;    // false for NaN
+        if (ylo == yhi) result[1] = ylo;
+        return result;
+    }
+
+    /**
+     * Computes the correctly rounded X (or Y) coordinate of the circumcenter with exact integer arithmetic.
+     */
+    static double circumcenterExactly(boolean yAxis, double ax, double ay, double bx, double by, double cx, double cy) {
+        int k = 0;
+        for (double v : new double[]{ax, ay, bx, by, cx, cy}) {
+            if (v != 0) k = Math.max(k, -lowestBitExponent(v));
+        }
+        BigInteger iax = scaled(ax, k), iay = scaled(ay, k);
+        BigInteger bpx = scaled(bx, k).subtract(iax), bpy = scaled(by, k).subtract(iay);
+        BigInteger cpx = scaled(cx, k).subtract(iax), cpy = scaled(cy, k).subtract(iay);
+        BigInteger den = bpx.multiply(cpy).subtract(bpy.multiply(cpx)).shiftLeft(1);
+        BigInteger b2 = bpx.multiply(bpx).add(bpy.multiply(bpy)), c2 = cpx.multiply(cpx).add(cpy.multiply(cpy));
+        BigInteger offset = yAxis
+                ? bpx.multiply(c2).subtract(cpx.multiply(b2))
+                : cpy.multiply(b2).subtract(bpy.multiply(c2));
+        // coordinate = a + offset / den; offset is scaled by 2^3k, den and a * den by 2^2k and 2^3k
+        BigInteger num = (yAxis ? iay : iax).multiply(den).add(offset);
+        return roundQuotient(num, den, -k);
+    }
 
     /**
      * Computes the correctly rounded X (or Y) coordinate of the crossing point with exact integer arithmetic.

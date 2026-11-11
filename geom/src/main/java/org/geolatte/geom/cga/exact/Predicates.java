@@ -40,6 +40,15 @@ public final class Predicates {
     // Shewchuk's error bound for orientation: (3 + 16 eps) eps, with eps = 2^-53
     private static final double CCW_ERRBOUND = (3.0 + 16.0 * 0x1p-53) * 0x1p-53;
 
+    // Shewchuk's error bound for in-circle: (10 + 96 eps) eps
+    private static final double ICC_ERRBOUND = (10.0 + 96.0 * 0x1p-53) * 0x1p-53;
+
+    // The in-circle error bound is only used if all non-zero coordinate differences lie in this range: then no
+    // product of up to four differences (nor a difference of such products, multiplied by a lift) underflows or
+    // overflows.
+    private static final double ICC_MIN_DIFFERENCE = 0x1p-200;
+    private static final double ICC_MAX_DIFFERENCE = 0x1p200;
+
     // Shewchuk's error bounds assume that no underflow occurs. The absolute rounding error of a product that
     // underflows is at most 2^-1075; this margin covers that generously.
     private static final double UNDERFLOW_MARGIN = 0x1p-1060;
@@ -173,6 +182,8 @@ public final class Predicates {
      * orientation of the line through a, b and c with respect to d (0 if d is on the line too).
      */
     public static int inCircle(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy) {
+        int fast = inCircleErrorBound(ax, ay, bx, by, cx, cy, dx, dy);
+        if (fast != UNDECIDED) return fast;
         checkFinite(ax, ay, bx, by);
         checkFinite(cx, cy, dx, dy);
         int s = inCircleFilter(ax, ay, bx, by, cx, cy, dx, dy);
@@ -189,6 +200,39 @@ public final class Predicates {
      */
     public static int inCircle(Position a, Position b, Position c, Position d) {
         return inCircle(x(a), y(a), x(b), y(b), x(c), y(c), x(d), y(d));
+    }
+
+    /**
+     * Floating point evaluation with Shewchuk's error bound. Returns the exact sign, or UNDECIDED (also for
+     * non-finite input, and when a coordinate difference is outside the range in which the bound is valid).
+     */
+    static int inCircleErrorBound(double ax, double ay, double bx, double by, double cx, double cy,
+                                  double dx, double dy) {
+        double adx = ax - dx, ady = ay - dy, bdx = bx - dx, bdy = by - dy, cdx = cx - dx, cdy = cy - dy;
+        if (!(inIccRange(adx) && inIccRange(ady) && inIccRange(bdx) && inIccRange(bdy)
+                && inIccRange(cdx) && inIccRange(cdy))) {
+            return UNDECIDED;
+        }
+        double bdxcdy = bdx * cdy, cdxbdy = cdx * bdy;
+        double cdxady = cdx * ady, adxcdy = adx * cdy;
+        double adxbdy = adx * bdy, bdxady = bdx * ady;
+        double alift = adx * adx + ady * ady;
+        double blift = bdx * bdx + bdy * bdy;
+        double clift = cdx * cdx + cdy * cdy;
+        double det = alift * (bdxcdy - cdxbdy) + blift * (cdxady - adxcdy) + clift * (adxbdy - bdxady);
+        double permanent = (Math.abs(bdxcdy) + Math.abs(cdxbdy)) * alift
+                + (Math.abs(cdxady) + Math.abs(adxcdy)) * blift
+                + (Math.abs(adxbdy) + Math.abs(bdxady)) * clift;
+        double errBound = ICC_ERRBOUND * permanent;
+        if (det > errBound) return 1;
+        if (det < -errBound) return -1;
+        return UNDECIDED;
+    }
+
+    // NaN and infinite differences fail the test
+    private static boolean inIccRange(double d) {
+        double a = Math.abs(d);
+        return a == 0 || (a >= ICC_MIN_DIFFERENCE && a <= ICC_MAX_DIFFERENCE);
     }
 
     static int inCircleFilter(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy) {
