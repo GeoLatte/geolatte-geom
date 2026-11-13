@@ -110,7 +110,8 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - `PointLocator.of(geometry).locate(x, y)` returns the `Location` (`INTERIOR`, `BOUNDARY` or `EXTERIOR`) of a
   point.
 - `DefaultProjectedGeometryOperations`, the default `ProjectedGeometryOperations`, computes its spatial
-  predicates with `Relate` and its convex hull with `ConvexHull`.
+  predicates with `Relate`, its convex hull with `ConvexHull`, and `isSimple`, `isValid` and `boundary` with
+  `Simplicity`, `Validity` and `Boundary` (see below).
 
 **Union semantics.** A geometry is the union of its elements: points, lines and polygons, also as members of a
 `GeometryCollection`, and also when members overlap or touch. The location of a point is decided by the elements
@@ -184,6 +185,69 @@ locator.
 point on polygon boundaries the same angular ordering to decide whether the polygons cover all of its
 neighbourhood.
 
+### `Simplicity`, `Validity` and `Boundary`
+
+- `Simplicity.isSimple(geometry)` tests simplicity (`ST_IsSimple`):
+  - A multipoint is simple if no two of its points are equal.
+  - A line string is simple if it passes through no point twice, except that it may be closed.
+  - A multi line string is simple if its elements are simple and only meet in endpoints of both, which are not
+    closed.
+  - Polygons are simple if each of their rings is simple.
+  - A collection is simple if each element is simple.
+  - Repeated consecutive positions are ignored. JTS (1.19 and 1.20) instead reports a repeated position inside
+    a line as a self-intersection.
+- `Validity.of(geometry)` tests validity (`ST_IsValid`) and reports the first problem with its location;
+  `Validity.isValid(geometry)` returns only the verdict. The rules are those of JTS `IsValidOp` (the Simple
+  Features rules), with the same verdict on every tested input:
+  - coordinates are finite;
+  - a line string has two distinct positions;
+  - a ring is closed, has three distinct positions and is simple;
+  - the rings of a polygon meet only in single points, where they do not cross;
+  - holes lie inside the shell and not inside each other;
+  - the interior of a polygon is connected;
+  - the polygons of a multipolygon have disjoint interiors and meet only in single points.
+- `Boundary.of(geometry)` returns the boundary (`ST_Boundary`):
+  - nothing for points;
+  - the endpoints, by the Mod-2 rule, for lines, in the order in which they first occur;
+  - the rings for polygons.
+  - It is purely combinatorial: the positions of the geometry are compared exactly by X and Y and returned with
+    their Z and M values.
+  - The boundary of a heterogeneous `GeometryCollection` is not defined element by element, and is refused, as
+    in JTS.
+
+**Exactness.** All three are exact for the input doubles. No intersection point is computed to decide the
+result: rings that meet in a valid polygon always meet in a vertex of one of them.
+
+- The segments that meet are found with the monotone chains and R-tree of the relate engine, and each pair is
+  classified exactly with `segmentIntersection`.
+- In a polygon, a crossing or an overlap of two rings makes it invalid; other pairs touch, in a point that is a
+  vertex of at least one of them.
+- At each touch point, the edges of the rings that pass through it are sorted by angle, exactly with
+  `crossProductSign`. The rings must not interleave around the point: if they did, they would cross there.
+- After that, the rings form a nested family, so each ring lies entirely inside or outside each other ring. For
+  each polygon, the number of its shells minus the number of its holes that contain a point must be 0 or 1, and
+  the sum over the polygons too. These counts only change across rings, and they are constant on each side of a
+  ring.
+  - So one test per ring is enough: an exact point-in-ring test at a vertex that no other ring passes through.
+    The candidate rings come from an R-tree on the ring boxes.
+  - If every vertex of the ring touches other rings, the side of each such ring is decided by the direction of
+    the ring's first edge, exactly.
+  - A count of −1 is a hole outside its shell or in another hole; a count of 2 is two overlapping polygons.
+- The interior of a polygon is connected if the graph of its rings and the points where they touch has no cycle
+  (union–find).
+
+Indicative timings, against JTS 1.20 `IsValidOp` and `IsSimpleOp`:
+
+| Geometry | Exact | JTS 1.20 |
+|---|---|---|
+| polygon of 100,000 vertices, `isValid` | ≈ 2 ms | ≈ 5 ms |
+| polygon of 1,000,000 vertices, `isValid` | ≈ 13 ms | ≈ 47 ms |
+| polygon with 1,000 holes of 50 vertices, `isValid` | ≈ 3 ms | ≈ 12 ms |
+| multipolygon of 10,000 polygons of 20 vertices, `isValid` | ≈ 7 ms | ≈ 24 ms |
+| polygon with 800 holes that touch at their corners (invalid), `isValid` | ≈ 3.7 ms | ≈ 2.4 ms |
+| simple spiral of 100,000 vertices, `isSimple` | ≈ 6 ms | ≈ 7 ms |
+| 10,000 lines chained at their endpoints, `isSimple` | ≈ 1.5 ms | ≈ 4.4 ms |
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -241,10 +305,10 @@ There are two kinds of operation, with different guarantees:
 | Operation | Exact implementation | What is needed |
 |---|---|---|
 | `Dimension`, `Envelope`, `IsEmpty`, `StartPoint`, `EndPoint`, `IsClosed` | combinatorial or exact equality | — |
-| `Boundary` | to do | combinatorial (Mod-2 rule); no arithmetic |
-| `IsSimple`, `IsRing` | to do | all segment intersections within one geometry; the arrangement of the relate engine provides them |
+| `Boundary` | **done** | `Boundary`: combinatorial (Mod-2 rule); not for heterogeneous collections |
+| `IsSimple`, `IsRing` | **done** | `Simplicity`; `LineString.isRing()` is closed and simple |
 | `Equals`, `Disjoint`, `Intersects`, `Touches`, `Crosses`, `Within`, `Contains`, `Overlaps`, `Relate` (and `Covers`, `CoveredBy`) | **done** | `Relate`, with union semantics |
-| `IsValid` (SQL/MM) | to do | the arrangement of the relate engine, plus a check that the polygon interior is connected |
+| `IsValid` (SQL/MM) | **done** | `Validity`, with the rules of JTS `IsValidOp` |
 | `ConvexHull` | **done** | — |
 | `Area` | to do | correctly rounded value of an exact sum (primitive 5); the area is rational |
 | `Centroid` | to do | correctly rounded quotient of two exact sums (primitive 5); the centroid is rational |
@@ -277,8 +341,8 @@ Primitives 1–4 are done: they make up the relate engine.
 
 ### Order of work
 
-1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple` and
-   `IsValid` can be built on its arrangement.
+1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple`,
+   `IsValid` and `Boundary` are done as well, on its monotone chains and exact angular ordering.
 2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length`; small and independent, each needing one
    rounding routine.
 3. **`PointOnSurface`**.

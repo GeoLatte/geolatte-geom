@@ -29,6 +29,7 @@ import org.locationtech.jts.operation.distance.DistanceOp;
 import org.locationtech.jts.operation.overlay.OverlayOp;
 import org.locationtech.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
 import org.locationtech.jts.operation.relate.RelateOp;
+import org.locationtech.jts.operation.valid.IsValidOp;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
@@ -65,6 +66,11 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     @Override
     public <P extends C2D> boolean isSimple(final Geometry<P> geometry) {
         return new IsSimpleOp(JTS.to(geometry)).isSimple();
+    }
+
+    @Override
+    public <P extends C2D> boolean isValid(final Geometry<P> geometry) {
+        return new IsValidOp(JTS.to(geometry)).isValid();
     }
 
     @Override

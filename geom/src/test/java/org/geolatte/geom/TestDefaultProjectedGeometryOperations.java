@@ -133,6 +133,30 @@ public class TestDefaultProjectedGeometryOperations {
         assertTrue(ops.convexHull(new Polygon<>(crs)).isEmpty());
     }
 
+    @Test
+    public void simplicityValidityAndBoundary() {
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            assertTrue(o.isSimple(g("LINESTRING (0 0, 1 1, 2 0)")));
+            assertFalse(o.isSimple(g("LINESTRING (0 0, 2 2, 2 0, 0 2)")));
+            assertTrue(o.isValid(g(SQUARE)));
+            assertFalse(o.isValid(g("POLYGON ((0 0, 4 4, 4 0, 0 4, 0 0))")));
+            assertFalse(o.isValid(g("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0), (2 0, 4 2, 2 2, 2 0))")));
+            assertTrue(o.isValid(g("POLYGON EMPTY")));
+            assertTrue(o.equalsTopologically(g("MULTIPOINT ((0 0), (2 0))"), o.boundary(g("LINESTRING (0 0, 1 1, 2 0)"))));
+            assertTrue(o.boundary(g("LINESTRING (0 0, 1 1, 2 0, 0 0)")).isEmpty());
+            assertTrue(o.equalsTopologically(g("MULTIPOINT ((0 0), (3 0))"),
+                    o.boundary(g("MULTILINESTRING ((0 0, 1 1), (1 1, 2 0), (2 0, 3 0))"))));
+            assertTrue(o.equalsTopologically(g("LINESTRING (0 0, 4 0, 4 4, 0 4, 0 0)"), o.boundary(g(SQUARE))));
+            assertTrue(o.boundary(g("POINT (1 1)")).isEmpty());
+        }
+        // a hole within an ulp of the shell: it crosses the shell
+        double c = 0.1 + 0.2;
+        assertFalse(ops.isValid(g("POLYGON ((0 0, 1 1, 0 1, 0 0), (" + c + " " + Math.nextDown(c)
+                + ", 0.1 0.8, 0.05 0.9, " + c + " " + Math.nextDown(c) + "))")));
+        assertTrue(ops.isValid(g("POLYGON ((0 0, 1 1, 0 1, 0 0), (" + c + " " + c
+                + ", 0.1 0.8, 0.05 0.9, " + c + " " + c + "))")));
+    }
+
     private static Geometry<C2D> g(String wkt) {
         return Wkt.fromWkt(wkt, crs);
     }

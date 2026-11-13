@@ -170,31 +170,9 @@ final class RelateComputer {
                 }
                 for (int i : Hilbert.order(px, py)) mcs.add(new MonotoneChain(i, px[i], py[i]));
             }
-            for (int k = 0; k < chains.length; k++) {
-                ChainData c = chains[k];
-                int n = c.xs.length - 1, start = 0;
-                int q = quadrant(c.xs[1] - c.xs[0], c.ys[1] - c.ys[0]);
-                for (int i = 1; i < n; i++) {
-                    int qi = quadrant(c.xs[i + 1] - c.xs[i], c.ys[i + 1] - c.ys[i]);
-                    if (qi != q) {
-                        mcs.add(new MonotoneChain(k, c, start, i));
-                        start = i;
-                        q = qi;
-                    }
-                }
-                mcs.add(new MonotoneChain(k, c, start, n));
-            }
+            for (int k = 0; k < chains.length; k++) addMonotoneChains(k, chains[k].xs, chains[k].ys, mcs);
             monotone = mcs.toArray(new MonotoneChain[0]);
-            int m = monotone.length;
-            double[] minX = new double[m], minY = new double[m], maxX = new double[m], maxY = new double[m];
-            for (int i = 0; i < m; i++) {
-                MonotoneChain mc = monotone[i];
-                minX[i] = Math.min(mc.x(mc.start), mc.x(mc.end));
-                maxX[i] = Math.max(mc.x(mc.start), mc.x(mc.end));
-                minY[i] = Math.min(mc.y(mc.start), mc.y(mc.end));
-                maxY[i] = Math.max(mc.y(mc.start), mc.y(mc.end));
-            }
-            tree = new EnvelopeTree(minX, minY, maxX, maxY);
+            tree = tree(monotone);
         }
 
         /**
@@ -881,11 +859,11 @@ final class RelateComputer {
         final double px, py;    // the point
         final int start, end;   // the segments start to end - 1, from vertex start to vertex end
 
-        MonotoneChain(int chain, ChainData data, int start, int end) {
+        MonotoneChain(int chain, double[] xs, double[] ys, int start, int end) {
             this.chain = chain;
             this.point = -1;
-            this.xs = data.xs;
-            this.ys = data.ys;
+            this.xs = xs;
+            this.ys = ys;
             this.px = this.py = 0;
             this.start = start;
             this.end = end;
@@ -917,6 +895,39 @@ final class RelateComputer {
 
     private static int quadrant(double dx, double dy) {
         return dx >= 0 ? (dy >= 0 ? 0 : 3) : (dy >= 0 ? 1 : 2);
+    }
+
+    /**
+     * Splits chain k (at least 2 positions, without repeated consecutive positions) into monotone chains
+     */
+    static void addMonotoneChains(int k, double[] xs, double[] ys, List<MonotoneChain> out) {
+        int n = xs.length - 1, start = 0;
+        int q = quadrant(xs[1] - xs[0], ys[1] - ys[0]);
+        for (int i = 1; i < n; i++) {
+            int qi = quadrant(xs[i + 1] - xs[i], ys[i + 1] - ys[i]);
+            if (qi != q) {
+                out.add(new MonotoneChain(k, xs, ys, start, i));
+                start = i;
+                q = qi;
+            }
+        }
+        out.add(new MonotoneChain(k, xs, ys, start, n));
+    }
+
+    /**
+     * An R-tree on the bounding boxes of the monotone chains (that of a monotone run is that of its end vertices)
+     */
+    static EnvelopeTree tree(MonotoneChain[] monotone) {
+        int m = monotone.length;
+        double[] minX = new double[m], minY = new double[m], maxX = new double[m], maxY = new double[m];
+        for (int i = 0; i < m; i++) {
+            MonotoneChain mc = monotone[i];
+            minX[i] = Math.min(mc.x(mc.start), mc.x(mc.end));
+            maxX[i] = Math.max(mc.x(mc.start), mc.x(mc.end));
+            minY[i] = Math.min(mc.y(mc.start), mc.y(mc.end));
+            maxY[i] = Math.max(mc.y(mc.start), mc.y(mc.end));
+        }
+        return new EnvelopeTree(minX, minY, maxX, maxY);
     }
 
     /**

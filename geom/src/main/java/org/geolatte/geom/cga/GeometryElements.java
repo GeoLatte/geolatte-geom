@@ -113,10 +113,16 @@ final class GeometryElements {
     }
 
     // the coordinates, without consecutive repeated positions
-    private static double[][] distinct(PositionSequence<?> positions) {
+    static double[][] distinct(PositionSequence<?> positions) {
         int n = positions.size();
         double[] xs = new double[n], ys = new double[n];
         DouglasPeucker.coordinates(positions, xs, ys);
+        return distinct(xs, ys);
+    }
+
+    // the coordinates without consecutive repeated positions, and with -0.0 replaced by 0.0; may reuse the arrays
+    static double[][] distinct(double[] xs, double[] ys) {
+        int n = xs.length;
         int m = 0;
         for (int i = 0; i < n; i++) {
             double x = xs[i] + 0.0, y = ys[i] + 0.0;

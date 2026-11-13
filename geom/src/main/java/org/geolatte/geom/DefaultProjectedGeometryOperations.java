@@ -20,8 +20,11 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.Boundary;
 import org.geolatte.geom.cga.ConvexHull;
 import org.geolatte.geom.cga.Relate;
+import org.geolatte.geom.cga.Simplicity;
+import org.geolatte.geom.cga.Validity;
 
 /**
  * The default implementation of {@code ProjectedGeometryOperations}.
@@ -29,9 +32,10 @@ import org.geolatte.geom.cga.Relate;
  * <p>The spatial predicates ({@code intersects}, {@code disjoint}, {@code touches}, {@code crosses},
  * {@code within}, {@code contains}, {@code overlaps}, {@code covers}, {@code coveredBy}, {@code equalsTopologically}
  * and {@code relates}) are computed exactly with {@link Relate}: the result is exact for the given coordinates, and
- * geometry collections have union semantics. The convex hull is computed exactly with {@link ConvexHull}. The
- * other operations do not have an exact implementation yet; they
- * are delegated to a {@link JTSGeometryOperations}.</p>
+ * geometry collections have union semantics. {@code isSimple}, {@code isValid}, {@code boundary} and
+ * {@code convexHull} are computed exactly with {@link Simplicity}, {@link Validity}, {@link Boundary} and
+ * {@link ConvexHull}. The other operations do not have an exact implementation yet; they are delegated to a
+ * {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
@@ -117,19 +121,24 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
         return ConvexHull.of(geometry);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
-    // delegated to JTS
-    // ---------------------------------------------------------------------------------------------------------
-
     @Override
     public <P extends C2D> boolean isSimple(final Geometry<P> geometry) {
-        return jts.isSimple(geometry);
+        return Simplicity.isSimple(geometry);
+    }
+
+    @Override
+    public <P extends C2D> boolean isValid(final Geometry<P> geometry) {
+        return Validity.isValid(geometry);
     }
 
     @Override
     public <P extends C2D> Geometry<P> boundary(final Geometry<P> geometry) {
-        return jts.boundary(geometry);
+        return Boundary.of(geometry);
     }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // delegated to JTS
+    // ---------------------------------------------------------------------------------------------------------
 
     @Override
     public <P extends C2D, G extends Geometry<P>> G reverse(final G geometry) {

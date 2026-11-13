@@ -46,6 +46,15 @@ public interface ProjectedGeometryOperations {
     <P extends C2D> boolean isSimple(final Geometry<P> geometry);
 
     /**
+     * Tests the validity of the specified <code>Geometry</code>: whether it is well formed, as defined by the
+     * Simple Feature Access specification. An empty <code>Geometry</code> is valid.
+     *
+     * @param geometry the <code>Geometry</code> to test for validity.
+     * @return True iff the specified <code>Geometry</code> is valid.
+     */
+    <P extends C2D> boolean isValid(final Geometry<P> geometry);
+
+    /**
      * Calculates the boundary of the specified <code>Geometry</code>.
      *
      * @param geometry the <code>Geometry</code> for which to calculate the boundary.

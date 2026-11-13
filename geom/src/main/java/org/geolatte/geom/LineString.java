@@ -89,14 +89,19 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     }
 
     /**
-     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and non-empty.
+     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple (see
+     * {@link org.geolatte.geom.cga.Simplicity}).
      *
-     * <p>Note that this implementation allows rings thate are non-simple.</p>
-     *
-     * @return true if this <code>LineString</code> is a ring.
+     * @return true if this <code>LineString</code> is a ring; false if it is empty, or has a coordinate that is NaN
+     * or infinite.
      */
     public boolean isRing() {
-        return !isEmpty() && isClosed();
+        if (!isClosed()) return false;
+        try {
+            return org.geolatte.geom.cga.Simplicity.isSimple(this);
+        } catch (IllegalArgumentException e) {   // a coordinate that is not finite
+            return false;
+        }
     }
 
     @Override
