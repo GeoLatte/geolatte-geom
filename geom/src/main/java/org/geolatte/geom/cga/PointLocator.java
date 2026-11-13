@@ -101,6 +101,17 @@ public final class PointLocator {
         return scan(x, y).containingLeft;
     }
 
+    /**
+     * The location as in {@link GeometryElements#roughLocation}: {@code INSIDE} if the point lies in the interior of
+     * a polygon, {@code EXTERIOR} if it is not a point of the geometry, {@code ON} otherwise.
+     */
+    int roughLocation(double x, double y) {
+        x += 0.0;
+        y += 0.0;
+        if (rings.size() > 0 && scan(x, y).containing > 0) return GeometryElements.INSIDE;
+        return locate(x, y) == Location.EXTERIOR ? GeometryElements.EXTERIOR : GeometryElements.ON;
+    }
+
     // the location relative to the union of the polygons
     private Location locateInArea(double x, double y) {
         if (rings.size() == 0) return Location.EXTERIOR;

@@ -97,7 +97,7 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - The default clip envelope is the envelope of the sites, expanded by its diameter.
 - Cell vertices are correctly rounded circumcenters, and adjacent cells share bit-identical vertices.
 
-### `Relate`, `IntersectionMatrix` and `PointLocator`
+### `Relate`, `PreparedRelate`, `IntersectionMatrix` and `PointLocator`
 
 - `Relate.relate(a, b)` returns the DE-9IM `IntersectionMatrix`; `relate(a, b, pattern)` matches it against a
   pattern (`T`, `F`, `*`, `0`, `1`, `2`).
@@ -105,6 +105,8 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
   `contains`, `overlaps`, `covers` and `coveredBy` are static methods of `Relate`, and are also available on an
   `IntersectionMatrix` (`isTouches`, `isCrosses`, ...). The static methods stop as soon as the answer is known
   (see below), so they are usually faster than computing the matrix.
+- `PreparedRelate.of(a)` prepares a geometry for testing it against many others: `relate(b)` and the same named
+  predicates, with the prepared geometry as the first argument. It is immutable and thread-safe.
 - `PointLocator.of(geometry).locate(x, y)` returns the `Location` (`INTERIOR`, `BOUNDARY` or `EXTERIOR`) of a
   point.
 - `DefaultProjectedGeometryOperations`, the default `ProjectedGeometryOperations`, computes its spatial
@@ -168,6 +170,16 @@ For valid Simple Features geometries this is the usual definition. Only the indi
 
 Otherwise the predicate is evaluated on the full matrix.
 
+**Prepared geometries.** `PreparedRelate` computes once everything that depends only on the prepared geometry A:
+its monotone chains and their R-tree, the pairs of its own segments that meet, a `PointLocator`, and its connected
+components (elements that meet each other), each with its contribution to the matrix when it lies in the exterior
+or the interior of another geometry. A computation against B then only uses the components whose bounding box
+meets that of B; the others lie in the exterior of B. If no element of A meets one of B, every component lies
+entirely in the interior or in the exterior of B, and one point location decides which; A then contributes no
+segments at all. The arrangement only stores the vertices and segments of a chain where something happens, so a
+long ring that B touches costs no more than a short one. The reference depths in A come from the prepared
+locator.
+
 `PointLocator` uses exact crossing parity per polygon, on an interval index over the ring segments, and for a
 point on polygon boundaries the same angular ordering to decide whether the polygons cover all of its
 neighbourhood.
@@ -197,6 +209,19 @@ This is comparable to JTS 1.20 `RelateNG` (and 4 to 15 times faster than JTS `Re
 named predicates take ≈ 1 ms for two polygons of 100,000 vertices when they are decided early, most of which is
 spent copying the coordinates; RelateNG is faster there (≈ 0.1–0.3 ms), because JTS geometries cache their
 envelope and RelateNG reads the coordinates in place.
+
+With `PreparedRelate`, per test against 2,000 small geometries (points, or polygons of 12 vertices):
+
+| Prepared geometry | Predicate | Full matrix |
+|---|---|---|
+| a polygon of 100,000 vertices, against points | ≈ 1 µs | ≈ 1 µs |
+| a polygon of 100,000 vertices, against small polygons | ≈ 1.5 µs | ≈ 4 µs |
+| 10,000 small polygons | ≈ 8–35 µs | ≈ 57 µs |
+| 10 lines of 1,000 segments that cross each other often | ≈ 0.3–2.5 µs | ≈ 63 µs |
+
+This is comparable to prepared `RelateNG`, except for the full matrix of the line set: when B touches a component
+of A, the whole component is part of the arrangement. That costs ≈ 1 ms for each of the 7 % of tests where it
+happens; RelateNG, which evaluates the topology only locally, averages ≈ 5 µs per test.
 
 ## Roadmap: the Simple Features operations
 

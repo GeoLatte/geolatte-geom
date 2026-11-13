@@ -1,6 +1,7 @@
 package org.geolatte.geom.cga;
 
 import org.geolatte.geom.Geometry;
+import org.geolatte.geom.cga.RelateComputer.Operand;
 
 /**
  * Exact computation of the spatial relationship (the DE-9IM {@link IntersectionMatrix}) between two geometries,
@@ -18,10 +19,16 @@ import org.geolatte.geom.Geometry;
  * boundaries follow the Mod-2 rule. The individual polygons must be valid.</p>
  *
  * <p>Only the X and Y coordinates are used; the coordinate reference systems are not checked.</p>
+ *
+ * <p>To test one geometry against many others, use {@link PreparedRelate}.</p>
  */
 public final class Relate {
 
     private Relate() {
+    }
+
+    private static Operand operand(Geometry<?> geometry) {
+        return new Operand(GeometryElements.of(geometry));
     }
 
     /**
@@ -29,7 +36,7 @@ public final class Relate {
      * @throws IllegalArgumentException if a coordinate is NaN or infinite
      */
     public static IntersectionMatrix relate(Geometry<?> a, Geometry<?> b) {
-        return relate(GeometryElements.of(a), GeometryElements.of(b));
+        return relate(operand(a), operand(b));
     }
 
     /**
@@ -40,37 +47,12 @@ public final class Relate {
         return relate(a, b).matches(pattern);
     }
 
-    private static IntersectionMatrix relate(GeometryElements a, GeometryElements b) {
-        return new RelateComputer(a, b).compute();
-    }
-
-    // the predicate, decided early if possible, otherwise from the matrix
-    private static boolean evaluate(GeometryElements a, GeometryElements b, RelateComputer.Predicate predicate,
-                                    java.util.function.Predicate<IntersectionMatrix> test) {
-        RelateComputer computer = new RelateComputer(a, b, predicate);
-        IntersectionMatrix matrix = computer.compute();
-        return matrix == null ? computer.decided : test.test(matrix);
-    }
-
-    // the location (EXTERIOR, ON or INSIDE, see GeometryElements.roughLocation) in g of a position of the other
-    // geometry. Every point of a geometry is a limit of points of its interior, so INSIDE means that the
-    // interiors intersect.
-    private static int roughLocation(GeometryElements other, GeometryElements g) {
-        double[] p = other.anyPosition();
-        return g.roughLocation(p[0], p[1]);
-    }
-
     /**
      * @return true if the geometries are topologically equal (they are the same point set); two empty geometries
      * are equal
      */
     public static boolean equalsTopologically(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (ea.isEmpty() || eb.isEmpty()) return ea.isEmpty() && eb.isEmpty();
-        if (ea.minX != eb.minX || ea.minY != eb.minY || ea.maxX != eb.maxX || ea.maxY != eb.maxY) return false;
-        if (roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
-        if (roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isEquals);
+        return equalsTopologically(operand(a), operand(b));
     }
 
     /**
@@ -84,11 +66,7 @@ public final class Relate {
      * @return true if the geometries have at least one point in common
      */
     public static boolean intersects(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (!ea.envelopeIntersects(eb)) return false;
-        if (roughLocation(ea, eb) != GeometryElements.EXTERIOR) return true;
-        if (roughLocation(eb, ea) != GeometryElements.EXTERIOR) return true;
-        return evaluate(ea, eb, RelateComputer.Predicate.INTERSECTS, IntersectionMatrix::isIntersects);
+        return intersects(operand(a), operand(b));
     }
 
     /**
@@ -96,67 +74,128 @@ public final class Relate {
      * (see {@link IntersectionMatrix#isTouches()})
      */
     public static boolean touches(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (ea.dimension == 0 && eb.dimension == 0) return false;
-        if (!ea.envelopeIntersects(eb)) return false;
-        if (roughLocation(ea, eb) == GeometryElements.INSIDE) return false;
-        if (roughLocation(eb, ea) == GeometryElements.INSIDE) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.TOUCHES, IntersectionMatrix::isTouches);
+        return touches(operand(a), operand(b));
     }
 
     /**
      * @return true if a crosses b (see {@link IntersectionMatrix#isCrosses()})
      */
     public static boolean crosses(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (ea.dimension == eb.dimension && ea.dimension != 1) return false;
-        return ea.envelopeIntersects(eb)
-                && evaluate(ea, eb, RelateComputer.Predicate.CROSSES, IntersectionMatrix::isCrosses);
+        return crosses(operand(a), operand(b));
     }
 
     /**
      * @return true if a lies within b (see {@link IntersectionMatrix#isWithin()})
      */
     public static boolean within(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (!eb.envelopeContains(ea) || roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isWithin);
+        return within(operand(a), operand(b));
     }
 
     /**
      * @return true if a contains b (see {@link IntersectionMatrix#isContains()})
      */
     public static boolean contains(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (!ea.envelopeContains(eb) || roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isContains);
+        return contains(operand(a), operand(b));
     }
 
     /**
      * @return true if the geometries overlap (see {@link IntersectionMatrix#isOverlaps()})
      */
     public static boolean overlaps(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (ea.dimension != eb.dimension) return false;
-        return ea.envelopeIntersects(eb)
-                && evaluate(ea, eb, RelateComputer.Predicate.OVERLAPS, IntersectionMatrix::isOverlaps);
+        return overlaps(operand(a), operand(b));
     }
 
     /**
      * @return true if every point of b is a point of a, and b is not empty
      */
     public static boolean covers(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (!ea.envelopeContains(eb) || roughLocation(eb, ea) == GeometryElements.EXTERIOR) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCovers);
+        return covers(operand(a), operand(b));
     }
 
     /**
      * @return true if every point of a is a point of b, and a is not empty
      */
     public static boolean coveredBy(Geometry<?> a, Geometry<?> b) {
-        GeometryElements ea = GeometryElements.of(a), eb = GeometryElements.of(b);
-        if (!eb.envelopeContains(ea) || roughLocation(ea, eb) == GeometryElements.EXTERIOR) return false;
-        return evaluate(ea, eb, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCoveredBy);
+        return coveredBy(operand(a), operand(b));
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+    // on operands, shared with PreparedRelate
+    // ---------------------------------------------------------------------------------------------------------
+
+    static IntersectionMatrix relate(Operand a, Operand b) {
+        return new RelateComputer(a, b, RelateComputer.Predicate.NONE).compute();
+    }
+
+    // the predicate, decided early if possible, otherwise from the matrix
+    private static boolean evaluate(Operand a, Operand b, RelateComputer.Predicate predicate,
+                                    java.util.function.Predicate<IntersectionMatrix> test) {
+        RelateComputer computer = new RelateComputer(a, b, predicate);
+        IntersectionMatrix matrix = computer.compute();
+        return matrix == null ? computer.decided : test.test(matrix);
+    }
+
+    // the location (EXTERIOR, ON or INSIDE, see GeometryElements.roughLocation) in g of a position of the other
+    // geometry. Every point of a geometry is a limit of points of its interior, so INSIDE means that the
+    // interiors intersect.
+    private static int roughLocation(Operand other, Operand g) {
+        double[] p = other.elements.anyPosition();
+        return g.roughLocation(p[0], p[1]);
+    }
+
+    static boolean equalsTopologically(Operand a, Operand b) {
+        GeometryElements ea = a.elements, eb = b.elements;
+        if (ea.isEmpty() || eb.isEmpty()) return ea.isEmpty() && eb.isEmpty();
+        if (ea.minX != eb.minX || ea.minY != eb.minY || ea.maxX != eb.maxX || ea.maxY != eb.maxY) return false;
+        if (roughLocation(a, b) == GeometryElements.EXTERIOR) return false;
+        if (roughLocation(b, a) == GeometryElements.EXTERIOR) return false;
+        return evaluate(a, b, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isEquals);
+    }
+
+    static boolean intersects(Operand a, Operand b) {
+        if (!a.elements.envelopeIntersects(b.elements)) return false;
+        if (roughLocation(a, b) != GeometryElements.EXTERIOR) return true;
+        if (roughLocation(b, a) != GeometryElements.EXTERIOR) return true;
+        return evaluate(a, b, RelateComputer.Predicate.INTERSECTS, IntersectionMatrix::isIntersects);
+    }
+
+    static boolean touches(Operand a, Operand b) {
+        if (a.elements.dimension == 0 && b.elements.dimension == 0) return false;
+        if (!a.elements.envelopeIntersects(b.elements)) return false;
+        if (roughLocation(a, b) == GeometryElements.INSIDE) return false;
+        if (roughLocation(b, a) == GeometryElements.INSIDE) return false;
+        return evaluate(a, b, RelateComputer.Predicate.TOUCHES, IntersectionMatrix::isTouches);
+    }
+
+    static boolean crosses(Operand a, Operand b) {
+        if (a.elements.dimension == b.elements.dimension && a.elements.dimension != 1) return false;
+        return a.elements.envelopeIntersects(b.elements)
+                && evaluate(a, b, RelateComputer.Predicate.CROSSES, IntersectionMatrix::isCrosses);
+    }
+
+    static boolean within(Operand a, Operand b) {
+        if (!b.elements.envelopeContains(a.elements) || roughLocation(a, b) == GeometryElements.EXTERIOR) return false;
+        return evaluate(a, b, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isWithin);
+    }
+
+    static boolean contains(Operand a, Operand b) {
+        if (!a.elements.envelopeContains(b.elements) || roughLocation(b, a) == GeometryElements.EXTERIOR) return false;
+        return evaluate(a, b, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isContains);
+    }
+
+    static boolean overlaps(Operand a, Operand b) {
+        if (a.elements.dimension != b.elements.dimension) return false;
+        return a.elements.envelopeIntersects(b.elements)
+                && evaluate(a, b, RelateComputer.Predicate.OVERLAPS, IntersectionMatrix::isOverlaps);
+    }
+
+    static boolean covers(Operand a, Operand b) {
+        if (!a.elements.envelopeContains(b.elements) || roughLocation(b, a) == GeometryElements.EXTERIOR) return false;
+        return evaluate(a, b, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCovers);
+    }
+
+    static boolean coveredBy(Operand a, Operand b) {
+        if (!b.elements.envelopeContains(a.elements) || roughLocation(a, b) == GeometryElements.EXTERIOR) return false;
+        return evaluate(a, b, RelateComputer.Predicate.CONTAINMENT, IntersectionMatrix::isCoveredBy);
     }
 }

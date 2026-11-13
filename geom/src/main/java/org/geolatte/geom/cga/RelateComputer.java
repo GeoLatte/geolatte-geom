@@ -35,6 +35,9 @@ import java.util.*;
  * than one polygon, or points and a polygon: the rings of a valid polygon only touch in vertices, and these are
  * found by looking up every node in the ring chains afterwards (the closing step).</p>
  * <p>With a {@link Predicate}, the computation stops as soon as the predicate is decided, see {@link #compute()}.</p>
+ * <p>The structures that depend on one geometry only are in an {@link Operand}, which can be prepared once and used
+ * in many computations (see {@link PreparedRelate}). A computation then only uses the connected components of a
+ * prepared operand that are near the other geometry, and none if the geometries do not meet.</p>
  * <p>Nodes, edges, and the faces next to the edges partition the plane into cells, in each of which the location
  * relative to each geometry is constant. The matrix entry of the locations of a cell is at least the dimension of
  * the cell.</p>
@@ -44,9 +47,11 @@ final class RelateComputer {
     static final int A = 0, B = 1;
     static final int POINT = 0, LINE = 1, RING = 2;
 
+    private final Operand[] operands;
     private final GeometryElements[] elements;
     private final List<Chain> chains = new ArrayList<>();
-    private final List<Seg> points = new ArrayList<>();
+    private final Chain[][] chainsOf = new Chain[2][];
+    private final Seg[][] pointsOf = new Seg[2][];
     private final List<Node> vertices = new ArrayList<>();
     private final Map<Long, Node> nodes = new HashMap<>();
     private final List<Node> allNodes = new ArrayList<>();
@@ -69,16 +74,23 @@ final class RelateComputer {
 
     private final Predicate predicate;
     private final boolean[] simple = new boolean[2];
-    private EnvelopeTree[] trees;
-    private List<List<MonotoneChain>> monotone;
+    private final boolean[][] kept = new boolean[2][];   // per component of a prepared operand: is it used?
+    private final int[][] keptList = new int[2][];
+    private final boolean[][] inside = new boolean[2][]; // per component: not used, and in the other's interior
+    private boolean contactAB;   // an element of A meets one of B
     Boolean decided;   // the value of the predicate, if decided before the matrix is complete
 
     RelateComputer(GeometryElements a, GeometryElements b) {
-        this(a, b, Predicate.NONE);
+        this(new Operand(a), new Operand(b), Predicate.NONE);
     }
 
     RelateComputer(GeometryElements a, GeometryElements b, Predicate predicate) {
-        this.elements = new GeometryElements[]{a, b};
+        this(new Operand(a), new Operand(b), predicate);
+    }
+
+    RelateComputer(Operand a, Operand b, Predicate predicate) {
+        this.operands = new Operand[]{a, b};
+        this.elements = new GeometryElements[]{a.elements, b.elements};
         this.predicate = predicate;
         // a geometry is locally simple if no element covers the neighbourhood of a point on the boundary of another
         // element: then a proper crossing that no other segment passes through tells the locations around it
@@ -91,8 +103,14 @@ final class RelateComputer {
      * @return the matrix, or null if the predicate was decided before the matrix was complete (see decided)
      */
     IntersectionMatrix compute() {
-        addElements(elements[A], A);
-        addElements(elements[B], B);
+        for (int g = 0; g < 2; g++) operands[g].index();
+        for (int g = 0; g < 2; g++) {
+            selectComponents(g);
+            pointsOf[g] = new Seg[operands[g].elements.points.size()];
+            chainsOf[g] = new Chain[operands[g].chains.length];
+            // the elements of a prepared operand are added after the join, when it is known which are needed
+            if (kept[g] == null) addElements(g);
+        }
         findContacts();
         if (decided != null) return null;
         buildEdges();
@@ -102,25 +120,260 @@ final class RelateComputer {
     }
 
     // ---------------------------------------------------------------------------------------------------------
-    // the arrangement
+    // the operands
     // ---------------------------------------------------------------------------------------------------------
 
     /**
-     * A line, or a ring of a polygon
+     * A geometry with the structures that do not depend on the other geometry: its lines and rings, their monotone
+     * chains, and an R-tree on these. A prepared operand (see {@link #prepare()}) also has the pairs of its
+     * segments that meet and a point locator; it can be used in any number of computations, also concurrently.
      */
-    static final class Chain {
-        final int geom, kind, polygon, delta;
+    static final class Operand {
+        final GeometryElements elements;
+        final boolean selfContacts;   // elements can meet other than in rings of the same polygon
+        ChainData[] chains;           // the lines, then the rings
+        MonotoneChain[] monotone;     // the points along a Hilbert curve, then the chains along the lines and rings
+        EnvelopeTree tree;            // on the monotone chains
+        int[] contacts;               // if prepared: the pairs of segments (chain, segment) that meet
+        PointLocator locator;         // if prepared
+        // if prepared: the connected components (chains and points that meet each other), so that a computation
+        // only needs the components near the other geometry; the others lie in its exterior
+        int componentCount;
+        int[] memberStart, members;   // per component, its chains (k) and points (-1 - i)
+        private int[] component;      // per chain, then per point: its component
+        int[] contactStart;           // per component, its contacts (in contacts, 4 values per contact)
+        int[][] dims;                 // per location (I, BD) and component: the highest dimension of its cells in
+                                      // that location of this geometry, -1 if none
+        int[][] byDim;                // per location: the components with such cells, by decreasing dimension
+        EnvelopeTree componentTree;   // on the bounding boxes of the components
+
+        Operand(GeometryElements elements) {
+            this.elements = elements;
+            this.selfContacts = !elements.lines.isEmpty() || elements.polygonCount > 1
+                    || (!elements.points.isEmpty() && elements.polygonCount > 0);
+        }
+
+        // builds the chains, monotone chains and their R-tree
+        void index() {
+            if (tree != null) return;
+            List<ChainData> data = new ArrayList<>();
+            for (double[][] line : elements.lines) data.add(new ChainData(LINE, -1, 0, line[0], line[1]));
+            for (GeometryElements.Ring r : elements.rings) data.add(new ChainData(RING, r.polygon, r.delta, r.xs, r.ys));
+            chains = data.toArray(new ChainData[0]);
+            List<MonotoneChain> mcs = new ArrayList<>();
+            List<double[]> points = elements.points;
+            if (!points.isEmpty()) {
+                double[] px = new double[points.size()], py = new double[points.size()];
+                for (int i = 0; i < px.length; i++) {
+                    px[i] = points.get(i)[0];
+                    py[i] = points.get(i)[1];
+                }
+                for (int i : Hilbert.order(px, py)) mcs.add(new MonotoneChain(i, px[i], py[i]));
+            }
+            for (int k = 0; k < chains.length; k++) {
+                ChainData c = chains[k];
+                int n = c.xs.length - 1, start = 0;
+                int q = quadrant(c.xs[1] - c.xs[0], c.ys[1] - c.ys[0]);
+                for (int i = 1; i < n; i++) {
+                    int qi = quadrant(c.xs[i + 1] - c.xs[i], c.ys[i + 1] - c.ys[i]);
+                    if (qi != q) {
+                        mcs.add(new MonotoneChain(k, c, start, i));
+                        start = i;
+                        q = qi;
+                    }
+                }
+                mcs.add(new MonotoneChain(k, c, start, n));
+            }
+            monotone = mcs.toArray(new MonotoneChain[0]);
+            int m = monotone.length;
+            double[] minX = new double[m], minY = new double[m], maxX = new double[m], maxY = new double[m];
+            for (int i = 0; i < m; i++) {
+                MonotoneChain mc = monotone[i];
+                minX[i] = Math.min(mc.x(mc.start), mc.x(mc.end));
+                maxX[i] = Math.max(mc.x(mc.start), mc.x(mc.end));
+                minY[i] = Math.min(mc.y(mc.start), mc.y(mc.end));
+                maxY[i] = Math.max(mc.y(mc.start), mc.y(mc.end));
+            }
+            tree = new EnvelopeTree(minX, minY, maxX, maxY);
+        }
+
+        /**
+         * Computes the pairs of segments of the geometry that meet, and a point locator
+         */
+        Operand prepare() {
+            index();
+            locator = new PointLocator(elements);
+            int[][] found = {new int[16]};
+            int[] count = {0};
+            if (selfContacts) {
+                tree.selfJoin((i, j) -> {
+                    MonotoneChain a = monotone[i], b = monotone[j];
+                    if (independent(a, b)) return false;
+                    pairs(a, a.start, a.end, b, b.start, b.end, (s, t) -> {
+                        if (consecutive(a, s, b, t)) return false;
+                        SegmentIntersection kind = Predicates.segmentIntersection(a.x(s), a.y(s), a.x(s + 1),
+                                a.y(s + 1), b.x(t), b.y(t), b.x(t + 1), b.y(t + 1));
+                        if (kind == SegmentIntersection.DISJOINT) return false;
+                        if (count[0] + 4 > found[0].length) found[0] = Arrays.copyOf(found[0], 2 * found[0].length);
+                        int[] f = found[0];
+                        f[count[0]++] = a.code();
+                        f[count[0]++] = s;
+                        f[count[0]++] = b.code();
+                        f[count[0]++] = t;
+                        return false;
+                    });
+                    return false;
+                });
+            }
+            contacts = Arrays.copyOf(found[0], count[0]);
+            EnvelopeTree tree = components();
+            dims = new RelateComputer(this, new Operand(new GeometryElements()), Predicate.NONE).componentDims();
+            byDim = new int[2][];
+            for (int loc = 0; loc < 2; loc++) {
+                int[] d = dims[loc];
+                byDim[loc] = java.util.stream.IntStream.range(0, componentCount).filter(c -> d[c] >= 0).boxed()
+                        .sorted((c1, c2) -> Integer.compare(d[c2], d[c1])).mapToInt(Integer::intValue).toArray();
+            }
+            componentTree = tree;   // from now on, computations use only the components they need
+            return this;
+        }
+
+        // the index of a chain (k) or point (-1 - i) in the union-find arrays
+        private int id(int code) {
+            return code >= 0 ? code : chains.length - 1 - code;
+        }
+
+        // finds the connected components, groups the members and contacts per component, and returns an R-tree on
+        // the components
+        private EnvelopeTree components() {
+            int n = chains.length + elements.points.size();
+            int[] parent = new int[n];
+            for (int i = 0; i < n; i++) parent[i] = i;
+            for (int k = 0; k < contacts.length; k += 4) union(parent, id(contacts[k]), id(contacts[k + 2]));
+            // the rings of a polygon touch at most in vertices, which are not in the contacts
+            int[] firstRing = new int[elements.polygonCount];
+            Arrays.fill(firstRing, -1);
+            for (int k = 0; k < chains.length; k++) {
+                if (chains[k].kind != RING) continue;
+                int p = chains[k].polygon;
+                if (firstRing[p] < 0) firstRing[p] = k;
+                else union(parent, firstRing[p], k);
+            }
+            component = new int[n];
+            int[] index = new int[n];
+            Arrays.fill(index, -1);
+            componentCount = 0;
+            for (int i = 0; i < n; i++) {
+                int r = find(parent, i);
+                if (index[r] < 0) index[r] = componentCount++;
+                component[i] = index[r];
+            }
+            memberStart = new int[componentCount + 1];
+            for (int i = 0; i < n; i++) memberStart[component[i] + 1]++;
+            for (int c = 0; c < componentCount; c++) memberStart[c + 1] += memberStart[c];
+            members = new int[n];
+            int[] next = Arrays.copyOf(memberStart, componentCount);
+            for (int i = 0; i < n; i++) members[next[component[i]]++] = i < chains.length ? i : chains.length - 1 - i;
+            // the contacts, ordered by component
+            int m = contacts.length / 4;
+            contactStart = new int[componentCount + 1];
+            for (int k = 0; k < m; k++) contactStart[component[id(contacts[4 * k])] + 1]++;
+            for (int c = 0; c < componentCount; c++) contactStart[c + 1] += contactStart[c];
+            int[] sorted = new int[contacts.length];
+            next = Arrays.copyOf(contactStart, componentCount);
+            for (int k = 0; k < m; k++) {
+                System.arraycopy(contacts, 4 * k, sorted, 4 * next[component[id(contacts[4 * k])]]++, 4);
+            }
+            contacts = sorted;
+            // the bounding boxes
+            double[] minX = new double[componentCount], minY = new double[componentCount];
+            double[] maxX = new double[componentCount], maxY = new double[componentCount];
+            Arrays.fill(minX, Double.POSITIVE_INFINITY);
+            Arrays.fill(minY, Double.POSITIVE_INFINITY);
+            Arrays.fill(maxX, Double.NEGATIVE_INFINITY);
+            Arrays.fill(maxY, Double.NEGATIVE_INFINITY);
+            for (int i = 0; i < n; i++) {
+                int c = component[i];
+                double x0, y0, x1, y1;
+                if (i < chains.length) {
+                    x0 = chains[i].minX;
+                    y0 = chains[i].minY;
+                    x1 = chains[i].maxX;
+                    y1 = chains[i].maxY;
+                } else {
+                    double[] p = elements.points.get(i - chains.length);
+                    x0 = x1 = p[0];
+                    y0 = y1 = p[1];
+                }
+                minX[c] = Math.min(minX[c], x0);
+                minY[c] = Math.min(minY[c], y0);
+                maxX[c] = Math.max(maxX[c], x1);
+                maxY[c] = Math.max(maxY[c], y1);
+            }
+            return new EnvelopeTree(minX, minY, maxX, maxY);
+        }
+
+        private static int find(int[] parent, int i) {
+            while (parent[i] != i) {
+                parent[i] = parent[parent[i]];
+                i = parent[i];
+            }
+            return i;
+        }
+
+        private static void union(int[] parent, int i, int j) {
+            parent[find(parent, i)] = find(parent, j);
+        }
+
+        // the component of a chain (k) or point (-1 - i)
+        int componentOf(int code) {
+            return component[id(code)];
+        }
+
+        // pairs of monotone chains that need not be tested: two points meet only if they are the same node, and the
+        // rings of a valid polygon do not cross each other
+        boolean independent(MonotoneChain a, MonotoneChain b) {
+            if (a.chain < 0 && b.chain < 0) return true;
+            if (a.chain < 0 || b.chain < 0) return false;
+            ChainData ca = chains[a.chain], cb = chains[b.chain];
+            return ca.kind == RING && cb.kind == RING && ca.polygon == cb.polygon;
+        }
+
+        // pairs of segments that need not be tested: consecutive segments of a chain meet in their common vertex,
+        // unless they overlap (the chain turns back)
+        boolean consecutive(MonotoneChain a, int i, MonotoneChain b, int j) {
+            if (a.chain < 0 || a.chain != b.chain) return false;
+            ChainData c = chains[a.chain];
+            int n = c.xs.length - 1;
+            int vertex;
+            if (i + 1 == j || (c.closed && i == n - 1 && j == 0)) vertex = j;
+            else if (j + 1 == i || (c.closed && j == n - 1 && i == 0)) vertex = i;
+            else return false;
+            return c.turnsBack == null || !c.turnsBack[vertex];
+        }
+
+        /**
+         * The location of the point (see {@link GeometryElements#roughLocation})
+         */
+        int roughLocation(double x, double y) {
+            return locator == null ? elements.roughLocation(x, y) : locator.roughLocation(x, y);
+        }
+    }
+
+    /**
+     * A line, or a ring of a polygon, of an operand
+     */
+    static final class ChainData {
+        final int kind, polygon, delta;
         final double[] xs, ys;     // a ring is closed: its last position is the first one
         final boolean closed;
         final int vertexCount;     // distinct vertices: those of a ring exclude the closing position
-        final Node[] nodes;        // the node at each vertex, null if the vertex is not a node
-        final Seg[] segs;          // created when a segment meets another one
-        final boolean[] turnsBack; // the segments before and after the vertex overlap
+        final int lexMin;          // the index of the lexicographically smallest vertex
+        final boolean[] turnsBack; // for a line: the segments before and after the vertex overlap; null for a ring
         double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY;
         double maxX = Double.NEGATIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
 
-        Chain(int geom, int kind, int polygon, int delta, double[] xs, double[] ys) {
-            this.geom = geom;
+        ChainData(int kind, int polygon, int delta, double[] xs, double[] ys) {
             this.kind = kind;
             this.polygon = polygon;
             this.delta = delta;
@@ -128,20 +381,20 @@ final class RelateComputer {
             this.ys = ys;
             this.closed = kind == RING;
             this.vertexCount = closed ? xs.length - 1 : xs.length;
-            this.nodes = new Node[vertexCount];
-            this.segs = new Seg[xs.length - 1];
-            this.turnsBack = new boolean[vertexCount];
+            this.turnsBack = closed ? null : new boolean[vertexCount];
+            int min = 0;
             for (int i = 0; i < vertexCount; i++) {
                 minX = Math.min(minX, xs[i]);
                 maxX = Math.max(maxX, xs[i]);
                 minY = Math.min(minY, ys[i]);
                 maxY = Math.max(maxY, ys[i]);
+                if (xs[i] < xs[min] || (xs[i] == xs[min] && ys[i] < ys[min])) min = i;
                 // only consecutive segments of a line can be tested against each other: rings of a polygon are
                 // not tested against the rings of the same polygon
                 if (closed || i == 0 || i == vertexCount - 1) continue;
-                int previous = i > 0 ? i - 1 : vertexCount - 1;
-                turnsBack[i] = turnsBack(xs[previous], ys[previous], xs[i], ys[i], xs[i + 1], ys[i + 1]);
+                turnsBack[i] = turnsBack(xs[i - 1], ys[i - 1], xs[i], ys[i], xs[i + 1], ys[i + 1]);
             }
+            this.lexMin = min;
         }
 
         // for consecutive segments (p, q) and (q, r): do they overlap?
@@ -152,22 +405,61 @@ final class RelateComputer {
             return Predicates.orientation(px, py, qx, qy, rx, ry) == 0
                     && Predicates.dotSign(qx, qy, px, py, qx, qy, rx, ry) > 0;
         }
+    }
 
-        // the index of the lexicographically smallest vertex
-        int lexMin() {
-            int min = 0;
-            for (int i = 1; i < vertexCount; i++) {
-                if (xs[i] < xs[min] || (xs[i] == xs[min] && ys[i] < ys[min])) min = i;
-            }
-            return min;
+    // ---------------------------------------------------------------------------------------------------------
+    // the arrangement
+    // ---------------------------------------------------------------------------------------------------------
+
+    /**
+     * A line or ring in the computation. Only the vertices and segments where something happens have state, so
+     * that the cost does not depend on the length of the chain.
+     */
+    static final class Chain {
+        final ChainData data;
+        final int geom, index, kind, polygon, delta;
+        final double[] xs, ys;
+        final boolean closed;
+        final int vertexCount;
+        private final IntMap<Node> nodes = new IntMap<>();   // the node at a vertex, if the vertex is a node
+        private final IntMap<Seg> segs = new IntMap<>();     // the segments that meet another one
+        private int[] marks = new int[4];   // 2 v for a node at vertex v, 2 i + 1 for nodes inside segment i
+        private int markCount = 0;
+        boolean registered;   // part of the arrangement (a chain of a prepared operand may be created before)
+
+        Chain(ChainData data, int geom, int index) {
+            this.data = data;
+            this.geom = geom;
+            this.index = index;
+            this.kind = data.kind;
+            this.polygon = data.polygon;
+            this.delta = data.delta;
+            this.xs = data.xs;
+            this.ys = data.ys;
+            this.closed = data.closed;
+            this.vertexCount = data.vertexCount;
+        }
+
+        Node node(int vertex) {
+            return nodes.get(vertex);
+        }
+
+        Seg seg(int i) {
+            return segs.get(i);
+        }
+
+        private void mark(int m) {
+            if (markCount == marks.length) marks = Arrays.copyOf(marks, 2 * markCount);
+            marks[markCount++] = m;
         }
     }
 
     static final class Seg {
         final Chain chain;          // null for a point
-        final int index;            // the index in the chain: from vertex index to vertex index + 1
+        final int index;            // the index in the chain: from vertex index to vertex index + 1; for a point,
+                                    // the index of the point
         final int geom, kind;
-        final Node point;           // the node of a point
+        Node point;                 // the node of a point, once it is needed
         final double x0, y0, x1, y1;
         final double minX, maxX, minY, maxY;
         List<Incidence> incidences;   // nodes in the interior of the segment
@@ -189,14 +481,13 @@ final class RelateComputer {
             this.maxY = Math.max(y0, y1);
         }
 
-        Seg(int geom, Node point) {
+        Seg(int geom, int index, double x, double y) {
             this.chain = null;
-            this.index = 0;
+            this.index = index;
             this.geom = geom;
             this.kind = POINT;
-            this.point = point;
-            this.x0 = this.x1 = this.minX = this.maxX = point.x;
-            this.y0 = this.y1 = this.minY = this.maxY = point.y;
+            this.x0 = this.x1 = this.minX = this.maxX = x;
+            this.y0 = this.y1 = this.minY = this.maxY = y;
         }
 
         // the index in the chain of vertex 0 or 1 of the segment
@@ -205,7 +496,10 @@ final class RelateComputer {
         }
 
         void addIncidence(Node node, Seg other) {
-            if (incidences == null) incidences = new ArrayList<>(2);
+            if (incidences == null) {
+                incidences = new ArrayList<>(2);
+                chain.mark(2 * index + 1);
+            }
             incidences.add(new Incidence(node, other));
         }
 
@@ -218,6 +512,57 @@ final class RelateComputer {
         // for a point on the line of the segment: does it lie strictly between the endpoints?
         boolean strictlyInside(double x, double y) {
             return x0 != x1 ? minX < x && x < maxX : minY < y && y < maxY;
+        }
+    }
+
+    /**
+     * A map from non-negative ints to objects, with open addressing
+     */
+    static final class IntMap<V> {
+        private int[] keys;
+        private Object[] values;
+        private int size;
+
+        @SuppressWarnings("unchecked")
+        V get(int key) {
+            if (keys == null) return null;
+            int mask = keys.length - 1;
+            for (int i = hash(key) & mask; values[i] != null; i = (i + 1) & mask) {
+                if (keys[i] == key) return (V) values[i];
+            }
+            return null;
+        }
+
+        // the key must not be present
+        void put(int key, V value) {
+            if (keys == null) {
+                keys = new int[4];
+                values = new Object[4];
+            } else if (2 * (size + 1) > keys.length) {
+                int[] oldKeys = keys;
+                Object[] oldValues = values;
+                keys = new int[2 * oldKeys.length];
+                values = new Object[2 * oldKeys.length];
+                size = 0;
+                for (int i = 0; i < oldKeys.length; i++) {
+                    if (oldValues[i] != null) insert(oldKeys[i], oldValues[i]);
+                }
+            }
+            insert(key, value);
+        }
+
+        private void insert(int key, Object value) {
+            int mask = keys.length - 1;
+            int i = hash(key) & mask;
+            while (values[i] != null) i = (i + 1) & mask;
+            keys[i] = key;
+            values[i] = value;
+            size++;
+        }
+
+        private static int hash(int key) {
+            int h = key * 0x9E3779B9;
+            return h ^ (h >>> 16);
         }
     }
 
@@ -266,6 +611,7 @@ final class RelateComputer {
 
     static final class Edge {
         final Node n0, n1;
+        Chain chain;             // a chain of which the edge is a part
         final int[] delta = new int[2];
         final boolean[] line = new boolean[2];
         final int[] left = new int[2], right = new int[2];
@@ -326,31 +672,121 @@ final class RelateComputer {
         }
     }
 
-    private void addElements(GeometryElements e, int g) {
-        for (double[] p : e.points) {
-            Node n = nodeAt(p[0], p[1]);
-            n.point[g] = true;
-            points.add(new Seg(g, n));
+    /**
+     * For a prepared operand: the components whose bounding box meets the bounding box of the other geometry. The
+     * other components lie in the exterior of the other geometry, at a distance; they do not meet the used
+     * components, and their contribution to the matrix is known (see Operand.dims).
+     */
+    private void selectComponents(int g) {
+        Operand operand = operands[g];
+        if (operand.componentTree == null) return;
+        GeometryElements other = elements[1 - g];
+        kept[g] = new boolean[operand.componentCount];
+        int[][] list = {new int[8]};
+        int[] count = {0};
+        operand.componentTree.query(other.minX, other.minY, other.maxX, other.maxY, c -> {
+            kept[g][c] = true;
+            if (count[0] == list[0].length) list[0] = Arrays.copyOf(list[0], 2 * count[0]);
+            list[0][count[0]++] = c;
+        });
+        keptList[g] = Arrays.copyOf(list[0], count[0]);
+    }
+
+    /**
+     * If the geometries do not meet, each component of a prepared operand lies in the interior or in the exterior
+     * of the other geometry, so that its contribution to the matrix is known (see Operand.dims), and it is not
+     * used. The location of one of its positions decides.
+     */
+    private void locateComponents(int g) {
+        Operand operand = operands[g], other = operands[1 - g];
+        PointLocator locator = keptList[g].length > MAX_SCANS && other.locator == null
+                ? new PointLocator(other.elements) : null;
+        inside[g] = new boolean[operand.componentCount];
+        int count = 0;
+        for (int c : keptList[g]) {
+            int member = operand.members[operand.memberStart[c]];
+            double x, y;
+            if (member >= 0) {
+                x = operand.chains[member].xs[0];
+                y = operand.chains[member].ys[0];
+            } else {
+                double[] p = operand.elements.points.get(-1 - member);
+                x = p[0];
+                y = p[1];
+            }
+            int location = locator != null ? locator.roughLocation(x, y) : other.roughLocation(x, y);
+            if (location == GeometryElements.ON) {   // not expected without contacts: use the component
+                keptList[g][count++] = c;
+                continue;
+            }
+            kept[g][c] = false;
+            inside[g][c] = location == GeometryElements.INSIDE;
         }
-        for (double[][] line : e.lines) {
-            Chain c = addChain(new Chain(g, LINE, -1, 0, line[0], line[1]));
+        keptList[g] = Arrays.copyOf(keptList[g], count);
+    }
+
+    private void addElements(int g) {
+        Operand operand = operands[g];
+        if (kept[g] == null) {
+            for (int i = 0; i < pointsOf[g].length; i++) addPoint(g, i);
+            for (int k = 0; k < chainsOf[g].length; k++) addChain(g, k);
+            return;
+        }
+        for (int c : keptList[g]) {
+            for (int k = operand.memberStart[c]; k < operand.memberStart[c + 1]; k++) {
+                int member = operand.members[k];
+                if (member >= 0) addChain(g, member);
+                else addPoint(g, -1 - member);
+            }
+        }
+    }
+
+    private void addPoint(int g, int i) {
+        vertexNode(point(g, i), 0);
+    }
+
+    private void addChain(int g, int k) {
+        Chain c = chain(g, k);
+        c.registered = true;
+        chains.add(c);
+        vertexNode(c, c.data.lexMin);
+        if (c.kind == LINE) {
             vertexNode(c, 0).endpoints[g]++;
             vertexNode(c, c.vertexCount - 1).endpoints[g]++;
         }
-        for (GeometryElements.Ring ring : e.rings) {
-            addChain(new Chain(g, RING, ring.polygon, ring.delta, ring.xs, ring.ys));
-        }
-    }
-
-    private Chain addChain(Chain c) {
-        chains.add(c);
-        vertexNode(c, c.lexMin());
-        return c;
     }
 
     private static Seg seg(Chain c, int i) {
-        Seg s = c.segs[i];
-        if (s == null) s = c.segs[i] = new Seg(c, i);
+        Seg s = c.segs.get(i);
+        if (s == null) {
+            s = new Seg(c, i);
+            c.segs.put(i, s);
+        }
+        return s;
+    }
+
+    // segment i of a monotone chain of geometry g
+    private Seg seg(int g, MonotoneChain mc, int i) {
+        return seg(g, mc.code(), i);
+    }
+
+    // segment i of a chain, or a point, of geometry g (see MonotoneChain.code)
+    private Seg seg(int g, int code, int i) {
+        return code < 0 ? point(g, -1 - code) : seg(chain(g, code), i);
+    }
+
+    private Chain chain(int g, int k) {
+        Chain c = chainsOf[g][k];
+        if (c == null) c = chainsOf[g][k] = new Chain(operands[g].chains[k], g, k);
+        return c;
+    }
+
+    private Seg point(int g, int i) {
+        Seg s = pointsOf[g][i];
+        if (s == null) {
+            double[] p = operands[g].elements.points.get(i);
+            s = pointsOf[g][i] = new Seg(g, i, p[0], p[1]);
+        }
         return s;
     }
 
@@ -361,17 +797,23 @@ final class RelateComputer {
 
     // the node of a vertex of a chain
     private Node vertexNode(Chain c, int vertex) {
-        Node n = c.nodes[vertex];
+        Node n = c.nodes.get(vertex);
         if (n == null) {
             n = nodeAt(c.xs[vertex], c.ys[vertex]);
-            c.nodes[vertex] = n;
+            c.nodes.put(vertex, n);
+            c.mark(2 * vertex);
         }
         return n;
     }
 
     // the node of vertex 0 or 1 of a segment
     private Node vertexNode(Seg s, int end) {
-        return s.kind == POINT ? s.point : vertexNode(s.chain, s.vertex(end));
+        if (s.kind != POINT) return vertexNode(s.chain, s.vertex(end));
+        if (s.point == null) {
+            s.point = nodeAt(s.x0, s.y0);
+            s.point.point[s.geom] = true;
+        }
+        return s.point;
     }
 
     // the node of a vertex or point at (x, y)
@@ -433,34 +875,43 @@ final class RelateComputer {
      * same monotone chain only meet if they are consecutive, in their common vertex.
      */
     static final class MonotoneChain {
-        final Chain chain;   // null for a point
-        final Seg point;
-        final int start, end;  // the segments start to end - 1, from vertex start to vertex end
+        final int chain;        // the index of the chain in its operand; -1 for a point
+        final int point;        // the index of the point; -1 for a chain
+        final double[] xs, ys;  // the coordinates of the chain
+        final double px, py;    // the point
+        final int start, end;   // the segments start to end - 1, from vertex start to vertex end
 
-        MonotoneChain(Chain chain, int start, int end) {
+        MonotoneChain(int chain, ChainData data, int start, int end) {
             this.chain = chain;
-            this.point = null;
+            this.point = -1;
+            this.xs = data.xs;
+            this.ys = data.ys;
+            this.px = this.py = 0;
             this.start = start;
             this.end = end;
         }
 
-        MonotoneChain(Seg point) {
-            this.chain = null;
+        MonotoneChain(int point, double px, double py) {
+            this.chain = -1;
             this.point = point;
+            this.xs = this.ys = null;
+            this.px = px;
+            this.py = py;
             this.start = 0;
             this.end = 1;
         }
 
         double x(int vertex) {
-            return chain == null ? point.x0 : chain.xs[vertex];
+            return xs == null ? px : xs[vertex];
         }
 
         double y(int vertex) {
-            return chain == null ? point.y0 : chain.ys[vertex];
+            return ys == null ? py : ys[vertex];
         }
 
-        Seg seg(int i) {
-            return chain == null ? point : RelateComputer.seg(chain, i);
+        // the chain index, or -1 - the point index
+        int code() {
+            return chain >= 0 ? chain : -1 - point;
         }
     }
 
@@ -474,40 +925,51 @@ final class RelateComputer {
      * polygon. Where such a point is a node for another reason, the rings are split there afterwards.
      *
      * <p>The monotone chains of each geometry are in an R-tree; pairs within a geometry come from a self-join (if
-     * it can have such pairs), pairs between the geometries from a join of the two trees.</p>
+     * it can have such pairs; a prepared operand has them already), pairs between the geometries from a join of
+     * the two trees.</p>
      */
     private void findContacts() {
-        monotone = new ArrayList<>();
-        trees = new EnvelopeTree[2];
-        for (int g = 0; g < 2; g++) {
-            monotone.add(monotoneChains(g));
-            trees[g] = tree(monotone.get(g));
-        }
         // first the pairs between the geometries, which may decide the predicate
-        List<MonotoneChain> ma = monotone.get(A), mb = monotone.get(B);
-        EnvelopeTree.join(trees[A], trees[B], (i, j) -> {
-            MonotoneChain a = ma.get(i), b = mb.get(j);
-            if (a.point != null && b.point != null) {
-                if (predicate == Predicate.INTERSECTS && a.point.point == b.point.point) decided = true;
+        MonotoneChain[] ma = operands[A].monotone, mb = operands[B].monotone;
+        EnvelopeTree.join(operands[A].tree, operands[B].tree, (i, j) -> {
+            MonotoneChain a = ma[i], b = mb[j];
+            if (a.chain < 0 && b.chain < 0) {
+                if (a.px == b.px && a.py == b.py) {
+                    contactAB = true;
+                    if (predicate == Predicate.INTERSECTS) decided = true;
+                }
             } else {
-                overlap(a, a.start, a.end, b, b.start, b.end);
+                overlap(A, a, B, b);
             }
             return decided != null;
         });
         if (decided != null) return;
         for (int g = 0; g < 2; g++) {
-            GeometryElements e = elements[g];
-            boolean selfContacts = !e.lines.isEmpty() || e.polygonCount > 1 || (!e.points.isEmpty() && e.polygonCount > 0);
-            if (!selfContacts) continue;
-            List<MonotoneChain> mcs = monotone.get(g);
-            trees[g].selfJoin((i, j) -> {
-                MonotoneChain a = mcs.get(i), b = mcs.get(j);
-                if (a.point != null && b.point != null) return false;
-                if (a.chain != null && b.chain != null && a.chain.kind == RING && b.chain.kind == RING
-                        && a.chain.polygon == b.chain.polygon) {
-                    return false;
+            if (kept[g] == null) continue;
+            if (!contactAB) locateComponents(g);
+            addElements(g);
+        }
+        for (int g = 0; g < 2; g++) {
+            Operand operand = operands[g];
+            if (!operand.selfContacts) continue;
+            if (operand.contacts != null) {
+                int[] f = operand.contacts;
+                if (kept[g] == null) {
+                    for (int k = 0; k < f.length; k += 4) contact(seg(g, f[k], f[k + 1]), seg(g, f[k + 2], f[k + 3]));
+                } else {
+                    for (int c : keptList[g]) {
+                        for (int k = 4 * operand.contactStart[c]; k < 4 * operand.contactStart[c + 1]; k += 4) {
+                            contact(seg(g, f[k], f[k + 1]), seg(g, f[k + 2], f[k + 3]));
+                        }
+                    }
                 }
-                overlap(a, a.start, a.end, b, b.start, b.end);
+                continue;
+            }
+            int geom = g;
+            MonotoneChain[] mcs = operand.monotone;
+            operand.tree.selfJoin((i, j) -> {
+                MonotoneChain a = mcs[i], b = mcs[j];
+                if (!operand.independent(a, b)) overlap(geom, a, geom, b);
                 return false;
             });
         }
@@ -516,73 +978,32 @@ final class RelateComputer {
         for (Node n : allNodes) if (n.exact) exact.add(n);
         for (int g = 0; g < 2; g++) {
             if (elements[g].polygonCount == 0) continue;
-            List<MonotoneChain> mcs = monotone.get(g);
+            MonotoneChain[] mcs = operands[g].monotone;
+            Chain[] own = chainsOf[g];
             for (Node n : exact) {
-                trees[g].query(n.x, n.y, n.x, n.y, i -> {
-                    MonotoneChain mc = mcs.get(i);
-                    if (mc.chain != null && mc.chain.kind == RING) splitAt(mc, mc.start, mc.end, n);
+                operands[g].tree.query(n.x, n.y, n.x, n.y, i -> {
+                    MonotoneChain mc = mcs[i];
+                    // a chain that is not used does not pass through the node: it would be in the same component
+                    if (mc.chain >= 0 && own[mc.chain] != null && own[mc.chain].registered && own[mc.chain].kind == RING) {
+                        splitAt(own[mc.chain], mc, mc.start, mc.end, n);
+                    }
                 });
             }
         }
     }
 
-    // the monotone chains of geometry g: the points along a Hilbert curve, the chains in their order along the
-    // lines and rings
-    private List<MonotoneChain> monotoneChains(int g) {
-        List<MonotoneChain> monotone = new ArrayList<>();
-        List<Seg> own = new ArrayList<>();
-        for (Seg p : points) if (p.geom == g) own.add(p);
-        if (!own.isEmpty()) {
-            double[] px = new double[own.size()], py = new double[own.size()];
-            for (int i = 0; i < px.length; i++) {
-                px[i] = own.get(i).x0;
-                py[i] = own.get(i).y0;
-            }
-            for (int i : Hilbert.order(px, py)) monotone.add(new MonotoneChain(own.get(i)));
-        }
-        for (Chain c : chains) {
-            if (c.geom != g) continue;
-            int n = c.xs.length - 1, start = 0;
-            int q = quadrant(c.xs[1] - c.xs[0], c.ys[1] - c.ys[0]);
-            for (int i = 1; i < n; i++) {
-                int qi = quadrant(c.xs[i + 1] - c.xs[i], c.ys[i + 1] - c.ys[i]);
-                if (qi != q) {
-                    monotone.add(new MonotoneChain(c, start, i));
-                    start = i;
-                    q = qi;
-                }
-            }
-            monotone.add(new MonotoneChain(c, start, n));
-        }
-        return monotone;
-    }
-
-    private static EnvelopeTree tree(List<MonotoneChain> monotone) {
-        int m = monotone.size();
-        double[] minX = new double[m], minY = new double[m], maxX = new double[m], maxY = new double[m];
-        for (int i = 0; i < m; i++) {
-            MonotoneChain mc = monotone.get(i);
-            minX[i] = Math.min(mc.x(mc.start), mc.x(mc.end));
-            maxX[i] = Math.max(mc.x(mc.start), mc.x(mc.end));
-            minY[i] = Math.min(mc.y(mc.start), mc.y(mc.end));
-            maxY[i] = Math.max(mc.y(mc.start), mc.y(mc.end));
-        }
-        return new EnvelopeTree(minX, minY, maxX, maxY);
-    }
-
-    // if the exact node lies on segments v0 to v1 - 1 of the monotone chain, it is a node of the chain there
-    private void splitAt(MonotoneChain mc, int v0, int v1, Node n) {
+    // if the exact node lies on segments v0 to v1 - 1 of the monotone chain of c, it is a node of c there
+    private void splitAt(Chain c, MonotoneChain mc, int v0, int v1, Node n) {
         double x0 = mc.x(v0), x1 = mc.x(v1), y0 = mc.y(v0), y1 = mc.y(v1);
         if (n.x < Math.min(x0, x1) || n.x > Math.max(x0, x1) || n.y < Math.min(y0, y1) || n.y > Math.max(y0, y1)) {
             return;
         }
         if (v1 - v0 > 1) {
             int mid = (v0 + v1) >>> 1;
-            splitAt(mc, v0, mid, n);
-            splitAt(mc, mid, v1, n);
+            splitAt(c, mc, v0, mid, n);
+            splitAt(c, mc, mid, v1, n);
             return;
         }
-        Chain c = mc.chain;
         if (n.x == x0 && n.y == y0) {
             vertexNode(c, v0);
         } else if (n.x == x1 && n.y == y1) {
@@ -592,47 +1013,40 @@ final class RelateComputer {
         }
     }
 
-    // the pairs of segments a0 to a1 - 1 of a and b0 to b1 - 1 of b with intersecting bounding boxes
-    private void overlap(MonotoneChain a, int a0, int a1, MonotoneChain b, int b0, int b1) {
-        if (decided != null) return;
-        // the bounding box of a monotone run is that of its end vertices
-        double ax0 = a.x(a0), ax1 = a.x(a1), bx0 = b.x(b0), bx1 = b.x(b1);
-        if (Math.max(ax0, ax1) < Math.min(bx0, bx1) || Math.min(ax0, ax1) > Math.max(bx0, bx1)) return;
-        double ay0 = a.y(a0), ay1 = a.y(a1), by0 = b.y(b0), by1 = b.y(b1);
-        if (Math.max(ay0, ay1) < Math.min(by0, by1) || Math.min(ay0, ay1) > Math.max(by0, by1)) return;
-        if (a1 - a0 == 1 && b1 - b0 == 1) {
-            Seg s = a.seg(a0), t = b.seg(b0);
-            if (!skip(s, t)) contact(s, t);
-        } else if (a1 - a0 >= b1 - b0) {
-            int mid = (a0 + a1) >>> 1;
-            overlap(a, a0, mid, b, b0, b1);
-            overlap(a, mid, a1, b, b0, b1);
-        } else {
-            int mid = (b0 + b1) >>> 1;
-            overlap(a, a0, a1, b, b0, mid);
-            overlap(a, a0, a1, b, mid, b1);
-        }
+    // classifies the pairs of segments of monotone chains a (of geometry ga) and b (of gb) that may meet
+    private void overlap(int ga, MonotoneChain a, int gb, MonotoneChain b) {
+        Operand operand = operands[ga];
+        pairs(a, a.start, a.end, b, b.start, b.end, (i, j) -> {
+            if (ga != gb || !operand.consecutive(a, i, b, j)) contact(seg(ga, a, i), seg(gb, b, j));
+            return decided != null;
+        });
     }
 
     /**
-     * Pairs that need no test: two points meet only if they are the same node; consecutive segments of a chain
-     * meet in their common vertex, unless they overlap (the chain turns back).
+     * Calls the action for the pairs of segments a0 to a1 - 1 of a and b0 to b1 - 1 of b with intersecting bounding
+     * boxes, until it returns true
+     *
+     * @return true if the action returned true
      */
-    private static boolean skip(Seg s, Seg t) {
-        if (s.kind == POINT) return t.kind == POINT;
-        if (s.chain != t.chain) return false;
-        int n = s.chain.segs.length;
-        if (s.index + 1 == t.index || (s.chain.closed && s.index == n - 1 && t.index == 0)) {
-            return !s.chain.turnsBack[t.index];
+    static boolean pairs(MonotoneChain a, int a0, int a1, MonotoneChain b, int b0, int b1,
+                         EnvelopeTree.PairConsumer action) {
+        // the bounding box of a monotone run is that of its end vertices
+        double ax0 = a.x(a0), ax1 = a.x(a1), bx0 = b.x(b0), bx1 = b.x(b1);
+        if (Math.max(ax0, ax1) < Math.min(bx0, bx1) || Math.min(ax0, ax1) > Math.max(bx0, bx1)) return false;
+        double ay0 = a.y(a0), ay1 = a.y(a1), by0 = b.y(b0), by1 = b.y(b1);
+        if (Math.max(ay0, ay1) < Math.min(by0, by1) || Math.min(ay0, ay1) > Math.max(by0, by1)) return false;
+        if (a1 - a0 == 1 && b1 - b0 == 1) return action.accept(a0, b0);
+        if (a1 - a0 >= b1 - b0) {
+            int mid = (a0 + a1) >>> 1;
+            return pairs(a, a0, mid, b, b0, b1, action) || pairs(a, mid, a1, b, b0, b1, action);
         }
-        if (t.index + 1 == s.index || (s.chain.closed && t.index == n - 1 && s.index == 0)) {
-            return !s.chain.turnsBack[s.index];
-        }
-        return false;
+        int mid = (b0 + b1) >>> 1;
+        return pairs(a, a0, a1, b, b0, mid, action) || pairs(a, a0, a1, b, mid, b1, action);
     }
 
     private void contact(Seg s, Seg t) {
         SegmentIntersection kind = Predicates.segmentIntersection(s.x0, s.y0, s.x1, s.y1, t.x0, t.y0, t.x1, t.y1);
+        if (kind != SegmentIntersection.DISJOINT && s.geom != t.geom) contactAB = true;
         switch (kind) {
             case DISJOINT:
                 return;
@@ -706,10 +1120,10 @@ final class RelateComputer {
     private boolean alone(int g, Seg s, double x, double y) {
         double ex = Math.ulp(x), ey = Math.ulp(y);
         double x0 = x - ex, x1 = x + ex, y0 = y - ey, y1 = y + ey;
-        List<MonotoneChain> mcs = monotone.get(g);
+        MonotoneChain[] mcs = operands[g].monotone;
         boolean[] other = {false};
-        trees[g].query(x0, y0, x1, y1, i -> {
-            if (!other[0]) other[0] = touchesBox(mcs.get(i), mcs.get(i).start, mcs.get(i).end, s, x0, y0, x1, y1);
+        operands[g].tree.query(x0, y0, x1, y1, i -> {
+            if (!other[0]) other[0] = touchesBox(mcs[i], mcs[i].start, mcs[i].end, s, x0, y0, x1, y1);
         });
         return !other[0];
     }
@@ -725,7 +1139,8 @@ final class RelateComputer {
             int mid = (v0 + v1) >>> 1;
             return touchesBox(mc, v0, mid, s, x0, y0, x1, y1) || touchesBox(mc, mid, v1, s, x0, y0, x1, y1);
         }
-        return mc.chain == null ? mc.point != s : !(mc.chain == s.chain && v0 == s.index);
+        if (mc.chain < 0) return !(s.chain == null && s.index == mc.point);
+        return !(s.chain != null && s.chain.index == mc.chain && v0 == s.index);
     }
 
     // if endpoint `end` of s lies on t, it is a node, of s and of t
@@ -745,15 +1160,21 @@ final class RelateComputer {
     // splits the chains into edges at their nodes
     private void buildEdges() {
         for (Chain c : chains) {
-            int n = c.segs.length;
-            int start = c.closed ? c.lexMin() : 0;   // a node
-            Node from = c.nodes[start];
-            int first = -1;   // the segment in which the current edge starts
-            for (int k = 0; k < n; k++) {
-                int i = (start + k) % n;
-                if (first < 0) first = i;
-                Seg s = c.segs[i];
-                if (s != null && s.incidences != null) {
+            int n = c.xs.length - 1;   // the number of segments
+            int count = c.markCount;
+            int[] marks = c.marks;
+            Arrays.sort(marks, 0, count);
+            int start = c.closed ? c.data.lexMin : 0;   // a node
+            int p = Arrays.binarySearch(marks, 0, count, 2 * start);
+            Node from = c.node(start);
+            int first = start;   // the segment in which the current edge starts
+            // the marks after the start, in order along the chain; for a ring, back to the start
+            int steps = c.closed ? count : count - 1 - p;
+            for (int k = 1; k <= steps; k++) {
+                int mark = marks[(p + k) % count];
+                if ((mark & 1) == 1) {
+                    int i = mark >> 1;
+                    Seg s = c.seg(i);
                     s.incidences.sort((i1, i2) -> compareAlong(s, i1, i2));
                     Node previous = null;
                     for (Incidence incidence : s.incidences) {
@@ -762,12 +1183,12 @@ final class RelateComputer {
                         from = previous = incidence.node;
                         first = i;
                     }
-                }
-                Node end = c.nodes[c.closed && i + 1 == c.vertexCount ? 0 : i + 1];
-                if (end != null) {
-                    addEdge(c, from, first, end, i);
+                } else {
+                    int v = mark >> 1;
+                    Node end = c.node(v);
+                    addEdge(c, from, first, end, (v + n - 1) % n);
                     from = end;
-                    first = -1;
+                    first = v;
                 }
             }
         }
@@ -775,7 +1196,8 @@ final class RelateComputer {
 
     // adds the edge from u to v, which leaves u along segment first and arrives at v along segment last
     private void addEdge(Chain c, Node u, int first, Node v, int last) {
-        boolean shared = first == last && c.segs[first] != null && c.segs[first].overlapping;
+        Seg firstSeg = c.seg(first);
+        boolean shared = first == last && firstSeg != null && firstSeg.overlapping;
         long key = u.id < v.id ? ((long) u.id << 32) | v.id : ((long) v.id << 32) | u.id;
         if (shared) {
             Edge e = sharedEdges.get(key);
@@ -785,6 +1207,7 @@ final class RelateComputer {
             }
         }
         Edge e = new Edge(u, v);
+        e.chain = c;
         e.add(c, 1);
         edges.add(e);
         double[] xs = c.xs, ys = c.ys;
@@ -856,11 +1279,13 @@ final class RelateComputer {
 
     /**
      * The number of polygons of geometry g that contain the points immediately to the left of (x, y), the
-     * lexicographically smallest vertex of a component (see {@link PointLocator#countContainingLeft}). For a few
-     * components, the rings are scanned; for more, a point locator with an index is built.
+     * lexicographically smallest vertex of a component (see {@link PointLocator#countContainingLeft}). A prepared
+     * operand has a point locator; otherwise, for a few components, the rings are scanned, and for more, a point
+     * locator with an index is built.
      */
     private int countContainingLeft(int g, double x, double y) {
         if (elements[g].polygonCount == 0) return 0;
+        if (operands[g].locator != null) return operands[g].locator.countContainingLeft(x, y);
         if (locators[g] == null && scans[g]++ < MAX_SCANS) return scanContainingLeft(g, x, y);
         if (locators[g] == null) locators[g] = new PointLocator(elements[g]);
         return locators[g].countContainingLeft(x, y);
@@ -870,8 +1295,10 @@ final class RelateComputer {
     // pass through (x, y)
     private int scanContainingLeft(int g, double x, double y) {
         Set<Integer> odd = new HashSet<>();
-        for (Chain c : chains) {
-            if (c.geom != g || c.kind != RING || y < c.minY || y > c.maxY || x > c.maxX) continue;
+        for (Chain chain : chainsOf[g]) {
+            if (chain == null) continue;
+            ChainData c = chain.data;
+            if (c.kind != RING || y < c.minY || y > c.maxY || x > c.maxX) continue;
             boolean parity = false;
             for (int i = 0; i + 1 < c.xs.length; i++) {
                 double x0 = c.xs[i], y0 = c.ys[i], x1 = c.xs[i + 1], y1 = c.ys[i + 1];
@@ -996,7 +1423,58 @@ final class RelateComputer {
             set(m, faceLocation(e.left[A]), faceLocation(e.left[B]), 2);
             set(m, faceLocation(e.right[A]), faceLocation(e.right[B]), 2);
         }
+        // the components that were not used lie in the exterior of the other geometry
+        for (int g = 0; g < 2; g++) {
+            if (kept[g] == null) continue;
+            Operand operand = operands[g];
+            for (int loc = I; loc <= BD; loc++) {
+                // the highest dimension of the components in the exterior, and of those in the interior
+                for (int c : operand.byDim[loc]) {
+                    if (kept[g][c] || (inside[g] != null && inside[g][c])) continue;
+                    int d = operand.dims[loc][c];
+                    if (g == A) set(m, loc, E, d);
+                    else set(m, E, loc, d);
+                    break;
+                }
+                if (inside[g] == null) continue;
+                for (int c : operand.byDim[loc]) {
+                    if (!inside[g][c]) continue;
+                    int d = operand.dims[loc][c];
+                    if (g == A) set(m, loc, I, d);
+                    else set(m, I, loc, d);
+                    break;
+                }
+            }
+        }
         return new IntersectionMatrix(m, elements[A].dimension, elements[B].dimension);
+    }
+
+    /**
+     * For a computation of a prepared operand A against the empty geometry: per location (I, BD) in A and per
+     * component of A, the highest dimension of the cells of the component in that location; -1 if none
+     */
+    int[][] componentDims() {
+        compute();
+        Operand operand = operands[A];
+        int[][] dims = new int[2][operand.componentCount];
+        for (int[] d : dims) Arrays.fill(d, -1);
+        for (Edge e : edges) {
+            int c = operand.componentOf(e.chain.index);
+            note(dims, c, edgeLocation(e, A), 1);
+            note(dims, c, faceLocation(e.left[A]), 2);
+            note(dims, c, faceLocation(e.right[A]), 2);
+        }
+        for (Node n : allNodes) {
+            if (!n.star.isEmpty()) note(dims, operand.componentOf(n.star.get(0).edge.chain.index), nodeLocation(n, A), 0);
+        }
+        for (Seg p : pointsOf[A]) {
+            if (p != null && p.point.star.isEmpty()) note(dims, operand.componentOf(-1 - p.index), nodeLocation(p.point, A), 0);
+        }
+        return dims;
+    }
+
+    private static void note(int[][] dims, int component, int location, int dimension) {
+        if (location != E) dims[location][component] = Math.max(dims[location][component], dimension);
     }
 
     private static void set(int[] m, int a, int b, int dimension) {

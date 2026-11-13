@@ -413,6 +413,95 @@ public class RelateTest {
     }
 
     /**
+     * A prepared geometry, used many times, gives the same results as Relate.
+     */
+    @Test
+    public void preparedSameAsRelate() {
+        for (int trial = 0; trial < 300; trial++) {
+            org.locationtech.jts.geom.Geometry a = anyGeometry();
+            Geometry<?> ga = JTS.from(a);
+            PreparedRelate prepared = PreparedRelate.of(ga);
+            assertSame(ga, prepared.getGeometry());
+            for (int k = 0; k < 15; k++) {
+                Geometry<?> gb = JTS.from(anyGeometry());
+                IntersectionMatrix m = Relate.relate(ga, gb);
+                String msg = a + " / " + gb + " " + m;
+                assertEquals(msg, m, prepared.relate(gb));
+                assertEquals(msg, m.isIntersects(), prepared.intersects(gb));
+                assertEquals(msg, m.isDisjoint(), prepared.disjoint(gb));
+                assertEquals(msg, m.isTouches(), prepared.touches(gb));
+                assertEquals(msg, m.isCrosses(), prepared.crosses(gb));
+                assertEquals(msg, m.isWithin(), prepared.within(gb));
+                assertEquals(msg, m.isContains(), prepared.contains(gb));
+                assertEquals(msg, m.isOverlaps(), prepared.overlaps(gb));
+                assertEquals(msg, m.isCovers(), prepared.covers(gb));
+                assertEquals(msg, m.isCoveredBy(), prepared.coveredBy(gb));
+                assertEquals(msg, m.isEquals(), prepared.equalsTopologically(gb));
+                assertTrue(msg, prepared.relate(gb, m.toString()));
+            }
+            // against itself, and against an empty geometry
+            assertTrue(prepared.equalsTopologically(ga));
+            assertEquals(Relate.relate(ga, ga), prepared.relate(ga));
+            Geometry<?> empty = geometry("POLYGON EMPTY");
+            assertEquals(Relate.relate(ga, empty), prepared.relate(empty));
+            assertFalse(prepared.intersects(empty) || prepared.contains(empty) || prepared.equalsTopologically(empty));
+        }
+    }
+
+    /**
+     * A prepared geometry with many components, most of which are far from the other geometry
+     */
+    @Test
+    public void preparedWithManyComponents() {
+        for (int trial = 0; trial < 150; trial++) {
+            org.locationtech.jts.geom.Geometry[] parts = new org.locationtech.jts.geom.Geometry[2 + random.nextInt(8)];
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = transform(anyGeometry(), 6 * random.nextInt(4) - 6, 1, random.nextBoolean());
+            }
+            org.locationtech.jts.geom.Geometry a = factory.createGeometryCollection(parts);
+            Geometry<?> ga = JTS.from(a);
+            PreparedRelate prepared = PreparedRelate.of(ga);
+            for (int k = 0; k < 20; k++) {
+                Geometry<?> gb = JTS.from(anyGeometry());
+                IntersectionMatrix m = Relate.relate(ga, gb);
+                String msg = a + " / " + gb;
+                assertEquals(msg, m, prepared.relate(gb));
+                assertEquals(msg, m.isCovers(), prepared.covers(gb));
+                assertEquals(msg, m.isTouches(), prepared.touches(gb));
+            }
+        }
+    }
+
+    @Test
+    public void preparedIsThreadSafe() throws Exception {
+        org.locationtech.jts.geom.Geometry big = factory.createGeometryCollection(new org.locationtech.jts.geom.Geometry[]{
+                factory.createPoint(new Coordinate(3, 3)).buffer(2.5, 200),
+                factory.createLineString(walk(50, 6))});
+        PreparedRelate prepared = PreparedRelate.of(JTS.from(big));
+        List<Geometry<?>> others = new ArrayList<>();
+        for (int i = 0; i < 400; i++) others.add(JTS.from(anyGeometry()));
+        List<String> expected = new ArrayList<>();
+        for (Geometry<?> g : others) expected.add(Relate.relate(JTS.from(big), g).toString());
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(4);
+        try {
+            List<java.util.concurrent.Future<Boolean>> results = new ArrayList<>();
+            for (int t = 0; t < 8; t++) {
+                int offset = t;
+                results.add(pool.submit(() -> {
+                    for (int i = 0; i < others.size(); i++) {
+                        int k = (i + 50 * offset) % others.size();
+                        if (!expected.get(k).equals(prepared.relate(others.get(k)).toString())) return false;
+                    }
+                    return true;
+                }));
+            }
+            for (java.util.concurrent.Future<Boolean> r : results) assertTrue(r.get());
+        } finally {
+            pool.shutdown();
+        }
+    }
+
+    /**
      * The quick location used by the predicates is consistent with the point locator.
      */
     @Test
