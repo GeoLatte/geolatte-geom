@@ -284,6 +284,30 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
 
     }
 
+    /**
+     * The JTS length of the polygons ({@code getLength()}), or NaN for an empty geometry
+     */
+    @Override
+    public <P extends C2D, G extends Geometry<P> & Polygonal<P>> double perimeter(final G geometry) {
+        return geometry.isEmpty() ? Double.NaN : JTS.to(geometry).getLength();
+    }
+
+    /**
+     * The JTS interior point ({@code getInteriorPoint()}), in the coordinate reference system of the geometry, with
+     * NaN for the coordinates other than X and Y; an empty point for an empty geometry
+     */
+    @Override
+    public <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> pointOnSurface(final G geometry) {
+        CoordinateReferenceSystem<P> crs = geometry.getCoordinateReferenceSystem();
+        if (geometry.isEmpty()) return new Point<>(crs);
+        org.locationtech.jts.geom.Point point = JTS.to(geometry).getInteriorPoint();
+        double[] coordinates = new double[crs.getCoordinateDimension()];
+        java.util.Arrays.fill(coordinates, Double.NaN);
+        coordinates[0] = point.getX();
+        coordinates[1] = point.getY();
+        return new Point<>(Positions.mkPosition(crs, coordinates), crs);
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public  <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {

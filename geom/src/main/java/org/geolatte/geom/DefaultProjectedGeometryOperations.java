@@ -41,8 +41,9 @@ import org.geolatte.geom.cga.Validity;
  * {@link ConvexHull}. {@code distance}, {@code centroid} and {@code exactArea} are correctly rounded (the double
  * nearest to the exact value), with {@link Distance}, {@link Centroid} and {@link Area#of}; {@code exactLength} is
  * correctly rounded except extremely close to a midpoint between two doubles, where it is faithfully rounded, with
- * {@link Length#of}. {@code area} and {@code length} are computed in plain floating point, with {@link Area#fast}
- * and {@link Length#fast}. The other operations do not have an exact implementation yet; they are delegated to a
+ * {@link Length#of}, as is {@code exactPerimeter}. {@code area}, {@code length} and {@code perimeter} are computed
+ * in plain floating point, with {@link Area#fast} and {@link Length#fast}. {@code pointOnSurface} is computed with
+ * {@link org.geolatte.geom.cga.PointOnSurface}, which decides exactly that the point is in the interior. The other operations do not have an exact implementation yet; they are delegated to a
  * {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},

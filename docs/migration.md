@@ -31,12 +31,18 @@ The interface has six new abstract methods:
 | `coveredBy(a, b)` | no point of `a` lies in the exterior of `b` |
 | `isValid(g)` | `g` is well formed (`ST_IsValid`); an empty geometry is valid |
 
-It also has two new default methods, which implementations inherit:
+It also has new default methods, which implementations inherit:
 
 | Method | Meaning |
 |---|---|
 | `exactArea(g)` | the area, correctly rounded (the double nearest to the exact area); about ten times slower than `area` |
 | `exactLength(g)` | the length, correctly rounded (faithfully in extremely rare cases); about five times slower than `length` |
+| `perimeter(g)` | the sum of the lengths of the rings of a polygonal geometry (`ST_Perimeter`), in floating point; NaN if empty |
+| `exactPerimeter(g)` | the perimeter, correctly rounded as `exactLength`; NaN if empty |
+| `pointOnSurface(g)` | a point in the interior of a polygonal geometry (`ST_PointOnSurface`); an empty point if empty |
+
+`JTSGeometryOperations` implements `perimeter` and `pointOnSurface` with JTS (`getLength()` and
+`getInteriorPoint()`).
 
 The six abstract methods only break classes that implement the interface. Callers are not affected. Both
 implementations in the library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A
@@ -266,7 +272,7 @@ The following is new and does not change existing behaviour:
 - `org.geolatte.geom.cga`:
   - `Relate`, `PreparedRelate`, `IntersectionMatrix`, `Location` and `PointLocator`;
   - `Simplicity`, `Validity` and `Boundary`;
-  - `Area`, `Centroid`, `Distance` and `Length`;
+  - `Area`, `Centroid`, `Distance`, `Length` and `PointOnSurface`;
   - `ConvexHull`, `DouglasPeucker` (optionally preserving topology), `DelaunayTriangulation` and
     `VoronoiDiagram`.
 - `LineSegment.classifyIntersection`, `intersects` and `intersection`, with the new `SegmentIntersection` and

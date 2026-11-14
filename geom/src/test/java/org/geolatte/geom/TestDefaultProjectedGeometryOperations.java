@@ -197,6 +197,26 @@ public class TestDefaultProjectedGeometryOperations {
         assertEquals(org.geolatte.geom.cga.Length.of(line), ops.exactLength(line), 0);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void perimeterAndPointOnSurface() {
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            Polygon<C2D> withHole = (Polygon<C2D>) g("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0), (1 1, 1 3, 3 3, 3 1, 1 1))");
+            assertEquals(24.0, o.perimeter(withHole), 0);
+            assertEquals(24.0, o.exactPerimeter(withHole), 0);
+            assertTrue(Double.isNaN(o.perimeter((Polygon<C2D>) g("POLYGON EMPTY"))));
+            assertTrue(Double.isNaN(o.exactPerimeter((Polygon<C2D>) g("POLYGON EMPTY"))));
+            Point<C2D> point = o.pointOnSurface(withHole);
+            assertEquals(crs, point.getCoordinateReferenceSystem());
+            assertTrue(o.contains(withHole, point));
+            assertTrue(o.pointOnSurface((Polygon<C2D>) g("POLYGON EMPTY")).isEmpty());
+        }
+        MultiPolygon<C2D> squares = (MultiPolygon<C2D>) g("MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)), "
+                + "((5 0, 15 0, 15 10, 5 10, 5 0)))");
+        assertEquals(44.0, ops.perimeter(squares), 0);
+        assertEquals(new C2D(10, 5), ops.pointOnSurface(squares).getPosition());
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void differentCrsForDistance() {
         ops.distance(g(SQUARE), Wkt.fromWkt("POINT (1 1)", l72));

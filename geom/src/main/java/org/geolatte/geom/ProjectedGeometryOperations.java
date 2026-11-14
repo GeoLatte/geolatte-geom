@@ -310,6 +310,52 @@ public interface ProjectedGeometryOperations {
     }
 
     /**
+     * Calculates the perimeter of the specified {@code Geometry}: the length of its boundary, i.e. the sum of the
+     * lengths of all rings of its polygons ({@code ST_Perimeter}).
+     *
+     * <p>The default implementation computes the perimeter in plain floating point arithmetic, with
+     * {@link org.geolatte.geom.cga.Length#fast(Geometry)}. Use {@link #exactPerimeter(Geometry)} for a correctly
+     * rounded result.</p>
+     *
+     * @param geometry the Geometry
+     * @return the perimeter of the specified Geometry, or NaN if it is empty
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double perimeter(final G geometry) {
+        return geometry.isEmpty() ? Double.NaN : org.geolatte.geom.cga.Length.fast(geometry);
+    }
+
+    /**
+     * Calculates the perimeter of the specified {@code Geometry}, correctly rounded (see
+     * {@link #exactLength(Geometry)}).
+     *
+     * <p>The default implementation uses {@link org.geolatte.geom.cga.Length#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the perimeter of the specified Geometry, correctly rounded, or NaN if it is empty
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double exactPerimeter(final G geometry) {
+        return geometry.isEmpty() ? Double.NaN : org.geolatte.geom.cga.Length.of(geometry);
+    }
+
+    /**
+     * Calculates a point that is guaranteed to lie in the interior of the specified {@code Geometry}
+     * ({@code ST_PointOnSurface}).
+     *
+     * <p>The default implementation uses {@link org.geolatte.geom.cga.PointOnSurface}, which decides exactly that
+     * the point lies in the interior of a (valid) polygon. Only for an extremely thin polygon, where no interior
+     * point is found, it returns a vertex. The point has the coordinate reference system of the geometry, with NaN
+     * for the coordinates other than X and Y.</p>
+     *
+     * @param geometry the Geometry
+     * @return a point in the interior of the specified Geometry, or an empty point if it is empty
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> pointOnSurface(final G geometry) {
+        return org.geolatte.geom.cga.PointOnSurface.of(geometry);
+    }
+
+    /**
      * Calculates a centroid for the specified {@code Geometry}.
      *
      * @param geometry the Geometry

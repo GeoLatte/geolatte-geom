@@ -323,7 +323,8 @@ nearly collinear positions at coordinates around 100,000, its area can be off by
   or in a collection with union semantics, is at distance 0), and NaN when one of them is empty. It backs
   `distance` in `DefaultProjectedGeometryOperations`.
 - `Length.of(geometry)` returns the length of lines, the perimeter of polygons (all rings), and the sum over the
-  elements of a collection; points have no length. It backs `ProjectedGeometryOperations.exactLength`.
+  elements of a collection; points have no length. It backs `ProjectedGeometryOperations.exactLength` and
+  `exactPerimeter`; `Length.fast` backs `length` and `perimeter`.
 - `Length.fast(geometry)` sums `sqrt(dx² + dy²)` in plain floating point, reading the coordinates in place. It is
   as fast as JTS, and backs `length` in `DefaultProjectedGeometryOperations`, as `Area.fast` backs `area`.
 
@@ -382,6 +383,35 @@ segments, unless the geometries are indexed beforehand (`IndexedFacetDistance`).
 |---|---|---|---|
 | polygon of 100,000 vertices | ≈ 0.7 ms | ≈ 0.14 ms | ≈ 0.14 ms |
 | polygon of 1,000,000 vertices | ≈ 6.7 ms | ≈ 1.4 ms | ≈ 1.4 ms |
+
+### `PointOnSurface`
+
+`PointOnSurface.of(geometry)` returns a point that lies on the geometry (`ST_PointOnSurface`), with the rules of
+JTS `InteriorPoint`: for polygons, a point in the interior; otherwise an interior vertex of a line nearest to the
+centroid (else the nearest endpoint), or the point nearest to the centroid. It backs `pointOnSurface`.
+
+**Guarantee.** For a valid polygon, the point lies in its **interior**, decided exactly. For a multipolygon or a
+collection it lies in the interior of one of the polygons, and so in the interior of their union. A polygon of
+zero area has no interior; its rings then count as lines, and the result is one of their vertices. The same
+holds when no interior point is found on the scan lines that are tried, which happens for extremely thin
+polygons, often because no point with double coordinates lies in their interior. The result is then on the
+boundary, but never outside.
+
+**Algorithm.** As in JTS, a horizontal scan line is placed between the vertex y coordinates nearest to the middle
+of the polygon's envelope, so that it passes through no vertex. The crossings with the edges are computed in
+floating point, and the candidate is the midpoint of the widest interval between crossings 2k and 2k + 1. Its
+location is then decided exactly: no vertex lies on the scan line, so the edges that cross it are found exactly
+by comparing y coordinates, and whether each passes to the left of the candidate is an exact `orientation` test.
+The candidate is accepted if that count is odd and it lies on no edge. Otherwise the next widest intervals, and
+then other scan lines (from the middle outwards), are tried. The approximation only chooses the candidate, so
+rounding errors can at worst cost a retry.
+
+The results are the same as those of JTS 1.19 `getInteriorPoint()` on ordinary polygons, and so is the speed
+(≈ 0.4 ms for a polygon of 100,000 vertices, ≈ 1.1 ms for a multipolygon of 10,000 polygons of 20 vertices).
+On nearly degenerate polygons they differ: for 100,000 nearly collinear triangles at coordinates around
+(152000, 212000), JTS returned a point outside the triangle in 14 % of the cases and on its boundary in 20 %.
+`PointOnSurface` never returned a point outside; in 20 % of the cases no double was found in the interior along
+the scan lines tried (often there is none), and the result was a vertex.
 
 ## Performance
 
@@ -447,9 +477,9 @@ There are two kinds of operation, with different guarantees:
 | `ConvexHull` | **done** | — |
 | `Area` | **done** | `Area.of`: correctly rounded (`exactArea`); `Area.fast`: floating point (`area`) |
 | `Centroid` | **done** | `Centroid`: correctly rounded for areas and points; lines are weighted by rounded lengths |
-| `PointOnSurface` | to do | scan line, ordering of implicit x-coordinates, exact check that the result is inside |
+| `PointOnSurface` | **done** | `PointOnSurface`: in the interior, decided exactly |
 | `Distance` | **done** | `Distance`: correctly rounded; NaN for an empty operand |
-| `Length` (and `Perimeter`) | **done** | `Length.of`: correctly rounded in practice, always faithful (`exactLength`); `Length.fast`: floating point (`length`) |
+| `Length`, `Perimeter` | **done** | `Length.of`: correctly rounded (`exactLength`, `exactPerimeter`); `Length.fast`: floating point (`length`, `perimeter`) |
 | `Intersection`, `Union`, `Difference`, `SymDifference` | to do | noding, graph labelling, polygon assembly, and snap rounding of the output (primitive 7) |
 | `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
 | `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
@@ -479,5 +509,5 @@ Primitives 1–6 are done: 1–4 make up the relate engine, 5 gives the area and
 1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple`,
    `IsValid` and `Boundary` are done as well, on its monotone chains and exact angular ordering.
 2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length` are **done**.
-3. **`PointOnSurface`**.
+3. **`PointOnSurface`**, **done**.
 4. **Overlay** with snap rounding, followed by **`Buffer`** on top of it.

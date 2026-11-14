@@ -393,9 +393,10 @@ geographic geometries, transform them to a suitable projected system first.
 You get an implementation from the `GeometryOperations` factory class. For projected geometries there are two:
 
 - `DefaultProjectedGeometryOperations`, the default. It computes the predicates, `isSimple`, `isValid`, `boundary`
-  and `convexHull` exactly, and `distance`, `centroid`, `exactArea` and `exactLength` correctly rounded (see
-  [Exact computations](#exact-computations)). `area` and `length` are computed in plain floating point. It
-  delegates the other operations to [JTS](#jts-interop).
+  and `convexHull` exactly, `pointOnSurface` with an exact check that the point is inside, and `distance`,
+  `centroid`, `exactArea`, `exactLength` and `exactPerimeter` correctly rounded (see
+  [Exact computations](#exact-computations)). `area`, `length` and `perimeter` are computed in plain floating
+  point. It delegates the other operations to [JTS](#jts-interop).
 - `JTSGeometryOperations` delegates all operations to JTS. Create one with `new JTSGeometryOperations()` if you
   need the results of version 1 (see [Migrating from version 1](migration.md)).
 
@@ -406,18 +407,24 @@ You get an implementation from the `GeometryOperations` factory class. For proje
 | Predicates     | `intersects`, `disjoint`, `touches`, `crosses`, `within`, `contains`, `overlaps`, `covers`, `coveredBy`, `equalsTopologically`, `relates` (with a DE-9IM pattern) |
 | Well-formedness | `isSimple`, `isValid`                                                                      |
 | Set operations | `intersection`, `union`, `difference`, `symmetricDifference`                                |
-| Measurements   | `distance`, `length` and `exactLength` (linear geometries), `area` and `exactArea` (polygonal geometries) |
-| Constructions  | `buffer`, `convexHull`, `centroid` (polygonal geometries), `boundary`, `reverse`            |
+| Measurements   | `distance`, `length` and `exactLength` (linear geometries), `area`, `exactArea`, `perimeter` and `exactPerimeter` (polygonal geometries) |
+| Constructions  | `buffer`, `convexHull`, `centroid` and `pointOnSurface` (polygonal geometries), `boundary`, `reverse` |
 
 `length` and `exactLength` accept only linear geometries (`LineString`, `MultiLineString`), and `area` and `centroid` only polygonal
-ones (`Polygon`, `MultiPolygon`); this is enforced at compile time.
+ones (`Polygon`, `MultiPolygon`), as do `perimeter`, `exactPerimeter` and `pointOnSurface`; this is enforced at
+compile time.
 
 `area` is computed in plain floating point: it is fast, but its error is not bounded, and can be large for
 slivers and other nearly degenerate polygons. `exactArea` returns the same area correctly rounded (the double
 nearest to the exact value); it is about ten times slower. Likewise, `length` is the floating point sum of the
 segment lengths (as in JTS), and `exactLength` the correctly rounded length, about five times slower.
 
+`perimeter` and `exactPerimeter` are the sum of the lengths of all rings, computed like `length` and
+`exactLength`; they are NaN for an empty geometry.
+
 `distance` is correctly rounded. It is 0 for geometries that intersect, and NaN if a geometry is empty.
+
+`pointOnSurface` returns a point in the interior of a polygonal geometry (an empty point if it is empty).
 
 A predicate with an empty operand is false, except `disjoint`, which is then true, and `equalsTopologically`, which
 is true for two empty geometries. The operands must have the same coordinate reference system; otherwise an
@@ -468,6 +475,8 @@ The exact algorithms are also available directly, in the `org.geolatte.geom.cga`
 - `Simplicity`, `Boundary` and `ConvexHull` back `isSimple`, `boundary` and `convexHull`;
 - `Area` and `Centroid` compute the area and centroid of any geometry, correctly rounded (the double nearest to
   the exact value); `Area.fast` computes the area in plain floating point;
+- `PointOnSurface` computes a point in the interior of any geometry with polygons (and a vertex of lines or a
+  point otherwise);
 - `Distance` computes the correctly rounded distance between two geometries, and `Length` the length of any
   geometry (the perimeter of polygons), correctly rounded with `Length.of` or in floating point with
   `Length.fast`.
