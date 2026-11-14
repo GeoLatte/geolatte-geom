@@ -11,10 +11,13 @@ The actual GeoJSON encoding/decoding logic lives in the Jackson-free
 `geolatte-geojson-core` module; this module is a thin Jackson 3 adapter on top of it.
 A separate `geolatte-geojson-jackson2` module provides the equivalent for Jackson 2.x.
 
-> **Upgrading from 1.x:**
-> - The Maven coordinate changed from `org.geolatte:geolatte-geojson` to
->   `org.geolatte:geolatte-geojson-jackson3`.
-> - The adapter classes (`GelatteGeomModule`, the per-type
+> **Use this module** if your project is on Jackson 3.x. If you are on Jackson 2.x, use
+> `geolatte-geojson-jackson2` instead.
+
+> **Upgrading from `geolatte-geojson` 1.x:**
+> - `geolatte-geojson` 1.x (up to 1.11) was built on Jackson 2. If you stay on Jackson 2, switch to
+>   `org.geolatte:geolatte-geojson-jackson2`. Use this module only if you also move to Jackson 3.
+> - The adapter classes (`GeolatteGeomModule`, the per-type
 >   serializers/deserializers, etc.) moved from `org.geolatte.geom.json` to
 >   `org.geolatte.geom.json.jackson3`. Update your imports accordingly.
 > - The data types (`Setting`, `GeoJsonFeature`, `GeoJsonFeatureCollection`)
@@ -29,13 +32,16 @@ Add the following dependency to the POM.
 <dependency>
     <groupId>org.geolatte</groupId>
     <artifactId>geolatte-geojson-jackson3</artifactId>
-    <version>${geolatte-geom-version}</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 
-This will pull in the Jackson 3 `jackson-databind` dependency. Note that the Jackson dependency
-is declared as `<optional>true</optional>`: consumers must declare the desired Jackson 3 version
-explicitly in their own POM.
+The GeoJSON modules are versioned independently of `geolatte-geom`; this dependency brings in
+`geolatte-geojson-core` and a matching `geolatte-geom` transitively.
+
+This module is built and tested against Jackson 3.1.x. The Jackson dependency is declared as
+`<optional>true</optional>`: consumers must declare the desired Jackson 3 version explicitly in
+their own POM.
 
 The library provides a custom module `GeolatteGeomModule` (in package
 `org.geolatte.geom.json.jackson3`) that can be added to a Jackson 3 `ObjectMapper`.
@@ -60,9 +66,10 @@ Optionally you can customize the `GeolatteGeomModule` behavior by:
 You can configure a default Coordinate Reference System by passing it in the constructor of the `GeolatteGeomModule`
 
 ```java
-    CoordinateReferenceSystem<G2D> crs=...;
-    ObjectMapper mapper=new ObjectMapper();
-    mapper.registerModule(new GeolatteGeomModule(crs));
+    CoordinateReferenceSystem<G2D> crs = ...;
+    ObjectMapper mapper = JsonMapper.builder()
+        .addModule(new GeolatteGeomModule(crs))
+        .build();
 ```
 
 If no default is specified in the constructor, the default will be set to `WGS84`.
@@ -80,13 +87,24 @@ You can set a feature flag after creation of the `GeolatteGeomModule`:
 ```java
     GeolatteGeomModule module = new GeolatteGeomModule();
     module.set(Setting.IGNORE_CRS, true);
-    mapper = new ObjectMapper();
-    mapper.registerModule(module);
+    ObjectMapper mapper = JsonMapper.builder()
+        .addModule(module)
+        .build();
 ```
 
 The following settings are currently supported:
-- `IGNORE_CRS`: ignore the`crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate (default: `false`) 
+- `IGNORE_CRS`: ignore the `crs` element in the GeoJson `Geometry` (if any) and always use the default coordinate reference system (default: `false`)
 - `SUPPRESS_CRS_SERIALIZATION`: do not serialize a `crs` object in `Geometry` GeoJsons (default: `false`)
 - `SERIALIZE_CRS_AS_URN`: serialize `crs` as a URN (default: `false`)
+- `SERIALIZE_FEATURE_BBOX`: serialize a `bbox` member for each `Feature` whose bounding box is non-empty (default: `false`)
+- `SERIALIZE_FEATURE_COLLECTION_BBOX`: serialize a `bbox` member for a `FeatureCollection` whose bounding box is non-empty (default: `false`)
 
+## Serializing features without the module
 
+Always register `GeolatteGeomModule` when serializing `GeoJsonFeature` or `GeoJsonFeatureCollection` instances.
+Without it, Jackson falls back to generic bean serialization, which does not produce GeoJSON.
+
+In versions 1.9.0 to 1.11, `GeoJsonFeature.getBbox()` was annotated with `@JsonInclude(NON_EMPTY)`. The annotation
+only affected that generic bean serialization, and was removed when `GeoJsonFeature` moved to the Jackson-free
+`geolatte-geojson-core` artifact. If you relied on it to omit empty bounding boxes, register the module and set
+`SERIALIZE_FEATURE_BBOX` to `true`: the `bbox` member is then written only when the bounding box is non-empty.

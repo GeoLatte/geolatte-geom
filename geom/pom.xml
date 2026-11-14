@@ -1,15 +1,21 @@
-<!-- ~ This file is part of the GeoLatte project. ~ ~ GeoLatte is free software:
-	you can redistribute it and/or modify ~ it under the terms of the GNU Lesser
-	General Public License as published by ~ the Free Software Foundation, either
-	version 3 of the License, or ~ (at your option) any later version. ~ ~ GeoLatte
-	is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY;
-	without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR
-	PURPOSE. See the ~ GNU Lesser General Public License for more details. ~
-	~ You should have received a copy of the GNU Lesser General Public License
-	~ along with GeoLatte. If not, see <http://www.gnu.org/licenses />. ~ ~ Copyright
-	(C) 2010 - 2011 and Ownership of code is shared by: ~ Qmino bvba - Romeinsestraat
-	18 - 3001 Heverlee (http://www.qmino.com) ~ Geovise bvba - Generaal Eisenhowerlei
-	9 - 2140 Antwerpen (http://www.geovise.com) -->
+<!--
+  ~ This file is part of the GeoLatte project.
+  ~
+  ~     GeoLatte is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Lesser General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     GeoLatte is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Lesser General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Lesser General Public License
+  ~     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2010 - 2026  Geovise BV - Indiestraat 35/401 - 2000 Antwerpen
+  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -56,13 +62,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-lgpl</artifactId>
-			<version>1.5.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>2.1.3</version>
@@ -73,20 +72,6 @@
 			<groupId>jaxen</groupId>
 			<artifactId>jaxen</artifactId>
 			<version>1.1.4</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId>
-			<version>32.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-hsql</artifactId>
-			<version>32.2</version>
 			<scope>test</scope>
 		</dependency>
 

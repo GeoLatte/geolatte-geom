@@ -1,15 +1,21 @@
-<!-- ~ This file is part of the GeoLatte project. ~ ~ GeoLatte is free software:
-	you can redistribute it and/or modify ~ it under the terms of the GNU Lesser
-	General Public License as published by ~ the Free Software Foundation, either
-	version 3 of the License, or ~ (at your option) any later version. ~ ~ GeoLatte
-	is distributed in the hope that it will be useful, ~ but WITHOUT ANY WARRANTY;
-	without even the implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR
-	PURPOSE. See the ~ GNU Lesser General Public License for more details. ~
-	~ You should have received a copy of the GNU Lesser General Public License
-	~ along with GeoLatte. If not, see <http://www.gnu.org/licenses />. ~ ~ Copyright
-	(C) 2010 - 2011 and Ownership of code is shared by: ~ Qmino bvba - Romeinsestraat
-	18 - 3001 Heverlee (http://www.qmino.com) ~ Geovise bvba - Generaal Eisenhowerlei
-	9 - 2140 Antwerpen (http://www.geovise.com) -->
+<!--
+  ~ This file is part of the GeoLatte project.
+  ~
+  ~     GeoLatte is free software: you can redistribute it and/or modify
+  ~     it under the terms of the GNU Lesser General Public License as published by
+  ~     the Free Software Foundation, either version 3 of the License, or
+  ~     (at your option) any later version.
+  ~
+  ~     GeoLatte is distributed in the hope that it will be useful,
+  ~     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~     GNU Lesser General Public License for more details.
+  ~
+  ~     You should have received a copy of the GNU Lesser General Public License
+  ~     along with GeoLatte.  If not, see <http://www.gnu.org/licenses/>.
+  ~
+  ~ Copyright (C) 2010 - 2026  Geovise BV - Indiestraat 35/401 - 2000 Antwerpen
+  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -48,7 +54,7 @@
                inside <version> elements without warning, so a custom property
                is not viable for the GeoJSON axis.
              Bump either axis with scripts/bump-version.sh; see docs/release-process.md. -->
-        <revision>1.13</revision>
+        <revision>1.13.1</revision>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -58,8 +64,8 @@
 
     <licenses>
         <license>
-            <name>LGPL 3.0</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <name>LGPL-3.0-or-later</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -151,6 +157,12 @@
                             <waitUntil>uploaded</waitUntil>
                             <centralBaseUrl>https://central.sonatype.com</centralBaseUrl>
                             <centralSnapshotsUrl>https://central.sonatype.com/repository/maven-snapshots/</centralSnapshotsUrl>
+                            <!-- The parent pom is build-only (aggregator + shared config). The
+                                 flattened module poms carry no <parent> reference, so nothing
+                                 on Central needs it; keep it out of every deployment bundle. -->
+                            <excludeArtifacts>
+                                <artifact>geolatte</artifact>
+                            </excludeArtifacts>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -252,28 +264,4 @@
 
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>osgeo</id>
-            <name>OSGeo Release Repository</name>
-            <url>https://repo.osgeo.org/repository/release/</url>
-            <snapshots><enabled>false</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-        </repository>
-        <repository>
-            <id>osgeo-snapshot</id>
-            <name>OSGeo Snapshot Repository</name>
-            <url>https://repo.osgeo.org/repository/snapshot/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>false</enabled></releases>
-        </repository>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 </project>

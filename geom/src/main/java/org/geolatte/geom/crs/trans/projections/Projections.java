@@ -39,8 +39,11 @@ public class Projections {
             return PseudoMercator.fromCrsParameters(projected.getGeographicCoordinateSystem(), params);
         }
 
-        //TODO -- Log a warning in this case
-        return CoordinateOperations.identity(2);
+        if (Projection.NOOP.equals(projection)) {
+            return CoordinateOperations.identity(2);
+        }
+
+        throw new UnsupportedTransformException(projected.getCrsId(), projection);
 
     }
 }
