@@ -20,7 +20,9 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.Area;
 import org.geolatte.geom.cga.Boundary;
+import org.geolatte.geom.cga.Centroid;
 import org.geolatte.geom.cga.ConvexHull;
 import org.geolatte.geom.cga.Relate;
 import org.geolatte.geom.cga.Simplicity;
@@ -34,8 +36,10 @@ import org.geolatte.geom.cga.Validity;
  * and {@code relates}) are computed exactly with {@link Relate}: the result is exact for the given coordinates, and
  * geometry collections have union semantics. {@code isSimple}, {@code isValid}, {@code boundary} and
  * {@code convexHull} are computed exactly with {@link Simplicity}, {@link Validity}, {@link Boundary} and
- * {@link ConvexHull}. The other operations do not have an exact implementation yet; they are delegated to a
- * {@link JTSGeometryOperations}.</p>
+ * {@link ConvexHull}. {@code centroid} and {@code exactArea} are correctly rounded (the double nearest to the
+ * exact value), with {@link Centroid} and {@link Area#of}; {@code area} is computed in plain floating point, with
+ * {@link Area#fast}. The other operations do not have an exact implementation yet;
+ * they are delegated to a {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
@@ -182,11 +186,11 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
 
     @Override
     public <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry) {
-        return jts.area(geometry);
+        return Area.fast(geometry);
     }
 
     @Override
     public <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> centroid(final G geometry) {
-        return jts.centroid(geometry);
+        return Centroid.of(geometry);
     }
 }

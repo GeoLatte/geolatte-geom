@@ -9,7 +9,8 @@ code keeps working without changes, but some results differ, and one interface h
 1. If you implement `ProjectedGeometryOperations` yourself, add the six new methods
    ([details](#projectedgeometryoperations-has-new-methods)).
 2. The default `ProjectedGeometryOperations` is no longer `JTSGeometryOperations`. Predicates, `isSimple`,
-   `boundary` and `convexHull` are now exact, and give different results in some cases
+   `boundary`, `convexHull` and `centroid` are now exact or correctly rounded, and give different results in
+   some cases
    ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
    `new JTSGeometryOperations()` explicitly.
 3. `LineString.isRing()` now also requires the line string to be simple
@@ -30,9 +31,12 @@ The interface has six new abstract methods:
 | `coveredBy(a, b)` | no point of `a` lies in the exterior of `b` |
 | `isValid(g)` | `g` is well formed (`ST_IsValid`); an empty geometry is valid |
 
-This only breaks classes that implement the interface. Callers are not affected. Both implementations in the
-library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A custom implementation can
-extend either one, or implement the methods itself.
+It also has a new default method, `exactArea(g)`: the area, correctly rounded (the double nearest to the exact
+area), about ten times slower than `area`. Implementations inherit it.
+
+The six abstract methods only break classes that implement the interface. Callers are not affected. Both
+implementations in the library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A
+custom implementation can extend either one, or implement the methods itself.
 
 ## The default `ProjectedGeometryOperations` changed
 
@@ -47,10 +51,15 @@ The new default computes these operations exactly, with the classes in `org.geol
 - `isSimple`, with `Simplicity`;
 - `isValid`, with `Validity`;
 - `boundary`, with `Boundary`;
-- `convexHull`, with `ConvexHull`.
+- `convexHull`, with `ConvexHull`;
+- `centroid`, correctly rounded, with `Centroid`.
 
-`reverse`, `distance`, `buffer`, `intersection`, `union`, `difference`, `symmetricDifference`, `length`, `area`
-and `centroid` are still delegated to JTS, and behave as before.
+`area` is computed with `Area.fast`, in plain floating point arithmetic, as fast as JTS and with the same kind
+of rounding errors. The results can differ from those of JTS in the last bits. The new `exactArea` returns the
+correctly rounded area.
+
+`reverse`, `distance`, `buffer`, `intersection`, `union`, `difference`, `symmetricDifference` and `length` are
+still delegated to JTS, and behave as before.
 
 `JTSGeometryOperations` itself is unchanged, apart from the new methods. To get the version 1 behaviour for all
 operations, use it directly:
@@ -160,6 +169,26 @@ In a comparison on 20,000 random small line strings, multi line strings and mult
 difference. As before, repeated consecutive positions are
 ignored, and polygons are simple if their rings are simple.
 
+### `centroid` is correctly rounded
+
+The centroid of a polygonal geometry is now the double nearest to the exact value. JTS computes it in floating
+point, so results can differ in the last bits; for nearly degenerate polygons (slivers) they can differ more, and
+the JTS result is then the inaccurate one. The definition is unchanged: holes subtract from the area whatever the
+orientation of the rings, and a polygon with zero area has the centroid of its rings.
+
+The point returned by `centroid` has changed type:
+
+- It now has the coordinate reference system of the geometry, with NaN for the coordinates other than X and Y.
+  In version 1 it was a 2D point in the coordinate reference system registered for the SRID, even when the
+  geometry had Z or M coordinates. Such a point was typed as `Point<P>` but held `C2D` positions, so that, for
+  example, reading its Z coordinate as `C3D` failed with a `ClassCastException`.
+
+```
+centroid(POLYGON Z ((0 0 1, 4 0 1, 4 4 1, 0 4 1, 0 0 1)))   (SRID 31370 with a vertical axis)
+  version 1: SRID=31370;POINT(2 2)       a C2D position
+  now:       SRID=31370;POINT(2 2 NaN)   a C3D position
+```
+
 ### `isValid` is new
 
 `isValid` follows the Simple Features rules, as JTS `IsValidOp` does, and is exact. `Validity.of(geometry)` also
@@ -203,10 +232,13 @@ The following is new and does not change existing behaviour:
 - `org.geolatte.geom.cga.exact`:
   - `Predicates`: exact orientation, in-circle, segment intersection, distance comparisons and ring orientation;
   - `Constructions`: correctly rounded segment intersections and circumcenters;
+  - `Summation`: exact sums of (products of) doubles, with correctly rounded values and quotients;
+  - `PolygonMoments`: the correctly rounded area and centroid of polygon rings;
   - building blocks: `Interval`, `ExactSum`, `Essa`.
 - `org.geolatte.geom.cga`:
   - `Relate`, `PreparedRelate`, `IntersectionMatrix`, `Location` and `PointLocator`;
   - `Simplicity`, `Validity` and `Boundary`;
+  - `Area` and `Centroid`;
   - `ConvexHull`, `DouglasPeucker` (optionally preserving topology), `DelaunayTriangulation` and
     `VoronoiDiagram`.
 - `LineSegment.classifyIntersection`, `intersects` and `intersection`, with the new `SegmentIntersection` and

@@ -157,6 +157,27 @@ public class TestDefaultProjectedGeometryOperations {
                 + ", 0.1 0.8, 0.05 0.9, " + c + " " + c + "))")));
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void areaAndCentroid() {
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            Polygon<C2D> withHole = (Polygon<C2D>) g("POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1))");
+            assertEquals(15.0, o.area(withHole), 0);
+            assertEquals(15.0, o.exactArea(withHole), 0);
+            Point<C2D> centroid = o.centroid((Polygon<C2D>) g(SQUARE));
+            assertEquals(2.0, centroid.getPosition().getX(), 0);
+            assertEquals(2.0, centroid.getPosition().getY(), 0);
+        }
+        // a rectangle of about 1 mm at large coordinates: the exact area is the product of the (exact) differences
+        Polygon<C2D> small = (Polygon<C2D>) Wkt.fromWkt(
+                "POLYGON ((152345.678 212345.789, 152345.679 212345.789, 152345.679 212345.79, 152345.678 212345.79, "
+                        + "152345.678 212345.789))", crs);
+        double side = (152345.679 - 152345.678), height = (212345.79 - 212345.789);   // exact differences
+        assertEquals(side * height, ops.exactArea(small), 0);
+        assertEquals(org.geolatte.geom.cga.Area.fast(small), ops.area(small), 0);
+        assertEquals(crs, ops.centroid(small).getCoordinateReferenceSystem());
+    }
+
     private static Geometry<C2D> g(String wkt) {
         return Wkt.fromWkt(wkt, crs);
     }

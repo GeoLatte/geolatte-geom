@@ -261,10 +261,29 @@ public interface ProjectedGeometryOperations {
     /**
      * Calculates the area of the specified {@code Geometry}.
      *
+     * <p>The implementations in this library compute the area in plain floating point arithmetic, which is fast
+     * but has no bound on its error: it can be inaccurate for thin or nearly degenerate polygons. Use
+     * {@link #exactArea(Geometry)} for a correctly rounded result.</p>
+     *
      * @param geometry the Geometry
      * @return the area of the specified Geometry
      */
     <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
+
+    /**
+     * Calculates the area of the specified {@code Geometry}, correctly rounded: the result is the double nearest
+     * to the exact area of the geometry as given.
+     *
+     * <p>This is about ten times slower than {@link #area(Geometry)}. The default implementation uses
+     * {@link org.geolatte.geom.cga.Area#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the area of the specified Geometry, correctly rounded
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double exactArea(final G geometry) {
+        return org.geolatte.geom.cga.Area.of(geometry);
+    }
 
     /**
      * Calculates a centroid for the specified {@code Geometry}.

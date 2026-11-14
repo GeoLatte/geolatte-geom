@@ -14,7 +14,11 @@
  *     an implicit crossing point), each implemented as an interval filter followed by
  *     ESSA (Sec. 4.6, 5.2, 8.3, 8.4);</li>
  *     <li>{@link org.geolatte.geom.cga.exact.Constructions}: constructions with correctly rounded results (the
- *     intersection of line segments, the circumcenter of a triangle).</li>
+ *     intersection of line segments, the circumcenter of a triangle);</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.Summation}: exact sums of doubles and of products of doubles, with
+ *     correctly rounded values and quotients;</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.PolygonMoments}: the correctly rounded area and centroid of polygon
+ *     rings.</li>
  * </ul>
  *
  * <p>Predicates are exact: their result is the result for the given double coordinates as exact real numbers.

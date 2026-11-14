@@ -60,6 +60,11 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
 - **`ExactSum`**: represents sums of products of doubles exactly as lists of doubles, so that ESSA can be
   applied.
 - **`Expansion`** (package-private): Shewchuk's expansion arithmetic, used in the `inCircle` stage.
+- **`Summation`**: the exact sum of doubles and of products of two or three doubles, kept as non-overlapping
+  partial sums (Shewchuk's GROW-EXPANSION, as in Python's `math.fsum`), with a `BigInteger` part for terms that
+  would underflow or overflow. `signum()` is exact; `round()`, `round(scale)` and `roundQuotient(num, den)` are
+  correctly rounded. This is primitive 5 of the roadmap.
+- **`PolygonMoments`**: the correctly rounded area and centroid of a set of rings (see below).
 
 ## Algorithms in `cga`
 
@@ -248,6 +253,65 @@ Indicative timings, against JTS 1.20 `IsValidOp` and `IsSimpleOp`:
 | simple spiral of 100,000 vertices, `isSimple` | ≈ 6 ms | ≈ 7 ms |
 | 10,000 lines chained at their endpoints, `isSimple` | ≈ 1.5 ms | ≈ 4.4 ms |
 
+### `Area` and `Centroid`
+
+- `Area.of(geometry)` returns the area: for each polygon, the area enclosed by its shell minus the areas enclosed
+  by its holes, whatever the orientation of the rings, summed over the polygons of a multipolygon or collection.
+  Points and lines have no area. Overlapping polygons of a collection are counted once per polygon, as in JTS.
+  It backs `ProjectedGeometryOperations.exactArea`.
+- `Area.fast(geometry)` computes the same area with the shoelace formula in plain floating point. It is as fast
+  as JTS, reads the coordinates in place, and has no accuracy guarantee. It backs `area` in
+  `DefaultProjectedGeometryOperations`, because the area is often needed in bulk, where speed matters more than
+  the last bits.
+- `Centroid.of(geometry)` returns the centroid of the parts of the highest dimension with a non-zero measure, as
+  JTS does: the centroid of the area; else of the segments, weighted by length; else the average of the points
+  (a line of zero length counts as its first point). The result has the coordinate reference system of the
+  geometry, with NaN for Z and M; the centroid of an empty geometry is an empty point.
+
+**Guarantee.** The area and the centroid of an area are rational functions of the coordinates:
+
+```
+A  = 1/2 sum_r f_r sum_i c_i,                         c_i = x_i y_(i+1) - x_(i+1) y_i
+Cx = sum_r f_r sum_i (x_i + x_(i+1)) c_i / (6 A)      (and Cy alike)
+```
+
+with `f_r = ±1` the sign with which ring r is counted (from the exact sign of its area). Both are **correctly
+rounded**: the result is the double nearest to the exact value (ties to even). It does not depend on the order of
+the polygons, rings or positions, nor on the orientation of the rings; scaling by a power of 2 scales the result
+exactly. The average of points is correctly rounded too. The centroid of lines is not: segment lengths are square
+roots, which are rounded (the sums are then exact, so the result is very accurate).
+
+**Algorithm** (`PolygonMoments`):
+
+1. Each ring is accumulated in double-word arithmetic with a rigorous error bound. Coordinates are taken relative
+   to the first position of the ring, when all those differences are exact (as for typical projected data,
+   where the coordinates of a ring are within a factor 2 of each other). This removes the cancellation due to
+   large coordinates. The difference of the two products of each `c_i` is formed exactly before it is added, so
+   the running sums stay small, and so do their rounding errors. The loops have no data-dependent branches.
+2. The ring results are combined with the sign of each ring's area (`Predicates.ringOrientation` if the
+   first stage cannot decide it). The centroid of a ring relative to its first position `o` is shifted back
+   exactly: `Nx = 3 o S + Mx`.
+3. The totals are enclosed in intervals about 2⁻¹⁰⁰ times their magnitude wide, and the quotient for the
+   centroid is enclosed with the double-word division of `Constructions`. When the interval contains no rounding
+   boundary, the result is decided; this is the case for all realistic input.
+4. Otherwise (nearly degenerate polygons, a centroid extremely close to a rounding boundary, coordinates outside
+   [2⁻²⁰⁰, 2²⁰⁰]), the sums are computed exactly with `Summation`, from the original coordinates, and rounded with
+   `BigInteger` arithmetic.
+
+Indicative timings, against JTS 1.19 `getArea()` and `getCentroid()` (including copying the coordinates, about
+1.3 ms per million positions):
+
+| Geometry | `Area.of` | `Area.fast` | JTS | `Centroid` | JTS |
+|---|---|---|---|---|---|
+| polygon of 100,000 vertices | ≈ 0.5 ms | ≈ 0.04 ms | ≈ 0.04 ms | ≈ 1.5 ms | ≈ 0.9 ms |
+| polygon of 1,000,000 vertices | ≈ 5 ms | ≈ 0.4 ms | ≈ 0.4 ms | ≈ 15 ms | ≈ 9 ms |
+| multipolygon of 10,000 polygons of 20 vertices | ≈ 1.1 ms | ≈ 0.13 ms | ≈ 0.12 ms | ≈ 3.4 ms | ≈ 1.2 ms |
+
+The correctly rounded area costs about ten times the floating point sum of `Area.fast` and JTS, which has no
+accuracy guarantee. The naive shoelace sum gives 0 for a square of 1 mm² at Belgian Lambert coordinates. JTS,
+which takes the X coordinates relative to the first position, gets such a square right, but not slivers: for
+nearly collinear positions at coordinates around 100,000, its area can be off by a factor of 75.
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -310,8 +374,8 @@ There are two kinds of operation, with different guarantees:
 | `Equals`, `Disjoint`, `Intersects`, `Touches`, `Crosses`, `Within`, `Contains`, `Overlaps`, `Relate` (and `Covers`, `CoveredBy`) | **done** | `Relate`, with union semantics |
 | `IsValid` (SQL/MM) | **done** | `Validity`, with the rules of JTS `IsValidOp` |
 | `ConvexHull` | **done** | — |
-| `Area` | to do | correctly rounded value of an exact sum (primitive 5); the area is rational |
-| `Centroid` | to do | correctly rounded quotient of two exact sums (primitive 5); the centroid is rational |
+| `Area` | **done** | `Area.of`: correctly rounded (`exactArea`); `Area.fast`: floating point (`area`) |
+| `Centroid` | **done** | `Centroid`: correctly rounded for areas and points; lines are weighted by rounded lengths |
 | `PointOnSurface` | to do | scan line, ordering of implicit x-coordinates, exact check that the result is inside |
 | `Distance` | to do | exact selection of the minimum over segment pairs, then a correctly rounded √(N/D) (primitive 6) |
 | `Length` | to do | a sum of square roots: faithful rounding (≤ 1 ulp) rather than correct rounding |
@@ -321,7 +385,7 @@ There are two kinds of operation, with different guarantees:
 
 ### Primitives
 
-Primitives 1–4 are done: they make up the relate engine.
+Primitives 1–5 are done: 1–4 make up the relate engine, 5 gives the area and the centroid.
 
 1. **Ordering of implicit intersection points** (done): `orientationOfCrossing` compares a crossing point with
    a line, which orders crossings along a segment and decides whether two crossings coincide. Crossing points
@@ -330,8 +394,8 @@ Primitives 1–4 are done: they make up the relate engine.
 3. **Angular ordering of edges around a node** (done): every edge lies on an original segment, so this reduces
    to the half plane, from exact coordinate comparisons, and `crossProductSign`.
 4. **Noding of two geometries** (done): the arrangement and depth labelling of `Relate`.
-5. **Correct rounding of exact sums and quotients**, for `Area` and `Centroid`: a generalization of the staged
-   rounding (enclosure → midpoint test with ESSA → BigInteger) behind `crossingPoint` and `circumcenter`.
+5. **Correct rounding of exact sums and quotients** (done): `Summation`, with a double-word first stage in
+   `PolygonMoments`, for `Area` and `Centroid`.
 6. **Correctly rounded square root of a rational**, for `Distance`: the distance from a point to a segment
    is √(cross² / |ab|²).
 7. **Snap rounding.** Overlay output vertices are rounded crossing points, which in general do not lie on
@@ -343,7 +407,7 @@ Primitives 1–4 are done: they make up the relate engine.
 
 1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple`,
    `IsValid` and `Boundary` are done as well, on its monotone chains and exact angular ordering.
-2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length`; small and independent, each needing one
+2. **Numeric measures**: `Area` and `Centroid` are **done**; `Distance` and `Length` remain, each needing one
    rounding routine.
 3. **`PointOnSurface`**.
 4. **Overlay** with snap rounding, followed by **`Buffer`** on top of it.

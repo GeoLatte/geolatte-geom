@@ -259,7 +259,7 @@ public final class Constructions {
      *
      * @return false if an intermediate result is too small for the error bounds to hold
      */
-    private static boolean encloseSumOfQuotient(double pa, double nh, double nl, double denH, double denL,
+    static boolean encloseSumOfQuotient(double pa, double nh, double nl, double denH, double denL,
                                                 double rel, double[] out, int offset) {
         // t = n / den in double-word arithmetic. With q1 = RN(nh / denh), the remainder nh - q1 * denh is
         // representable and computed exactly by fma. Relative error <= 13.1 u^2.

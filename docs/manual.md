@@ -393,8 +393,9 @@ geographic geometries, transform them to a suitable projected system first.
 You get an implementation from the `GeometryOperations` factory class. For projected geometries there are two:
 
 - `DefaultProjectedGeometryOperations`, the default. It computes the predicates, `isSimple`, `isValid`, `boundary`
-  and `convexHull` exactly (see [Exact computations](#exact-computations)), and delegates the other operations to
-  [JTS](#jts-interop).
+  and `convexHull` exactly, and `centroid` and `exactArea` correctly rounded (see
+  [Exact computations](#exact-computations)). `area` is computed in plain floating point. It delegates the other
+  operations to [JTS](#jts-interop).
 - `JTSGeometryOperations` delegates all operations to JTS. Create one with `new JTSGeometryOperations()` if you
   need the results of version 1 (see [Migrating from version 1](migration.md)).
 
@@ -405,11 +406,15 @@ You get an implementation from the `GeometryOperations` factory class. For proje
 | Predicates     | `intersects`, `disjoint`, `touches`, `crosses`, `within`, `contains`, `overlaps`, `covers`, `coveredBy`, `equalsTopologically`, `relates` (with a DE-9IM pattern) |
 | Well-formedness | `isSimple`, `isValid`                                                                      |
 | Set operations | `intersection`, `union`, `difference`, `symmetricDifference`                                |
-| Measurements   | `distance`, `length` (linear geometries), `area` (polygonal geometries)                     |
+| Measurements   | `distance`, `length` (linear geometries), `area` and `exactArea` (polygonal geometries)     |
 | Constructions  | `buffer`, `convexHull`, `centroid` (polygonal geometries), `boundary`, `reverse`            |
 
 `length` accepts only linear geometries (`LineString`, `MultiLineString`), and `area` and `centroid` only polygonal
 ones (`Polygon`, `MultiPolygon`); this is enforced at compile time.
+
+`area` is computed in plain floating point: it is fast, but its error is not bounded, and can be large for
+slivers and other nearly degenerate polygons. `exactArea` returns the same area correctly rounded (the double
+nearest to the exact value); it is about ten times slower.
 
 A predicate with an empty operand is false, except `disjoint`, which is then true, and `equalsTopologically`, which
 is true for two empty geometries. The operands must have the same coordinate reference system; otherwise an
@@ -456,7 +461,9 @@ The exact algorithms are also available directly, in the `org.geolatte.geom.cga`
 - `PreparedRelate` tests one geometry against many others, reusing its index;
 - `PointLocator` locates a point (interior, boundary or exterior) of a geometry;
 - `Validity.of(geometry)` tells why a geometry is invalid, and where;
-- `Simplicity`, `Boundary` and `ConvexHull` back `isSimple`, `boundary` and `convexHull`.
+- `Simplicity`, `Boundary` and `ConvexHull` back `isSimple`, `boundary` and `convexHull`;
+- `Area` and `Centroid` compute the area and centroid of any geometry, correctly rounded (the double nearest to
+  the exact value); `Area.fast` computes the area in plain floating point.
 
 ```java
 import org.geolatte.geom.cga.*;
