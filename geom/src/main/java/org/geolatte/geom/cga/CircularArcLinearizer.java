@@ -18,6 +18,10 @@ import static org.geolatte.geom.PositionSequenceBuilders.variableSized;
  */
 public class CircularArcLinearizer<P extends Position> {
 
+    // upper bound for the number of steps between two positions on the arc. This guards against
+    // (nearly) degenerate arcs that would otherwise exhaust the heap (see issue #171)
+    private static final int MAX_STEPS = 1_000_000;
+
     final private double threshold;
     final private P p0;
     final private P p1;
@@ -50,7 +54,8 @@ public class CircularArcLinearizer<P extends Position> {
     }
 
     public PositionSequence<P> linearizeCircle() {
-        double angleIncr = acos((c.radius - threshold) / c.radius);
+        // argument is clamped, otherwise acos returns NaN if threshold > 2 * radius
+        double angleIncr = acos(max(-1.0, (c.radius - threshold) / c.radius));
         PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
         double theta0 = angleInDirection(p0);
         double theta1 = angleInDirection(p1);
@@ -72,6 +77,14 @@ public class CircularArcLinearizer<P extends Position> {
      * @return a PositionSequence that approximates the arc segment
      */
     public PositionSequence<P> linearize() {
+        if (isNegligiblyCurved()) {
+            PositionSequenceBuilder<P> builder = variableSized((Class<P>) p0.getClass());
+            builder.add(p0);
+            builder.add(p1);
+            builder.add(p2);
+            return builder.toPositionSequence();
+        }
+
         double theta0 = angleInDirection(p0);
         double theta1 = angleInDirection(p1);
         double theta2 = angleInDirection(p2);
@@ -82,7 +95,8 @@ public class CircularArcLinearizer<P extends Position> {
         // we want error to be < threshold, so we can calculate increment
         // notice that argument to acos is very close to 1 (if threshold is small, as we assume here)
         // so angleIncrement is garuanteed to be positive and small
-        double angleIncr = acos((c.radius - threshold) / c.radius);
+        // (argument is clamped, otherwise acos returns NaN if threshold > 2 * radius)
+        double angleIncr = acos(max(-1.0, (c.radius - threshold) / c.radius));
 
         //TODO -- quick check if angles theta are closer together than angleIncr, then we don't need to
         // linearize
@@ -127,7 +141,14 @@ public class CircularArcLinearizer<P extends Position> {
 	       	normalizedTheta1 += 2.0 * Math.PI;
 	    }
         //first a number of steps and angleIncrement such that we go in equal increment steps from theta to theta1
-        int steps = (int) Math.ceil(Math.abs(normalizedTheta1 - theta) / maxAngleIncr);
+        double numSteps = Math.ceil(Math.abs(normalizedTheta1 - theta) / maxAngleIncr);
+        // a NaN or infinite number of steps also fails this test
+        if (!(numSteps <= MAX_STEPS)) {
+            throw new IllegalArgumentException(String.format(
+                    "Can't linearize arc: too many points required (radius = %s, threshold = %s)", c.radius,
+                    threshold));
+        }
+        int steps = Math.max(1, (int) numSteps);
         double angleIncr = Math.abs(normalizedTheta1 - theta) / (double) steps;
         
         //determine increments for Z and M dimensions:
@@ -157,6 +178,36 @@ public class CircularArcLinearizer<P extends Position> {
             }
             builder.add(buf);
         }
+    }
+
+    /**
+     * Checks whether the arc deviates at most threshold from the chord p0-p2, so that it doesn't need to be
+     * linearized. This is e.g. the case for arcs through nearly collinear positions, which have an extremely large
+     * radius.
+     *
+     * <p>The deviation is the sagitta s = h^2 / (R + sqrt(R^2 - h^2)), with h half the chord length. This formula
+     * only holds for arcs smaller than PI, so larger arcs are never considered negligible. Arcs with a NaN or
+     * infinite radius are degenerate and always considered negligible.</p>
+     *
+     * @return true if the arc doesn't need to be linearized
+     */
+    private boolean isNegligiblyCurved() {
+        double r = c.radius;
+        if (Double.isNaN(r) || Double.isInfinite(r)) {
+            return true;
+        }
+        // Inscribed angle theorem: the arc is smaller than PI iff the angle p0-p1-p2 is obtuse.
+        // This only uses coordinate differences, so is numerically stable even for very large radii.
+        double ax = p0.getCoordinate(0) - p1.getCoordinate(0);
+        double ay = p0.getCoordinate(1) - p1.getCoordinate(1);
+        double bx = p2.getCoordinate(0) - p1.getCoordinate(0);
+        double by = p2.getCoordinate(1) - p1.getCoordinate(1);
+        if (ax * bx + ay * by >= 0) {
+            return false;
+        }
+        double h = hypot(p2.getCoordinate(0) - p0.getCoordinate(0), p2.getCoordinate(1) - p0.getCoordinate(1)) / 2;
+        double sagitta = h * h / (r + sqrt(max(0.0, r * r - h * h)));
+        return sagitta <= threshold;
     }
 
     //atan2 give the angular coordinate theta of the polar coordinates (r, theta)
