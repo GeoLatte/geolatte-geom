@@ -12,6 +12,8 @@ A geometry model for Java with:
 * Codecs for translating from/to native database formats for Postgis, MySQL, Oracle (`SDO_GEOMETRY`), Microsoft SQL
   Server (`GEOMETRY` and `GEOGRAPHY`), and DB2 (as used by Hibernate Spatial).
 * Pluggable, extendable Geometry operations
+* Exact spatial predicates (DE-9IM), validity and simplicity tests, robust against rounding errors, and correctly
+  rounded area, centroid, distance and length
 * Coordinate reference system aware
 * space filling curves
 
@@ -40,6 +42,9 @@ The library is published on Maven Central. For Maven, you can include the follow
 - [Quick start](docs/quick-start.md): creating geometries and encoding them to WKT/WKB
 - [Manual](docs/manual.md): the geometry model, coordinate reference systems, geometry operations, coordinate
   transformations, encoding and decoding, and more
+- [Exact computational geometry](docs/exact-cga.md): the exact predicates and algorithms, their guarantees and
+  performance
+- [Migrating from version 1](docs/migration.md): the changes in behaviour since version 1
 - [Javadoc on javadoc.io](https://javadoc.io/doc/org.geolatte/geolatte-geom)
 
 # GeoJSON

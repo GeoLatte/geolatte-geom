@@ -15,10 +15,14 @@ import static org.geolatte.geom.CrsMock.*;
 import static org.geolatte.geom.builder.DSL.*;
 import static org.junit.Assert.*;
 
-public class LineStringSimplicityTest {
+/**
+ * Simplicity of line strings with {@link Simplicity} (these cases were written for the floating point
+ * {@code LineStringSimplicity} of the 2.0 branch, which the exact {@link Simplicity} replaced).
+ */
+public class LineStringSimplicityCasesTest {
 
     private static boolean isSimple(LineString<?> line) {
-        return LineStringSimplicity.isSimple(line.getPositions());
+        return Simplicity.isSimple(line);
     }
 
     @Test

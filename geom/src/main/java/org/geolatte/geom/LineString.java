@@ -21,7 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.geolatte.geom.cga.LineStringSimplicity;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 /**
@@ -123,15 +122,22 @@ public class LineString<P extends Position> extends Geometry<P> implements Linea
     }
 
     /**
-     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple.
+     * Checks whether this <code>LineString</code> is a ring, i.e. is closed and simple (see
+     * {@link org.geolatte.geom.cga.Simplicity}).
      *
      * <p>As specified for <code>ST_IsRing</code> in ISO/IEC 13249-3 (SQL/MM Spatial), Z and M coordinate values are
      * ignored in both the closedness and the simplicity test.</p>
      *
-     * @return true if this <code>LineString</code> is a ring.
+     * @return true if this <code>LineString</code> is a ring; false if it is empty, or has a coordinate that is NaN
+     * or infinite.
      */
     public boolean isRing() {
-        return isClosed() && LineStringSimplicity.isSimple(getPositions());
+        if (!isClosed()) return false;
+        try {
+            return org.geolatte.geom.cga.Simplicity.isSimple(this);
+        } catch (IllegalArgumentException e) {   // a coordinate that is not finite
+            return false;
+        }
     }
 
     /**

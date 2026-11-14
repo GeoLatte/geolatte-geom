@@ -3,10 +3,17 @@ package org.geolatte.geom.cga;
 import org.geolatte.geom.LinearRing;
 import org.geolatte.geom.Position;
 import org.geolatte.geom.PositionSequence;
+import org.geolatte.geom.cga.exact.Predicates;
 
 import java.util.stream.IntStream;
 
 /**
+ * Numerical methods for computational geometry.
+ *
+ * <p>The predicates ({@code orientation}, {@code collinear}, {@code orient2d}, {@code isCounterClockwise}) are
+ * exact: their result is the result for the coordinates as given, never falsified by rounding errors. See
+ * {@link Predicates}.</p>
+ *
  * Created by Karel Maesen, Geovise BVBA on 01/03/15.
  */
 public class NumericalMethods {
@@ -68,21 +75,24 @@ public class NumericalMethods {
     }
 
     /**
-     * Determines if the triangle determined by p0, p1, p2 is counterclockwise in 2D.
+     * Determines the orientation of the triangle determined by p0, p1, p2 in 2D.
      * 
-     * <p>This is equivalent to p2 is to the left of the line p0 - p1.</p>
+     * <p>Counterclockwise is equivalent to p2 is to the left of the line p0 - p1.</p>
+     *
+     * <p>The result is exact, see {@link Predicates#orientation(Position, Position, Position)}.</p>
      *
      * @param p0
      * @param p1
      * @param p2
-     * @return true if counterclockwise
+     * @return the orientation of the triangle
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
      */
     public static Orientation orientation(Position p0, Position p1, Position p2) {
-        double det = deltaDeterminant(p0, p1, p2);
-        if (det == 0) {
+        int sign = Predicates.orientation(p0, p1, p2);
+        if (sign == 0) {
             return Orientation.Colinear;
         }
-        return det > 0? Orientation.Counterclockwise : Orientation.Clockwise;
+        return sign > 0? Orientation.Counterclockwise : Orientation.Clockwise;
     }
 
     /**
@@ -107,12 +117,12 @@ public class NumericalMethods {
     /**
      * Determines whether the specified {@code LinearRing} is counter-clockwise.
      *
-     * <p> Orientation is determined by calculating the signed area of the given ring
-     * and using the sign to determine the orientation
+     * <p> Orientation is determined by the (exact) sign of the signed area of the given ring.
      * <p>The specified Ring is assumed to be valid.
      *
      * @param ring a {@code LinearRing}
      * @return true if the positions of the ring describe it counter-clockwise
+     * @throws IllegalArgumentException if the signed area is zero, or a coordinate is NaN or infinite
      */
     public static boolean isCounterClockwise(LinearRing<?> ring) {
         double res = orient2d(ring);
@@ -125,28 +135,25 @@ public class NumericalMethods {
     /**
      * Determine the orientation of a {@code LinearRing}
      *
-     * This uses Newell's method (see Graphics Gems III, V. 5)
+     * <p>The orientation is the exact sign of the signed area of the ring,
+     * see {@link Predicates#ringOrientation(PositionSequence)}.</p>
      *
      * @param ring the linear ring
-     * @return -1 if the specified ring is clockwise, +1 if counterclockwise, 0 if all vertices are collinear
+     * @return -1 if the specified ring is clockwise, +1 if counterclockwise, 0 if the signed area is zero (e.g.
+     * if all vertices are collinear)
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
      */
     public static double orient2d(LinearRing<?> ring) {
-        return orient2d(ring.getPositions());
+        return Predicates.ringOrientation(ring.getPositions());
     }
 
-    private static double orient2d(PositionSequence<?> positions) {
-        double d = 0;
-        for (int i = 0; i < positions.size() - 1; i++) {
-            double[] p1 = positions.getPositionN(i).toArray(null);
-            double[] p2 = positions.getPositionN(i+1).toArray(null);
-            d += (p1[0] - p2[0]) * (p1[1] + p2[1]);
-        }
-        return Math.signum(d);
-    }
-
+    /**
+     * Determines whether the specified positions are collinear in 2D. The result is exact.
+     *
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
     public static boolean collinear(Position p0, Position p1, Position p2) {
-        double det = deltaDeterminant(p0, p1, p2);
-        return det == 0;
+        return Predicates.orientation(p0, p1, p2) == 0;
     }
 
     public static double determinant(Position p0, Position p1) {
@@ -154,13 +161,7 @@ public class NumericalMethods {
         double[] c1 = p1.toArray(null);
         return determinant(c0[0], c0[1], c1[0], c1[1]);
     }
-    
-    private static double deltaDeterminant(Position p0, Position p1, Position p2) {
-        double[] c0 = p0.toArray(null);
-        double[] c1 = p1.toArray(null);
-        double[] c2 = p2.toArray(null);
-        return determinant(1, 1, 1, c0[0], c1[0], c2[0], c0[1], c1[1], c2[1]);
-    }
+
 
     public static class TwoSum {
         final double estimate;

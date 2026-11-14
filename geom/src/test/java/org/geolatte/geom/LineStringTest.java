@@ -130,6 +130,10 @@ public class LineStringTest {
         assertFalse(emptyLine.isRing());
         assertFalse(linestr2d.isRing());
         assertTrue(simpleClosed.isRing());
+        // closed, but not simple
+        assertFalse(linestring(crs, c(1, 1), c(-1, -1), c(1, -1), c(-1, 1), c(1, 1)).isRing());
+        assertFalse(linestring(crs, c(0, 0), c(1, 0), c(0, 0)).isRing());
+        assertFalse(linestring(crs, c(0, 0), c(2, 0), c(2, 2), c(1, 0), c(0, 0)).isRing());
     }
 
     @Test

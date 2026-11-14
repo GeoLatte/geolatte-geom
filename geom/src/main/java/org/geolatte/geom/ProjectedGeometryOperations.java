@@ -35,7 +35,7 @@ public interface ProjectedGeometryOperations {
     /**
      * Default implementation of this interface
      */
-    public final ProjectedGeometryOperations Default = new JTSGeometryOperations();
+    public final ProjectedGeometryOperations Default = new DefaultProjectedGeometryOperations();
 
     /**
      * Tests the simplicity of the specified <code>Geometry</code>.
@@ -44,6 +44,15 @@ public interface ProjectedGeometryOperations {
      * @return True iff the specified <code>Geometry</code> is simple.
      */
     <P extends C2D> boolean isSimple(final Geometry<P> geometry);
+
+    /**
+     * Tests the validity of the specified <code>Geometry</code>: whether it is well formed, as defined by the
+     * Simple Feature Access specification. An empty <code>Geometry</code> is valid.
+     *
+     * @param geometry the <code>Geometry</code> to test for validity.
+     * @return True iff the specified <code>Geometry</code> is valid.
+     */
+    <P extends C2D> boolean isValid(final Geometry<P> geometry);
 
     /**
      * Calculates the boundary of the specified <code>Geometry</code>.
@@ -110,6 +119,55 @@ public interface ProjectedGeometryOperations {
     <P extends C2D> boolean overlaps(final Geometry<P> geometry, final Geometry<P> other);
 
     /**
+     * Checks if the first specified <code>Geometry</code> is spatially within the second.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the within test
+     * @param other    the second <code>Geometry</code> operand of the within test
+     * @return true iff the first specified <code>Geometry</code> is spatially within the second
+     */
+    <P extends C2D> boolean within(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the specified <code>Geometry</code>s are spatially disjoint: they have no point in common. This is
+     * the negation of {@link #intersects(Geometry, Geometry)}.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the disjoint test
+     * @param other    the second <code>Geometry</code> operand of the disjoint test
+     * @return true iff the specified <code>Geometry</code>s are spatially disjoint
+     */
+    <P extends C2D> boolean disjoint(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the specified <code>Geometry</code>s are topologically equal: they represent the same point set.
+     * Two empty <code>Geometry</code>s are equal.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the equality test
+     * @param other    the second <code>Geometry</code> operand of the equality test
+     * @return true iff the specified <code>Geometry</code>s are topologically equal
+     */
+    <P extends C2D> boolean equalsTopologically(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the first specified <code>Geometry</code> spatially covers the second: no point of the second
+     * lies in the exterior of the first.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the covers test
+     * @param other    the second <code>Geometry</code> operand of the covers test
+     * @return true iff the first specified <code>Geometry</code> spatially covers the second
+     */
+    <P extends C2D> boolean covers(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Checks if the first specified <code>Geometry</code> is spatially covered by the second: no point of the
+     * first lies in the exterior of the second.
+     *
+     * @param geometry the first <code>Geometry</code> operand of the covered-by test
+     * @param other    the second <code>Geometry</code> operand of the covered-by test
+     * @return true iff the first specified <code>Geometry</code> is spatially covered by the second
+     */
+    <P extends C2D> boolean coveredBy(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
      * Checks if the specified <code>Geometry</code>s are spatially related by testing
      * for intersections between the interior, boundary and exterior of the two geometric objects as specified by
      * the values in the intersection pattern matrix. This returns false if all the tested intersections are empty except
@@ -127,6 +185,9 @@ public interface ProjectedGeometryOperations {
      * Calculates the shortest distance between any two points in the two <code>Geometry</code>s in the
      * coordinate reference system of this <code>Geometry</code>. Only the X/Y-coordinates are used in the distance
      * calculation; M- and Z-coordinates are ignored.
+     *
+     * <p>{@link DefaultProjectedGeometryOperations} computes the distance correctly rounded (the double nearest to
+     * the exact distance), with {@link org.geolatte.geom.cga.Distance}, and returns NaN if a geometry is empty.</p>
      *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
@@ -195,18 +256,104 @@ public interface ProjectedGeometryOperations {
     /**
      * Calculates the length of the specified {@code Geometry}.
      *
+     * <p>The implementations in this library compute the length in plain floating point arithmetic: the relative
+     * error grows with the number of segments. Use {@link #exactLength(Geometry)} for a correctly rounded
+     * result.</p>
+     *
      * @param geometry the Geometry
      * @return the length of the specified Geometry
      */
     <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry);
 
     /**
+     * Calculates the length of the specified {@code Geometry}, correctly rounded: the result is the double nearest
+     * to the exact length (a sum of square roots), except when the exact length lies extremely close (relatively
+     * within about 2^-100) to the midpoint between two doubles; it is then one of the two doubles next to the exact
+     * length.
+     *
+     * <p>This is about five times slower than {@link #length(Geometry)}. The default implementation uses
+     * {@link org.geolatte.geom.cga.Length#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the length of the specified Geometry, correctly rounded
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Linear<P>> double exactLength(final G geometry) {
+        return org.geolatte.geom.cga.Length.of(geometry);
+    }
+
+    /**
      * Calculates the area of the specified {@code Geometry}.
+     *
+     * <p>The implementations in this library compute the area in plain floating point arithmetic, which is fast
+     * but has no bound on its error: it can be inaccurate for thin or nearly degenerate polygons. Use
+     * {@link #exactArea(Geometry)} for a correctly rounded result.</p>
      *
      * @param geometry the Geometry
      * @return the area of the specified Geometry
      */
     <P extends C2D, G extends Geometry<P> & Polygonal<P>> double area(final G geometry);
+
+    /**
+     * Calculates the area of the specified {@code Geometry}, correctly rounded: the result is the double nearest
+     * to the exact area of the geometry as given.
+     *
+     * <p>This is about ten times slower than {@link #area(Geometry)}. The default implementation uses
+     * {@link org.geolatte.geom.cga.Area#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the area of the specified Geometry, correctly rounded
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double exactArea(final G geometry) {
+        return org.geolatte.geom.cga.Area.of(geometry);
+    }
+
+    /**
+     * Calculates the perimeter of the specified {@code Geometry}: the length of its boundary, i.e. the sum of the
+     * lengths of all rings of its polygons ({@code ST_Perimeter}).
+     *
+     * <p>The default implementation computes the perimeter in plain floating point arithmetic, with
+     * {@link org.geolatte.geom.cga.Length#fast(Geometry)}. Use {@link #exactPerimeter(Geometry)} for a correctly
+     * rounded result.</p>
+     *
+     * @param geometry the Geometry
+     * @return the perimeter of the specified Geometry, or NaN if it is empty
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double perimeter(final G geometry) {
+        return geometry.isEmpty() ? Double.NaN : org.geolatte.geom.cga.Length.fast(geometry);
+    }
+
+    /**
+     * Calculates the perimeter of the specified {@code Geometry}, correctly rounded (see
+     * {@link #exactLength(Geometry)}).
+     *
+     * <p>The default implementation uses {@link org.geolatte.geom.cga.Length#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the perimeter of the specified Geometry, correctly rounded, or NaN if it is empty
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> double exactPerimeter(final G geometry) {
+        return geometry.isEmpty() ? Double.NaN : org.geolatte.geom.cga.Length.of(geometry);
+    }
+
+    /**
+     * Calculates a point that is guaranteed to lie in the interior of the specified {@code Geometry}
+     * ({@code ST_PointOnSurface}).
+     *
+     * <p>The default implementation uses {@link org.geolatte.geom.cga.PointOnSurface}, which decides exactly that
+     * the point lies in the interior of a (valid) polygon. Only for an extremely thin polygon, where no interior
+     * point is found, it returns a vertex. The point has the coordinate reference system of the geometry, with NaN
+     * for the coordinates other than X and Y.</p>
+     *
+     * @param geometry the Geometry
+     * @return a point in the interior of the specified Geometry, or an empty point if it is empty
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Polygonal<P>> Point<P> pointOnSurface(final G geometry) {
+        return org.geolatte.geom.cga.PointOnSurface.of(geometry);
+    }
 
     /**
      * Calculates a centroid for the specified {@code Geometry}.
