@@ -178,6 +178,30 @@ public class TestDefaultProjectedGeometryOperations {
         assertEquals(crs, ops.centroid(small).getCoordinateReferenceSystem());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void distanceAndLength() {
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            assertEquals(5.0, o.distance(g("POINT (0 0)"), g("POINT (3 4)")), 0);
+            assertEquals(0.0, o.distance(g(SQUARE), g("POINT (1 1)")), 0);
+            LineString<C2D> line = (LineString<C2D>) g("LINESTRING (0 0, 3 4, 3 10)");
+            assertEquals(11.0, o.length(line), 0);
+            assertEquals(11.0, o.exactLength(line), 0);
+        }
+        // the perpendicular distance 1 / sqrt(5), correctly rounded
+        assertEquals(0.4472135954999579, ops.distance(g("POINT (0 1)"), g("LINESTRING (-1 0, 1 1)")), 0);
+        assertTrue(Double.isNaN(ops.distance(g("POINT EMPTY"), g(SQUARE))));
+        assertTrue(Double.isNaN(ops.distance(g(SQUARE), g("POLYGON EMPTY"))));
+        LineString<C2D> line = (LineString<C2D>) g("LINESTRING (152345.678 212345.789, 152346.1 212347.2, 152349 212340)");
+        assertEquals(org.geolatte.geom.cga.Length.fast(line), ops.length(line), 0);
+        assertEquals(org.geolatte.geom.cga.Length.of(line), ops.exactLength(line), 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void differentCrsForDistance() {
+        ops.distance(g(SQUARE), Wkt.fromWkt("POINT (1 1)", l72));
+    }
+
     private static Geometry<C2D> g(String wkt) {
         return Wkt.fromWkt(wkt, crs);
     }

@@ -142,6 +142,42 @@ final class EnvelopeTree {
                 && own[4 * i + 1] <= boxes[4 * c + 3] && boxes[4 * c + 1] <= own[4 * i + 3];
     }
 
+    // ---------------------------------------------------------------------------------------------------------
+    // Traversal: node (level, i). Level 0 holds the rectangles themselves; the root is the single node at level
+    // height(), with index 0.
+    // ---------------------------------------------------------------------------------------------------------
+
+    int height() {
+        return levels.length;
+    }
+
+    /**
+     * Copies the box of node (level, i) into out[offset .. offset + 3]: minX, minY, maxX, maxY
+     */
+    void box(int level, int i, double[] out, int offset) {
+        double[] boxes = level == levels.length ? root : levels[level];
+        int b = level == levels.length ? 0 : 4 * i;
+        out[offset] = boxes[b];
+        out[offset + 1] = boxes[b + 1];
+        out[offset + 2] = boxes[b + 2];
+        out[offset + 3] = boxes[b + 3];
+    }
+
+    /**
+     * @return the index of the first child (at level - 1) of node (level, i), for level &gt; 0
+     */
+    int firstChild(int level, int i) {
+        return level == levels.length ? 0 : i * NODE_CAPACITY;
+    }
+
+    /**
+     * @return one past the index of the last child (at level - 1) of node (level, i), for level &gt; 0
+     */
+    int endChild(int level, int i) {
+        int count = levels[level - 1].length / 4;
+        return level == levels.length ? count : Math.min((i + 1) * NODE_CAPACITY, count);
+    }
+
     /**
      * Calls the action with the index of each rectangle that has a point in common with the query rectangle
      */

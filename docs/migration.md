@@ -9,8 +9,8 @@ code keeps working without changes, but some results differ, and one interface h
 1. If you implement `ProjectedGeometryOperations` yourself, add the six new methods
    ([details](#projectedgeometryoperations-has-new-methods)).
 2. The default `ProjectedGeometryOperations` is no longer `JTSGeometryOperations`. Predicates, `isSimple`,
-   `boundary`, `convexHull` and `centroid` are now exact or correctly rounded, and give different results in
-   some cases
+   `boundary`, `convexHull`, `centroid` and `distance` are now exact or correctly rounded, and give different
+   results in some cases; `distance` returns NaN for an empty geometry, where it returned 0
    ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
    `new JTSGeometryOperations()` explicitly.
 3. `LineString.isRing()` now also requires the line string to be simple
@@ -31,8 +31,12 @@ The interface has six new abstract methods:
 | `coveredBy(a, b)` | no point of `a` lies in the exterior of `b` |
 | `isValid(g)` | `g` is well formed (`ST_IsValid`); an empty geometry is valid |
 
-It also has a new default method, `exactArea(g)`: the area, correctly rounded (the double nearest to the exact
-area), about ten times slower than `area`. Implementations inherit it.
+It also has two new default methods, which implementations inherit:
+
+| Method | Meaning |
+|---|---|
+| `exactArea(g)` | the area, correctly rounded (the double nearest to the exact area); about ten times slower than `area` |
+| `exactLength(g)` | the length, correctly rounded (faithfully in extremely rare cases); about five times slower than `length` |
 
 The six abstract methods only break classes that implement the interface. Callers are not affected. Both
 implementations in the library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A
@@ -52,14 +56,18 @@ The new default computes these operations exactly, with the classes in `org.geol
 - `isValid`, with `Validity`;
 - `boundary`, with `Boundary`;
 - `convexHull`, with `ConvexHull`;
-- `centroid`, correctly rounded, with `Centroid`.
+- `centroid`, correctly rounded, with `Centroid`;
+- `distance`, correctly rounded, with `Distance`.
 
 `area` is computed with `Area.fast`, in plain floating point arithmetic, as fast as JTS and with the same kind
 of rounding errors. The results can differ from those of JTS in the last bits. The new `exactArea` returns the
 correctly rounded area.
 
-`reverse`, `distance`, `buffer`, `intersection`, `union`, `difference`, `symmetricDifference` and `length` are
-still delegated to JTS, and behave as before.
+`length` is computed with `Length.fast`, which sums the same floating point segment lengths in the same order as
+JTS, and gives the same results. The new `exactLength` returns the correctly rounded length.
+
+`reverse`, `buffer`, `intersection`, `union`, `difference` and `symmetricDifference` are still delegated to JTS,
+and behave as before.
 
 `JTSGeometryOperations` itself is unchanged, apart from the new methods. To get the version 1 behaviour for all
 operations, use it directly:
@@ -189,6 +197,25 @@ centroid(POLYGON Z ((0 0 1, 4 0 1, 4 4 1, 0 4 1, 0 0 1)))   (SRID 31370 with a v
   now:       SRID=31370;POINT(2 2 NaN)   a C3D position
 ```
 
+### `distance` is correctly rounded, and NaN for empty geometries
+
+`distance` now returns the double nearest to the exact distance. JTS computes it in floating point, so results
+can differ in the last bits. It is also much faster for large geometries: JTS `DistanceOp` compares all pairs of
+segments, while `Distance` searches two R-trees (two polygons of 100,000 vertices: ≈ 3 ms instead of ≈ 1 s).
+
+Two other changes:
+
+- The distance to or from an empty geometry is NaN (in SQL/MM, `ST_Distance` is null). In version 1 it was 0,
+  which cannot be told apart from the distance of intersecting geometries.
+- The operands must have the same coordinate reference system, as for the predicates; otherwise `distance`
+  throws an `IllegalArgumentException`. In version 1 the coordinates were compared regardless.
+
+```
+distance(POINT EMPTY, POINT (1 1))
+  version 1: 0.0
+  now:       NaN
+```
+
 ### `isValid` is new
 
 `isValid` follows the Simple Features rules, as JTS `IsValidOp` does, and is exact. `Validity.of(geometry)` also
@@ -234,11 +261,12 @@ The following is new and does not change existing behaviour:
   - `Constructions`: correctly rounded segment intersections and circumcenters;
   - `Summation`: exact sums of (products of) doubles, with correctly rounded values and quotients;
   - `PolygonMoments`: the correctly rounded area and centroid of polygon rings;
+  - `MinimumDistance` and `LengthSum`: the correctly rounded distance and length;
   - building blocks: `Interval`, `ExactSum`, `Essa`.
 - `org.geolatte.geom.cga`:
   - `Relate`, `PreparedRelate`, `IntersectionMatrix`, `Location` and `PointLocator`;
   - `Simplicity`, `Validity` and `Boundary`;
-  - `Area` and `Centroid`;
+  - `Area`, `Centroid`, `Distance` and `Length`;
   - `ConvexHull`, `DouglasPeucker` (optionally preserving topology), `DelaunayTriangulation` and
     `VoronoiDiagram`.
 - `LineSegment.classifyIntersection`, `intersects` and `intersection`, with the new `SegmentIntersection` and

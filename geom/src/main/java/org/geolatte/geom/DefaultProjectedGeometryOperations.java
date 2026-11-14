@@ -24,6 +24,8 @@ import org.geolatte.geom.cga.Area;
 import org.geolatte.geom.cga.Boundary;
 import org.geolatte.geom.cga.Centroid;
 import org.geolatte.geom.cga.ConvexHull;
+import org.geolatte.geom.cga.Distance;
+import org.geolatte.geom.cga.Length;
 import org.geolatte.geom.cga.Relate;
 import org.geolatte.geom.cga.Simplicity;
 import org.geolatte.geom.cga.Validity;
@@ -36,14 +38,17 @@ import org.geolatte.geom.cga.Validity;
  * and {@code relates}) are computed exactly with {@link Relate}: the result is exact for the given coordinates, and
  * geometry collections have union semantics. {@code isSimple}, {@code isValid}, {@code boundary} and
  * {@code convexHull} are computed exactly with {@link Simplicity}, {@link Validity}, {@link Boundary} and
- * {@link ConvexHull}. {@code centroid} and {@code exactArea} are correctly rounded (the double nearest to the
- * exact value), with {@link Centroid} and {@link Area#of}; {@code area} is computed in plain floating point, with
- * {@link Area#fast}. The other operations do not have an exact implementation yet;
- * they are delegated to a {@link JTSGeometryOperations}.</p>
+ * {@link ConvexHull}. {@code distance}, {@code centroid} and {@code exactArea} are correctly rounded (the double
+ * nearest to the exact value), with {@link Distance}, {@link Centroid} and {@link Area#of}; {@code exactLength} is
+ * correctly rounded except extremely close to a midpoint between two doubles, where it is faithfully rounded, with
+ * {@link Length#of}. {@code area} and {@code length} are computed in plain floating point, with {@link Area#fast}
+ * and {@link Length#fast}. The other operations do not have an exact implementation yet; they are delegated to a
+ * {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
- * geometries. The operands must have the same coordinate reference system.</p>
+ * geometries. The distance to or from an empty geometry is NaN (where {@link JTSGeometryOperations} returns 0). The
+ * operands must have the same coordinate reference system.</p>
  */
 public class DefaultProjectedGeometryOperations implements ProjectedGeometryOperations {
 
@@ -151,7 +156,9 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
 
     @Override
     public <P extends C2D> double distance(final Geometry<P> geometry, final Geometry<P> other) {
-        return jts.distance(geometry, other);
+        if (geometry.isEmpty() || other.isEmpty()) return Double.NaN;
+        checkCompatibleCRS(geometry, other);
+        return Distance.of(geometry, other);
     }
 
     @Override
@@ -181,7 +188,7 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
 
     @Override
     public <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry) {
-        return jts.length(geometry);
+        return Length.fast(geometry);
     }
 
     @Override

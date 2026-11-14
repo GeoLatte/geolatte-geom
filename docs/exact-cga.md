@@ -65,6 +65,10 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
   would underflow or overflow. `signum()` is exact; `round()`, `round(scale)` and `roundQuotient(num, den)` are
   correctly rounded. This is primitive 5 of the roadmap.
 - **`PolygonMoments`**: the correctly rounded area and centroid of a set of rings (see below).
+- **`MinimumDistance`**: the correctly rounded minimum of the distances of candidate point-point and
+  point-segment pairs, i.e. the correctly rounded square root of a rational (primitive 6, see below).
+- **`LengthSum`**: the sum of the lengths of segments, correctly rounded in practice and faithfully rounded always
+  (see below).
 
 ## Algorithms in `cga`
 
@@ -312,6 +316,73 @@ accuracy guarantee. The naive shoelace sum gives 0 for a square of 1 mm² at Bel
 which takes the X coordinates relative to the first position, gets such a square right, but not slivers: for
 nearly collinear positions at coordinates around 100,000, its area can be off by a factor of 75.
 
+### `Distance` and `Length`
+
+- `Distance.of(geometry, other)` returns the smallest distance between a point of one geometry and a point of the
+  other. It is 0 when the geometries intersect (`Relate.intersects`, so a geometry inside a polygon of the other,
+  or in a collection with union semantics, is at distance 0), and NaN when one of them is empty. It backs
+  `distance` in `DefaultProjectedGeometryOperations`.
+- `Length.of(geometry)` returns the length of lines, the perimeter of polygons (all rings), and the sum over the
+  elements of a collection; points have no length. It backs `ProjectedGeometryOperations.exactLength`.
+- `Length.fast(geometry)` sums `sqrt(dx² + dy²)` in plain floating point, reading the coordinates in place. It is
+  as fast as JTS, and backs `length` in `DefaultProjectedGeometryOperations`, as `Area.fast` backs `area`.
+
+**Guarantee.** For non-intersecting geometries, the distance is attained between a vertex of one and a vertex or
+segment of the other, so its square is rational: `|p - q|²`, or `((b - a) × (p - a))² / |b - a|²` when the
+perpendicular from p falls inside segment ab. The distance is **correctly rounded**: the double nearest to the
+exact distance (ties to even). It is symmetric, and scaling by a power of 2 scales it exactly.
+
+A length is a sum of square roots. A positive sum of square roots is rational only if every term is, so the
+length can be exactly a midpoint between two doubles (a tie) only when every segment length is rational, as for
+lines along the axes. Otherwise it is irrational, and can in principle lie arbitrarily close to a midpoint.
+`Length.of` is **correctly rounded** (ties to even), except when the exact length is irrational and lies within
+about 10⁻⁵⁸ (relatively) of a midpoint; it is then one of the two doubles next to it (faithful rounding).
+
+**Algorithm** (`Distance`, `MinimumDistance`):
+
+1. The elements (points and segments) of each geometry go into a packed R-tree. A branch-and-bound search visits
+   the pairs of nodes in order of the distance of their boxes, and keeps an upper bound of the distance. For each
+   pair of elements, the distances of the vertices of each to the other element are estimated in floating point,
+   with a rigorous error bound (2⁻⁴⁰ relative to the coordinate differences). Pairs whose lower bound exceeds the
+   final upper bound are dropped. A single point or segment against a geometry, and two very small geometries,
+   skip the trees.
+2. Each remaining pair is classified exactly: whether the perpendicular falls inside the segment
+   (`Predicates.dotSign`), so that the squared distance is one of the two rational forms above. It is computed
+   in double-word arithmetic with a rigorous relative error bound, and the square root is taken with one Newton
+   step. When the enclosure of the smallest one contains no rounding boundary, the result is decided.
+3. Otherwise (a distance extremely close to a midpoint, an exact tie, extreme magnitudes), the squared distances
+   are compared exactly as `BigInteger` rationals, and the square root of the smallest is rounded correctly from
+   an integer square root with more than 60 bits and a sticky bit.
+
+**Algorithm** (`Length`, `LengthSum`):
+
+1. The coordinate differences are exact double-words, the sum of their squares is computed with a tiny error, and
+   its square root with one Newton step (relative error below 2⁻¹⁰⁰). The lengths are summed with TwoSum, with a
+   rigorous bound on the error, and the enclosure is rounded as for the area. This decides the result unless the
+   exact length lies within about 2⁻¹⁰⁰ of a midpoint, or is one.
+2. Otherwise (and for coordinate differences outside [2⁻⁴⁵⁰, 2⁴⁵⁰]), the lengths are computed again with
+   `BigDecimal` square roots: exactly when they are rational, and with at least 60 digits otherwise. Their exact
+   sum is then rounded.
+
+Indicative timings, against JTS 1.19 `DistanceOp` and `getLength()`:
+
+| Geometries | `Distance.of` | JTS |
+|---|---|---|
+| a point and a polygon of 100 vertices | ≈ 1 µs | ≈ 1 µs |
+| a point and a polygon of 100,000 vertices | ≈ 1.2 ms | ≈ 0.9 ms |
+| two polygons of 100 vertices | ≈ 3 µs | ≈ 3 µs |
+| two polygons of 10,000 vertices | ≈ 0.25 ms | ≈ 5 ms |
+| two polygons of 100,000 vertices | ≈ 3 ms | ≈ 970 ms |
+| two lines of 100,000 vertices | ≈ 3.5 ms | ≈ 980 ms |
+
+About a fifth of the time of `Distance.of` is the `intersects` test. JTS `DistanceOp` compares all pairs of
+segments, unless the geometries are indexed beforehand (`IndexedFacetDistance`).
+
+| Geometry | `Length.of` | `Length.fast` | JTS |
+|---|---|---|---|
+| polygon of 100,000 vertices | ≈ 0.7 ms | ≈ 0.14 ms | ≈ 0.14 ms |
+| polygon of 1,000,000 vertices | ≈ 6.7 ms | ≈ 1.4 ms | ≈ 1.4 ms |
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -377,15 +448,15 @@ There are two kinds of operation, with different guarantees:
 | `Area` | **done** | `Area.of`: correctly rounded (`exactArea`); `Area.fast`: floating point (`area`) |
 | `Centroid` | **done** | `Centroid`: correctly rounded for areas and points; lines are weighted by rounded lengths |
 | `PointOnSurface` | to do | scan line, ordering of implicit x-coordinates, exact check that the result is inside |
-| `Distance` | to do | exact selection of the minimum over segment pairs, then a correctly rounded √(N/D) (primitive 6) |
-| `Length` | to do | a sum of square roots: faithful rounding (≤ 1 ulp) rather than correct rounding |
+| `Distance` | **done** | `Distance`: correctly rounded; NaN for an empty operand |
+| `Length` (and `Perimeter`) | **done** | `Length.of`: correctly rounded in practice, always faithful (`exactLength`); `Length.fast`: floating point (`length`) |
 | `Intersection`, `Union`, `Difference`, `SymDifference` | to do | noding, graph labelling, polygon assembly, and snap rounding of the output (primitive 7) |
 | `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
 | `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
 
 ### Primitives
 
-Primitives 1–5 are done: 1–4 make up the relate engine, 5 gives the area and the centroid.
+Primitives 1–6 are done: 1–4 make up the relate engine, 5 gives the area and the centroid, 6 the distance.
 
 1. **Ordering of implicit intersection points** (done): `orientationOfCrossing` compares a crossing point with
    a line, which orders crossings along a segment and decides whether two crossings coincide. Crossing points
@@ -396,8 +467,8 @@ Primitives 1–5 are done: 1–4 make up the relate engine, 5 gives the area and
 4. **Noding of two geometries** (done): the arrangement and depth labelling of `Relate`.
 5. **Correct rounding of exact sums and quotients** (done): `Summation`, with a double-word first stage in
    `PolygonMoments`, for `Area` and `Centroid`.
-6. **Correctly rounded square root of a rational**, for `Distance`: the distance from a point to a segment
-   is √(cross² / |ab|²).
+6. **Correctly rounded square root of a rational** (done): `MinimumDistance`, for `Distance`. The distance
+   from a point to a segment is √(cross² / |ab|²).
 7. **Snap rounding.** Overlay output vertices are rounded crossing points, which in general do not lie on
    either segment. Without snap rounding the output can become invalid (slivers, new self-intersections).
    Doubles do not form a uniform grid, which complicates the classic hot-pixel algorithm. This is the main
@@ -407,7 +478,6 @@ Primitives 1–5 are done: 1–4 make up the relate engine, 5 gives the area and
 
 1. **Relate engine** (primitives 1–4), **done**: all spatial relations and `Equals` are exact. `IsSimple`,
    `IsValid` and `Boundary` are done as well, on its monotone chains and exact angular ordering.
-2. **Numeric measures**: `Area` and `Centroid` are **done**; `Distance` and `Length` remain, each needing one
-   rounding routine.
+2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length` are **done**.
 3. **`PointOnSurface`**.
 4. **Overlay** with snap rounding, followed by **`Buffer`** on top of it.

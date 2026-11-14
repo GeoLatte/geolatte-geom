@@ -18,7 +18,10 @@
  *     <li>{@link org.geolatte.geom.cga.exact.Summation}: exact sums of doubles and of products of doubles, with
  *     correctly rounded values and quotients;</li>
  *     <li>{@link org.geolatte.geom.cga.exact.PolygonMoments}: the correctly rounded area and centroid of polygon
- *     rings.</li>
+ *     rings;</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.MinimumDistance}: the correctly rounded minimum of point-point and
+ *     point-segment distances (the square root of a rational);</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.LengthSum}: the correctly rounded sum of segment lengths.</li>
  * </ul>
  *
  * <p>Predicates are exact: their result is the result for the given double coordinates as exact real numbers.

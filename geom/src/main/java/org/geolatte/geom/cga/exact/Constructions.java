@@ -611,7 +611,7 @@ public final class Constructions {
     }
 
     // the exponent of the least significant non-zero bit of a finite, non-zero double
-    private static int lowestBitExponent(double v) {
+    static int lowestBitExponent(double v) {
         long bits = Double.doubleToRawLongBits(v);
         int biased = (int) ((bits >>> 52) & 0x7ff);
         long mantissa = bits & 0xfffffffffffffL;
@@ -621,7 +621,7 @@ public final class Constructions {
     }
 
     // v * 2^k as an integer (k must be large enough)
-    private static BigInteger scaled(double v, int k) {
+    static BigInteger scaled(double v, int k) {
         if (v == 0) return BigInteger.ZERO;
         long bits = Double.doubleToRawLongBits(v);
         int biased = (int) ((bits >>> 52) & 0x7ff);

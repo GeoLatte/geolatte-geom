@@ -186,6 +186,9 @@ public interface ProjectedGeometryOperations {
      * coordinate reference system of this <code>Geometry</code>. Only the X/Y-coordinates are used in the distance
      * calculation; M- and Z-coordinates are ignored.
      *
+     * <p>{@link DefaultProjectedGeometryOperations} computes the distance correctly rounded (the double nearest to
+     * the exact distance), with {@link org.geolatte.geom.cga.Distance}, and returns NaN if a geometry is empty.</p>
+     *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
      * @return the shortest distance between the two specified <code>Geometries</code>
@@ -253,10 +256,31 @@ public interface ProjectedGeometryOperations {
     /**
      * Calculates the length of the specified {@code Geometry}.
      *
+     * <p>The implementations in this library compute the length in plain floating point arithmetic: the relative
+     * error grows with the number of segments. Use {@link #exactLength(Geometry)} for a correctly rounded
+     * result.</p>
+     *
      * @param geometry the Geometry
      * @return the length of the specified Geometry
      */
     <P extends C2D, G extends Geometry<P> & Linear<P>> double length(final G geometry);
+
+    /**
+     * Calculates the length of the specified {@code Geometry}, correctly rounded: the result is the double nearest
+     * to the exact length (a sum of square roots), except when the exact length lies extremely close (relatively
+     * within about 2^-100) to the midpoint between two doubles; it is then one of the two doubles next to the exact
+     * length.
+     *
+     * <p>This is about five times slower than {@link #length(Geometry)}. The default implementation uses
+     * {@link org.geolatte.geom.cga.Length#of(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return the length of the specified Geometry, correctly rounded
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     */
+    default <P extends C2D, G extends Geometry<P> & Linear<P>> double exactLength(final G geometry) {
+        return org.geolatte.geom.cga.Length.of(geometry);
+    }
 
     /**
      * Calculates the area of the specified {@code Geometry}.
