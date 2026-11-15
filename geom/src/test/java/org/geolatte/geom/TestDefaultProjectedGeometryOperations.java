@@ -1,5 +1,6 @@
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
@@ -215,6 +216,64 @@ public class TestDefaultProjectedGeometryOperations {
                 + "((5 0, 15 0, 15 10, 5 10, 5 0)))");
         assertEquals(44.0, ops.perimeter(squares), 0);
         assertEquals(new C2D(10, 5), ops.pointOnSurface(squares).getPosition());
+    }
+
+    @Test
+    public void overlay() {
+        Geometry<C2D> a = g(SQUARE), b = g("POLYGON ((2 2, 6 2, 6 6, 2 6, 2 2))");
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            assertTrue(o.equalsTopologically(g("POLYGON ((2 2, 4 2, 4 4, 2 4, 2 2))"), o.intersection(a, b)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 4 0, 4 2, 6 2, 6 6, 2 6, 2 4, 0 4, 0 0))"),
+                    o.union(a, b)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 4 0, 4 2, 2 2, 2 4, 0 4, 0 0))"), o.difference(a, b)));
+            assertTrue(o.equalsTopologically(g("MULTIPOLYGON (((0 0, 4 0, 4 2, 2 2, 2 4, 0 4, 0 0)), "
+                    + "((4 2, 6 2, 6 6, 2 6, 2 4, 4 4, 4 2)))"), o.symmetricDifference(a, b)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 4 0, 4 2, 6 2, 6 6, 2 6, 2 4, 0 4, 0 0))"),
+                    o.unaryUnion(g("MULTIPOLYGON (((0 0, 4 0, 4 4, 0 4, 0 0)), ((2 2, 6 2, 6 6, 2 6, 2 2)))"))));
+        }
+        // the exact overlay accepts collections, has point set semantics, and types empty results
+        Geometry<C2D> collection = g("GEOMETRYCOLLECTION (POLYGON ((0 0, 4 0, 4 4, 0 4, 0 0)), POINT (10 10))");
+        assertTrue(ops.equalsTopologically(g("GEOMETRYCOLLECTION (POLYGON ((2 2, 4 2, 4 4, 2 4, 2 2)), POINT (10 10))"),
+                ops.intersection(collection, g("GEOMETRYCOLLECTION (POLYGON ((2 2, 6 2, 6 6, 2 6, 2 2)), "
+                        + "POINT (10 10))"))));
+        assertEquals(g("LINESTRING (4 0, 4 4)").getGeometryType(),
+                ops.intersection(a, g("POLYGON ((4 0, 8 0, 8 4, 4 4, 4 0))")).getGeometryType());
+        Geometry<C2D> empty = ops.intersection(a, g("POLYGON ((10 10, 11 10, 11 11, 10 10))"));
+        assertTrue(empty.isEmpty());
+        assertEquals(GeometryType.POLYGON, empty.getGeometryType());
+    }
+
+    @Test
+    public void overlayOnAFixedGrid() {
+        Grid mm = Grid.fixed("0.001");
+        Geometry<C2D> a = g("POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))");
+        Geometry<C2D> b = g("POLYGON ((1.0004 0, 2 0, 2 1, 1.0004 1, 1.0004 0))");
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            // snapped to the grid, the squares share a side
+            assertTrue(o.equalsTopologically(g("LINESTRING (1 0, 1 1)"), o.intersection(a, b, mm)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 2 0, 2 1, 0 1, 0 0))"), o.union(a, b, mm)));
+            assertTrue(o.equalsTopologically(a, o.difference(a, b, mm)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 2 0, 2 1, 0 1, 0 0))"), o.symmetricDifference(a, b, mm)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 2 0, 2 1, 0 1, 0 0))"),
+                    o.unaryUnion(g("MULTIPOLYGON (((0 0, 1 0, 1 1, 0 1, 0 0)), ((1.0004 0, 2 0, 2 1, 1.0004 1, 1.0004 0)))"), mm)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 0, 1.001 0, 1.001 1, 0 1, 0 0))"),
+                    o.reducePrecision(g("POLYGON ((0.0004 0.0004, 1.0006 0.0004, 1.0006 1.0004, 0.0004 1.0004, 0.0004 0.0004))"), mm)));
+            // on the double grid they stay apart
+            assertTrue(o.intersection(a, b, Grid.DOUBLE).isEmpty());
+            assertTrue(o.equalsTopologically(a, o.reducePrecision(a, Grid.DOUBLE)));
+        }
+        // a polygon thinner than a cell collapses
+        assertTrue(ops.reducePrecision(g("POLYGON ((0 0, 10 0, 10 0.0004, 0 0.0004, 0 0))"), mm).isEmpty());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void differentCrsForOverlayOnAGrid() {
+        ops.union(g(SQUARE), Wkt.fromWkt("POINT (1 1)", l72), Grid.fixed(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void differentCrsForOverlay() {
+        ops.intersection(g(SQUARE), Wkt.fromWkt("POINT (1 1)", l72));
     }
 
     @Test(expected = IllegalArgumentException.class)

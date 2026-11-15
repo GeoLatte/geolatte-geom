@@ -2,6 +2,7 @@ package org.geolatte.geom.cga;
 
 import org.geolatte.geom.*;
 import org.geolatte.geom.cga.exact.Predicates;
+import org.geolatte.geom.crs.CoordinateReferenceSystem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +24,21 @@ final class GeometryElements {
      */
     static final class Ring {
         final double[] xs, ys;
+        final double[] zs, ms;   // null unless the measures are kept
         final int polygon;
         final int delta;
 
-        Ring(double[] xs, double[] ys, int polygon, int delta) {
-            this.xs = xs;
-            this.ys = ys;
+        Ring(double[][] c, int polygon, int delta) {
+            this.xs = c[0];
+            this.ys = c[1];
+            this.zs = c.length > 2 ? c[2] : null;
+            this.ms = c.length > 2 ? c[3] : null;
             this.polygon = polygon;
             this.delta = delta;
         }
     }
 
+    // with measures: per point {x, y, z, m}, per line {xs, ys, zs, ms}; Z or M is NaN where the geometry has none
     final List<double[]> points = new ArrayList<>();      // {x, y}
     final List<double[][]> lines = new ArrayList<>();     // {xs, ys}, at least 2 distinct positions
     final List<Ring> rings = new ArrayList<>();
@@ -42,9 +47,41 @@ final class GeometryElements {
     double minX = Double.POSITIVE_INFINITY, minY = Double.POSITIVE_INFINITY;
     double maxX = Double.NEGATIVE_INFINITY, maxY = Double.NEGATIVE_INFINITY;
 
+    private boolean measures;
+    private int zIndex = -1, mIndex = -1;
+
     static GeometryElements of(Geometry<?> geometry) {
         GeometryElements elements = new GeometryElements();
         elements.collect(geometry);
+        return elements;
+    }
+
+    /**
+     * The elements, keeping the Z and M coordinates of the positions
+     */
+    static GeometryElements withMeasures(Geometry<?> geometry) {
+        GeometryElements elements = new GeometryElements();
+        elements.measures = true;
+        CoordinateReferenceSystem<?> crs = geometry.getCoordinateReferenceSystem();
+        if (crs.hasZ()) elements.zIndex = 2;
+        if (crs.hasM()) elements.mIndex = crs.getCoordinateDimension() - 1;
+        elements.collect(geometry);
+        return elements;
+    }
+
+    /**
+     * @return the elements without the points (sharing the lines and rings)
+     */
+    GeometryElements withoutPoints() {
+        GeometryElements elements = new GeometryElements();
+        elements.lines.addAll(lines);
+        elements.rings.addAll(rings);
+        elements.polygonCount = polygonCount;
+        elements.dimension = lines.isEmpty() && rings.isEmpty() ? -1 : rings.isEmpty() ? 1 : 2;
+        elements.minX = minX;
+        elements.minY = minY;
+        elements.maxX = maxX;
+        elements.maxY = maxY;
         return elements;
     }
 
@@ -55,10 +92,8 @@ final class GeometryElements {
     private void collect(Geometry<?> geometry) {
         if (geometry.isEmpty()) return;
         if (geometry instanceof Point) {
-            PositionSequence<?> positions = geometry.getPositions();
-            double[] xs = new double[1], ys = new double[1];
-            DouglasPeucker.coordinates(positions, xs, ys);
-            addPoint(xs[0], ys[0]);
+            double[][] c = coordinates(geometry.getPositions());
+            addPoint(c, 0);
         } else if (geometry instanceof LineString) {
             addLine(geometry.getPositions());
         } else if (geometry instanceof Polygon) {
@@ -78,15 +113,33 @@ final class GeometryElements {
         }
     }
 
-    private void addPoint(double x, double y) {
-        points.add(new double[]{x + 0.0, y + 0.0});   // + 0.0 turns -0.0 into 0.0
+    // adds position i of the coordinates
+    private void addPoint(double[][] c, int i) {
+        double x = c[0][i] + 0.0, y = c[1][i] + 0.0;   // + 0.0 turns -0.0 into 0.0
+        points.add(c.length > 2 ? new double[]{x, y, c[2][i], c[3][i]} : new double[]{x, y});
         include(x, y, 0);
     }
 
+    // the coordinates {xs, ys}, or with measures {xs, ys, zs, ms}
+    private double[][] coordinates(PositionSequence<?> positions) {
+        int n = positions.size();
+        double[] xs = new double[n], ys = new double[n];
+        DouglasPeucker.coordinates(positions, xs, ys);
+        if (!measures) return new double[][]{xs, ys};
+        double[] zs = new double[n], ms = new double[n];
+        double[] buffer = new double[Math.max(2, positions.getCoordinateDimension())];
+        for (int i = 0; i < n; i++) {
+            positions.getCoordinates(i, buffer);
+            zs[i] = zIndex >= 0 && zIndex < buffer.length ? buffer[zIndex] : Double.NaN;
+            ms[i] = mIndex >= 2 && mIndex < buffer.length ? buffer[mIndex] : Double.NaN;
+        }
+        return new double[][]{xs, ys, zs, ms};
+    }
+
     private void addLine(PositionSequence<?> positions) {
-        double[][] c = distinct(positions);
+        double[][] c = distinct(coordinates(positions));
         if (c[0].length == 1) {
-            addPoint(c[0][0], c[1][0]);
+            addPoint(c, 0);
             return;
         }
         lines.add(c);
@@ -95,10 +148,10 @@ final class GeometryElements {
 
     private void addRing(PositionSequence<?> positions, int polygon, boolean hole) {
         if (positions.isEmpty()) return;
-        double[][] c = distinct(positions);
+        double[][] c = distinct(coordinates(positions));
         int n = c[0].length;
         if (n == 1) {
-            addPoint(c[0][0], c[1][0]);
+            addPoint(c, 0);
             return;
         }
         int orientation = Predicates.ringOrientation(c[0], c[1], n);
@@ -108,7 +161,7 @@ final class GeometryElements {
             return;
         }
         int delta = hole ? -orientation : orientation;
-        rings.add(new Ring(c[0], c[1], polygon, delta));
+        rings.add(new Ring(c, polygon, delta));
         for (int i = 0; i < n; i++) include(c[0][i], c[1][i], 2);
     }
 
@@ -122,20 +175,26 @@ final class GeometryElements {
 
     // the coordinates without consecutive repeated positions, and with -0.0 replaced by 0.0; may reuse the arrays
     static double[][] distinct(double[] xs, double[] ys) {
+        return distinct(new double[][]{xs, ys});
+    }
+
+    // the same for {xs, ys, ...}: the other arrays follow the positions (the first of repeated positions is kept)
+    static double[][] distinct(double[][] c) {
+        double[] xs = c[0], ys = c[1];
         int n = xs.length;
         int m = 0;
         for (int i = 0; i < n; i++) {
             double x = xs[i] + 0.0, y = ys[i] + 0.0;
             if (m > 0 && xs[m - 1] == x && ys[m - 1] == y) continue;
+            for (int k = 2; k < c.length; k++) c[k][m] = c[k][i];
             xs[m] = x;
             ys[m] = y;
             m++;
         }
         if (m < n) {
-            xs = java.util.Arrays.copyOf(xs, m);
-            ys = java.util.Arrays.copyOf(ys, m);
+            for (int k = 0; k < c.length; k++) c[k] = java.util.Arrays.copyOf(c[k], m);
         }
-        return new double[][]{xs, ys};
+        return c;
     }
 
     private void include(double x, double y, int dim) {

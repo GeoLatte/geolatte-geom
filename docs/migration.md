@@ -11,9 +11,10 @@ keeps working without changes, but some results differ, and two interfaces have 
    ([details](#projectedgeometryoperations-has-new-methods)).
 2. The default `ProjectedGeometryOperations` is no longer `JTSGeometryOperations`. Predicates, `isSimple`,
    `boundary`, `convexHull`, `centroid` and `distance` are now exact or correctly rounded, and give different
-   results in some cases; `distance` returns NaN for an empty geometry, where it returned 0
-   ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
-   `new JTSGeometryOperations()` explicitly.
+   results in some cases; `distance` returns NaN for an empty geometry, where it returned 0. `intersection`,
+   `union`, `difference` and `symmetricDifference` are exact and snap rounded; they accept geometry collections,
+   keep M, and return typed empty results ([details](#the-default-projectedgeometryoperations-changed)). To keep
+   the old results, use `new JTSGeometryOperations()` explicitly.
 3. `LineString.isRing()` now also requires the line string to be simple
    ([details](#linestringisring-requires-simplicity)). Use `isClosed()` for the old meaning.
 4. The predicates of `NumericalMethods` are exact, and reject NaN and infinite coordinates
@@ -48,9 +49,15 @@ It also has new default methods, which implementations inherit:
 | `perimeter(g)` | the sum of the lengths of the rings of a polygonal geometry (`ST_Perimeter`), in floating point; NaN if empty |
 | `exactPerimeter(g)` | the perimeter, correctly rounded as `exactLength`; NaN if empty |
 | `pointOnSurface(g)` | a point in the interior of a polygonal geometry (`ST_PointOnSurface`); an empty point if empty |
+| `unaryUnion(g)` | the union of the elements of `g` (e.g. the overlapping members of a collection), as a valid geometry |
 
-`JTSGeometryOperations` implements `perimeter` and `pointOnSurface` with JTS (`getLength()` and
-`getInteriorPoint()`).
+`JTSGeometryOperations` implements `perimeter`, `pointOnSurface` and `unaryUnion` with JTS (`getLength()`,
+`getInteriorPoint()` and `UnaryUnionOp`).
+
+The interface also has new default methods, which need no implementation: overloads of `intersection`, `union`,
+`difference`, `symmetricDifference` and `unaryUnion` with a `Grid` parameter, and `reducePrecision(g, grid)` (see
+[Fixed grids](#fixed-grids-replace-jts-precision-models)). `JTSGeometryOperations` implements them with JTS
+`OverlayNG`, `UnaryUnionNG` and `GeometryPrecisionReducer`.
 
 The six abstract methods only break classes that implement the interface. Callers are not affected. Both
 implementations in the library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A
@@ -71,7 +78,8 @@ The new default computes these operations exactly, with the classes in `org.geol
 - `boundary`, with `Boundary`;
 - `convexHull`, with `ConvexHull`;
 - `centroid`, correctly rounded, with `Centroid`;
-- `distance`, correctly rounded, with `Distance`.
+- `distance`, correctly rounded, with `Distance`;
+- `intersection`, `union`, `difference` and `symmetricDifference`, exactly and snap rounded, with `Overlay`.
 
 `area` is computed with `Area.fast`, in plain floating point arithmetic, as fast as JTS and with the same kind
 of rounding errors. The results can differ from those of JTS in the last bits. The new `exactArea` returns the
@@ -80,8 +88,7 @@ correctly rounded area.
 `length` is computed with `Length.fast`, which sums the same floating point segment lengths in the same order as
 JTS, and gives the same results. The new `exactLength` returns the correctly rounded length.
 
-`reverse`, `buffer`, `intersection`, `union`, `difference` and `symmetricDifference` are still delegated to JTS,
-and behave as before.
+`reverse` and `buffer` are still delegated to JTS, and behave as before.
 
 `JTSGeometryOperations` itself is unchanged, apart from the new methods. To get the version 1 behaviour for all
 operations, use it directly:
@@ -230,6 +237,62 @@ distance(POINT EMPTY, POINT (1 1))
   now:       NaN
 ```
 
+### The set operations are exact and snap rounded
+
+`intersection`, `union`, `difference` and `symmetricDifference` now use `Overlay` instead of the legacy JTS
+`OverlayOp` (with snapping if needed). Every topological decision is exact, and the result is snap rounded to the
+double grid, so it is always valid (see [Exact computational geometry](exact-cga.md#overlay)). The point set
+semantics are the same, so in ordinary cases the results are the same point sets. The differences:
+
+- **Geometry collections are accepted**, with union semantics: their members may overlap. Version 1 rejected
+  collections with overlapping members (JTS throws a `TopologyException`).
+- **Empty results are typed by the dimension of the result.** Version 1 returned an empty `Point` when an operand
+  was empty. Now the intersection of a polygon with an empty polygon is an empty `Polygon`.
+- **The result is normalised also when an operand is empty.** In version 1, the union with an empty geometry
+  returned the other operand unchanged. Now it is the union of its elements: a multipolygon with overlapping
+  members becomes a valid polygon. The new `unaryUnion` does the same for one geometry.
+- **Z and M are kept.** A vertex keeps the Z and M of the input vertex (of the first operand if both have one),
+  and a new vertex gets them interpolated along the segment of the first operand. Version 1 averaged the Z values
+  of the two segments at a crossing, and lost M.
+- **Shells are counterclockwise and holes clockwise**; JTS returns the reverse. Rings may start at another
+  vertex.
+- **Coordinates can differ in the last bits.** A crossing point is now the double nearest to the exact crossing.
+- **Lines are merged** through nodes where only two result edges meet, except at the endpoints of input lines.
+
+The polygons of the operands must be valid, as for the predicates. Invalid input does not throw, but the result is
+then undefined.
+
+The operations are about 1.5 to 2.5 times slower than JTS OverlayNG on large inputs, and comparable to the legacy
+`OverlayOp` (see [Performance](exact-cga.md#overlay)).
+
+### Fixed grids replace JTS precision models
+
+Version 1 had no way to round results to a fixed precision, other than through JTS. The set operations now have
+overloads with a `org.geolatte.geom.cga.Grid`, and there is a new `reducePrecision`:
+
+```java
+Grid mm = Grid.fixed("0.001");           // or Grid.fixed(0.001), or Grid.ofScale(1000)
+Geometry<C2D> i = ops.intersection(a, b, mm);
+Geometry<C2D> r = ops.reducePrecision(g, mm);
+```
+
+| JTS | geolatte-geom 2 |
+|---|---|
+| `new PrecisionModel(1000)` | `Grid.ofScale(1000)` or `Grid.fixed("0.001")` |
+| `new PrecisionModel(-10)` (grid size 10) | `Grid.fixed(10)` |
+| `new PrecisionModel()` (floating) | `Grid.DOUBLE` |
+| `OverlayNG.overlay(a, b, op, pm)` | `ops.intersection(a, b, grid)`, etc., or `Overlay.overlay(a, b, op, grid)` |
+| `GeometryPrecisionReducer.reduce(g, pm)` | `ops.reducePrecision(g, grid)` |
+
+`JTS.toPrecisionModel(grid)` converts a `Grid` to a JTS `PrecisionModel`, for code that still calls JTS.
+
+The cell size is an exact decimal, and coordinates are rounded exactly: halves round up as in JTS, but JTS
+rounds `x * scale` in floating point, so a coordinate within an ulp of a half can round the other way (JTS rounds
+0.0045 to 0.005 at scale 1000; the double 0.0045 is just below 0.0045, so `Grid` gives 0.004). A scale whose
+reciprocal is not a finite decimal (such as 3) is rejected; use `Grid.fixed` with the cell size instead. Results
+are valid, with every vertex on the grid; parts thinner than a cell are dropped, as in OverlayNG. See
+[Fixed grids](exact-cga.md#overlay).
+
 ### `isValid` is new
 
 `isValid` follows the Simple Features rules, as JTS `IsValidOp` does, and is exact. `Validity.of(geometry)` also
@@ -323,11 +386,16 @@ The following is new and does not change existing behaviour:
   - `Summation`: exact sums of (products of) doubles, with correctly rounded values and quotients;
   - `PolygonMoments`: the correctly rounded area and centroid of polygon rings;
   - `MinimumDistance` and `LengthSum`: the correctly rounded distance and length;
+  - `RoundingCell`: exact predicates on the rounding cells of double points, for snap rounding;
+  - `GridCell`: exact predicates on the cells of a fixed decimal grid, and exact rounding to it;
   - building blocks: `Interval`, `ExactSum`, `Essa`.
 - `org.geolatte.geom.cga`:
   - `Relate`, `PreparedRelate`, `IntersectionMatrix`, `Location` and `PointLocator`;
   - `Simplicity`, `Validity` and `Boundary`;
   - `Area`, `Centroid`, `Distance`, `Length` and `PointOnSurface`;
+  - `Overlay`: intersection, union, difference, symmetric difference, unary union and precision reduction, on the
+    double grid or a fixed `Grid`;
+  - `Grid`: the double grid, and fixed grids with a decimal cell size (`Grid.fixed`, `Grid.ofScale`);
   - `ConvexHull`, `DouglasPeucker` (optionally preserving topology), `DelaunayTriangulation` and
     `VoronoiDiagram`.
 - `LineSegment.classifyIntersection`, `intersects` and `intersection`, with the new `SegmentIntersection` and

@@ -28,8 +28,13 @@ import org.locationtech.jts.operation.buffer.BufferOp;
 import org.locationtech.jts.operation.distance.DistanceOp;
 import org.locationtech.jts.operation.overlay.OverlayOp;
 import org.locationtech.jts.operation.overlay.snap.SnapIfNeededOverlayOp;
+import org.locationtech.jts.operation.overlayng.OverlayNG;
+import org.locationtech.jts.operation.overlayng.UnaryUnionNG;
+import org.locationtech.jts.precision.GeometryPrecisionReducer;
 import org.locationtech.jts.operation.relate.RelateOp;
+import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.locationtech.jts.operation.valid.IsValidOp;
+import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
 
@@ -249,6 +254,18 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code UnaryUnionOp}.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> unaryUnion(final Geometry<P> geometry) {
+        if (geometry.isEmpty()) return geometry;
+        org.locationtech.jts.geom.Geometry union = UnaryUnionOp.union(JTS.to(geometry));
+        return JTS.from(union, geometry.getCoordinateReferenceSystem());
+    }
+
     @Override
     public <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
         checkCompatibleCRS(geometry, other);
@@ -270,6 +287,89 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
                 checkNotGeometryCollection(other);
                 org.locationtech.jts.geom.Geometry symDifference = SnapIfNeededOverlayOp.overlayOp(JTS.to(geometry), JTS.to(other), OverlayOp.SYMDIFFERENCE);
                 return JTS.from(symDifference, geometry.getCoordinateReferenceSystem());
+    }
+
+    // the overlay operations on a grid: on a fixed grid with JTS OverlayNG and the corresponding precision model
+
+    private <P extends C2D> Geometry<P> overlayNG(Geometry<P> geometry, Geometry<P> other, int op, Grid grid) {
+        checkCompatibleCRS(geometry, other);
+        org.locationtech.jts.geom.Geometry result = OverlayNG.overlay(JTS.to(geometry), JTS.to(other), op,
+                JTS.toPrecisionModel(grid));
+        return JTS.from(result, geometry.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code OverlayNG} with the precision model of the grid
+     * ({@link JTS#toPrecisionModel(Grid)}) for a fixed grid.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other,
+                                                    final Grid grid) {
+        if (!grid.isFixed()) return intersection(geometry, other);
+        return overlayNG(geometry, other, OverlayNG.INTERSECTION, grid);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code OverlayNG} for a fixed grid.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other, final Grid grid) {
+        if (!grid.isFixed()) return union(geometry, other);
+        return overlayNG(geometry, other, OverlayNG.UNION, grid);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code OverlayNG} for a fixed grid.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other,
+                                                  final Grid grid) {
+        if (!grid.isFixed()) return difference(geometry, other);
+        return overlayNG(geometry, other, OverlayNG.DIFFERENCE, grid);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code OverlayNG} for a fixed grid.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other,
+                                                           final Grid grid) {
+        if (!grid.isFixed()) return symmetricDifference(geometry, other);
+        return overlayNG(geometry, other, OverlayNG.SYMDIFFERENCE, grid);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code UnaryUnionNG} for a fixed grid.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> unaryUnion(final Geometry<P> geometry, final Grid grid) {
+        if (!grid.isFixed()) return unaryUnion(geometry);
+        org.locationtech.jts.geom.Geometry union = UnaryUnionNG.union(JTS.to(geometry), JTS.toPrecisionModel(grid));
+        return JTS.from(union, geometry.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code GeometryPrecisionReducer}; for the double grid it returns the unary
+     * union.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> reducePrecision(final Geometry<P> geometry, final Grid grid) {
+        if (!grid.isFixed()) return unaryUnion(geometry);
+        org.locationtech.jts.geom.Geometry reduced =
+                GeometryPrecisionReducer.reduce(JTS.to(geometry), JTS.toPrecisionModel(grid));
+        return JTS.from(reduced, geometry.getCoordinateReferenceSystem());
     }
 
     @Override

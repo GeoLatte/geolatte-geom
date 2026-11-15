@@ -21,7 +21,11 @@
  *     rings;</li>
  *     <li>{@link org.geolatte.geom.cga.exact.MinimumDistance}: the correctly rounded minimum of point-point and
  *     point-segment distances (the square root of a rational);</li>
- *     <li>{@link org.geolatte.geom.cga.exact.LengthSum}: the correctly rounded sum of segment lengths.</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.LengthSum}: the correctly rounded sum of segment lengths;</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.RoundingCell}: exact predicates on the rounding cells of double
+ *     points, the pixels of snap rounding;</li>
+ *     <li>{@link org.geolatte.geom.cga.exact.GridCell}: exact predicates on the cells of a fixed grid with a
+ *     decimal cell size, and exact rounding to it.</li>
  * </ul>
  *
  * <p>Predicates are exact: their result is the result for the given double coordinates as exact real numbers.

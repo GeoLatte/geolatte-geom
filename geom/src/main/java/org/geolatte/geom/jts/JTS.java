@@ -506,5 +506,22 @@ public class JTS {
             return (CoordinateSequence) geometry.getPositions();
         }
     }
-}
 
+    /**
+     * Returns the JTS {@code PrecisionModel} for a grid: a floating precision model for the double grid; for a fixed
+     * grid one with scale 1 / size (if the size is less than 1) or with grid size {@code size}.
+     *
+     * <p>A JTS precision model rounds with floating point arithmetic, so a coordinate within a few units in the last
+     * place of a half may round differently than with {@link org.geolatte.geom.cga.Grid#round(double)}, which is
+     * exact; and the scale of a cell size such as 0.03 is not exactly a double.</p>
+     *
+     * @param grid the grid
+     * @return the corresponding JTS precision model
+     */
+    public static PrecisionModel toPrecisionModel(org.geolatte.geom.cga.Grid grid) {
+        if (!grid.isFixed()) return new PrecisionModel();
+        java.math.BigDecimal size = grid.cellSize();
+        if (size.compareTo(java.math.BigDecimal.ONE) >= 0) return new PrecisionModel(-size.doubleValue());
+        return new PrecisionModel(java.math.BigDecimal.ONE.divide(size, java.math.MathContext.DECIMAL64).doubleValue());
+    }
+}

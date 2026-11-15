@@ -69,6 +69,10 @@ The same segment operations are available on `LineSegment` itself: `classifyInte
   point-segment pairs, i.e. the correctly rounded square root of a rational (primitive 6, see below).
 - **`LengthSum`**: the sum of the lengths of segments, correctly rounded in practice and faithfully rounded always
   (see below).
+- **`RoundingCell`**: exact predicates on the rounding cells of double points, the pixels of snap rounding
+  (primitive 7, see `Overlay` below): whether a segment meets a cell, and in which order it enters two cells.
+- **`GridCell`**: the same predicates for the cells of a fixed grid with a decimal cell size, and the exact
+  rounding of a coordinate or of the crossing point of two segments to that grid (see `Overlay` below).
 
 ## Algorithms in `cga`
 
@@ -413,6 +417,140 @@ On nearly degenerate polygons they differ: for 100,000 nearly collinear triangle
 `PointOnSurface` never returned a point outside; in 20 % of the cases no double was found in the interior along
 the scan lines tried (often there is none), and the result was a vertex.
 
+### `Overlay`
+
+`Overlay.intersection`, `union`, `difference`, `symDifference` and `unaryUnion` (and `overlay(a, b, operation)`)
+compute the overlay of two geometries. They back the set operations of `DefaultProjectedGeometryOperations`, and
+the new `unaryUnion`. Each has an overload with a `Grid`: `Grid.DOUBLE` (the default) or a fixed grid such as
+`Grid.fixed("0.001")` (see *Fixed grids* below). `Overlay.reducePrecision(geometry, grid)` snap rounds a single
+geometry to a grid; it is the unary union on that grid.
+
+**Semantics.** A geometry is the union of its elements, as for `Relate`: the members of a `GeometryCollection` may
+overlap, and each polygon must be valid. The result is the set of points for which the operation holds, so it can
+mix dimensions: the intersection of two squares that share a side is a `LineString`, and the union of a polygon
+and a line that sticks out of it is a `GeometryCollection` of the polygon and the parts of the line outside it.
+Lower dimensional parts that lie on higher dimensional parts of the result are absorbed. An empty result is an
+empty geometry of the dimension of the result (for an intersection the lower dimension of the operands, for a
+difference that of the first operand, otherwise the higher one), as in JTS OverlayNG.
+
+**Guarantee.** All decisions are exact for the input doubles, and the result is snap rounded to the double grid
+(for fixed grids see below):
+
+- the result is valid;
+- each vertex is a vertex of an operand, or the double nearest to a point where two segments cross;
+- each edge passes through the rounding cells (see below) that the exact result passes through, so it lies
+  within one unit in the last place of it;
+- parts of polygons that are thinner than that can collapse; they are dropped, as in OverlayNG;
+- points of an operand that are not on its lines or polygons are located exactly in the other operand.
+
+**Snap rounding on the double grid (primitive 7).** The *rounding cell* of a double point is the set of points of
+the plane whose coordinates round to it: in each axis, from the midpoint with the previous double to the midpoint
+with the next one. Under round half to even, the interval of an even double is closed and that of an odd one is
+open, so the cells tile the plane, and a correctly rounded crossing point lies in its own cell. Doubles are not a
+uniform grid (around a power of 2 the cell is asymmetric), but each cell is convex and contains its point, which
+is all that the argument of Guibas and Marimont needs. `RoundingCell` decides exactly whether a segment meets a
+cell and in which order a segment enters two cells: a floating point filter decides almost all cases, the rest are
+clipped exactly with rational arithmetic (Liang–Barsky on `BigDecimal` fractions, respecting the open and closed
+sides).
+
+The *hot pixels* are the cells of all vertices of the lines and rings of both operands, and of the correctly
+rounded crossing points of their segments (found with the monotone chains of `Relate`). Each segment is replaced
+by the polyline through the points of the hot pixels it meets, in the order in which it enters them (Hobby's snap
+rounding). The vertices do not move. The snapped segments are then checked exactly: a vertex that lies in the
+interior of another snapped segment is inserted into it, and so are the ends of overlapping segments, so that
+the chains share vertices and identical segments. Should two snapped segments still cross, their rounded crossing
+point becomes a hot pixel and the snapping is repeated. That has not happened in any test; it is a safeguard.
+
+**Fixed grids.** `Grid.fixed(size)` takes a decimal cell size g (a `BigDecimal`, a string such as `"0.001"`, or
+a double read as its shortest decimal, so `0.001` is one thousandth); `Grid.ofScale(scale)` takes the number of
+cells per unit, as JTS's `PrecisionModel`, and requires 1 / scale to be a finite decimal. The grid points are
+(i g, j g). The cell of a grid point is the half-open square [(i − ½) g, (i + ½) g) × [(j − ½) g, (j + ½) g), so
+a coordinate v rounds to floor(v / g + ½) g: halves round up, as in JTS. The cells tile the plane. A grid point
+such as 0.001 is in general not a double, so it is represented by the double nearest to it, which lies inside
+the cell as long as the cell is wider than the spacing of the doubles there. The operations check this for the
+coordinates of the operands, and throw an `IllegalArgumentException` otherwise: a cell size of 0.001 works up to
+coordinates of about 10¹², far beyond projected coordinates.
+
+The snap rounding is the same as on the double grid, with the cells of the fixed grid as pixels: the hot pixels
+are the cells that contain a vertex, or the exact crossing point of two segments (located exactly, with a
+`BigDecimal` fallback near cell boundaries, not via a rounded double). Each segment becomes the polyline through
+the grid points of the hot pixels it meets, from the grid point of its start to that of its end, so vertices
+move to their grid points. Hobby's argument only needs convex cells that tile the plane and contain their
+representative points; the exact check of the snapped segments makes the result crossing free in any case.
+`GridCell` decides the cell predicates exactly, with floating point filters and an exact `BigDecimal` fallback.
+
+The guarantee carries over: the result is valid (checked exactly on its doubles), each vertex is a grid point,
+each edge passes through the cells that the exact result passes through, and parts thinner than a cell collapse
+and are dropped — including lines and polygons that collapse to a point, and polygons that collapse to a line,
+as in OverlayNG. Snapping can make operands meet that did not: squares 0.0004 apart share a side on a millimetre
+grid. Points of an operand that are not on its lines or polygons are located exactly in the original operands,
+then rounded to their grid point, and dropped if that lies on a line or polygon of the result. A vertex takes the
+Z and M of the first input vertex (of the first operand first) that rounds to it.
+
+Snap rounding is not idempotent: an edge of a result can pass through the cell of another vertex of it, so
+rounding the result again can move that edge to the vertex (in 7 % of random star polygons with grids of a few
+percent of their size). This holds for JTS's snap rounding as well. Iterated snap rounding would avoid it, at the
+cost of the bound of one cell on the displacement.
+
+JTS rounds with floating point arithmetic: `PrecisionModel.makePrecise(0.0045)` with scale 1000 gives 0.005,
+because 0.0045 × 1000 rounds to 4.5. The double 0.0045 is slightly less than 0.0045, so `Grid.round` gives 0.004.
+
+**Algorithm.** The snapped segments become the edges of a planar graph. Equal segments are merged, with per
+operand a flag for lines and the sum of the deltas of the rings along it (the change of the number of polygons
+from its right to its left). Edges of collapsed polygon parts sum to zero and are dropped. The edges around each
+node are sorted with exact direction comparisons, and the depths (number of polygons) of the faces are propagated
+around the nodes and along the edges, starting for each connected component from the face to the left of its
+smallest node, whose depth is counted exactly along a ray. This gives each face, edge and node a location relative
+to each operand, as in `Relate`. The result consists of the faces for which the operation holds; the edges for
+which it holds, outside such faces; and the nodes for which it holds, outside both.
+
+The boundary of the result faces is traced with the result to the left, splitting traces at repeated nodes into
+simple rings. Counterclockwise rings are shells, clockwise rings holes. Each hole goes to the innermost shell that
+contains it, decided with a node of the hole that is not on the shell. Result edges are merged into maximal lines
+through nodes where only two of them meet, except at the endpoints of input lines; a line follows the direction of
+the first input line along it.
+
+**Z and M.** The result has the coordinate reference system of the first operand. A vertex keeps the Z and M of
+the input vertex at the same position (of the first operand if both have one). A new vertex gets the values
+interpolated along the segment of the input it was created on (of the first operand, if both have one), at the
+projection of the vertex on it.
+
+**Tests.** Unions of random grid cells are computed exactly (no coordinate is rounded): the areas of all results
+equal the cell counts, and the identities A = (A − B) ∪ (A ∩ B), A △ B = (A ∪ B) − (A ∩ B) and commutativity hold
+exactly. On random star polygons with holes, also at projected coordinates, the areas agree with JTS 1.19
+OverlayNG within a relative 10⁻¹², and so does the area of the symmetric difference of the two results. Polygons
+overlaid with copies of themselves moved by a few ulps or rotated by 10⁻¹⁴ radians, and polygons whose vertices
+all lie within a few ulps, always give valid results. On fixed grids (0.001, 0.03, 0.5, 7), random star polygons
+give valid results with all vertices on the grid, with areas within 2 g × the perimeters of those of OverlayNG
+with the corresponding `PrecisionModel`; a scratch stress run of 24,000 overlays of star polygons, copies shifted
+by a fraction of a cell, and collections of lines and points, on six grids, gave no invalid result and no
+exception. `GridCell` is checked against an independent rational oracle, and `SnapRounder` on 60,000 random sets
+of chains on fixed grids.
+
+**Performance.** Per operation, after warm up:
+
+| Operands | `Overlay` | OverlayNG (robust) | `OverlayOp` (legacy, snap if needed) |
+|---|---|---|---|
+| two polygons of 1,000 vertices | ≈ 0.7–2 ms | ≈ 1 ms | ≈ 0.6 ms |
+| two polygons of 10,000 vertices | ≈ 8 ms | ≈ 5 ms | ≈ 4 ms |
+| two polygons of 100,000 vertices | ≈ 170–220 ms | ≈ 160 ms | ≈ 145 ms |
+| a multipolygon of 10,000 squares and a polygon of 1,000 vertices | ≈ 65 ms | ≈ 28 ms | ≈ 145 ms |
+
+The time grows with the number of crossings. Two polygons of 32,000 vertices with long spikes that cross 330,000
+times take ≈ 2.5 s, against ≈ 2.9 s for OverlayNG.
+
+On a millimetre grid (`Grid.fixed("0.001")`), against OverlayNG with the corresponding fixed `PrecisionModel`, and
+`reducePrecision` against JTS `GeometryPrecisionReducer`:
+
+| Operands | `Overlay`, grid 0.001 | OverlayNG, scale 1000 | `reducePrecision` | `GeometryPrecisionReducer` |
+|---|---|---|---|---|
+| two polygons of 1,000 vertices | ≈ 1.7 ms | ≈ 1.6 ms | ≈ 1.1 ms | ≈ 0.9 ms |
+| two polygons of 10,000 vertices | ≈ 7 ms | ≈ 9 ms | ≈ 4 ms | ≈ 6 ms |
+| two polygons of 100,000 vertices | ≈ 160 ms | ≈ 175 ms | ≈ 70 ms | ≈ 125 ms |
+| a multipolygon of 10,000 squares and a polygon of 1,000 vertices | ≈ 55 ms | ≈ 55 ms | | |
+
+A fixed grid costs about as much as the double grid.
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -480,13 +618,15 @@ There are two kinds of operation, with different guarantees:
 | `PointOnSurface` | **done** | `PointOnSurface`: in the interior, decided exactly |
 | `Distance` | **done** | `Distance`: correctly rounded; NaN for an empty operand |
 | `Length`, `Perimeter` | **done** | `Length.of`: correctly rounded (`exactLength`, `exactPerimeter`); `Length.fast`: floating point (`length`, `perimeter`) |
-| `Intersection`, `Union`, `Difference`, `SymDifference` | to do | noding, graph labelling, polygon assembly, and snap rounding of the output (primitive 7) |
+| `Intersection`, `Union`, `Difference`, `SymDifference` (and `unaryUnion`) | **done** | `Overlay`: exact decisions, snap rounded to the double grid or a fixed grid (primitive 7); point set semantics |
+| precision reduction (PostGIS `ST_ReducePrecision`) | **done** | `Overlay.reducePrecision`: snap rounded to a fixed grid, valid |
 | `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
 | `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
 
 ### Primitives
 
-Primitives 1–6 are done: 1–4 make up the relate engine, 5 gives the area and the centroid, 6 the distance.
+All primitives are done: 1–4 make up the relate engine, 5 gives the area and the centroid, 6 the distance, and 7
+the overlay.
 
 1. **Ordering of implicit intersection points** (done): `orientationOfCrossing` compares a crossing point with
    a line, which orders crossings along a segment and decides whether two crossings coincide. Crossing points
@@ -499,10 +639,11 @@ Primitives 1–6 are done: 1–4 make up the relate engine, 5 gives the area and
    `PolygonMoments`, for `Area` and `Centroid`.
 6. **Correctly rounded square root of a rational** (done): `MinimumDistance`, for `Distance`. The distance
    from a point to a segment is √(cross² / |ab|²).
-7. **Snap rounding.** Overlay output vertices are rounded crossing points, which in general do not lie on
-   either segment. Without snap rounding the output can become invalid (slivers, new self-intersections).
-   Doubles do not form a uniform grid, which complicates the classic hot-pixel algorithm. This is the main
-   design question for the constructive operations.
+7. **Snap rounding** (done): overlay output vertices are rounded crossing points, which in general do not lie on
+   either segment; without snap rounding the output can become invalid. `SnapRounder` uses the rounding cells
+   of the doubles as pixels (`RoundingCell`): they are not uniform, but they tile the plane and contain their
+   points, which is what Hobby's snap rounding needs. A fixed grid with a decimal cell size (`Grid.fixed`) uses
+   the cells of `GridCell` instead; `Grid` hides the difference from `SnapRounder`.
 
 ### Order of work
 
@@ -510,4 +651,5 @@ Primitives 1–6 are done: 1–4 make up the relate engine, 5 gives the area and
    `IsValid` and `Boundary` are done as well, on its monotone chains and exact angular ordering.
 2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length` are **done**.
 3. **`PointOnSurface`**, **done**.
-4. **Overlay** with snap rounding, followed by **`Buffer`** on top of it.
+4. **Overlay** with snap rounding, **done**.
+5. **`Buffer`**, on top of the overlay: offset curves, followed by a union.

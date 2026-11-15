@@ -21,6 +21,9 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.Grid;
+import org.geolatte.geom.cga.Overlay;
+
 /**
 * Defines standard operations on {@code Geometry}s with projected coordinate systems.
 *
@@ -220,6 +223,12 @@ public interface ProjectedGeometryOperations {
     /**
      * Calculates the point set intersection of the specified <code>Geometry</code>s.
      *
+     * <p>{@link DefaultProjectedGeometryOperations} computes the overlay operations ({@code intersection},
+     * {@code union}, {@code difference}, {@code symmetricDifference} and {@code unaryUnion}) exactly, snap rounded to
+     * the double grid, with {@link Overlay}: the result is valid, can mix dimensions (as a
+     * {@code GeometryCollection}), and the operands can be geometry collections (with union semantics). Each has an
+     * overload that snap rounds to a {@link Grid}, such as a fixed grid with a cell size of 0.001.</p>
+     *
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
      * @return a <code>Geometry</code> representing the point set intersection between the two specified <code>Geometries</code>
@@ -232,8 +241,24 @@ public interface ProjectedGeometryOperations {
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
      * @return a <code>Geometry</code> representing the point set union between the two specified <code>Geometries</code>
+     * @see #intersection(Geometry, Geometry)
      */
     <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Calculates the point set union of the elements of the specified {@code Geometry}: the members of a
+     * collection, which may overlap, merged into a valid geometry.
+     *
+     * <p>The default implementation uses {@link Overlay#unaryUnion(Geometry)}.</p>
+     *
+     * @param geometry the Geometry
+     * @return a <code>Geometry</code> representing the point set union of the elements of the Geometry
+     * @throws IllegalArgumentException if a coordinate is NaN or infinite
+     * @see #intersection(Geometry, Geometry)
+     */
+    default <P extends C2D> Geometry<P> unaryUnion(final Geometry<P> geometry) {
+        return Overlay.unaryUnion(geometry);
+    }
 
     /**
      * Calculates the point set difference of the specified <code>Geometry</code>s.
@@ -241,6 +266,7 @@ public interface ProjectedGeometryOperations {
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
      * @return a <code>Geometry</code> representing the point set difference between the two specified <code>Geometries</code>
+     * @see #intersection(Geometry, Geometry)
      */
     <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other);
 
@@ -250,8 +276,121 @@ public interface ProjectedGeometryOperations {
      * @param geometry the first <code>Geometry</code>
      * @param other    the second <code>Geometry</code>
      * @return a <code>Geometry</code> representing the point set symmetric difference between the two specified <code>Geometries</code>
+     * @see #intersection(Geometry, Geometry)
      */
     <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other);
+
+    /**
+     * Calculates the point set intersection of the specified {@code Geometry}s, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Overlay#intersection(Geometry, Geometry, Grid)}.</p>
+     *
+     * @param geometry the first {@code Geometry}
+     * @param other    the second {@code Geometry}
+     * @param grid     the grid: {@link Grid#DOUBLE}, or a fixed grid such as {@code Grid.fixed("0.001")}
+     * @return a {@code Geometry} representing the point set intersection, with its vertices on the grid
+     * @throws IllegalArgumentException if the geometries have different coordinate reference systems, or a
+     *                                  coordinate is NaN, infinite, or too large for the grid
+     * @see #intersection(Geometry, Geometry)
+     */
+    default <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other,
+                                                     final Grid grid) {
+        checkSameCrs(geometry, other);
+        return Overlay.intersection(geometry, other, grid);
+    }
+
+    /**
+     * Calculates the point set union of the specified {@code Geometry}s, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Overlay#union(Geometry, Geometry, Grid)}.</p>
+     *
+     * @param geometry the first {@code Geometry}
+     * @param other    the second {@code Geometry}
+     * @param grid     the grid
+     * @return a {@code Geometry} representing the point set union, with its vertices on the grid
+     * @throws IllegalArgumentException if the geometries have different coordinate reference systems, or a
+     *                                  coordinate is NaN, infinite, or too large for the grid
+     * @see #intersection(Geometry, Geometry, Grid)
+     */
+    default <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other, final Grid grid) {
+        checkSameCrs(geometry, other);
+        return Overlay.union(geometry, other, grid);
+    }
+
+    /**
+     * Calculates the point set difference of the specified {@code Geometry}s, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Overlay#difference(Geometry, Geometry, Grid)}.</p>
+     *
+     * @param geometry the first {@code Geometry}
+     * @param other    the second {@code Geometry}
+     * @param grid     the grid
+     * @return a {@code Geometry} representing the point set difference, with its vertices on the grid
+     * @throws IllegalArgumentException if the geometries have different coordinate reference systems, or a
+     *                                  coordinate is NaN, infinite, or too large for the grid
+     * @see #intersection(Geometry, Geometry, Grid)
+     */
+    default <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other,
+                                                   final Grid grid) {
+        checkSameCrs(geometry, other);
+        return Overlay.difference(geometry, other, grid);
+    }
+
+    /**
+     * Calculates the point set symmetric difference of the specified {@code Geometry}s, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Overlay#symDifference(Geometry, Geometry, Grid)}.</p>
+     *
+     * @param geometry the first {@code Geometry}
+     * @param other    the second {@code Geometry}
+     * @param grid     the grid
+     * @return a {@code Geometry} representing the point set symmetric difference, with its vertices on the grid
+     * @throws IllegalArgumentException if the geometries have different coordinate reference systems, or a
+     *                                  coordinate is NaN, infinite, or too large for the grid
+     * @see #intersection(Geometry, Geometry, Grid)
+     */
+    default <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other,
+                                                            final Grid grid) {
+        checkSameCrs(geometry, other);
+        return Overlay.symDifference(geometry, other, grid);
+    }
+
+    /**
+     * Calculates the point set union of the elements of the specified {@code Geometry}, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Overlay#unaryUnion(Geometry, Grid)}.</p>
+     *
+     * @param geometry the Geometry
+     * @param grid     the grid
+     * @return a {@code Geometry} representing the point set union of the elements, with its vertices on the grid
+     * @throws IllegalArgumentException if a coordinate is NaN, infinite, or too large for the grid
+     * @see #unaryUnion(Geometry)
+     */
+    default <P extends C2D> Geometry<P> unaryUnion(final Geometry<P> geometry, final Grid grid) {
+        return Overlay.unaryUnion(geometry, grid);
+    }
+
+    /**
+     * Reduces the precision of the specified {@code Geometry} to a grid: snap rounds it to the grid, and makes it
+     * valid. Overlapping elements are merged, crossing lines are noded, and parts that collapse to a lower
+     * dimension are dropped. This is the same as {@link #unaryUnion(Geometry, Grid)}.
+     *
+     * <p>The default implementation uses {@link Overlay#reducePrecision(Geometry, Grid)}.</p>
+     *
+     * @param geometry the Geometry
+     * @param grid     the grid, such as {@code Grid.fixed("0.001")}
+     * @return the valid {@code Geometry}, with its vertices on the grid
+     * @throws IllegalArgumentException if a coordinate is NaN, infinite, or too large for the grid
+     */
+    default <P extends C2D> Geometry<P> reducePrecision(final Geometry<P> geometry, final Grid grid) {
+        return Overlay.reducePrecision(geometry, grid);
+    }
+
+    private static void checkSameCrs(Geometry<?> geometry, Geometry<?> other) {
+        if (!geometry.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem())) {
+            throw new IllegalArgumentException("Geometries have different CRS's");
+        }
+    }
 
     /**
      * Calculates the length of the specified {@code Geometry}.

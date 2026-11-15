@@ -25,7 +25,9 @@ import org.geolatte.geom.cga.Boundary;
 import org.geolatte.geom.cga.Centroid;
 import org.geolatte.geom.cga.ConvexHull;
 import org.geolatte.geom.cga.Distance;
+import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.cga.Length;
+import org.geolatte.geom.cga.Overlay;
 import org.geolatte.geom.cga.Relate;
 import org.geolatte.geom.cga.Simplicity;
 import org.geolatte.geom.cga.Validity;
@@ -43,7 +45,12 @@ import org.geolatte.geom.cga.Validity;
  * correctly rounded except extremely close to a midpoint between two doubles, where it is faithfully rounded, with
  * {@link Length#of}, as is {@code exactPerimeter}. {@code area}, {@code length} and {@code perimeter} are computed
  * in plain floating point, with {@link Area#fast} and {@link Length#fast}. {@code pointOnSurface} is computed with
- * {@link org.geolatte.geom.cga.PointOnSurface}, which decides exactly that the point is in the interior. The other operations do not have an exact implementation yet; they are delegated to a
+ * {@link org.geolatte.geom.cga.PointOnSurface}, which decides exactly that the point is in the interior.
+ * {@code intersection}, {@code union}, {@code difference}, {@code symmetricDifference} and {@code unaryUnion} are
+ * computed exactly and snap rounded to the double grid with {@link Overlay}: the results are valid, the operands can
+ * be geometry collections, and an empty result is an empty geometry of the dimension of the result. Their overloads
+ * with a {@link Grid}, and {@code reducePrecision}, snap round to that grid instead. The other
+ * operations ({@code buffer}) do not have an exact implementation yet; they are delegated to a
  * {@link JTSGeometryOperations}.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
@@ -169,22 +176,22 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
 
     @Override
     public <P extends C2D> Geometry<P> intersection(final Geometry<P> geometry, final Geometry<P> other) {
-        return jts.intersection(geometry, other);
+        return intersection(geometry, other, Grid.DOUBLE);
     }
 
     @Override
     public <P extends C2D> Geometry<P> union(final Geometry<P> geometry, final Geometry<P> other) {
-        return jts.union(geometry, other);
+        return union(geometry, other, Grid.DOUBLE);
     }
 
     @Override
     public <P extends C2D> Geometry<P> difference(final Geometry<P> geometry, final Geometry<P> other) {
-        return jts.difference(geometry, other);
+        return difference(geometry, other, Grid.DOUBLE);
     }
 
     @Override
     public <P extends C2D> Geometry<P> symmetricDifference(final Geometry<P> geometry, final Geometry<P> other) {
-        return jts.symmetricDifference(geometry, other);
+        return symmetricDifference(geometry, other, Grid.DOUBLE);
     }
 
     @Override

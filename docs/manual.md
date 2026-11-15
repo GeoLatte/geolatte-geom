@@ -412,8 +412,11 @@ You get an implementation from the `GeometryOperations` factory class. For proje
 - `DefaultProjectedGeometryOperations`, the default. It computes the predicates, `isSimple`, `isValid`, `boundary`
   and `convexHull` exactly, `pointOnSurface` with an exact check that the point is inside, and `distance`,
   `centroid`, `exactArea`, `exactLength` and `exactPerimeter` correctly rounded (see
-  [Exact computations](#exact-computations)). `area`, `length` and `perimeter` are computed in plain floating
-  point. It delegates the other operations to [JTS](#jts-interop).
+  [Exact computations](#exact-computations)). It computes the set operations (`intersection`, `union`,
+  `difference`, `symmetricDifference` and `unaryUnion`) exactly, with the result snap rounded to the double grid,
+  or to a fixed grid (and `reducePrecision`).
+  `area`, `length` and `perimeter` are computed in plain floating point. It delegates the other operations
+  (`buffer`) to [JTS](#jts-interop).
 - `JTSGeometryOperations` delegates all operations to JTS. Create one with `new JTSGeometryOperations()` if you
   need the results of version 1 (see [Migrating from version 1](migration.md)).
 
@@ -423,7 +426,7 @@ You get an implementation from the `GeometryOperations` factory class. For proje
 |----------------|---------------------------------------------------------------------------------------------|
 | Predicates     | `intersects`, `disjoint`, `touches`, `crosses`, `within`, `contains`, `overlaps`, `covers`, `coveredBy`, `equalsTopologically`, `relates` (with a DE-9IM pattern) |
 | Well-formedness | `isSimple`, `isValid`                                                                      |
-| Set operations | `intersection`, `union`, `difference`, `symmetricDifference`                                |
+| Set operations | `intersection`, `union`, `difference`, `symmetricDifference`, `unaryUnion`, each also with a `Grid`; `reducePrecision` |
 | Measurements   | `distance`, `length` and `exactLength` (linear geometries), `area`, `exactArea`, `perimeter` and `exactPerimeter` (polygonal geometries) |
 | Constructions  | `buffer`, `convexHull`, `centroid` and `pointOnSurface` (polygonal geometries), `boundary`, `reverse` |
 
@@ -442,6 +445,25 @@ segment lengths (as in JTS), and `exactLength` the correctly rounded length, abo
 `distance` is correctly rounded. It is 0 for geometries that intersect, and NaN if a geometry is empty.
 
 `pointOnSurface` returns a point in the interior of a polygonal geometry (an empty point if it is empty).
+
+The set operations return the point set for which the operation holds, so the result can mix dimensions: the
+intersection of two squares that share a side is a `LineString`, and the union of a polygon and a point outside
+it is a `GeometryCollection`. The operands can be geometry collections, whose members may overlap; `unaryUnion`
+merges the members of one geometry. The result is always valid, its vertices are input vertices or the doubles
+nearest to crossing points, and it keeps the Z and M of the operands (interpolated at new vertices). An empty
+result is an empty geometry of the dimension of the result, such as `POLYGON EMPTY` for the intersection of two
+disjoint polygons.
+
+To round the result to a fixed precision, pass a `Grid` (from `org.geolatte.geom.cga`): `Grid.fixed("0.001")` (or
+`Grid.ofScale(1000)`) rounds every vertex to a millimetre grid. Snapping to the grid can make operands meet, and
+parts thinner than a cell are dropped; the result is still valid. `reducePrecision(geometry, grid)` rounds a
+single geometry to a grid and makes it valid.
+
+```java
+Grid mm = Grid.fixed("0.001");
+Geometry<C2D> union = ops.union(a, b, mm);
+Geometry<C2D> reduced = ops.reducePrecision(geometry, mm);
+```
 
 A predicate with an empty operand is false, except `disjoint`, which is then true, and `equalsTopologically`, which
 is true for two empty geometries. The operands must have the same coordinate reference system; otherwise an
@@ -496,7 +518,9 @@ The exact algorithms are also available directly, in the `org.geolatte.geom.cga`
   point otherwise);
 - `Distance` computes the correctly rounded distance between two geometries, and `Length` the length of any
   geometry (the perimeter of polygons), correctly rounded with `Length.of` or in floating point with
-  `Length.fast`.
+  `Length.fast`;
+- `Overlay` computes the set operations, snap rounded to the double grid or to a fixed `Grid`, and
+  `reducePrecision`.
 
 ```java
 import org.geolatte.geom.cga.*;
