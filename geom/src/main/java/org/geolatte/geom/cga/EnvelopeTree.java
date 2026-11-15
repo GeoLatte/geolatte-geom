@@ -181,6 +181,27 @@ final class EnvelopeTree {
     /**
      * Calls the action with the index of each rectangle that has a point in common with the query rectangle
      */
+    /**
+     * @return the number of rectangles that have a point in common with the query box, or the limit if that is
+     * smaller
+     */
+    int count(double minX, double minY, double maxX, double maxY, int limit) {
+        return count(levels.length, 0, minX, minY, maxX, maxY, 0, limit);
+    }
+
+    private int count(int level, int i, double minX, double minY, double maxX, double maxY, int found, int limit) {
+        if (level == 0) return found + 1;
+        double[] boxes = levels[level - 1];
+        int from = level == levels.length ? 0 : i * NODE_CAPACITY;
+        int to = level == levels.length ? boxes.length / 4 : Math.min(from + NODE_CAPACITY, boxes.length / 4);
+        for (int c = from; c < to && found < limit; c++) {
+            if (boxes[4 * c] <= maxX && minX <= boxes[4 * c + 2] && boxes[4 * c + 1] <= maxY && minY <= boxes[4 * c + 3]) {
+                found = count(level - 1, c, minX, minY, maxX, maxY, found, limit);
+            }
+        }
+        return found;
+    }
+
     void query(double minX, double minY, double maxX, double maxY, IntConsumer action) {
         query(levels.length, 0, minX, minY, maxX, maxY, action);
     }

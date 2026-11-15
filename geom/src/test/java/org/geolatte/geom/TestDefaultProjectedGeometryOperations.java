@@ -1,5 +1,6 @@
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.BufferParameters;
 import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.codec.Wkt;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
@@ -264,6 +265,27 @@ public class TestDefaultProjectedGeometryOperations {
         }
         // a polygon thinner than a cell collapses
         assertTrue(ops.reducePrecision(g("POLYGON ((0 0, 10 0, 10 0.0004, 0 0.0004, 0 0))"), mm).isEmpty());
+    }
+
+    @Test
+    public void bufferWithParameters() {
+        BufferParameters mitre = BufferParameters.DEFAULT.withJoin(BufferParameters.Join.MITRE)
+                .withEndCap(BufferParameters.EndCap.FLAT);
+        for (ProjectedGeometryOperations o : new ProjectedGeometryOperations[]{ops, jts}) {
+            assertTrue(o.equalsTopologically(g("POLYGON ((-1 -1, 5 -1, 5 5, -1 5, -1 -1))"),
+                    o.buffer(g(SQUARE), 1, mitre)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((1 1, 3 1, 3 3, 1 3, 1 1))"), o.buffer(g(SQUARE), -1, mitre)));
+            assertTrue(o.equalsTopologically(g("POLYGON ((0 -1, 4 -1, 4 1, 0 1, 0 -1))"),
+                    o.buffer(g("LINESTRING (0 0, 4 0)"), 1, mitre)));
+            assertEquals(Math.PI, org.geolatte.geom.cga.Area.of(o.buffer(g("POINT (1 1)"), 1)), 0.03);
+            assertTrue(o.buffer(g(SQUARE), -2, mitre).isEmpty());
+            // on a grid of 0.5, the corners of the buffer of a slanted line move to grid points
+            Geometry<C2D> snapped = o.buffer(g("LINESTRING (0 0, 4 3)"), 1, mitre, Grid.fixed("0.5"));
+            for (C2D p : snapped.getPositions()) {
+                assertEquals(0, p.getX() % 0.5, 0);
+                assertEquals(0, p.getY() % 0.5, 0);
+            }
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -21,6 +21,8 @@
 
 package org.geolatte.geom;
 
+import org.geolatte.geom.cga.Buffer;
+import org.geolatte.geom.cga.BufferParameters;
 import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.cga.Overlay;
 
@@ -206,11 +208,52 @@ public interface ProjectedGeometryOperations {
      * <code>Geometry</code>.</p>
      * <p>Z- or M-coordinates are ignored in the buffering operation; and the result will always be a 2D geometry.</p>
      *
+     * <p>A negative distance shrinks the polygons of the geometry; lines and points then give an empty result.
+     * Arcs are approximated with 8 segments per quadrant, and lines get round end caps and joins
+     * ({@link BufferParameters#DEFAULT}).</p>
+     *
      * @param geometry the <code>Geometry</code> for which to calculate the buffer
      * @param distance the buffer distance
      * @return a 2D <code>Geometry</code> representing the buffer of the specified <code>Geometry</code> with the specified distance.
      */
     <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance);
+
+    /**
+     * Calculates the buffer of the specified {@code Geometry}, with the given style: the number of segments per
+     * quadrant that approximate an arc, the end caps of lines, and the joins at the outer corners.
+     *
+     * <p>The default implementation uses {@link Buffer#buffer(Geometry, double, BufferParameters)}: the result is
+     * valid, snap rounded to the double grid.</p>
+     *
+     * @param geometry   the Geometry
+     * @param distance   the buffer distance; negative to shrink the polygons
+     * @param parameters the style, such as {@code BufferParameters.DEFAULT.withEndCap(EndCap.FLAT)}
+     * @return the buffer, a {@code Polygon} or {@code MultiPolygon}, possibly empty
+     * @throws IllegalArgumentException if the distance or a coordinate is NaN or infinite
+     */
+    default <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance,
+                                               final BufferParameters parameters) {
+        return Buffer.buffer(geometry, distance, parameters);
+    }
+
+    /**
+     * Calculates the buffer of the specified {@code Geometry}, with the given style, snap rounded to a grid.
+     *
+     * <p>The default implementation uses {@link Buffer#buffer(Geometry, double, BufferParameters, Grid)}.</p>
+     *
+     * @param geometry   the Geometry
+     * @param distance   the buffer distance; negative to shrink the polygons
+     * @param parameters the style
+     * @param grid       the grid, such as {@code Grid.fixed("0.001")}
+     * @return the buffer, a valid {@code Polygon} or {@code MultiPolygon} with its vertices on the grid, possibly
+     * empty
+     * @throws IllegalArgumentException if the distance or a coordinate is NaN or infinite, or a coordinate is too
+     *                                  large for the grid
+     */
+    default <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance,
+                                               final BufferParameters parameters, final Grid grid) {
+        return Buffer.buffer(geometry, distance, parameters, grid);
+    }
 
     /**
      * Calculates the convex hull of the specified <code>Geometry</code>.

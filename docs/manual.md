@@ -414,9 +414,9 @@ You get an implementation from the `GeometryOperations` factory class. For proje
   `centroid`, `exactArea`, `exactLength` and `exactPerimeter` correctly rounded (see
   [Exact computations](#exact-computations)). It computes the set operations (`intersection`, `union`,
   `difference`, `symmetricDifference` and `unaryUnion`) exactly, with the result snap rounded to the double grid,
-  or to a fixed grid (and `reducePrecision`).
-  `area`, `length` and `perimeter` are computed in plain floating point. It delegates the other operations
-  (`buffer`) to [JTS](#jts-interop).
+  or to a fixed grid (and `reducePrecision`), and `buffer` with exact noding, so its result is always valid.
+  `area`, `length` and `perimeter` are computed in plain floating point. It delegates `reverse` to
+  [JTS](#jts-interop).
 - `JTSGeometryOperations` delegates all operations to JTS. Create one with `new JTSGeometryOperations()` if you
   need the results of version 1 (see [Migrating from version 1](migration.md)).
 
@@ -428,7 +428,7 @@ You get an implementation from the `GeometryOperations` factory class. For proje
 | Well-formedness | `isSimple`, `isValid`                                                                      |
 | Set operations | `intersection`, `union`, `difference`, `symmetricDifference`, `unaryUnion`, each also with a `Grid`; `reducePrecision` |
 | Measurements   | `distance`, `length` and `exactLength` (linear geometries), `area`, `exactArea`, `perimeter` and `exactPerimeter` (polygonal geometries) |
-| Constructions  | `buffer`, `convexHull`, `centroid` and `pointOnSurface` (polygonal geometries), `boundary`, `reverse` |
+| Constructions  | `buffer` (also with `BufferParameters` and a `Grid`), `convexHull`, `centroid` and `pointOnSurface` (polygonal geometries), `boundary`, `reverse` |
 
 `length` and `exactLength` accept only linear geometries (`LineString`, `MultiLineString`), and `area` and `centroid` only polygonal
 ones (`Polygon`, `MultiPolygon`), as do `perimeter`, `exactPerimeter` and `pointOnSurface`; this is enforced at
@@ -483,6 +483,9 @@ double area = pgo.area(sq);                              // 100.0
 double distance = pgo.distance(sq, point(PROJECTED_2D_METER, c(13, 14)));   // 5.0
 Point<C2D> centroid = pgo.centroid(sq);                  // POINT(5 5)
 Geometry<C2D> buffered = pgo.buffer(center, 1.0);        // a polygon approximating a circle
+Geometry<C2D> shrunk = pgo.buffer(sq, -1.0);             // the square shrunk by 1 on each side
+Geometry<C2D> flat = pgo.buffer(linestring(PROJECTED_2D_METER, c(0, 0), c(10, 0)), 1.0,
+        BufferParameters.DEFAULT.withEndCap(EndCap.FLAT));   // the rectangle (0 -1, 10 -1, 10 1, 0 1)
 ```
 
 #### Exact computations
@@ -520,7 +523,10 @@ The exact algorithms are also available directly, in the `org.geolatte.geom.cga`
   geometry (the perimeter of polygons), correctly rounded with `Length.of` or in floating point with
   `Length.fast`;
 - `Overlay` computes the set operations, snap rounded to the double grid or to a fixed `Grid`, and
-  `reducePrecision`.
+  `reducePrecision`;
+- `Buffer` computes the buffer, with the style of `BufferParameters`, as a valid polygon. With round joins it first
+  simplifies the input by 1 % of the distance (`withSimplifyFactor`, 0 to turn it off); the result stays inside the
+  exact buffer.
 
 ```java
 import org.geolatte.geom.cga.*;
@@ -706,8 +712,8 @@ modules. You can also implement the interfaces on your own domain classes.
 
 ## Space-filling curves
 
-The `org.geolatte.geom.curve` package computes Morton codes (also known as Z-order codes) for 2D projected geometries.
-A Morton code labels a node in a QuadTree: a partition of a spatial extent made by recursively dividing it into four
+The `org.geolatte.geom.curve` package computes Morton codes (also known as Z-order codes) for 2D projected
+geometries, and orders points along a Hilbert curve. A Morton code labels a node in a QuadTree: a partition of a spatial extent made by recursively dividing it into four
 equal quadrants. At each level, the quadrants are labelled `0` (lower-left), `1` (upper-left), `2` (lower-right) and
 `3` (upper-right).
 
@@ -731,6 +737,28 @@ morton.envelopeOf("3");                // the upper-right quadrant: (50, 50) - (
 
 The codes have at most `depth` characters. An empty code means the geometry doesn't fit in any single quadrant. The
 methods throw an `IllegalArgumentException` for geometries outside the extent of the context.
+
+`HilbertCurve` maps the cells of a 2<sup>order</sup> × 2<sup>order</sup> grid to their position along a Hilbert
+curve, which visits every cell once and always moves to an adjacent cell. Sorting along it keeps nearby items
+together better than the Morton order, which jumps between quadrants; that helps to bulk load an index, to batch
+spatial work, or to insert points into a triangulation. The exact computations of `org.geolatte.geom.cga` use it
+for their R-trees and triangulations.
+
+```java
+HilbertCurve.index(1, 1, 1);           // 2: the order 1 curve visits (0, 0), (0, 1), (1, 1), (1, 0)
+HilbertCurve.cell(2, 1);               // {1, 1}
+
+// the indices of points, sorted along a curve over their bounding box
+int[] order = HilbertCurve.order(xs, ys);
+
+// or sort a list in place, here geometries by the centre of their envelope
+HilbertCurve.sort(geometries,
+        g -> (g.getEnvelope().lowerLeft().getX() + g.getEnvelope().upperRight().getX()) / 2,
+        g -> (g.getEnvelope().lowerLeft().getY() + g.getEnvelope().upperRight().getY()) / 2);
+```
+
+`order` and `sort` use a grid of 2<sup>16</sup> × 2<sup>16</sup> cells over the bounding box; points in the same
+cell keep their original order. `index` and `cell` take orders up to 31.
 
 ## Spatial index
 

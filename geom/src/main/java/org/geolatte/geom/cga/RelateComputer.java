@@ -3,6 +3,7 @@ package org.geolatte.geom.cga;
 import org.geolatte.geom.SegmentIntersection;
 import org.geolatte.geom.cga.exact.Constructions;
 import org.geolatte.geom.cga.exact.Predicates;
+import org.geolatte.geom.curve.HilbertCurve;
 
 import java.util.*;
 
@@ -168,7 +169,7 @@ final class RelateComputer {
                     px[i] = points.get(i)[0];
                     py[i] = points.get(i)[1];
                 }
-                for (int i : Hilbert.order(px, py)) mcs.add(new MonotoneChain(i, px[i], py[i]));
+                for (int i : HilbertCurve.order(px, py)) mcs.add(new MonotoneChain(i, px[i], py[i]));
             }
             for (int k = 0; k < chains.length; k++) addMonotoneChains(k, chains[k].xs, chains[k].ys, mcs);
             monotone = mcs.toArray(new MonotoneChain[0]);

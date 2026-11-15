@@ -34,6 +34,7 @@ import org.locationtech.jts.precision.GeometryPrecisionReducer;
 import org.locationtech.jts.operation.relate.RelateOp;
 import org.locationtech.jts.operation.union.UnaryUnionOp;
 import org.locationtech.jts.operation.valid.IsValidOp;
+import org.geolatte.geom.cga.BufferParameters;
 import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.crs.CoordinateReferenceSystem;
 import org.geolatte.geom.jts.JTS;
@@ -223,6 +224,36 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
         final BufferOp op = new BufferOp(JTS.to(geometry));
         return JTS.from(op.getResultGeometry(distance), geometry.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation uses JTS {@code BufferOp}, with the parameters mapped by
+     * {@link JTS#toBufferParameters}.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance,
+                                              final BufferParameters parameters) {
+        org.locationtech.jts.geom.Geometry result =
+                BufferOp.bufferOp(JTS.to(geometry), distance, JTS.toBufferParameters(parameters));
+        return JTS.from(result, geometry.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation buffers with JTS {@code BufferOp}, and reduces the result to the precision model of the
+     * grid ({@link JTS#toPrecisionModel(Grid)}) with {@code GeometryPrecisionReducer}.</p>
+     */
+    @Override
+    public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance,
+                                              final BufferParameters parameters, final Grid grid) {
+        if (!grid.isFixed()) return buffer(geometry, distance, parameters);
+        org.locationtech.jts.geom.Geometry result =
+                BufferOp.bufferOp(JTS.to(geometry), distance, JTS.toBufferParameters(parameters));
+        result = GeometryPrecisionReducer.reduce(result, JTS.toPrecisionModel(grid));
+        return JTS.from(result, geometry.getCoordinateReferenceSystem());
     }
 
     @Override

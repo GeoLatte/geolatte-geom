@@ -13,8 +13,9 @@ keeps working without changes, but some results differ, and two interfaces have 
    `boundary`, `convexHull`, `centroid` and `distance` are now exact or correctly rounded, and give different
    results in some cases; `distance` returns NaN for an empty geometry, where it returned 0. `intersection`,
    `union`, `difference` and `symmetricDifference` are exact and snap rounded; they accept geometry collections,
-   keep M, and return typed empty results ([details](#the-default-projectedgeometryoperations-changed)). To keep
-   the old results, use `new JTSGeometryOperations()` explicitly.
+   keep M, and return typed empty results. `buffer` no longer uses JTS; its vertices differ slightly
+   ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
+   `new JTSGeometryOperations()` explicitly.
 3. `LineString.isRing()` now also requires the line string to be simple
    ([details](#linestringisring-requires-simplicity)). Use `isClosed()` for the old meaning.
 4. The predicates of `NumericalMethods` are exact, and reject NaN and infinite coordinates
@@ -56,8 +57,9 @@ It also has new default methods, which implementations inherit:
 
 The interface also has new default methods, which need no implementation: overloads of `intersection`, `union`,
 `difference`, `symmetricDifference` and `unaryUnion` with a `Grid` parameter, and `reducePrecision(g, grid)` (see
-[Fixed grids](#fixed-grids-replace-jts-precision-models)). `JTSGeometryOperations` implements them with JTS
-`OverlayNG`, `UnaryUnionNG` and `GeometryPrecisionReducer`.
+[Fixed grids](#fixed-grids-replace-jts-precision-models)); and overloads of `buffer` with `BufferParameters` and
+with a `Grid` (see [`buffer`](#buffer-is-exact-and-has-a-style)). `JTSGeometryOperations` implements them with JTS
+`OverlayNG`, `UnaryUnionNG`, `GeometryPrecisionReducer` and `BufferOp`.
 
 The six abstract methods only break classes that implement the interface. Callers are not affected. Both
 implementations in the library, `DefaultProjectedGeometryOperations` and `JTSGeometryOperations`, have them. A
@@ -88,7 +90,7 @@ correctly rounded area.
 `length` is computed with `Length.fast`, which sums the same floating point segment lengths in the same order as
 JTS, and gives the same results. The new `exactLength` returns the correctly rounded length.
 
-`reverse` and `buffer` are still delegated to JTS, and behave as before.
+`reverse` is still delegated to JTS, and behaves as before.
 
 `JTSGeometryOperations` itself is unchanged, apart from the new methods. To get the version 1 behaviour for all
 operations, use it directly:
@@ -293,6 +295,49 @@ reciprocal is not a finite decimal (such as 3) is rejected; use `Grid.fixed` wit
 are valid, with every vertex on the grid; parts thinner than a cell are dropped, as in OverlayNG. See
 [Fixed grids](exact-cga.md#overlay).
 
+### `buffer` is exact, and has a style
+
+`buffer` is computed with `org.geolatte.geom.cga.Buffer` instead of JTS `BufferOp`. The arcs are approximated in the
+same way (8 segments per quadrant by default, vertices on the circle), but the noding and the union of the offset
+curves are exact, so the result is always valid. New overloads take the style of the buffer and a grid:
+
+```java
+BufferParameters style = BufferParameters.DEFAULT.withEndCap(EndCap.FLAT).withJoin(Join.MITRE);
+Geometry<C2D> b = ops.buffer(line, 2.5, style);
+Geometry<C2D> onGrid = ops.buffer(line, 2.5, style, Grid.fixed("0.001"));
+```
+
+| JTS `BufferParameters` | geolatte-geom 2 `BufferParameters` |
+|---|---|
+| `setQuadrantSegments(q)` | `withQuadrantSegments(q)` (at least 1) |
+| `CAP_ROUND`, `CAP_FLAT`, `CAP_SQUARE` | `EndCap.ROUND`, `EndCap.FLAT`, `EndCap.SQUARE` |
+| `JOIN_ROUND`, `JOIN_MITRE`, `JOIN_BEVEL` | `Join.ROUND`, `Join.MITRE`, `Join.BEVEL` |
+| `setMitreLimit(m)` | `withMitreLimit(m)` |
+| `setSimplifyFactor(f)` (default 0.01) | `withSimplifyFactor(f)` (default 0.01, at most 0.1; only used with round joins) |
+| `setSingleSided(true)` | not supported |
+| `BufferOp.bufferOp(g, d, params)` | `ops.buffer(g, d, parameters)` or `Buffer.buffer(g, d, parameters)` |
+
+`JTS.toBufferParameters(parameters)` converts them for code that still calls JTS.
+
+The results differ from those of JTS:
+
+- Both simplify the input by 1 % of the distance, but differently. `Buffer` uses exact Douglas-Peucker and
+  offsets a chord that cut off vertices on the inside by d − h, so the result stays inside the exact buffer (and
+  contains everything within d cos(3π / 8q) − 2h); JTS drops only vertices that turn toward the buffer, checks a
+  sample of them, and offsets by d, so it can reach up to h beyond the buffer. JTS also skips offset points that lie
+  very close together. The vertices therefore differ slightly (the areas typically agree to within 0.3 % of the
+  distance × the length of the geometry).
+- A buffer with a negative distance of a `GeometryCollection` unites its polygons first; JTS shrinks overlapping
+  polygons separately.
+- JTS drops the offset curve of a hole that the buffer closes, and with it the mitres of the hole's corners; `Buffer`
+  keeps them, so a mitre at a sharp point of the polygon can reach beyond the hole.
+- JTS can leave a hole in the buffer of a closed line string that crosses itself; `Buffer` does not.
+- Where the input curves more tightly than the distance, JTS joins the offset segments with short "closing segments"
+  near the vertex, which is fast but not guaranteed to cover the buffer. `Buffer` handles those vertices exactly,
+  locally (see the timings in [exact-cga.md](exact-cga.md#buffer)).
+- Z and M are not kept by either; the result has the coordinate reference system of the geometry, with NaN for Z
+  and M if it has them.
+
 ### `isValid` is new
 
 `isValid` follows the Simple Features rules, as JTS `IsValidOp` does, and is exact. `Validity.of(geometry)` also
@@ -396,6 +441,8 @@ The following is new and does not change existing behaviour:
   - `Overlay`: intersection, union, difference, symmetric difference, unary union and precision reduction, on the
     double grid or a fixed `Grid`;
   - `Grid`: the double grid, and fixed grids with a decimal cell size (`Grid.fixed`, `Grid.ofScale`);
+  - `Buffer` and `BufferParameters`: the buffer, with the JTS and PostGIS styles, on the double grid or a fixed
+    `Grid`;
   - `ConvexHull`, `DouglasPeucker` (optionally preserving topology), `DelaunayTriangulation` and
     `VoronoiDiagram`.
 - `LineSegment.classifyIntersection`, `intersects` and `intersection`, with the new `SegmentIntersection` and

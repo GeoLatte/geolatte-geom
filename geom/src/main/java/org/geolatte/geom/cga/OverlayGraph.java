@@ -26,7 +26,7 @@ final class OverlayGraph {
     static final int A = 0, B = 1;
 
     /**
-     * A line or ring of one of the geometries, with the Z and M coordinates of its positions
+     * A line or ring of one of the geometries, with the Z and M coordinates of its positions (null if it has none)
      */
     static final class Input {
         final int geom;
@@ -40,8 +40,8 @@ final class OverlayGraph {
             this.delta = delta;
             this.xs = c[0];
             this.ys = c[1];
-            this.zs = c[2];
-            this.ms = c[3];
+            this.zs = c.length > 2 ? c[2] : null;
+            this.ms = c.length > 2 ? c[3] : null;
         }
     }
 
@@ -190,6 +190,7 @@ final class OverlayGraph {
         boolean hasMeasures = false;
         for (Input in : inputs) {
             vertices += in.xs.length;
+            if (in.zs == null) continue;
             for (int i = 0; i < in.xs.length && !hasMeasures; i++) {
                 hasMeasures = !Double.isNaN(in.zs[i]) || !Double.isNaN(in.ms[i]);
             }
@@ -199,6 +200,7 @@ final class OverlayGraph {
         measures = hasMeasures ? new HashMap<>(2 * vertices) : null;
         if (hasMeasures) {
             for (Input in : inputs) {
+                if (in.zs == null) continue;
                 for (int i = 0; i < in.xs.length; i++) {
                     // a vertex moves to its grid point: the first input vertex there gives the measures
                     Key key = new Key(grid.round(in.xs[i]), grid.round(in.ys[i]));
@@ -241,7 +243,7 @@ final class OverlayGraph {
         Node n = nodeIndex.get(key);
         if (n != null) return n;
         double[] zm = measures == null ? NO_MEASURES : measures.get(key);
-        if (zm == null) zm = interpolate(in, c.origin[v], x, y);
+        if (zm == null) zm = in.zs == null ? NO_MEASURES : interpolate(in, c.origin[v], x, y);
         n = new Node(nodes.size(), x, y, zm[0], zm[1]);
         nodes.add(n);
         nodeIndex.put(key, n);

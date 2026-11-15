@@ -3,6 +3,7 @@ package org.geolatte.geom.cga;
 import org.geolatte.geom.SegmentIntersection;
 import org.geolatte.geom.cga.RelateComputer.MonotoneChain;
 import org.geolatte.geom.cga.exact.Predicates;
+import org.geolatte.geom.curve.HilbertCurve;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,23 @@ final class SegmentContacts {
         for (int k = 0; k < chains.size(); k++) {
             RelateComputer.addMonotoneChains(k, chains.get(k)[0], chains.get(k)[1], list);
         }
-        mcs = list.toArray(new MonotoneChain[0]);
+        MonotoneChain[] array = list.toArray(new MonotoneChain[0]);
+        if (chains.size() > 1) {
+            // the tree groups consecutive monotone chains, so they are taken along a Hilbert curve: the chains need
+            // not lie close to each other, as for many small separate rings
+            int m = array.length;
+            double[] cx = new double[m], cy = new double[m];
+            for (int i = 0; i < m; i++) {
+                MonotoneChain mc = array[i];
+                cx[i] = 0.5 * mc.x(mc.start) + 0.5 * mc.x(mc.end);
+                cy[i] = 0.5 * mc.y(mc.start) + 0.5 * mc.y(mc.end);
+            }
+            int[] order = HilbertCurve.order(cx, cy);
+            MonotoneChain[] sorted = new MonotoneChain[m];
+            for (int i = 0; i < m; i++) sorted[i] = array[order[i]];
+            array = sorted;
+        }
+        mcs = array;
         tree = RelateComputer.tree(mcs);
     }
 

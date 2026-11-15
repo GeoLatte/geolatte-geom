@@ -1,6 +1,7 @@
 package org.geolatte.geom.cga;
 
 import org.geolatte.geom.cga.exact.Predicates;
+import org.geolatte.geom.curve.HilbertCurve;
 
 import java.util.Arrays;
 
@@ -60,7 +61,7 @@ final class Triangulator {
         triangles = new int[0];
         neighbors = new int[0];
         if (n < 3) return false;
-        int[] order = Hilbert.order(xs, ys);
+        int[] order = HilbertCurve.order(xs, ys);
         int a = order[0], b = order[1], first = -1;
         for (int i = 2; i < n; i++) {
             if (orientation(a, b, order[i]) != 0) {

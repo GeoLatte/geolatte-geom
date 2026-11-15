@@ -22,6 +22,7 @@ package org.geolatte.geom;
 
 import org.geolatte.geom.cga.Area;
 import org.geolatte.geom.cga.Boundary;
+import org.geolatte.geom.cga.Buffer;
 import org.geolatte.geom.cga.Centroid;
 import org.geolatte.geom.cga.ConvexHull;
 import org.geolatte.geom.cga.Distance;
@@ -49,9 +50,8 @@ import org.geolatte.geom.cga.Validity;
  * {@code intersection}, {@code union}, {@code difference}, {@code symmetricDifference} and {@code unaryUnion} are
  * computed exactly and snap rounded to the double grid with {@link Overlay}: the results are valid, the operands can
  * be geometry collections, and an empty result is an empty geometry of the dimension of the result. Their overloads
- * with a {@link Grid}, and {@code reducePrecision}, snap round to that grid instead. The other
- * operations ({@code buffer}) do not have an exact implementation yet; they are delegated to a
- * {@link JTSGeometryOperations}.</p>
+ * with a {@link Grid}, and {@code reducePrecision}, snap round to that grid instead. {@code buffer} is computed
+ * with {@link Buffer}: its decisions are exact, and the result is valid.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
@@ -171,7 +171,7 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
 
     @Override
     public <P extends C2D> Geometry<P> buffer(final Geometry<P> geometry, final double distance) {
-        return jts.buffer(geometry, distance);
+        return Buffer.buffer(geometry, distance);
     }
 
     @Override

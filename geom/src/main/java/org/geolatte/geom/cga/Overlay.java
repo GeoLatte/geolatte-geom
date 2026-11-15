@@ -305,7 +305,7 @@ public final class Overlay {
         }
     }
 
-    private static <P extends Position> Geometry<P> empty(int dimension, CoordinateReferenceSystem<P> crs) {
+    static <P extends Position> Geometry<P> empty(int dimension, CoordinateReferenceSystem<P> crs) {
         switch (dimension) {
             case 0:
                 return Geometries.mkEmptyPoint(crs);
@@ -318,7 +318,7 @@ public final class Overlay {
         }
     }
 
-    private static <P extends Position> Geometry<P> build(OverlayResult result, List<double[]> points, int dimension,
+    static <P extends Position> Geometry<P> build(OverlayResult result, List<double[]> points, int dimension,
                                                           CoordinateReferenceSystem<P> crs) {
         PositionFactory<P> factory = new PositionFactory<>(crs);
         List<Polygon<P>> polygons = new ArrayList<>(result.polygons.size());

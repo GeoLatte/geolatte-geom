@@ -13,8 +13,8 @@ A geometry model for Java with:
   Server (`GEOMETRY` and `GEOGRAPHY`), and DB2 (as used by Hibernate Spatial).
 * Pluggable, extendable Geometry operations
 * Exact spatial predicates (DE-9IM), validity and simplicity tests, robust against rounding errors, correctly
-  rounded area, centroid, distance and length, and exact set operations (intersection, union, difference) with snap
-  rounding to the double grid or a fixed precision grid
+  rounded area, centroid, distance and length, and exact set operations (intersection, union, difference) and
+  buffers with snap rounding to the double grid or a fixed precision grid
 * Coordinate reference system aware
 * space filling curves
 

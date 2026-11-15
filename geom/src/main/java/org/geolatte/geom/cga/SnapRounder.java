@@ -2,6 +2,7 @@ package org.geolatte.geom.cga;
 
 import org.geolatte.geom.SegmentIntersection;
 import org.geolatte.geom.cga.exact.RoundingCell;
+import org.geolatte.geom.curve.HilbertCurve;
 
 import java.util.*;
 
@@ -159,13 +160,18 @@ final class SnapRounder {
     private List<Chain> snapAll() {
         double[] minX = new double[hotCount], minY = new double[hotCount];
         double[] maxX = new double[hotCount], maxY = new double[hotCount];
-        for (int h = 0; h < hotCount; h++) {
+        // the tree groups consecutive pixels. The pixels of the vertices are in the order of the chains, which is local
+        // for a single chain; for several chains, which need not lie close to each other (as many small separate
+        // rings), the tree takes them along a Hilbert curve
+        int[] order = chains.size() > 1 ? HilbertCurve.order(hx, hy, hotCount) : null;
+        for (int t = 0; t < hotCount; t++) {
+            int h = order == null ? t : order[t];
             // a box that contains the cell
             double gx = grid.boxHalfWidth(hx[h]), gy = grid.boxHalfWidth(hy[h]);
-            minX[h] = hx[h] - gx;
-            maxX[h] = hx[h] + gx;
-            minY[h] = hy[h] - gy;
-            maxY[h] = hy[h] + gy;
+            minX[t] = hx[h] - gx;
+            maxX[t] = hx[h] + gx;
+            minY[t] = hy[h] - gy;
+            maxY[t] = hy[h] + gy;
         }
         EnvelopeTree tree = new EnvelopeTree(minX, minY, maxX, maxY);
         List<Chain> result = new ArrayList<>(chains.size());
@@ -189,7 +195,8 @@ final class SnapRounder {
                 if (known != null) {
                     for (int h : known) mark[h] = current;
                 }
-                tree.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), h -> {
+                tree.query(Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by), t -> {
+                    int h = order == null ? t : order[t];
                     double px = hx[h], py = hy[h];
                     if ((px == rax && py == ray) || (px == rbx && py == rby)) return;
                     if (mark[h] == current

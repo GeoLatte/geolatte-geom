@@ -3,7 +3,8 @@
 The `org.geolatte.geom.cga.exact` package and the algorithms in `org.geolatte.geom.cga` built on it compute
 geometric results exactly for double precision coordinates. The methods follow H. Ratschek and J. Rokne,
 *Geometric Computations with Interval and New Robust Methods* (Horwood, 2003), complemented by Shewchuk's
-adaptive expansion arithmetic and double-word arithmetic (Joldes, Muller & Popescu).
+adaptive expansion arithmetic and double-word arithmetic (from *Tight and rigorous error bounds for 
+basic building blocks of double-word arithmetic*, Joldes, Muller & Popescu).
 
 Two kinds of guarantee apply:
 
@@ -27,7 +28,7 @@ All predicates take either raw `double` coordinates or `Position`s.
 | `segmentIntersection(a, b, c, d)` | `DISJOINT`, `CROSSING`, `TOUCHING` or `OVERLAPPING` | the four orientations plus the collinear ordering |
 | `compareDistanceToSegment(a, b, p, q)` | whether p or q is nearer to segment ab | exact |
 | `compareDistanceToSegment(a, b, p, double d)` | how the distance from p to ab compares with d | exact |
-| `squaredDistanceToSegment(...)` | an `Interval` enclosing the squared distance | interval arithmetic |
+| `squaredDistanceToSegment(...)` Joldes, Muller & Popescu)| an `Interval` enclosing the squared distance | interval arithmetic |
 | `squaredDistancesToSegment(...)` | the same enclosure for many points at once | fast bulk filter |
 | `dotSign(...)` | exact sign of a dot product | exact |
 | `crossProductSign(a, b, c, d)` | sign of (b − a) × (d − c): compares two directions | error-bound filter → interval → ESSA → BigDecimal |
@@ -460,6 +461,8 @@ rounding). The vertices do not move. The snapped segments are then checked exact
 interior of another snapped segment is inserted into it, and so are the ends of overlapping segments, so that
 the chains share vertices and identical segments. Should two snapped segments still cross, their rounded crossing
 point becomes a hot pixel and the snapping is repeated. That has not happened in any test; it is a safeguard.
+The hot pixels and the monotone chains are packed into their R-trees along a Hilbert curve, so that many small
+separate rings (such as the disks of a buffer of points) stay fast.
 
 **Fixed grids.** `Grid.fixed(size)` takes a decimal cell size g (a `BigDecimal`, a string such as `"0.001"`, or
 a double read as its shortest decimal, so `0.001` is one thousandth); `Grid.ofScale(scale)` takes the number of
@@ -551,6 +554,130 @@ On a millimetre grid (`Grid.fixed("0.001")`), against OverlayNG with the corresp
 
 A fixed grid costs about as much as the double grid.
 
+### `Buffer`
+
+`Buffer.buffer(geometry, distance)` computes the buffer: for a positive distance d the points within d of the
+geometry, for a negative distance the points of its polygons farther than |d| from their boundary (lines and points
+then give nothing), and for 0 the union of its polygons. It backs `buffer` in `DefaultProjectedGeometryOperations`.
+Overloads take `BufferParameters`, the style of JTS and PostGIS (segments per quadrant, round, flat or square end
+caps, round, mitre or bevel joins, mitre limit, simplify factor), and a `Grid`. The result is a `Polygon` or `MultiPolygon`, possibly
+empty, without Z or M.
+
+**Approximation.** Arcs are approximated as in JTS: the arc around a vertex is divided into round(angle / quantum)
+equal parts, with a quantum of π / 2q for q segments per quadrant, and its vertices lie on the circle. With round
+joins and caps the result therefore lies inside the exact buffer, by at most d (1 − cos(3π / 8q)) (0.011 d for
+q = 8). Mitres follow JTS 1.19: the meeting point of the offset lines if it lies within the mitre limit × d of the
+vertex, otherwise a mitre cut off perpendicular to the bisector at that distance, or a bevel if the bevel lies
+farther out.
+
+**Simplification.** With round joins the input is first simplified with tolerance h = simplify factor × |d|
+(0.01 |d| by default, as in JTS; at most 0.1 |d|). That adds at most 2h to the error above, and the result still lies
+inside the exact buffer. Each ring and line is simplified with the exact Douglas-Peucker algorithm: every dropped
+vertex lies within h of the chord that replaces it (decided exactly), so the part of the input that a chord replaces
+lies within h of it and vice versa. The pieces (see below) are built on the simplified path, with arcs of radius d
+around its vertices, which are input vertices. The quadrilateral of a chord keeps depth d if no dropped vertex lies
+on the side away from the buffer: each of its points is then within d of the dropped part, which crosses the normal
+through the point between the chord and the point, or passes within h of the point. Otherwise the quadrilateral has
+depth d − h. So the error of the simplification only appears where vertices were dropped toward the inside, and
+there it is at most 2h: a point within d cos(3π / 8q) − 2h of the input is within d cos(3π / 8q) − h of the
+simplified path. The simplified polygons must be valid with their rings oriented as before (checked exactly; the
+polygon is used as it is otherwise), so the winding number argument holds for them; what simplification cuts off a
+polygon lies within 2h of the simplified boundary, which the pieces cover as long as 2h ≤ (d − h) cos(3π / 8q),
+hence the limit of 0.1. With mitre or bevel joins the corners would change shape, so the input is not simplified;
+with flat or square caps the end segments of a line are kept.
+
+**Method.** Each ring, line and point gives a closed raw offset curve (`OffsetCurve`), whose winding number is
+positive exactly in the buffer. The curves go into the overlay graph of `Overlay` as rings of a single operand; it
+snap rounds them, labels the faces with their winding numbers (the depths of the overlay), and the faces with a
+positive winding number form the result. So no new topology code is involved, the result is valid, and all
+decisions (the kind of each turn, whether offset segments cross, the noding) are exact. The only errors are the
+arc approximation, the rounding of the constructed offset points, and snap rounding.
+
+Why the winding number is right: offset a closed path by d to its right. The pieces
+
+- the quadrilateral (a, a + d m, b + d m, b) of each segment from a to b, with m its right unit normal, and
+- at each left turn (the right side is convex there), the wedge of the join: the vertex plus the arc, mitre or
+  bevel between the two offset endpoints; at the end of a line the cap
+
+each have winding number 1 inside and 0 outside, and their union is the one sided buffer. In the sum of their
+boundaries the sides shared by a quadrilateral and a wedge cancel, and the segments of the path add up to the
+reversed path. What remains, plus the path, is the raw offset curve: the offset segments, joined by the joins at
+left turns and through the vertex at right turns (from the end of one offset segment to the vertex and on to the
+start of the next). Its winding number is the winding number of the path plus the number of pieces that contain the
+point. For a polygon ring oriented with the interior to its left, that is 1 in the polygon plus the pieces: positive
+exactly in the buffer. For a negative distance the reversed ring is offset, into the polygon, and the curve counts
+negatively: 1 in the polygon minus the pieces, positive exactly where the polygon is not covered by pieces. An open
+line is the closed path along the line and back, with caps at both ends; a closed line gives both directions of the
+ring. Since the argument holds for any quadrilaterals and wedges, the rounding of the offset points only perturbs
+the pieces; it does not break it.
+
+At a right turn whose offset segments cross, JTS joins them at the crossing point instead of through the vertex.
+That removes a cycle around the region between the crossing point, the offset endpoints and the vertex. If that
+region lies in both quadrilaterals, the number of pieces there drops from 2 to 1, which is harmless; so the
+shortcut is taken only if each offset endpoint lies in the quadrilateral of the other segment (decided exactly).
+And it is not taken at every vertex of a path: if all vertices took it, a point could lie in as many removed regions
+as in quadrilaterals. That happens when a negative buffer removes a convex polygon completely: with the shortcut
+everywhere, the curve is an inverted copy of the polygon, which JTS has to detect by a separate test.
+
+At a right turn whose offset segments do not cross, the curve passes through the vertex: a spike of length d. Where
+the path curves more tightly than d (dense, noisy or tightly curved input) every vertex has one, and each spike
+crosses the spikes and offset segments around it, so noding the curve as a whole costs time quadratic in d over the
+vertex spacing. Long spikes are therefore handled locally: spikes longer than 4 times an adjacent segment, or whose
+bounding box meets those of more than 8 segments (counted with an R-tree; a short spike is cheaper to leave in the
+curve, and the choice only affects speed). The offset curve splits into the path plus closed curves
+around chunks of consecutive vertices (from the first vertex of the chunk along the offset curve to its last vertex,
+and back along the path); the winding number of a chunk curve is the number of pieces of the chunk that contain the
+point (the shortcut argument holds within a chunk, which takes no shortcut at its ends). Long spikes at most 8
+vertices apart form a group; the chunks of a group (2 long spikes each) are united separately, those unions merged pairwise, and
+the union of the group takes the place of its chunks: the curve follows the path through the group, and the union
+counts once, with the sign of the curve. All terms are non-negative, so the sign of the total does not change. JTS
+instead closes the gap between the offset segments with short "closing segments" near the vertex. That is fast but
+not covered by an argument: put into this curve, they leave out parts of the buffer in about 1 % of random cases (up
+to 9 % of its area); in JTS itself, which also has other steps, misses were only found with fewer than 8
+segments per quadrant, and small.
+
+**Differences from JTS.** JTS also simplifies the input by 1 % of the distance, but only drops vertices that turn
+toward the buffer, checks only a sample of about 10 of the dropped vertices against the tolerance, and then offsets
+by the full distance (so its result can reach up to h beyond the buffer). It also skips offset points that lie very
+close together, and simplifies with every join style. So the vertices differ slightly. JTS also drops the offset curve of a hole
+that the buffer closes, which removes the mitres of the hole (a mitre at a sharp point of a polygon into a hole can
+reach far beyond it); it buffers the overlapping polygons of a collection with a negative distance separately,
+where `Buffer` unites them first; and it can leave a hole in the buffer of a closed line that crosses itself.
+
+**Tests.** Exact areas for points, squares and segments with every join and cap, erosion (an L shape, a square
+until it vanishes), holes that close, merging sides, collections, and fixed grids. On random star polygons with
+holes, random self-crossing open and closed lines, dense lines and point sets, also at projected coordinates, with
+1 to 10 segments per quadrant and distances from 0.05 to 15 of both signs, every result is valid, and an exact
+oracle on sample points confirms that the result contains every point within d cos(3π / 8q) − 2h of the geometry and
+no point farther than d (mirrored for negative distances); the same holds on dense wavy polygons, with and without
+holes, and dense lines with many spikes, with simplify factors from 0 to 0.1. Scratch stress runs of 20,000 random
+and 3,000 dense cases, including unlimited mitres and random simplify factors, found no violation. With all styles, on the cases where JTS follows the definition (see above),
+the area of the symmetric difference with JTS `BufferOp` is below 0.3 % of the distance × the length of the
+geometry. On fixed grids the result is valid, on the grid, and within a cell of the buffer on the double grid.
+
+**Performance.** After warm up, against JTS `BufferOp` with the default parameters:
+
+| Input | `Buffer` | JTS |
+|---|---|---|
+| smooth polygon, 1,000 vertices, d = 1 / 50 / −20 | 3.1 / 6.4 / 1.5 ms | 0.9 / 1.2 / 0.3 ms |
+| smooth polygon, 10,000 vertices, d = 1 / 50 / −20 | 5.1 / 3.8 / 1.4 ms | 0.7 / 2.3 / 0.7 ms |
+| smooth polygon, 100,000 vertices, d = 1 / 50 / −20 | 10.5 / 9.4 / 7.2 ms | 5.8 / 6.6 / 5.0 ms |
+| noisy polygon, 10,000 vertices, d = 1 / 50 / −20 | 23 / 65 / 112 ms | 7.4 / 587 / 222 ms |
+| noisy polygon, 100,000 vertices, d = 1 / 50 / −20 | 1.99 / 0.40 / 0.94 s | 2.59 s / out of memory / out of memory |
+| noisy line, 10,000 vertices 0.6 apart, d = 50 | 141 ms | 2,796 ms |
+| random star polygon, 10,000 vertices, d = 100 | 145 ms | 7,169 ms |
+| 10,000 points, d = 5 | 554 ms | 693 ms |
+
+The smooth polygons have radius about 1,000 with waves of amplitude 200 and 50; the noisy ones add Gaussian noise of
+0.5 to the radius; out of memory is with an 8 GB heap. Timings are indicative (repeated runs vary by up to 20 %).
+The input simplification (factor 0.01, the default) makes the difference on smooth, dense input: without it the
+smooth polygon of 100,000 vertices took 132 / 952 / 107 ms, since every vertex then gives a short offset segment and,
+where the distance is much larger than the curvature radius, a spike. With it, `Buffer` is within a factor of about
+1.5 to 5 of JTS on smooth input; what remains is the cost of the exact overlay. Simplification cannot remove noise
+that is larger than the tolerance (the noisy polygons at d = 1), and there JTS's own simplification does not help
+either. On noisy, dense or jagged input JTS spends its time noding long raw curves, and `Buffer`, which unites the
+spikes locally, is faster.
+
 ## Performance
 
 Indicative timings for 100,000 points:
@@ -620,7 +747,7 @@ There are two kinds of operation, with different guarantees:
 | `Length`, `Perimeter` | **done** | `Length.of`: correctly rounded (`exactLength`, `exactPerimeter`); `Length.fast`: floating point (`length`, `perimeter`) |
 | `Intersection`, `Union`, `Difference`, `SymDifference` (and `unaryUnion`) | **done** | `Overlay`: exact decisions, snap rounded to the double grid or a fixed grid (primitive 7); point set semantics |
 | precision reduction (PostGIS `ST_ReducePrecision`) | **done** | `Overlay.reducePrecision`: snap rounded to a fixed grid, valid |
-| `Buffer` | to do | offset curves followed by a union; the result is an approximation by definition |
+| `Buffer` | **done** | `Buffer`: raw offset curves, united by their winding number in the overlay graph; exact decisions, valid result, arcs approximated as in JTS |
 | `LocateAlong`, `LocateBetween` | existing | could use correctly rounded interpolation; low priority |
 
 ### Primitives
@@ -652,4 +779,4 @@ the overlay.
 2. **Numeric measures**: `Area`, `Centroid`, `Distance` and `Length` are **done**.
 3. **`PointOnSurface`**, **done**.
 4. **Overlay** with snap rounding, **done**.
-5. **`Buffer`**, on top of the overlay: offset curves, followed by a union.
+5. **`Buffer`**, on top of the overlay graph, **done**.

@@ -524,4 +524,41 @@ public class JTS {
         if (size.compareTo(java.math.BigDecimal.ONE) >= 0) return new PrecisionModel(-size.doubleValue());
         return new PrecisionModel(java.math.BigDecimal.ONE.divide(size, java.math.MathContext.DECIMAL64).doubleValue());
     }
+
+    /**
+     * Returns the JTS {@code BufferParameters} for a buffer style: the same number of segments per quadrant, end cap,
+     * join and mitre limit.
+     *
+     * @param parameters the buffer style
+     * @return the corresponding JTS buffer parameters
+     */
+    public static org.locationtech.jts.operation.buffer.BufferParameters toBufferParameters(
+            org.geolatte.geom.cga.BufferParameters parameters) {
+        org.locationtech.jts.operation.buffer.BufferParameters result =
+                new org.locationtech.jts.operation.buffer.BufferParameters();
+        result.setQuadrantSegments(parameters.getQuadrantSegments());
+        switch (parameters.getEndCap()) {
+            case FLAT:
+                result.setEndCapStyle(org.locationtech.jts.operation.buffer.BufferParameters.CAP_FLAT);
+                break;
+            case SQUARE:
+                result.setEndCapStyle(org.locationtech.jts.operation.buffer.BufferParameters.CAP_SQUARE);
+                break;
+            default:
+                result.setEndCapStyle(org.locationtech.jts.operation.buffer.BufferParameters.CAP_ROUND);
+        }
+        switch (parameters.getJoin()) {
+            case MITRE:
+                result.setJoinStyle(org.locationtech.jts.operation.buffer.BufferParameters.JOIN_MITRE);
+                break;
+            case BEVEL:
+                result.setJoinStyle(org.locationtech.jts.operation.buffer.BufferParameters.JOIN_BEVEL);
+                break;
+            default:
+                result.setJoinStyle(org.locationtech.jts.operation.buffer.BufferParameters.JOIN_ROUND);
+        }
+        result.setMitreLimit(parameters.getMitreLimit());
+        result.setSimplifyFactor(parameters.getSimplifyFactor());
+        return result;
+    }
 }

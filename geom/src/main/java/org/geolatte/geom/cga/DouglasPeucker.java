@@ -57,29 +57,38 @@ public final class DouglasPeucker {
         boolean[] keep = new boolean[n];
         if (n == 0) return keep;
         keep[0] = keep[n - 1] = true;
+        simplify(xs, ys, 0, n - 1, tolerance, keep, new double[n], new double[n]);
+        return keep;
+    }
 
+    /**
+     * Simplifies the positions first to last (both kept by the caller): marks the positions in between that are kept
+     *
+     * @param lo work space, at least as long as the coordinates
+     * @param hi work space, at least as long as the coordinates
+     */
+    static void simplify(double[] xs, double[] ys, int first, int last, double tolerance, boolean[] keep,
+                         double[] lo, double[] hi) {
         Interval tolerance2 = Interval.product(tolerance, tolerance);
-        double[] lo = new double[n], hi = new double[n];
         // stack of the index ranges [first, last] that remain to be simplified; recursion would overflow the call
         // stack for long lines. The parts are independent, so the order in which they are processed is irrelevant.
-        int[] stack = new int[2 * n];
+        int[] stack = new int[2 * (last - first + 1)];
         int top = 0;
-        stack[top++] = 0;
-        stack[top++] = n - 1;
+        stack[top++] = first;
+        stack[top++] = last;
         while (top > 0) {
-            int last = stack[--top];
-            int first = stack[--top];
-            if (last - first < 2) continue;
-            int farthest = farthestPosition(xs, ys, first, last, lo, hi);
-            if (!isWithinTolerance(xs, ys, first, last, farthest, lo, hi, tolerance, tolerance2)) {
+            int b = stack[--top];
+            int a = stack[--top];
+            if (b - a < 2) continue;
+            int farthest = farthestPosition(xs, ys, a, b, lo, hi);
+            if (!isWithinTolerance(xs, ys, a, b, farthest, lo, hi, tolerance, tolerance2)) {
                 keep[farthest] = true;
-                stack[top++] = first;
+                stack[top++] = a;
                 stack[top++] = farthest;
                 stack[top++] = farthest;
-                stack[top++] = last;
+                stack[top++] = b;
             }
         }
-        return keep;
     }
 
     /**
