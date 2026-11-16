@@ -503,7 +503,7 @@ public class JTS {
         if (geometry == null) {
             throw new JTSConversionException("Can't convert null geometries.");
         } else {
-            return (CoordinateSequence) geometry.getPositions();
+            return new PositionSequenceCoordinateSequence(geometry.getPositions());
         }
     }
 

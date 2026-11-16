@@ -34,8 +34,8 @@ import java.util.Arrays;
 import static org.geolatte.geom.crs.CoordinateReferenceSystems.*;
 
 /**
- * A <code>CoordinateSequenceFactory</code> that creates <code>PointSequences</code> (which extend
- * <code>CoordinateSequence</code>s).
+ * A <code>CoordinateSequenceFactory</code> that creates JTS views of <code>PositionSequence</code>s (see
+ * {@link PositionSequenceCoordinateSequence}), so that converting the JTS geometries back copies no coordinates.
  *
  * @author Karel Maesen, Geovise BVBA
  *         creation-date: 11/22/11
@@ -52,7 +52,11 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
 
     @Override
     public CoordinateSequence create(CoordinateSequence coordSeq) {
-        return coordSeq;
+        // a view is copied (cheaply, it shares the immutable positions), so that the result can be written to
+        // independently
+        return coordSeq instanceof PositionSequenceCoordinateSequence
+                ? ((PositionSequenceCoordinateSequence) coordSeq).copy()
+                : coordSeq;
     }
 
     @Override
@@ -85,8 +89,11 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
     @SuppressWarnings("unchecked")
     public <P extends Position> PositionSequence<P> toPositionSequence(CoordinateSequence cs, Class<P> posType,
                                                                        CoordinateReferenceSystem<P> crs) {
-        if (cs instanceof PositionSequence && ((PositionSequence) cs).getPositionClass().equals(posType)) {
-            return (PositionSequence<P>) cs;
+        if (cs instanceof PositionSequenceCoordinateSequence) {
+            PositionSequence<?> source = ((PositionSequenceCoordinateSequence) cs).unmodifiedSource();
+            if (source != null && source.getPositionClass().equals(posType)) {
+                return (PositionSequence<P>) source;
+            }
         }
 
         Coordinate c = new Coordinate();
@@ -142,7 +149,7 @@ class PointSequenceCoordinateSequenceFactory implements CoordinateSequenceFactor
             copy(co, ordinates, crs);
             builder.add(ordinates);
         }
-        return (CoordinateSequence) builder.toPositionSequence();
+        return new PositionSequenceCoordinateSequence(builder.toPositionSequence());
     }
 
     private <P extends Position> void copy(Coordinate co, double[] ordinates, CoordinateReferenceSystem<P> crs) {

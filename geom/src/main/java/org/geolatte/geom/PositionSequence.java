@@ -78,6 +78,24 @@ public interface PositionSequence<P extends Position> extends Iterable<P> {
      */
     void getCoordinates(int position, double[] coordinates);
 
+    /**
+     * Returns one coordinate of the position at the specified index, without creating the position.
+     *
+     * @param position the index of the position
+     * @param index    the index of the coordinate, from 0 to the coordinate dimension - 1 (as for
+     *                 {@link Position#getCoordinate(int)})
+     * @return the coordinate
+     * @throws IndexOutOfBoundsException if the position or the coordinate index is out of range
+     */
+    default double getCoordinate(int position, int index) {
+        if (index < 0 || index >= getCoordinateDimension()) {
+            throw new IndexOutOfBoundsException("Coordinate index " + index + " for dimension " + getCoordinateDimension());
+        }
+        double[] coordinates = new double[getCoordinateDimension()];
+        getCoordinates(position, coordinates);
+        return coordinates[index];
+    }
+
     P getPositionN(int index);
 
     default P first() {

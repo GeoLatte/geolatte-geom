@@ -29,6 +29,10 @@ keeps working without changes, but some results differ, and two interfaces have 
    ([details](#empty-members-of-collections-are-kept-in-wkt-and-wkb)).
 8. The unused class `org.geolatte.geom.Circle`, whose API used the JTS `Coordinate`, is removed
    ([details](#orggeolattegeomcircle-is-removed)).
+9. Position sequences no longer implement the JTS `CoordinateSequence`; `JTS.to` gives JTS a copy-on-write view
+   ([details](#position-sequences-are-no-longer-jts-coordinate-sequences)).
+10. JTS is an optional dependency: if you use `JTS.to`/`JTS.from` or `JTSGeometryOperations`, add `jts-core` to
+    your own dependencies ([details](#jts-is-an-optional-dependency)).
 
 ## `ProjectedGeometryOperations` has new methods
 
@@ -439,6 +443,39 @@ The class `org.geolatte.geom.Circle` was not used by the library, and its API wa
 `PrecisionModel`. Use `cga.CircularArcLinearizer` to linearize circular arcs, and `cga.Circle` for the circle
 through three positions.
 
+## Position sequences are no longer JTS coordinate sequences
+
+In version 1 the position sequences of a geometry implemented the JTS `CoordinateSequence`, and `JTS.to` handed
+them to JTS as they were. So JTS code that changed coordinates in place, such as
+`JTS.to(geometry).apply(filter)`, changed the geolatte geometry (and its `equals` and `hashCode`), although
+geometries are immutable. Now `JTS.to` wraps the positions in a view that still copies no coordinates, but copies
+them on the first write. JTS sees the same coordinates as before.
+
+- Code that casts `geometry.getPositions()` to `CoordinateSequence` must use `JTS.to(geometry)` and take the
+  coordinate sequence of the JTS geometry, or read the positions directly. The JTS-only methods (`getX(int)`,
+  `getOrdinate`, `getCoordinate(int)` returning a JTS `Coordinate`, `setOrdinate`, `toCoordinateArray`,
+  `expandEnvelope`, `getMeasures`) are gone from the position sequences; the new
+  `PositionSequence.getCoordinate(position, index)` returns one coordinate without creating a position.
+- Only the `org.geolatte.geom.jts` package and `JTSGeometryOperations` still use JTS: the rest of the library runs
+  without JTS on the class path.
+
+## JTS is an optional dependency
+
+Only the `org.geolatte.geom.jts` package and `JTSGeometryOperations` use JTS; the rest of the library runs without
+JTS on the class path. So `jts-core` is now an optional dependency of `geolatte-geom`, and no longer comes with it.
+If you use `JTS`, `JTSGeometryOperations` or JTS itself, declare it yourself, in a version compatible with the one
+geolatte-geom is built against (1.19.0):
+
+```xml
+<dependency>
+    <groupId>org.locationtech.jts</groupId>
+    <artifactId>jts-core</artifactId>
+    <version>1.19.0</version>
+</dependency>
+```
+
+Without it, these classes fail with a `NoClassDefFoundError` when they are first used.
+
 ## New API
 
 The following is new and does not change existing behaviour:
@@ -469,5 +506,6 @@ The following is new and does not change existing behaviour:
   [manual](manual.md#spatial-index)).
 - `LineString.is3DClosed()`, `MultiLineString.isClosed()` and `is3DClosed()`, and `Linear.getStartPoint()` and
   `getEndPoint()`.
+- `PositionSequence.getCoordinate(position, index)`: one coordinate of a position, without creating the position.
 
 The dependencies are unchanged.

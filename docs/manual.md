@@ -671,6 +671,9 @@ These are mainly used by [Hibernate Spatial](https://hibernate.org/orm/), but ca
 Because JTS has been the dominant geometry library in the Java ecosystem, JTS interoperability has been a major concern.
 The `JTS` class supports conversion from/to JTS `Geometry` instances.
 
+JTS is an optional dependency of geolatte-geom: only the `org.geolatte.geom.jts` package and `JTSGeometryOperations`
+use it. To use them, add `org.locationtech.jts:jts-core` (1.19.0) to your own dependencies.
+
 ```java
 import org.geolatte.geom.jts.JTS;
 
@@ -689,6 +692,10 @@ org.geolatte.geom.Point<G2D> glPnt2 = JTS.from(jtsPoint, WGS84);
   Vertical and measure axes are added when the JTS coordinates have Z or M values.
 - `JTS.from(jtsGeometry, crs)` uses the given coordinate reference system instead.
 - `JTS.to(envelope)` and `JTS.from(jtsEnvelope, crs)` convert between `Envelope` and the JTS `Envelope`.
+- `JTS.to(geometry)` copies no coordinates: the JTS geometry reads them from the positions of the geolatte geometry.
+  When JTS changes coordinates in place (for example `Geometry.apply(CoordinateSequenceFilter)`), the JTS sequence
+  first copies them, so the geolatte geometry never changes. `JTS.from` of a JTS geometry made by `JTS.to` (or by
+  JTS operations through its geometry factory) shares the positions again, unless JTS changed them.
 
 ## Features
 

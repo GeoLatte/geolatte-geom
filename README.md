@@ -22,6 +22,8 @@ The library's geometry model is largely based on the
 [Simple Feature Access (1.2.1) specification](https://portal.ogc.org/files/?artifact_id=25355).
 
 GeoLatte-geom is fully interoperable with [the Java Topology Suite (JTS)](https://github.com/locationtech/jts).
+JTS is an optional dependency: add `org.locationtech.jts:jts-core` to your project to use the conversions in
+`org.geolatte.geom.jts` or `JTSGeometryOperations`.
 
 # Using Geolatte-geom
 

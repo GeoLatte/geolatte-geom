@@ -21,15 +21,12 @@
 
 package org.geolatte.geom;
 
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.*;
-
 import java.io.Serializable;
 
 /**
  * @author Karel Maesen, Geovise BVBA, 2011
  */
-abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, CoordinateSequence, Serializable {
+abstract class AbstractPositionSequence<P extends Position> implements PositionSequence<P>, Serializable {
 
     private static final long serialVersionUID = 6884205871950410216L;
 
@@ -38,16 +35,6 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
     public AbstractPositionSequence(PositionFactory<P> factory) {
         this.factory = factory;
     }
-
-    private static org.locationtech.jts.geom.Coordinate[] toCoordinateArray(AbstractPositionSequence cseq) {
-        org.locationtech.jts.geom.Coordinate[] coordinates = new org.locationtech.jts.geom.Coordinate[cseq.size()];
-        for (int i = 0; i < cseq.size(); i++) {
-            coordinates[i] = cseq.getCoordinate(i);
-
-        }
-        return coordinates;
-    }
-
 
     @SuppressWarnings("unchecked")
     public Class<P> getPositionClass() {
@@ -66,183 +53,15 @@ abstract class AbstractPositionSequence<P extends Position> implements PositionS
         return factory.mkPosition(co);
     }
 
-    /*
-   This overrides the CoordinateSequence notion of dimension
-    */
-    public int getDimension() {
-        return getCoordinateDimension();
-    }
-
     @Override
     public int getCoordinateDimension() {
         return this.factory.getCoordinateDimension();
     }
 
-    /**
-     * Clones a  PointCollection
-     *
-     * <p>This method is defined in the JTS CoordinateSequence interface.
-     *
-     * @return
-     */
     @Override
     public abstract PositionSequence<P> clone();
 
     @Override
-    public int getMeasures() {
-        return factory.hasMComponent() ? 1 : 0;
-    }
-
-    @Override
-    public boolean hasZ() {
-        return factory.hasZComponent();
-    }
-
-    @Override
-    public boolean hasM() {
-        return factory.hasMComponent();
-    }
-
-    @Override
-    public double getZ(int index) {
-        if (hasZ()) {
-            return getOrdinate(index, 2);
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    @Override
-    public double getM(int index) {
-        if (hasM()) {
-            return getOrdinate(index, factory.getMComponentIndex());
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    public org.locationtech.jts.geom.Coordinate getCoordinate(int i) {
-        double[] c = new double[getCoordinateDimension()];
-        getCoordinates(i, c);
-        if (getCoordinateDimension() == 2) {
-            return toCoordinateXY(c);
-        } else if (factory.hasMComponent() && factory.hasZComponent()) {
-            return toCoordinateXYZM(c);
-        } else if (factory.hasZComponent()) {
-            return toCoordinateXYZ(c);
-        } else {
-            return toCoordinateXYM(c);
-        }
-    }
-
-    private CoordinateXY toCoordinateXY(double[] c) {
-        CoordinateXY co = new CoordinateXY();
-        co.setX(c[0]);
-        co.setY(c[1]);
-        return co;
-    }
-
-    private CoordinateXYM toCoordinateXYM(double[] c) {
-        CoordinateXYM co = new CoordinateXYM();
-        co.setX(c[0]);
-        co.setY(c[1]);
-        co.setM(c[2]);
-        return co;
-    }
-
-    private Coordinate toCoordinateXYZ(double[] c) {
-        Coordinate co = new Coordinate();
-        co.setX(c[0]);
-        co.setY(c[1]);
-        co.setZ(c[2]);
-        return co;
-    }
-
-    private CoordinateXYZM toCoordinateXYZM(double[] c) {
-        CoordinateXYZM co = new CoordinateXYZM();
-        co.setX(c[0]);
-        co.setY(c[1]);
-        co.setZ(c[2]);
-        co.setM(c[3]);
-        return co;
-    }
-
-    public org.locationtech.jts.geom.Coordinate getCoordinateCopy(int i) {
-        return getCoordinate(i);
-    }
-
-    @Override
-    public void getCoordinate(int index, org.locationtech.jts.geom.Coordinate coord) {
-        double[] c = new double[getCoordinateDimension()];
-        getCoordinates(index, c);
-        coord.x = c[0];
-        coord.y = c[1];
-    }
-
-    @Override
-    public double getX(int index) {
-        double[] c = new double[getCoordinateDimension()];
-        getCoordinates(index, c);
-        return c[0];
-    }
-
-    @Override
-    public double getY(int index) {
-        double[] c = new double[getCoordinateDimension()];
-        getCoordinates(index, c);
-        return c[1];
-    }
-
-    @Override
-    public double getOrdinate(int i, int ordinateIndex) {
-        double[] c = new double[getCoordinateDimension()];
-        getCoordinates(i, c);
-        if (ordinateIndex < getCoordinateDimension()) {
-            return c[ordinateIndex];
-        } else {
-            throw new IllegalArgumentException("Ordinate index " + ordinateIndex + " is not supported.");
-        }
-    }
-
-    @Override
-    public abstract void setOrdinate(int i, int ordinateIndex, double value);
-
-    @Override
-    public org.locationtech.jts.geom.Coordinate[] toCoordinateArray() {
-        return toCoordinateArray(this);
-    }
-
-    @Override
-    public Envelope expandEnvelope(Envelope envelope) {
-        EnvelopeExpander<P> expander = new EnvelopeExpander<P>(envelope);
-        this.accept(expander);
-        return expander.result();
-    }
-
-
-    @Override
     abstract public void accept(PositionVisitor<P> visitor);
-
-    private static class EnvelopeExpander<P extends Position> implements PositionVisitor<P> {
-
-        final private Envelope env;
-        final double[] buffer = new double[2];
-
-        EnvelopeExpander(Envelope env) {
-            this.env = env;
-        }
-
-        @Override
-        public void visit(P position) {
-
-            double ar[] = position.toArray(buffer);
-            this.env.expandToInclude(ar[0], ar[1]);
-        }
-
-        public Envelope result() {
-            return this.env;
-        }
-
-    }
 
 }

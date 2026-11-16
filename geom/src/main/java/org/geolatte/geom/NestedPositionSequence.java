@@ -21,8 +21,6 @@
 
 package org.geolatte.geom;
 
-import org.locationtech.jts.geom.CoordinateSequence;
-
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -96,37 +94,27 @@ class NestedPositionSequence<P extends Position> extends AbstractPositionSequenc
         return this.size;
     }
 
-    /** @deprecated in {@link org.locationtech.jts.geom.CoordinateSequence }.*/
-    @Deprecated
     @Override
     public NestedPositionSequence<P> clone() {
         return this; //this is correct since this object is immutable.
     }
 
     @Override
-    public NestedPositionSequence<P> copy() {
-        return this; //this is correct since this object is immutable.
-    }
-
-    @Override
-    public void setOrdinate(int position, int ordinateIndex, double value) {
+    public double getCoordinate(int position, int index) {
         int childOffset = position;
-        for (PositionSequence<P> pChild : getChildren()) {
-            CoordinateSequence child = (CoordinateSequence)pChild;
-            if (childOffset < child.size()) {
-                child.setOrdinate(childOffset, ordinateIndex, value);
-                return;
-            } else {
-                childOffset -= child.size();
+        for (PositionSequence<P> child : children) {
+            if (childOffset >= 0 && childOffset < child.size()) {
+                return child.getCoordinate(childOffset, index);
             }
+            childOffset -= child.size();
         }
-        throw new ArrayIndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", position, size()));
+        throw new IndexOutOfBoundsException(String.format("Index %d not found in collection of size %d", position, size()));
     }
 
     @Override
     public void getCoordinates(int position, double[] coordinates) {
         int childOffset = position;
-        for (PositionSequence<P> child : getChildren()) {
+        for (PositionSequence<P> child : children) {
             if (childOffset < child.size()) {
                 child.getCoordinates(childOffset, coordinates);
                 return;

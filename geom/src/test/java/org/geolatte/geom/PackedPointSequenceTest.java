@@ -24,8 +24,6 @@ package org.geolatte.geom;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
 
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.*;
@@ -86,51 +84,6 @@ public class PackedPointSequenceTest {
         assertEquals(3, testSeq3D.getCoordinateDimension());
         assertEquals(3, testSeq2DM.getCoordinateDimension());
         assertEquals(4, testSeq3DM.getCoordinateDimension());
-    }
-
-    @Test
-    public void testGetCoordinate() {
-        // test2D
-        assertEquals(new Coordinate(0, 0), testSeq2D.getCoordinate(0));
-        assertEquals(new Coordinate(1, -1), testSeq2D.getCoordinate(1));
-        assertEquals(new Coordinate(2, -2), testSeq2D.getCoordinate(2));
-
-        assertEquals(new Coordinate(0, 0, 0), testSeq3D.getCoordinate(0));
-        assertEquals(new Coordinate(1, -1, 1), testSeq3D.getCoordinate(1));
-        assertEquals(new Coordinate(2, -2, 2), testSeq3D.getCoordinate(2));
-
-        assertEquals(new Coordinate(0, 0), testSeq2DM.getCoordinate(0));
-        assertEquals(new Coordinate(1, -1), testSeq2DM.getCoordinate(1));
-        assertEquals(new Coordinate(2, -2), testSeq2DM.getCoordinate(2));
-
-        assertEquals(new Coordinate(0, 0, 0), testSeq3DM.getCoordinate(0));
-        assertEquals(new Coordinate(1, -1, 1), testSeq3DM.getCoordinate(1));
-        assertEquals(new Coordinate(2, -2, 2), testSeq3DM.getCoordinate(2));
-
-        try {
-            testSeq2D.getCoordinate(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            testSeq3D.getCoordinate(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            testSeq2DM.getCoordinate(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-        try {
-            testSeq3DM.getCoordinate(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-
     }
 
     @Test
@@ -209,15 +162,6 @@ public class PackedPointSequenceTest {
     }
 
     @Test
-    public void testGetCoordinateCopy() throws Exception {
-        //geom independance: changing returned coordinate does not change sequence.
-        Coordinate co = testSeq2D.getCoordinateCopy(1);
-        co.x = co.x + 1;
-        assertFalse(co.equals(testSeq2D.getCoordinateCopy(1)));
-    }
-
-
-    @Test
     public void testSize() throws Exception {
         assertEquals(3, testSeq2D.size());
         assertEquals(3, testSeq3D.size());
@@ -226,144 +170,6 @@ public class PackedPointSequenceTest {
         assertEquals(0, testEmpty.size());
     }
 
-
-    @Test
-    public void testGetX() {
-        assertEquals(0d, testSeq2D.getX(0), Math.ulp(10d));
-        assertEquals(1d, testSeq2D.getX(1), Math.ulp(10d));
-        assertEquals(2d, testSeq2D.getX(2), Math.ulp(10d));
-        assertEquals(0d, testSeq2DM.getX(0), Math.ulp(10d));
-        assertEquals(1d, testSeq2DM.getX(1), Math.ulp(10d));
-        assertEquals(2d, testSeq2DM.getX(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3D.getX(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3D.getX(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3D.getX(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getX(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getX(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getX(2), Math.ulp(10d));
-
-        try {
-            testSeq3D.getX(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-    }
-
-    @Test
-    public void testGetY() {
-        assertEquals(0d, testSeq2D.getY(0), Math.ulp(10d));
-        assertEquals(-1d, testSeq2D.getY(1), Math.ulp(10d));
-        assertEquals(-2d, testSeq2D.getY(2), Math.ulp(10d));
-        assertEquals(0d, testSeq2DM.getY(0), Math.ulp(10d));
-        assertEquals(-1d, testSeq2DM.getY(1), Math.ulp(10d));
-        assertEquals(-2d, testSeq2DM.getY(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3D.getY(0), Math.ulp(10d));
-        assertEquals(-1d, testSeq3D.getY(1), Math.ulp(10d));
-        assertEquals(-2d, testSeq3D.getY(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getY(0), Math.ulp(10d));
-        assertEquals(-1d, testSeq3DM.getY(1), Math.ulp(10d));
-        assertEquals(-2d, testSeq3DM.getY(2), Math.ulp(10d));
-
-        try {
-            testSeq3D.getY(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-    }
-
-    @Test
-    public void testGetZ() {
-        assertEquals(0d, testSeq3D.getZ(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3D.getZ(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3D.getZ(2), Math.ulp(10d));
-        assertEquals(0d, testSeq3DM.getZ(0), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getZ(1), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getZ(2), Math.ulp(10d));
-
-        try {
-            testSeq3D.getPositionN(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-    }
-
-    @Test
-    public void testGetM() {
-        assertEquals(0d, testSeq2DM.getM(0), Math.ulp(10d));
-        assertEquals(1d, testSeq2DM.getM(1), Math.ulp(10d));
-        assertEquals(2d, testSeq2DM.getM(2), Math.ulp(10d));
-        assertEquals(1d, testSeq3DM.getM(0), Math.ulp(10d));
-        assertEquals(2d, testSeq3DM.getM(1), Math.ulp(10d));
-        assertEquals(3d, testSeq3DM.getM(2), Math.ulp(10d));
-
-        try {
-            testSeq3D.getX(3);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-    }
-
-    @Test
-    public void testGetMeasures() {
-        assertEquals(0, testSeq2D.getMeasures());
-        assertEquals(0, testSeq3D.getMeasures());
-        assertEquals(1, testSeq2DM.getMeasures());
-        assertEquals(1, testSeq3DM.getMeasures());
-    }
-
-    @Test
-    public void testGetOrdinate() {
-
-        for (int i = 0; i < 3; i++) {
-            //X
-            Assert.assertEquals(testSeq2D.getX(i), testSeq2D.getOrdinate(i, CoordinateSequence.X), Math.ulp(10d));
-            Assert.assertEquals(testSeq2DM.getX(i), testSeq2DM.getOrdinate(i, CoordinateSequence.X), Math.ulp(10d));
-            Assert.assertEquals(testSeq3D.getX(i), testSeq3D.getOrdinate(i, CoordinateSequence.X), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getX(i), testSeq3DM.getOrdinate(i, CoordinateSequence.X), Math.ulp(10d));
-
-            //Y
-            Assert.assertEquals(testSeq2D.getY(i), testSeq2D.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
-            Assert.assertEquals(testSeq2DM.getY(i), testSeq2DM.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
-            Assert.assertEquals(testSeq3D.getY(i), testSeq3D.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getY(i), testSeq3DM.getOrdinate(i, CoordinateSequence.Y), Math.ulp(10d));
-
-            //Z
-            Assert.assertEquals(testSeq3D.getPositionN(i).getZ(), testSeq3D.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-            Assert.assertEquals(testSeq3DM.getPositionN(i).getZ(), testSeq3DM.getOrdinate(i, CoordinateSequence.Z), Math.ulp(10d));
-
-            //M
-            Assert.assertEquals(testSeq3DM.getPositionN(i).getM(), testSeq3DM.getOrdinate(i, CoordinateSequence.M), Math.ulp(10d));
-
-
-            try {
-                testSeq2D.getOrdinate(i, 5);
-                fail();
-            } catch (IllegalArgumentException e) {
-                //OK
-            }
-
-        }
-        try {
-            testSeq2D.getOrdinate(2, 5);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-
-        try {
-            testSeq2D.getOrdinate(4, 1);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-            //OK
-        }
-
-        try {
-            testSeq3D.getOrdinate(3, 0);
-            fail();
-        } catch (IndexOutOfBoundsException e) {
-        }
-
-    }
 
     @Test
     public void testEquals() {
@@ -385,11 +191,28 @@ public class PackedPointSequenceTest {
     }
 
     @Test
-    public void testCloneReturnsIndependentCopy() {
-        PositionSequence<?> clone = testSeq2D.clone();
-        ((CoordinateSequence) testSeq2D).setOrdinate(0, 0, 3);
-        assertNotEquals(testSeq2D, clone);
+    public void testGetCoordinateByIndex() {
+        double[] buffer = new double[4];
+        PositionSequence<?>[] sequences = {testSeq2D, testSeq3D, testSeq2DM, testSeq3DM};
+        for (PositionSequence<?> seq : sequences) {
+            for (int i = 0; i < seq.size(); i++) {
+                seq.getCoordinates(i, buffer);
+                for (int k = 0; k < seq.getCoordinateDimension(); k++) {
+                    assertEquals(buffer[k], seq.getCoordinate(i, k), 0);
+                }
+            }
+            assertThrows(IndexOutOfBoundsException.class, () -> seq.getCoordinate(3, 0));
+            assertThrows(IndexOutOfBoundsException.class, () -> seq.getCoordinate(-1, 0));
+            assertThrows(IndexOutOfBoundsException.class, () -> seq.getCoordinate(0, seq.getCoordinateDimension()));
+        }
+        assertThrows(IndexOutOfBoundsException.class, () -> testEmpty.getCoordinate(0, 0));
     }
 
+    @Test
+    public void testCloneReturnsEqualSequence() {
+        PositionSequence<?> clone = testSeq2D.clone();
+        assertEquals(testSeq2D, clone);
+        assertNotSame(testSeq2D, clone);
+    }
 
 }

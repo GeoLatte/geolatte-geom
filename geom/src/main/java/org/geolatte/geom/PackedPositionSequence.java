@@ -91,22 +91,21 @@ class PackedPositionSequence<P extends Position> extends AbstractPositionSequenc
         return new PositionSequenceIterator<P>(this);
     }
 
-    /** @deprecated in {@link org.locationtech.jts.geom.CoordinateSequence }.*/
-    @Deprecated
     @Override
     public PositionSequence<P> clone() {
         return new PackedPositionSequence<>(getPositionFactory(), Arrays.copyOf(this.coordinates, this.coordinates.length));
     }
 
     @Override
-    public PackedPositionSequence<P> copy() {
-        return new PackedPositionSequence<>(getPositionFactory(), Arrays.copyOf(this.coordinates, this.coordinates.length));
-    }
-
-    @Override
-    public void setOrdinate(int index, int ordinateIndex, double value) {
+    public double getCoordinate(int position, int index) {
         int dim = getCoordinateDimension();
-        this.coordinates[index * dim + ordinateIndex] = value;
+        if (index < 0 || index >= dim) {
+            throw new IndexOutOfBoundsException("Coordinate index " + index + " for dimension " + dim);
+        }
+        if (position < 0 || position >= size()) {
+            throw new IndexOutOfBoundsException("Position " + position + " in a sequence of size " + size());
+        }
+        return this.coordinates[position * dim + index];
     }
 
     @Override
