@@ -30,6 +30,7 @@ import org.geolatte.geom.cga.Grid;
 import org.geolatte.geom.cga.Length;
 import org.geolatte.geom.cga.Overlay;
 import org.geolatte.geom.cga.Relate;
+import org.geolatte.geom.cga.Reverse;
 import org.geolatte.geom.cga.Simplicity;
 import org.geolatte.geom.cga.Validity;
 
@@ -51,7 +52,8 @@ import org.geolatte.geom.cga.Validity;
  * computed exactly and snap rounded to the double grid with {@link Overlay}: the results are valid, the operands can
  * be geometry collections, and an empty result is an empty geometry of the dimension of the result. Their overloads
  * with a {@link Grid}, and {@code reducePrecision}, snap round to that grid instead. {@code buffer} is computed
- * with {@link Buffer}: its decisions are exact, and the result is valid.</p>
+ * with {@link Buffer}: its decisions are exact, and the result is valid. {@code reverse} is computed with
+ * {@link Reverse}. No operation uses JTS.</p>
  *
  * <p>As in {@link JTSGeometryOperations}, a predicate with an empty operand is false, except {@code disjoint},
  * which is the negation of {@code intersects}, and {@code equalsTopologically}, which is true for two empty
@@ -59,9 +61,6 @@ import org.geolatte.geom.cga.Validity;
  * operands must have the same coordinate reference system.</p>
  */
 public class DefaultProjectedGeometryOperations implements ProjectedGeometryOperations {
-
-    // the operations that are not (yet) computed exactly
-    private final ProjectedGeometryOperations jts = new JTSGeometryOperations();
 
     private static void checkCompatibleCRS(Geometry<?> geometry, Geometry<?> other) {
         if (!geometry.getCoordinateReferenceSystem().equals(other.getCoordinateReferenceSystem())) {
@@ -153,13 +152,9 @@ public class DefaultProjectedGeometryOperations implements ProjectedGeometryOper
         return Boundary.of(geometry);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
-    // delegated to JTS
-    // ---------------------------------------------------------------------------------------------------------
-
     @Override
     public <P extends C2D, G extends Geometry<P>> G reverse(final G geometry) {
-        return jts.reverse(geometry);
+        return Reverse.of(geometry);
     }
 
     @Override

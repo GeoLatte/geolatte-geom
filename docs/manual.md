@@ -415,9 +415,8 @@ You get an implementation from the `GeometryOperations` factory class. For proje
   [Exact computations](#exact-computations)). It computes the set operations (`intersection`, `union`,
   `difference`, `symmetricDifference` and `unaryUnion`) exactly, with the result snap rounded to the double grid,
   or to a fixed grid (and `reducePrecision`), and `buffer` with exact noding, so its result is always valid.
-  `area`, `length` and `perimeter` are computed in plain floating point. It delegates `reverse` to
-  [JTS](#jts-interop).
-- `JTSGeometryOperations` delegates all operations to JTS. Create one with `new JTSGeometryOperations()` if you
+  `area`, `length` and `perimeter` are computed in plain floating point. It does not use JTS.
+- `JTSGeometryOperations` delegates the operations to JTS (`reverse` excepted, which needs no JTS). Create one with `new JTSGeometryOperations()` if you
   need the results of version 1 (see [Migrating from version 1](migration.md)).
 
 ### Operations on projected geometries

@@ -13,8 +13,8 @@ keeps working without changes, but some results differ, and two interfaces have 
    `boundary`, `convexHull`, `centroid` and `distance` are now exact or correctly rounded, and give different
    results in some cases; `distance` returns NaN for an empty geometry, where it returned 0. `intersection`,
    `union`, `difference` and `symmetricDifference` are exact and snap rounded; they accept geometry collections,
-   keep M, and return typed empty results. `buffer` no longer uses JTS; its vertices differ slightly
-   ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
+   keep M, and return typed empty results. `buffer` no longer uses JTS; its vertices differ slightly. No operation
+   uses JTS any more ([details](#the-default-projectedgeometryoperations-changed)). To keep the old results, use
    `new JTSGeometryOperations()` explicitly.
 3. `LineString.isRing()` now also requires the line string to be simple
    ([details](#linestringisring-requires-simplicity)). Use `isClosed()` for the old meaning.
@@ -27,6 +27,8 @@ keeps working without changes, but some results differ, and two interfaces have 
    ([details](#closedness-and-linear-rings)).
 7. The WKT and WKB codecs keep empty members of collections
    ([details](#empty-members-of-collections-are-kept-in-wkt-and-wkb)).
+8. The unused class `org.geolatte.geom.Circle`, whose API used the JTS `Coordinate`, is removed
+   ([details](#orggeolattegeomcircle-is-removed)).
 
 ## `ProjectedGeometryOperations` has new methods
 
@@ -90,7 +92,8 @@ correctly rounded area.
 `length` is computed with `Length.fast`, which sums the same floating point segment lengths in the same order as
 JTS, and gives the same results. The new `exactLength` returns the correctly rounded length.
 
-`reverse` is still delegated to JTS, and behaves as before.
+`reverse` no longer goes through `JTSGeometryOperations`, and keeps the exterior ring of a polygon first
+([details](#reverse-keeps-the-exterior-ring-of-a-polygon-first)).
 
 `JTSGeometryOperations` itself is unchanged, apart from the new methods. To get the version 1 behaviour for all
 operations, use it directly:
@@ -343,6 +346,15 @@ The results differ from those of JTS:
 `isValid` follows the Simple Features rules, as JTS `IsValidOp` does, and is exact. `Validity.of(geometry)` also
 reports the first problem found and its location.
 
+### `reverse` keeps the exterior ring of a polygon first
+
+`reverse` (now `cga.Reverse`, in both implementations; it never used JTS) reverses the positions of each ring of a
+polygon and keeps the exterior ring first. In version 1 it also reversed the order of the rings, so a polygon with
+holes came back with a hole as its exterior ring. Collections still get their elements in reverse order.
+
+The SQL Server encoder, `Encoders.encode(geometry, true)`, now decides validity with the exact `cga.Validity`
+instead of JTS, so it only marks a geometry differently where JTS got the validity wrong.
+
 ## `LineString.isRing()` requires simplicity
 
 `LineString.isRing()` now follows `ST_IsRing`: a ring is a line string that is closed **and simple**. In version 1
@@ -420,6 +432,12 @@ coordinates near (150000, 200000)). The results only change where the old ones w
 
 These methods are also used by the Oracle SDO encoder (to orient the rings of polygons) and by the linearization of
 circular arcs. Both now orient nearly degenerate rings and arcs correctly.
+
+## `org.geolatte.geom.Circle` is removed
+
+The class `org.geolatte.geom.Circle` was not used by the library, and its API was built on the JTS `Coordinate` and
+`PrecisionModel`. Use `cga.CircularArcLinearizer` to linearize circular arcs, and `cga.Circle` for the circle
+through three positions.
 
 ## New API
 

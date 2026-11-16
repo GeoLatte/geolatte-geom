@@ -3,7 +3,6 @@ package org.geolatte.geom.cga;
 import org.geolatte.geom.*;
 import org.geolatte.geom.cga.exact.Interval;
 import org.geolatte.geom.cga.exact.Predicates;
-import org.locationtech.jts.geom.Envelope;
 
 import java.util.*;
 
@@ -83,13 +82,13 @@ final class TopologyPreservingSimplification {
     static final class Segment {
         final Component component;
         final int start, end;
-        final Envelope envelope;
+        final Box envelope;
 
         Segment(Component component, int start, int end) {
             this.component = component;
             this.start = start;
             this.end = end;
-            this.envelope = new Envelope(component.xs[start], component.xs[end], component.ys[start], component.ys[end]);
+            this.envelope = new Box(component.xs[start], component.xs[end], component.ys[start], component.ys[end]);
         }
 
         // is this one of the segments of the section (i, k) of the component?
@@ -130,7 +129,7 @@ final class TopologyPreservingSimplification {
     }
 
     private void buildIndex() {
-        Envelope extent = new Envelope();
+        Box extent = new Box();
         int count = 0;
         for (Component c : components) {
             for (Segment s : c.segments) extent.expandToInclude(s.envelope);
@@ -226,7 +225,7 @@ final class TopologyPreservingSimplification {
         Segment replacement = new Segment(c, i, k);
 
         // 1. contacts with the new segment, and with the section
-        Envelope sectionEnvelope = new Envelope(replacement.envelope);
+        Box sectionEnvelope = new Box(replacement.envelope);
         for (int m = i + 1; m < k; m++) {
             sectionEnvelope.expandToInclude(xs[m], ys[m]);
         }
@@ -277,12 +276,12 @@ final class TopologyPreservingSimplification {
         int a = 0, b = 0;
         while (a < section.length || b < others.length) {
             boolean fromSection = b == others.length
-                    || (a < section.length && section[a].envelope.getMinX() <= others[b].envelope.getMinX());
+                    || (a < section.length && section[a].envelope.minX <= others[b].envelope.minX);
             Segment next = fromSection ? section[a++] : others[b++];
             List<Segment> active = fromSection ? activeOthers : activeSection;
             for (int j = active.size() - 1; j >= 0; j--) {
                 Segment o = active.get(j);
-                if (o.envelope.getMaxX() < next.envelope.getMinX()) {
+                if (o.envelope.maxX < next.envelope.minX) {
                     // no later segment overlaps o in X
                     active.set(j, active.get(active.size() - 1));
                     active.remove(active.size() - 1);
@@ -298,10 +297,10 @@ final class TopologyPreservingSimplification {
         return true;
     }
 
-    private static final Comparator<Segment> BY_MIN_X = Comparator.comparingDouble(s -> s.envelope.getMinX());
+    private static final Comparator<Segment> BY_MIN_X = Comparator.comparingDouble(s -> s.envelope.minX);
 
     // the indexed segments whose envelope intersects the envelope, except those of the section (i, k)
-    private List<Segment> query(Envelope envelope, Component c, int i, int k) {
+    private List<Segment> query(Box envelope, Component c, int i, int k) {
         List<Segment> result = new ArrayList<>();
         index.query(envelope, t -> {
             if (!t.isIn(c, i, k)) result.add(t);
@@ -382,12 +381,12 @@ final class TopologyPreservingSimplification {
         private final double h0;      // halved cell size of level 0
         private final List<Map<Long, List<Segment>>> levels = new ArrayList<>();
 
-        SegmentIndex(Envelope extent, int count) {
-            this.x0 = extent.isNull() ? 0 : 0.5 * extent.getMinX();
-            this.y0 = extent.isNull() ? 0 : 0.5 * extent.getMinY();
+        SegmentIndex(Box extent, int count) {
+            this.x0 = extent.isNull() ? 0 : 0.5 * extent.minX;
+            this.y0 = extent.isNull() ? 0 : 0.5 * extent.minY;
             // a cell size at which the segments would be evenly spread over the cells
-            double w = extent.isNull() ? 0 : halfDifference(extent.getMaxX(), extent.getMinX());
-            double h = extent.isNull() ? 0 : halfDifference(extent.getMaxY(), extent.getMinY());
+            double w = extent.isNull() ? 0 : halfDifference(extent.maxX, extent.minX);
+            double h = extent.isNull() ? 0 : halfDifference(extent.maxY, extent.minY);
             int n = Math.max(count, 1);
             double size = w > 0 && h > 0 ? Math.sqrt(w / n) * Math.sqrt(h) : Math.max(w, h) / n;
             this.h0 = size > 0 ? size : 1;
@@ -398,8 +397,8 @@ final class TopologyPreservingSimplification {
             while (levels.size() <= level) levels.add(new HashMap<>());
             Map<Long, List<Segment>> grid = levels.get(level);
             double h = cellSize(level);
-            for (long cx = cell(s.envelope.getMinX(), x0, h); cx <= cell(s.envelope.getMaxX(), x0, h); cx++) {
-                for (long cy = cell(s.envelope.getMinY(), y0, h); cy <= cell(s.envelope.getMaxY(), y0, h); cy++) {
+            for (long cx = cell(s.envelope.minX, x0, h); cx <= cell(s.envelope.maxX, x0, h); cx++) {
+                for (long cy = cell(s.envelope.minY, y0, h); cy <= cell(s.envelope.maxY, y0, h); cy++) {
                     grid.computeIfAbsent(key(cx, cy), key -> new ArrayList<>(4)).add(s);
                 }
             }
@@ -409,8 +408,8 @@ final class TopologyPreservingSimplification {
             int level = level(s.envelope);
             Map<Long, List<Segment>> grid = levels.get(level);
             double h = cellSize(level);
-            for (long cx = cell(s.envelope.getMinX(), x0, h); cx <= cell(s.envelope.getMaxX(), x0, h); cx++) {
-                for (long cy = cell(s.envelope.getMinY(), y0, h); cy <= cell(s.envelope.getMaxY(), y0, h); cy++) {
+            for (long cx = cell(s.envelope.minX, x0, h); cx <= cell(s.envelope.maxX, x0, h); cx++) {
+                for (long cy = cell(s.envelope.minY, y0, h); cy <= cell(s.envelope.maxY, y0, h); cy++) {
                     Long key = key(cx, cy);
                     List<Segment> cell = grid.get(key);
                     cell.remove(s);
@@ -422,13 +421,13 @@ final class TopologyPreservingSimplification {
         /**
          * Passes each segment whose envelope intersects the envelope to the consumer, once.
          */
-        void query(Envelope envelope, java.util.function.Consumer<Segment> consumer) {
+        void query(Box envelope, java.util.function.Consumer<Segment> consumer) {
             for (int level = 0; level < levels.size(); level++) {
                 Map<Long, List<Segment>> grid = levels.get(level);
                 if (grid.isEmpty()) continue;
                 double h = cellSize(level);
-                long qx0 = cell(envelope.getMinX(), x0, h), qx1 = cell(envelope.getMaxX(), x0, h);
-                long qy0 = cell(envelope.getMinY(), y0, h), qy1 = cell(envelope.getMaxY(), y0, h);
+                long qx0 = cell(envelope.minX, x0, h), qx1 = cell(envelope.maxX, x0, h);
+                long qy0 = cell(envelope.minY, y0, h), qy1 = cell(envelope.maxY, y0, h);
                 if ((qx1 - qx0 + 1) * (qy1 - qy0 + 1) > grid.size()) {
                     for (Map.Entry<Long, List<Segment>> e : grid.entrySet()) {
                         long key = e.getKey();
@@ -447,20 +446,20 @@ final class TopologyPreservingSimplification {
 
         // reports the segments of cell (cx, cy) that intersect the envelope. A segment that is stored in several
         // cells is only reported in the first cell (smallest cx and cy) that it shares with the query.
-        private void report(List<Segment> cell, Envelope envelope, long cx, long cy, long qx0, long qy0, double h,
+        private void report(List<Segment> cell, Box envelope, long cx, long cy, long qx0, long qy0, double h,
                             java.util.function.Consumer<Segment> consumer) {
             for (Segment s : cell) {
                 if (!s.envelope.intersects(envelope)) continue;
-                if (cx == Math.max(cell(s.envelope.getMinX(), x0, h), qx0)
-                        && cy == Math.max(cell(s.envelope.getMinY(), y0, h), qy0)) {
+                if (cx == Math.max(cell(s.envelope.minX, x0, h), qx0)
+                        && cy == Math.max(cell(s.envelope.minY, y0, h), qy0)) {
                     consumer.accept(s);
                 }
             }
         }
 
         // the smallest level whose cell size is at least the (halved) extent of the envelope
-        private int level(Envelope e) {
-            double extent = Math.max(halfDifference(e.getMaxX(), e.getMinX()), halfDifference(e.getMaxY(), e.getMinY()));
+        private int level(Box e) {
+            double extent = Math.max(halfDifference(e.maxX, e.minX), halfDifference(e.maxY, e.minY));
             if (extent <= h0) return 0;
             int level = Math.max(0, Math.getExponent(extent) - Math.getExponent(h0));
             while (cellSize(level) < extent) level++;
@@ -487,6 +486,67 @@ final class TopologyPreservingSimplification {
 
         private static long key(long cx, long cy) {
             return (cx << 32) | (cy & 0xffffffffL);
+        }
+    }
+
+    /**
+     * A mutable axis-aligned bounding box; empty until it includes a point.
+     */
+    static final class Box {
+        double minX = 0, minY = 0, maxX = -1, maxY = -1;
+
+        Box() {
+        }
+
+        // the box of two corners (x1, y1) and (x2, y2), in any order
+        Box(double x1, double x2, double y1, double y2) {
+            minX = Math.min(x1, x2);
+            maxX = Math.max(x1, x2);
+            minY = Math.min(y1, y2);
+            maxY = Math.max(y1, y2);
+        }
+
+        Box(Box other) {
+            minX = other.minX;
+            minY = other.minY;
+            maxX = other.maxX;
+            maxY = other.maxY;
+        }
+
+        boolean isNull() {
+            return maxX < minX;
+        }
+
+        void expandToInclude(double x, double y) {
+            if (isNull()) {
+                minX = maxX = x;
+                minY = maxY = y;
+            } else {
+                minX = Math.min(minX, x);
+                maxX = Math.max(maxX, x);
+                minY = Math.min(minY, y);
+                maxY = Math.max(maxY, y);
+            }
+        }
+
+        void expandToInclude(Box other) {
+            if (other.isNull()) return;
+            if (isNull()) {
+                minX = other.minX;
+                minY = other.minY;
+                maxX = other.maxX;
+                maxY = other.maxY;
+            } else {
+                minX = Math.min(minX, other.minX);
+                maxX = Math.max(maxX, other.maxX);
+                minY = Math.min(minY, other.minY);
+                maxY = Math.max(maxY, other.maxY);
+            }
+        }
+
+        boolean intersects(Box other) {
+            return !isNull() && !other.isNull() && other.minX <= maxX && other.maxX >= minX
+                    && other.minY <= maxY && other.maxY >= minY;
         }
     }
 }

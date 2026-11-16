@@ -7,7 +7,6 @@ import org.geolatte.geom.cga.TopologyPreservingSimplification.Component;
 import org.geolatte.geom.cga.TopologyPreservingSimplification.Segment;
 import org.geolatte.geom.cga.TopologyPreservingSimplification.SegmentIndex;
 import org.junit.Test;
-import org.locationtech.jts.geom.Envelope;
 
 import java.util.*;
 
@@ -43,7 +42,7 @@ public class SegmentIndexTest {
             if (random.nextInt(20) == 0) j = i;                             // and some points
             segments.add(new Segment(c, Math.min(i, j), Math.max(i, j)));
         }
-        Envelope extent = new Envelope();
+        TopologyPreservingSimplification.Box extent = new TopologyPreservingSimplification.Box();
         for (Segment s : segments) extent.expandToInclude(s.envelope);
         SegmentIndex index = new SegmentIndex(extent, segments.size() / 3);
         for (Segment s : segments) index.insert(s);
@@ -61,7 +60,7 @@ public class SegmentIndexTest {
             double x = offset + random.nextDouble() * 120 * scale - 10 * scale;
             double y = offset + random.nextDouble() * 120 * scale - 10 * scale;
             double size = random.nextInt(4) == 0 ? 0 : Math.pow(10, random.nextDouble() * 3 - 1) * scale;
-            Envelope envelope = new Envelope(x, x + size, y, y + size * random.nextDouble());
+            TopologyPreservingSimplification.Box envelope = new TopologyPreservingSimplification.Box(x, x + size, y, y + size * random.nextDouble());
             Set<Segment> expected = Collections.newSetFromMap(new IdentityHashMap<>());
             for (Segment s : present) {
                 if (s.envelope.intersects(envelope)) expected.add(s);

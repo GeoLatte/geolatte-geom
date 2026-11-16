@@ -87,38 +87,12 @@ public class JTSGeometryOperations implements ProjectedGeometryOperations {
     }
 
     /**
-     * Creates a <code>Geometry</code> having as coordinates the coordinates of the input <code>Geometry</code> in reverse order.
-     *
-     * @param geometry the <code>Geometry</code> to reverse
-     * @return a <code>Geometry</code> with the same coordinates as the specified input <code>Geometry</code> but in reverse order
+     * Reverses the geometry with {@link org.geolatte.geom.cga.Reverse}, as {@link DefaultProjectedGeometryOperations}
+     * does: this needs no JTS.
      */
     @Override
     public <P extends C2D, G extends Geometry<P>> G reverse(G geometry) {
-        PositionSequence<P> pos = geometry.getPositions().reverse();
-        if (geometry instanceof Simple) {
-            return (G)Geometries.mkGeometry((Class<? extends Simple>)geometry.getClass(), pos, geometry.getCoordinateReferenceSystem());
-        } else {
-            Complex<P, ?> complex = (Complex<P, ?>) geometry;
-            Geometry<P>[] geoms = complex.components();
-            reverseOrder(reverseAll(geoms));
-            return (G)Geometries.mkGeometry((Class<? extends Complex>)geometry.getClass(), geoms);
-        }
-    }
-
-    private <P extends C2D> Geometry<P>[] reverseAll(Geometry<P>[] components) {
-        for (int i = 0; i < components.length; i++) {
-            components[i] = reverse(components[i]);
-        }
-        return components;
-    }
-
-    private <P extends C2D> Geometry<P>[]  reverseOrder(Geometry<P>[] components) {
-        for (int i = 0; i < components.length / 2; i++) {
-            Geometry<P> h = components[i];
-            components[i] = components[components.length - 1 - i];
-            components[components.length - 1 - i] = h;
-        }
-        return components;
+        return org.geolatte.geom.cga.Reverse.of(geometry);
     }
 
     @Override

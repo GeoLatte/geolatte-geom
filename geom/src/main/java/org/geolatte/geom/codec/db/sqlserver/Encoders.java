@@ -23,13 +23,13 @@ package org.geolatte.geom.codec.db.sqlserver;
 
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.db.Encoder;
-import org.geolatte.geom.jts.JTS;
+import org.geolatte.geom.cga.Validity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Serializes a JTS <code>Geometry</code> to a byte-array.
+ * Serializes a <code>Geometry</code> to a byte-array.
  *
  * @author Karel Maesen, Geovise BVBA.
  */
@@ -74,8 +74,8 @@ public class Encoders {
      * Serializes the geometry.
      *
      * <p>SQL Server marks invalid geometries in their serialization. When <code>checkValidity</code> is true, the
-     * geometry is only marked as valid if it is valid according to JTS. When false, the geometry is always marked
-     * as valid, so the caller must ensure it is.
+     * geometry is only marked as valid if it is valid according to {@link Validity} (decided exactly, on the
+     * coordinates in the plane). When false, the geometry is always marked as valid, so the caller must ensure it is.
      *
      * @param geom          the geometry to serialize
      * @param checkValidity whether to check the validity of the geometry
@@ -84,7 +84,7 @@ public class Encoders {
     public static byte[] encode(Geometry<?> geom, boolean checkValidity) {
         Encoder<SqlServerGeometry> encoder = encoderFor(geom);
         SqlServerGeometry sqlServerGeometry = encoder.encode(geom);
-        if (checkValidity && !JTS.to(geom).isValid()) {
+        if (checkValidity && !Validity.isValid(geom)) {
             sqlServerGeometry.clearIsValid();
         }
         return SqlServerGeometry.serialize(sqlServerGeometry);
